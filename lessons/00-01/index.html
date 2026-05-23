@@ -11,69 +11,162 @@
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-01</span>
 <span><a href="../../">目录</a> &nbsp; <a href="../00-02/">下一课 →</a></span></nav>
 <div class="container">
+
 <h1>00-01 标量、向量、矩阵、张量</h1>
 
-<p>深度学习中每一个数字都有形状。这节课把四种数据结构看清楚。</p>
+<p>深度学习里每一片数据都有形状。这四个人名不是随便叫的——它们是从零维到高维的四级台阶。把这四级踩实了，后面所有矩阵运算、梯度传播、张量操作一看就懂。</p>
 
-<h2>一、标量 Scalar</h2>
-<p>一个单独的数。温度 25°C、损失值 0.37、学习率 0.001——都是标量。</p>
-<p>形状：<code>()</code>——空括号，零维。在 numpy 里是 <code>np.array(3.14)</code>。</p>
+<hr>
 
-<h2>二、向量 Vector</h2>
-<p><strong>几何直觉：空间里的一根箭头。</strong></p>
-<p>$\mathbf{v} = [v_1, v_2, v_3]$ 是从原点到 $(v_1, v_2, v_3)$ 的箭头。长度 = 箭头的模，方向 = 箭头指哪。</p>
-<p>形状：<code>(n,)</code>——一维。比如一个 3 维词向量：<code>np.array([0.2, -0.5, 0.8])</code>。</p>
+<h2>一、标量 Scalar — 一个数</h2>
+
+<p><strong>就是你脑子里的「一个数字」。</strong></p>
+
+<p>温度 25°C、损失值 0.37、学习率 0.001——都是标量。标量没有方向、没有形状，就是一个孤零零的数。
+
+在 numpy 里怎么写？</p>
+
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np  <span class="hl-comment"># numpy：Python 做数学运算的核心库</span>
+
+s = np.array(<span class="hl-number">3.14</span>)    <span class="hl-comment"># np.array() 把 Python 数字变成 numpy 数组</span>
+                       <span class="hl-comment"># 3.14 是 Python 的 float，包一层 np.array 后变成 numpy 标量</span>
+<span class="hl-builtin">print</span>(s)               <span class="hl-comment"># 输出: 3.14</span>
+<span class="hl-builtin">print</span>(s.shape)          <span class="hl-comment"># 输出: () —— 空括号，表示零维</span>
+                       <span class="hl-comment"># .shape 是每个 numpy 数组都有的属性，告诉你「几行几列」</span>
+                       <span class="hl-comment"># 标量没有行也没有列，所以 shape 是空元组 ()</span></code></pre>
+
+<p>标量是最简单的——它就是起点。但深度学习里很少单独用标量。一个标量要跟一千个标量一起算，怎么同时管一千个数？答案就是向量。</p>
+
+<hr>
+
+<h2>二、向量 Vector — 一排数 = 一根箭头</h2>
+
+<p><strong>把一堆数排成一行（或一列），就是向量。</strong>比如一个学生的三门成绩：$[85, 92, 78]$。</p>
+
+<p>但这只是「写法」。向量的真身是<strong>空间里的一根箭头</strong>：从原点 $(0,0,0)$ 出发，指向 $(85, 92, 78)$。</p>
 
 <div class="callout callout-info">
-<strong>深度学习里向量无处不在：</strong>词嵌入是一个向量，隐藏层输出是一个向量，一个样本的特征也是一个向量。
+<strong>画面上看：</strong> 向量 $\mathbf{v} = [3, 4]$ 就是从 $(0,0)$ 到 $(3,4)$ 的一根箭头。它的<strong>长度</strong> = $\sqrt{3^2 + 4^2} = 5$，它的<strong>方向</strong>就是箭头指的那个朝向。
 </div>
 
-<h2>三、矩阵 Matrix</h2>
-<p><strong>几何直觉：空间变换的"操作手册"。</strong></p>
-<p>矩阵不是数据，是<strong>对向量做操作的规则</strong>。$\mathbf{y} = \mathbf{W}\mathbf{x}$ 的意思是：把向量 $\mathbf{x}$ 按照 $\mathbf{W}$ 规定的规则，扭成新向量 $\mathbf{y}$。</p>
-<p>形状：<code>(m, n)</code>——二维。$m$ 行 $n$ 列。全连接层权重 <code>W.shape = (512, 256)</code> 意思是：输入 256 维向量 → 输出 512 维向量。</p>
+<p>代码里怎么写：</p>
 
-<table>
-<tr><th>矩阵运算</th><th>直觉</th><th>形状规则</th></tr>
-<tr><td>$\mathbf{W}\mathbf{x}$</td><td>线性变换：旋转+缩放</td><td>$(m,n) \times (n,) \to (m,)$</td></tr>
-<tr><td>$\mathbf{W}_2\mathbf{W}_1$</td><td>两次变换复合</td><td>$(p,m) \times (m,n) \to (p,n)$</td></tr>
-<tr><td>$\mathbf{W}^T$</td><td>行列互换</td><td>$(m,n) \to (n,m)$</td></tr>
-</table>
-
-<h2>四、张量 Tensor</h2>
-<p><strong>三维及以上的数组统称张量。</strong></p>
-<p>一张 224×224 的 RGB 图片：形状 <code>(3, 224, 224)</code>——3 个通道，每个 224×224。</p>
-<p>一批 32 张图片：<code>(32, 3, 224, 224)</code>——四维张量。第 0 维是 batch。</p>
-
-<div class="callout callout-tip">
-<strong>记住就四个：</strong>标量 = 零维，向量 = 一维箭头，矩阵 = 二维变换，张量 = 三维以上容器。深度学习的全部数据都是这四种。
-</div>
-
-<h2>🖥️ 代码</h2>
 <pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
-<span class="hl-comment"># 标量：零维数组，形状是空元组 ()</span>
-s = np.array(<span class="hl-number">3.14</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"标量: 值={s}, 形状={s.shape}"</span>)  <span class="hl-comment"># 形状=()</span>
+v = np.array([<span class="hl-number">85</span>, <span class="hl-number">92</span>, <span class="hl-number">78</span>])  <span class="hl-comment"># 用方括号 [ ] 把三个数包起来，传给 np.array()</span>
+                              <span class="hl-comment"># numpy 自动识别：这是 1 维数组（向量）</span>
+<span class="hl-builtin">print</span>(v)                      <span class="hl-comment"># 输出: [85 92 78]</span>
+<span class="hl-builtin">print</span>(v.shape)                 <span class="hl-comment"># 输出: (3,) —— 长度为 3 的一维数组</span>
+                              <span class="hl-comment"># 逗号 (3,) 表示「这是一维，不是二维的单行」</span>
+                              <span class="hl-comment"># 如果是二维的单行，shape 会是 (1,3)</span>
+<span class="hl-builtin">print</span>(v[<span class="hl-number">1</span>])                   <span class="hl-comment"># 输出: 92 —— 索引从 0 开始，v[0]=85, v[1]=92, v[2]=78</span></code></pre>
 
-<span class="hl-comment"># 向量：一维数组，形状 (n,)</span>
-v = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>])
-<span class="hl-builtin">print</span>(<span class="hl-string">f"向量: {v}, 形状={v.shape}"</span>)  <span class="hl-comment"># 形状=(3,)</span>
+<p><strong>向量在深度学习里无处不在：</strong></p>
+<ul>
+  <li>一个词嵌入就是向量：$[0.2, -0.5, 0.8, \ldots]$（几十到几百维）</li>
+  <li>神经网络的一层输出就是向量：上一层 128 个神经元 → 128 维向量</li>
+  <li>一个样本的特征就是向量：图片 X 的所有像素拉直</li>
+</ul>
 
-<span class="hl-comment"># 矩阵：二维数组，形状 (行, 列)</span>
-M = np.array([[<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>], [<span class="hl-number">4</span>, <span class="hl-number">5</span>, <span class="hl-number">6</span>]])
-<span class="hl-builtin">print</span>(<span class="hl-string">f"矩阵:\n{M}\n形状={M.shape}"</span>)  <span class="hl-comment"># 形状=(2,3)</span>
+<hr>
 
-<span class="hl-comment"># 张量：三维数组，形状 (depth, rows, cols)</span>
-T = np.ones((<span class="hl-number">2</span>, <span class="hl-number">3</span>, <span class="hl-number">4</span>))
-<span class="hl-builtin">print</span>(<span class="hl-string">f"张量: 形状={T.shape}"</span>)  <span class="hl-comment"># 形状=(2,3,4)</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"  总元素数={T.size}"</span>)       <span class="hl-comment"># 2×3×4=24</span></code></pre>
-<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
+<h2>三、矩阵 Matrix — 向量的「操作手册」</h2>
+
+<p><strong>矩阵不是数据——矩阵是</strong>对一个向量做操作的<strong>规则。</strong></p>
+
+<p>来看一个具体的例子。假设你有一个向量 $\mathbf{x} = [1, 2]$（2 维箭头），你想把它转一下、拉一下，得到一个新向量 $\mathbf{y}$。你需要一个「操作手册」告诉机器：怎么把旧向量的每个分量搅和到一起产生新分量。这本操作手册就是矩阵。</p>
+
+<p>比如这个矩阵：
+$$\mathbf{W} = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}$$</p>
+
+<p>把它乘到向量上：</p>
+
+$$\mathbf{y} = \mathbf{W}\mathbf{x} = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix} \begin{bmatrix} 1 \\ 2 \end{bmatrix} = \begin{bmatrix} 2\times 1 + 1\times 2 \\ 0\times 1 + 3\times 2 \end{bmatrix} = \begin{bmatrix} 4 \\ 6 \end{bmatrix}$$
+
+<p>$\mathbf{x} = [1,2]$ 被扭成了 $\mathbf{y} = [4,6]$。<strong>矩阵是变换器</strong>。</p>
+
+<p><strong>形状规则必须记住：</strong></p>
+
+<table>
+<tr><th>操作</th><th>条件</th><th>结果形状</th></tr>
+<tr><td>矩阵 × 向量 $Wx$</td><td>$W$ 的列数 = $x$ 的长度</td><td>$(m,n) \times (n,) \to (m,)$</td></tr>
+<tr><td>矩阵 × 矩阵 $AB$</td><td>$A$ 的列数 = $B$ 的行数</td><td>$(m,n) \times (n,p) \to (m,p)$</td></tr>
+</table>
+
+<p>代码：</p>
+
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 创建矩阵：用两层方括号 [[第一行], [第二行]]</span>
+W = np.array([[<span class="hl-number">2</span>, <span class="hl-number">1</span>],     <span class="hl-comment"># 第一行：[2, 1]</span>
+              [<span class="hl-number">0</span>, <span class="hl-number">3</span>]])    <span class="hl-comment"># 第二行：[0, 3]</span>
+                       <span class="hl-comment"># 形状：(2, 2) —— 2 行 2 列</span>
+<span class="hl-builtin">print</span>(W.shape)           <span class="hl-comment"># 输出: (2, 2)</span>
+
+x = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>])     <span class="hl-comment"># 向量，形状 (2,)</span>
+
+<span class="hl-comment"># @ 是 Python 3.5+ 引入的矩阵乘法运算符</span>
+<span class="hl-comment"># 等价于 np.dot(W, x) 或 np.matmul(W, x)</span>
+y = W @ x               <span class="hl-comment"># 矩阵乘向量：W(2,2) × x(2,) → y(2,)</span>
+<span class="hl-builtin">print</span>(y)                 <span class="hl-comment"># 输出: [4 6]</span>
+
+<span class="hl-comment"># 验证手算：y[0] = 2×1 + 1×2 = 4, y[1] = 0×1 + 3×2 = 6</span></code></pre>
+
+<div class="callout callout-tip">
+<strong>深度学习里的矩阵：</strong> 全连接层的权重就是一个矩阵。$W.shape = (512, 256)$ 的意思是：输入 256 维向量 → 输出 512 维向量。网络就是一层又一层的矩阵乘法，把输入一步一步扭成输出。
+</div>
+
+<hr>
+
+<h2>四、张量 Tensor — 三维及以上的「数据容器」</h2>
+
+<p>标量是零维、向量是一维、矩阵是二维。三维及以上统称<strong>张量</strong>。</p>
+
+<p><strong>不需要怕这个词。</strong> 张量就是「多维数组」的学名。把形状写出来一看就明白：</p>
+
+<table>
+<tr><th>数据</th><th>形状</th><th>含义</th></tr>
+<tr><td>一张 224×224 的灰度图</td><td><code>(224, 224)</code></td><td>二维矩阵</td></tr>
+<tr><td>一张 224×224 的 RGB 彩图</td><td><code>(3, 224, 224)</code></td><td>三维张量：3 个通道，各 224×224</td></tr>
+<tr><td>一批 32 张 RGB 图</td><td><code>(32, 3, 224, 224)</code></td><td>四维张量：第 0 维是 batch</td></tr>
+<tr><td>一段 10 秒音频（16kHz 采样率）</td><td><code>(160000,)</code></td><td>一维向量</td></tr>
+</table>
+
+<p><strong>第 0 维几乎总是 batch。</strong> 深度学习不一次处理一张图，而是一次处理一批（batch）。所以第一维从 1 变成 batch_size。</p>
+
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 三维张量：2 张 3×4 的灰度图</span>
+<span class="hl-comment"># np.ones(形状) 创建全 1 数组</span>
+T = np.ones((<span class="hl-number">2</span>, <span class="hl-number">3</span>, <span class="hl-number">4</span>))     <span class="hl-comment"># (batch=2, height=3, width=4)</span>
+<span class="hl-builtin">print</span>(T.shape)              <span class="hl-comment"># 输出: (2, 3, 4)</span>
+
+<span class="hl-comment"># .size 返回数组里总共有多少个元素</span>
+<span class="hl-builtin">print</span>(T.size)               <span class="hl-comment"># 输出: 24 (= 2×3×4)</span>
+
+<span class="hl-comment"># .ndim 返回维度数（几维）</span>
+<span class="hl-builtin">print</span>(T.ndim)               <span class="hl-comment"># 输出: 3</span></code></pre>
+
+<hr>
+
+<h2>📌 四级台阶速查</h2>
+
+<table>
+<tr><th>名字</th><th>维度</th><th>shape 示例</th><th>直觉</th></tr>
+<tr><td>标量 Scalar</td><td>0</td><td><code>()</code></td><td>一个单独的数</td></tr>
+<tr><td>向量 Vector</td><td>1</td><td><code>(n,)</code></td><td>空间里的一根箭头</td></tr>
+<tr><td>矩阵 Matrix</td><td>2</td><td><code>(m, n)</code></td><td>对向量做变换的"操作手册"</td></tr>
+<tr><td>张量 Tensor</td><td>≥3</td><td><code>(b, c, h, w)</code></td><td>多维数据容器</td></tr>
+</table>
+
+<hr>
 
 <h2>💭 概念题</h2>
+
 <ol>
-<li>全连接层 $W$ 形状是 (128, 64)。如果输入向量 $\mathbf{x}$ 形状是 (64,)，输出 $\mathbf{y}=W\mathbf{x}$ 的形状是什么？——考察：矩阵乘的形状规则</li>
-<li>为什么深度学习把图片存成 (C, H, W) 而不是 (H, W, C)？两种存法在内存布局上有什么区别？——考察：张量维度顺序的工程考量</li>
+<li>全连接层权重 $W$ 形状是 (128, 64)。输入 $\mathbf{x}$ 形状是 (64,)。输出 $\mathbf{y} = W\mathbf{x}$ 的形状是什么？为什么列数必须匹配？——考察：矩阵乘法的形状规则</li>
+<li>向量和「只有一列的矩阵」有什么区别？<code>shape=(3,)</code> 和 <code>shape=(3,1)</code> 是一个东西吗？——考察：一维 vs 二维的细微差别</li>
+<li>为什么深度学习把图片存成 <code>(C, H, W)</code> 而不是 <code>(H, W, C)</code>？哪种对 GPU 更友好？——考察：张量维度顺序的工程考量（通道优先 = 内存连续）</li>
 </ol>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">

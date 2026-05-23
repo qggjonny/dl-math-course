@@ -11,58 +11,106 @@
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-04</span>
 <span><a href="../00-03/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-05/">下一课 →</a></span></nav>
 <div class="container">
+
 <h1>00-04 导数、偏导数、梯度</h1>
 
-<h2>一、导数：变化率</h2>
-<p><strong>几何直觉：曲线在某点的切线斜率。</strong></p>
+<p>这节是深度学习的心脏——训练的本质就是沿着梯度反方向走下去。</p>
+
+<hr>
+
+<h2>一、导数：曲线的「坡度」</h2>
+
+<p><strong>画面：</strong> 你开车上山。看仪表盘上的坡度计：正在 15° 上坡。如果你现在踩油门往山上再开 1 公里，高度大约上升 $\tan(15°) \times 1\text{km} \approx 270\text{m}$。</p>
+
+<p>导数就是这个「坡度」——在某一点，函数值随着输入变化的<strong>瞬时比率</strong>。</p>
+
 <p>$$f'(x) = \lim_{\epsilon \to 0} \frac{f(x+\epsilon) - f(x)}{\epsilon}$$</p>
-<p>切线向上斜（导数 &gt; 0）→ 往右走函数变大。这就是梯度下降的基础：<strong>沿导数反方向走，函数值下降。</strong></p>
 
-<h2>二、偏导数</h2>
-<p>多变量函数 $f(x,y)$，固定其他变量，只对一个变量求导。</p>
-<p>$$\frac{\partial f}{\partial x} = \lim_{\epsilon \to 0} \frac{f(x+\epsilon, y) - f(x, y)}{\epsilon}$$</p>
+<p><strong>拆开看：</strong></p>
+<ul>
+  <li>分子 $f(x+\epsilon) - f(x)$：往前走一丁点，函数值变了多少</li>
+  <li>分母 $\epsilon$：走了多远</li>
+  <li>比值 = 每走 1 单位，函数值变多少 = 坡度</li>
+  <li>$\lim_{\epsilon \to 0}$：$\epsilon$ 无限趋近 0，得到<strong>瞬时</strong>坡度（不是一段路的平均坡度）</li>
+</ul>
 
-<h2>三、梯度：所有偏导数的向量</h2>
-<p>$$\nabla f = \left[\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \cdots, \frac{\partial f}{\partial x_n}\right]$$</p>
-<p><strong>几何直觉：指向函数上升最快的方向。</strong> 梯度方向 = 最陡上坡。反方向 = 最陡下坡。梯度大小 = 坡度有多陡。</p>
-
-<div class="callout callout-tip">
-<strong>梯度下降 = 沿梯度反方向走一小步，反复。</strong>
-$$\theta_{t+1} = \theta_t - \eta \cdot \nabla f(\theta_t)$$
-$\eta$ 是学习率，控制每步大小。
+<div class="callout callout-info">
+<strong>导数 &gt; 0 → 切线向上斜 → 往右走函数变大。</strong><br>
+<strong>导数 &lt; 0 → 切线向下斜 → 往右走函数变小。</strong><br>
+<strong>导数 = 0 → 切线水平 → 局部极值点（山顶或山谷）。</strong>
 </div>
 
-<h2>🖥️ 代码</h2>
+<h2>二、偏导数：多变量的坡度</h2>
+
+<p>如果函数有两个输入 $f(x,y)$，你只问「$x$ 方向上的坡度是多少（$y$ 先不动）」，这就是偏导数。</p>
+
+<p>$$\frac{\partial f}{\partial x} = \lim_{\epsilon \to 0} \frac{f(x+\epsilon, y) - f(x, y)}{\epsilon}$$</p>
+
+<p>$\partial$（读"round"）这个符号只是提醒你「不止一个变量」。算法上跟普通导数一模一样。</p>
+
+<h2>三、梯度：所有方向的坡度合到一个向量里</h2>
+
+<p>$$\nabla f = \left[\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n}\right]$$</p>
+
+<p><strong>核心直觉：梯度向量指向函数值上升<em>最快</em>的方向。</strong>它的每个分量告诉你「沿着这个坐标轴走，坡有多陡」；合在一起，它指向全局最陡的上坡方向。</p>
+
+<div class="callout callout-tip">
+<strong>梯度下降 = 沿着梯度反方向走一小步，不断重复。</strong>
+$$\theta_{t+1} = \theta_t - \eta \cdot \nabla f(\theta_t)$$
+<ul>
+  <li>$\theta_t$：当前的参数位置</li>
+  <li>$\nabla f(\theta_t)$：当前位置的梯度（最陡上坡方向）</li>
+  <li>负号：因为我们想<strong>下降</strong>，所以反着走</li>
+  <li>$\eta$（学习率）：走多大步。太大 → 可能跳过最小值；太小 → 收敛太慢</li>
+</ul>
+</div>
+
+<hr>
+
+<h2>🖥️ 代码：从手算导数到梯度下降</h2>
+
 <pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
-<span class="hl-comment"># 中央差分求导：f'(x) ≈ (f(x+eps) - f(x-eps)) / (2*eps)</span>
-<span class="hl-comment"># 精度 O(eps²)，优于单边差分的 O(eps)</span>
+<span class="hl-comment"># ===== 1. 数值微分：验证链式法则的手算 =====</span>
 <span class="hl-keyword">def</span> <span class="hl-func">numerical_grad</span>(f, x, eps=<span class="hl-number">1e-5</span>):
+    <span class="hl-string">"""中央差分法求 f 在 x 处的导数
+    (f(x+eps) - f(x-eps)) / (2*eps) 
+    精度 O(eps²)，比单边差分的 O(eps) 高一个数量级
+    """</span>
     <span class="hl-keyword">return</span> (f(x + eps) - f(x - eps)) / (<span class="hl-number">2</span> * eps)
 
-<span class="hl-comment"># f(x)=x²，理论导数 f'(x)=2x</span>
-<span class="hl-keyword">def</span> <span class="hl-func">f</span>(x):
-    <span class="hl-keyword">return</span> x ** <span class="hl-number">2</span>
+<span class="hl-comment"># 测试 f(x) = x² → f'(x) = 2x</span>
+<span class="hl-keyword">def</span> <span class="hl-func">square</span>(x):
+    <span class="hl-keyword">return</span> x ** <span class="hl-number">2</span>  <span class="hl-comment"># x 的平方</span>
 
 <span class="hl-keyword">for</span> x <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>]:
-    num = numerical_grad(f, x)
-    theory = <span class="hl-number">2</span> * x
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"f'({x}) 数值={num:.5f} 理论={theory}"</span>)
+    num = numerical_grad(square, x)  <span class="hl-comment"># 数值近似</span>
+    theory = <span class="hl-number">2</span> * x                      <span class="hl-comment"># 理论 f'(x) = 2x</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"f'({x}) 数值={num:.6f}  理论={theory}"</span>)
 
-<span class="hl-comment"># 梯度下降：找 f(x)=x²-4x+4 的最小值（x=2）</span>
-x = <span class="hl-number">0.0</span>             <span class="hl-comment"># 初始值</span>
-lr = <span class="hl-number">0.1</span>            <span class="hl-comment"># 学习率 η</span>
+<span class="hl-comment"># ===== 2. 梯度下降：找 f(x)=x²-4x+4 的最小值 =====</span>
+<span class="hl-comment"># 理论最小值在 x=2（f'(x)=2x-4=0 → x=2）</span>
+x = <span class="hl-number">0.0</span>                    <span class="hl-comment"># 从 0 出发</span>
+lr = <span class="hl-number">0.1</span>                   <span class="hl-comment"># 学习率 η</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n出发: x={x:.1f}"</span>)
 <span class="hl-keyword">for</span> step <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">30</span>):
-    grad = <span class="hl-number">2</span>*x - <span class="hl-number">4</span>     <span class="hl-comment"># f'(x) = 2x - 4</span>
-    x = x - lr * grad  <span class="hl-comment"># 沿反方向走</span>
+    grad = <span class="hl-number">2</span>*x - <span class="hl-number">4</span>          <span class="hl-comment"># f'(x) = 2x - 4</span>
+    x = x - lr * grad       <span class="hl-comment"># 沿梯度反方向走</span>
     <span class="hl-keyword">if</span> step % <span class="hl-number">5</span> == <span class="hl-number">0</span>:
-        <span class="hl-builtin">print</span>(<span class="hl-string">f"第{step:2d}步: x={x:.4f}"</span>)  <span class="hl-comment"># 0→2</span></code></pre>
+        <span class="hl-builtin">print</span>(<span class="hl-string">f"  第{step:2d}步: x={x:.4f}  grad={grad:.4f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"  最终: x={x:.4f} (理论=2)"</span>)
+<span class="hl-comment"># x 从 0 逐渐滑到 2，梯度也从 -4 逐渐变成 0</span></code></pre>
+
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
 
+<hr>
+
 <h2>💭 概念题</h2>
+
 <ol>
-<li>梯度指向上升最快方向。为什么是"最快"而不只是"快"？——考察：方向导数与梯度的点乘关系</li>
-<li>学习率太大的后果（几何直觉）？太小呢？——考察：梯度下降收敛动力学</li>
+<li>梯度指向上升最快方向。为什么是"最快"？提示：任意方向的方向导数 = 梯度与该方向单位向量的点乘。——考察：方向导数的几何意义</li>
+<li>学习率太大时梯度下降会振荡甚至发散。为什么？用 x² 的例子，如果 lr=1.5 在 x=1 处会发生什么？——考察：梯度下降收敛条件</li>
+<li>中央差分 f(x+eps) - f(x-eps) 为什么比单边差分 f(x+eps) - f(x) 更精确？——考察：泰勒展开的偶次项抵消</li>
 </ol>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">

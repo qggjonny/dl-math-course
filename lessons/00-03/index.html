@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>00-03 范数与特征值 · 深度学习数学</title>
+<link rel="stylesheet" href="../../css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head><body>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-03</span>
+<span><a href="../00-02/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-04/">下一课 →</a></span></nav>
+<div class="container">
+
+<h1>00-03 范数与特征值</h1>
+
+<hr>
+
+<h2>一、范数：向量的"大小"怎么量</h2>
+
+<p>一个向量 $\mathbf{v} = [3, -4]$，它有多"大"？这取决于你怎么量。</p>
+
+<h3>L1 范数：走格子的距离</h3>
+
+<p>$$\|\mathbf{v}\|_1 = |3| + |-4| = 7$$</p>
+
+<p><strong>画面：</strong> 想象你在曼哈顿，街道全是横平竖直的网格。从 $(0,0)$ 走到 $(3,-4)$，你不能斜着走，必须沿街道走：先往东 3 个街区，再往南 4 个街区。总共走了 7 个街区。这就是 <strong>L1 范数（曼哈顿距离）</strong>。</p>
+
+<div class="callout callout-info">
+<strong>L1 的妙用——产生稀疏权重：</strong> L1 正则化就是给损失函数加上 $\lambda \sum |w_i|$ 作为惩罚。为什么这样能产生很多精确为 0 的权重？因为 L1 的导数在除了 0 以外的任何地方都是 ±1——惩罚力度不随权重变小而减弱，一路推到 0 为止。
+</div>
+
+<h3>L2 范数：直线距离</h3>
+
+<p>$$\|\mathbf{v}\|_2 = \sqrt{3^2 + (-4)^2} = \sqrt{9 + 16} = 5$$</p>
+
+<p><strong>画面：</strong> 这次你不管什么街道了，直接从起点飞到终点。这就是欧几里得距离——你脑子里那个"两点之间最短"的概念。</p>
+
+<div class="callout callout-info">
+<strong>L2 的妙用——Weight Decay：</strong> L2 正则化 = $\lambda \sum w_i^2$。它的导数是 $2\lambda w_i$——权重越大惩罚越狠，权重越小惩罚越轻。所以权重会趋向 0 但<strong>不会精确等于</strong> 0。这恰好防止过拟合又不损失信息。
+</div>
+
+<h3>为什么正则化 = 防过拟合？</h3>
+
+<p>极端权重 → 模型对输入的微小变化极度敏感 → 训练集上拟合太好但测试集上崩溃 = 过拟合。正则化就是把权重"往回拉"，强迫模型简单一点。</p>
+
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+v = np.array([<span class="hl-number">3</span>, -<span class="hl-number">4</span>])
+
+<span class="hl-comment"># L1：np.abs 取绝对值，np.sum 求和</span>
+l1 = np.<span class="hl-builtin">sum</span>(np.<span class="hl-builtin">abs</span>(v))  <span class="hl-comment"># |3| + |-4| = 7</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"L1 范数: {l1}"</span>)
+
+<span class="hl-comment"># L2：np.linalg.norm 默认参数是 L2</span>
+<span class="hl-comment"># 内部计算：sqrt(3² + (-4)²) = 5</span>
+l2 = np.linalg.norm(v)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"L2 范数: {l2}"</span>)</code></pre>
+
+<hr>
+
+<h2>二、特征值与特征向量：矩阵的「指纹」</h2>
+
+<p><strong>问题：</strong> 矩阵 $A$ 把一个向量扭了。有没有哪些向量，扭完之后<strong>方向完全不变</strong>，只是被拉长或缩短了？</p>
+
+<p>$$A\mathbf{v} = \lambda \mathbf{v}$$</p>
+
+<p>如果存在这样的 $\mathbf{v}$（且 $\mathbf{v} \neq \mathbf{0}$），那 $\mathbf{v}$ 就叫 <strong>特征向量</strong>，$\lambda$ 就叫 <strong>特征值</strong>。</p>
+
+<p><strong>画面：</strong> 想象你把一块橡胶皮拉伸。有些方向只是被拉长（特征值 &gt; 1），有些方向被压缩（0 &lt; 特征值 &lt; 1），有些方向完全不变（特征值 = 1）。特征向量就是这些"只缩放不旋转"的特殊方向。它们是矩阵的指纹——不同矩阵有不同的特征方向和缩放比例。</p>
+
+<p><strong>特征向量不唯一：</strong> 如果 $\mathbf{v}$ 是特征向量，$2\mathbf{v}$、$0.5\mathbf{v}$ 也是——方向一样只是长度不同。习惯上取长度为 1 的那个（单位特征向量）。</p>
+
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+A = np.array([[<span class="hl-number">4</span>, <span class="hl-number">1</span>],
+              [<span class="hl-number">2</span>, <span class="hl-number">3</span>]])
+
+<span class="hl-comment"># np.linalg.eig 返回两个东西：</span>
+<span class="hl-comment">#   eigvals: 特征值数组（排列顺序随机）</span>
+<span class="hl-comment">#   eigvecs: 特征向量矩阵（每列是一个特征向量）</span>
+eigvals, eigvecs = np.linalg.eig(A)
+
+<span class="hl-builtin">print</span>(<span class="hl-string">f"特征值: {eigvals}"</span>)        <span class="hl-comment"># [5, 2]  两个特征值</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"特征向量:\n{eigvecs}"</span>)
+
+<span class="hl-comment"># 验证第一个特征值-特征向量对：A@v 应该等于 λ*v</span>
+v1 = eigvecs[:, <span class="hl-number">0</span>]           <span class="hl-comment"># 取第 0 列（第一个特征向量）</span>
+l1 = eigvals[<span class="hl-number">0</span>]              <span class="hl-comment"># 第一个特征值</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n验证 A·v = λ·v:"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"  A·v = {A @ v1}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"  λ·v = {l1 * v1}"</span>)
+<span class="hl-comment"># np.allclose(a, b) 判断两个数组是否在浮点误差范围内相等</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"  np.allclose: {np.allclose(A @ v1, l1 * v1)}"</span>)  <span class="hl-comment"># True</span></code></pre>
+
+<div class="callout callout-tip">
+<strong>谱归一化（Spectral Normalization）：</strong> GAN 的训练经常不稳定。谱归一化把判别器每一层的权重矩阵除以它的最大特征值，保证矩阵的"放大能力"不超过 1——这样信息流过每一层时不会被放大，训练就稳了。
+</div>
+
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
+
+<hr>
+
+<h2>💭 概念题</h2>
+<ol>
+<li>L1 和 L2 正则化都惩罚大权重，但 L1 产生精确零而 L2 不产生。从梯度更新的角度解释这个区别。——考察：L1 的常数梯度 vs L2 的线性梯度</li>
+<li>矩阵的特征值全为正意味着什么？如果有一个特征值是 0 呢？如果有一个负的呢？——考察：正定性、奇异性、不确定性的直觉</li>
+</ol>
+
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-02/">← 00-02</a><a href="../../">📖 目录</a><a href="../00-04/">00-04 →</a></nav>
+</div></body></html>
