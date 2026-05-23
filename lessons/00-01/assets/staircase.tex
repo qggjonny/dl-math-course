@@ -1,0 +1,84 @@
+\documentclass[tikz,border=6pt]{standalone}
+\usepackage{ctex}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shadows,arrows.meta,calc}
+
+\begin{document}
+\begin{tikzpicture}[
+  scale=1.0,
+  panel/.style={rectangle,rounded corners=4pt,draw=gray!40,fill=gray!3,minimum width=3.2cm,minimum height=3.4cm},
+  label/.style={font=\bfseries\footnotesize},
+  desc/.style={font=\small},
+]
+
+% ====== 四个面板背景 ======
+\node[panel] (S) at (0,0) {};
+\node[panel] (V) at (3.8,0) {};
+\node[panel] (M) at (7.6,0) {};
+\node[panel] (T) at (11.4,0) {};
+
+% 台阶连接线
+\draw[->,>=Stealth,thick,orange!70!black] (1.0,1.5) -- (2.8,1.5)
+  node[midway,above,font=\footnotesize,orange!70!black] {+方向};
+\draw[->,>=Stealth,thick,orange!70!black] (4.8,1.5) -- (6.6,1.5)
+  node[midway,above,font=\footnotesize,orange!70!black] {+行列};
+\draw[->,>=Stealth,thick,orange!70!black] (8.6,1.5) -- (10.4,1.5)
+  node[midway,above,font=\footnotesize,orange!70!black] {+厚度};
+
+% ====== 面板 1：标量 ======
+\node[label] at (S.north) [yshift=-8pt] {标量};
+\node at (S) [circle,fill=blue!60!cyan,inner sep=5pt] {};
+\node[desc] at (S) [yshift=-1.2cm,text=blue!60!cyan] {一个点};
+\node[font=\ttfamily\tiny,text=gray] at (S) [yshift=-1.6cm] {shape: ()};
+
+% ====== 面板 2：向量 ======
+\node[label] at (V.north) [yshift=-8pt] {向量};
+\draw[->,gray] (V.west) ++(0.6,0.3) -- ++(2.0,0) node[right,gray,font=\tiny] {$x_1$};
+\draw[->,gray] (V.west) ++(0.6,0.3) -- ++(0,1.8) node[above,gray,font=\tiny] {$x_2$};
+\draw[->,>=Stealth,very thick,red!70!orange] ($(V.west)+(0.6,0.3)$) -- ++(1.5,1.2);
+\draw[dashed,gray!50] ($(V.west)+(0.6,0.3)$) -- ++(1.5,0);
+\draw[dashed,gray!50] ($(V.west)+(0.6,0.3)$) -- ++(0,1.2);
+\draw[dashed,gray!50] ($(V.west)+(2.1,0.3)$) -- ++(0,1.2);
+\draw[dashed,gray!50] ($(V.west)+(0.6,1.5)$) -- ++(1.5,0);
+\node[desc,red!70!orange] at (V) [yshift=-1.2cm] {一根箭};
+\node[font=\ttfamily\tiny,text=gray] at (V) [yshift=-1.6cm] {shape: (n,)};
+
+% ====== 面板 3：矩阵 ======
+\node[label] at (M.north) [yshift=-8pt] {矩阵};
+\foreach \i in {0,1,2} {
+  \foreach \j in {0,1,2} {
+    \fill[teal!30] ($(M.west)+(0.8+0.7*\i, 0.5+0.6*\j)$) rectangle ++(0.55,0.45);
+    \draw[teal!60] ($(M.west)+(0.8+0.7*\i, 0.5+0.6*\j)$) rectangle ++(0.55,0.45);
+  }
+}
+\draw[->,gray!70] ($(M.west)+(0.3,0.05)$) -- ++(0,2.2) node[midway,left,font=\tiny,text=gray] {m};
+\draw[->,gray!70] ($(M.west)+(0.2,-0.1)$) -- ++(2.8,0) node[midway,below,font=\tiny,text=gray] {n};
+\node[desc,teal!70!black] at (M) [yshift=-1.2cm] {一张网格};
+\node[font=\ttfamily\tiny,text=gray] at (M) [yshift=-1.6cm] {shape: (m, n)};
+\node[font=\footnotesize\itshape,blue!50!black] at ($(M)+(0,0.8)$) {操作手册};
+
+% ====== 面板 4：张量 ======
+\node[label] at (T.north) [yshift=-8pt] {张量};
+% 三张叠起来的纸
+\foreach \k in {0,1,2} {
+  \begin{scope}[shift={($(T.west)+(1.8+0.16*\k, 0.6+0.12*\k)$)}]
+    \foreach \i in {0,1,2} {
+      \foreach \j in {0,1,2} {
+        \fill[violet!40] (0.65*\i, 0.6*\j) rectangle ++(0.52,0.48);
+        \draw[violet!60] (0.65*\i, 0.6*\j) rectangle ++(0.52,0.48);
+      }
+    }
+  \end{scope}
+}
+\draw[->,>=Stealth,thick,violet!70!black] ($(T.west)+(1.2,0.4)$) -- ++(0.5,0.35) node[midway,left,font=\tiny] {c};
+\node[desc,violet!70!black] at (T) [yshift=-1.2cm] {一摞网格};
+\node[font=\ttfamily\tiny,text=gray] at (T) [yshift=-1.6cm] {shape: (c, h, w)};
+
+% ====== 底部维度 ======
+\node[font=\scriptsize\bfseries,text=blue!60!black] at ($(S.south)+(0,-0.5)$) {0维};
+\node[font=\scriptsize\bfseries,text=red!60!black]  at ($(V.south)+(0,-0.5)$) {1维};
+\node[font=\scriptsize\bfseries,text=teal!60!black] at ($(M.south)+(0,-0.5)$) {2维};
+\node[font=\scriptsize\bfseries,text=violet!60!black] at ($(T.south)+(0,-0.5)$) {3维};
+
+\end{tikzpicture}
+\end{document}
