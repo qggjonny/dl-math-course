@@ -67,6 +67,8 @@ flips = np.random.random(<span class="hl-number">1000</span>) &lt; p
   <li>$(1-p)^{n-k}$：剩下 n-k 次全部反面的概率</li>
 </ul>
 
+<figure><img src="assets/binomial_hist.png" alt="二项分布"><figcaption>n=10, p=0.5。k=5 的柱子最高——$inom{10}{5}=252$ 种排法，远多于两端的 $inom{10}{0}=1$ 种</figcaption></figure>
+
 <p><strong>形状：中间鼓，两头瘪。</strong> 抛 10 次公平硬币，恰好 5 次正面的概率最大——因为 $\binom{10}{5}=252$ 种排法，远比两端的 $\binom{10}{1}=10$ 种排法多。</p>
 
 <pre><code>n, p = <span class="hl-number">10</span>, <span class="hl-number">0.5</span>
