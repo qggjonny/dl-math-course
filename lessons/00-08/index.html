@@ -16,59 +16,52 @@
 
 <hr>
 
-<h2>一、期望：概率加权平均——不是最可能，是长期平均</h2>
+<h2>一、期望：平衡木的支点</h2>
 
-<p>掷一个六面骰子，每个面概率都是 1/6。问：掷很多很多次，平均值趋向多少？</p>
+<p><strong>画面：</strong> 一根长木条，上面站着六个小人，分别站在位置 1, 2, 3, 4, 5, 6（骰子的六个面）。你在这根木条下面放一个支点，放在哪个位置木条刚好平衡不倾斜？</p>
 
-<p>$$\mathbb{E}[X] = 1\times\frac{1}{6} + 2\times\frac{1}{6} + \cdots + 6\times\frac{1}{6} = 3.5$$</p>
+<p>当所有人都一样重时（公平骰子），支点放在正中间 3.5 的位置。这就是期望——<strong>概率加权的平衡支点</strong>。</p>
 
-<p><strong>画面：</strong> 想象你把骰子每个面的概率看成「砝码质量」，期望就是<strong>平衡支点的位置</strong>。支点放 3.5 的位置，整根横梁刚好平衡——左边三面的力矩 = 右边三面的力矩。</p>
+$$\mathbb{E}[X] = 1\times\frac{1}{6} + 2\times\frac{1}{6} + \cdots + 6\times\frac{1}{6} = 3.5$$
 
-<p><strong>期望 ≠ 最可能的值。</strong> 骰子最可能的面？均匀分布没有「最可能」。期望 3.5 是对长期平均的预测，不是对下一次的预测。</p>
+<p><strong>期望 ≠ 最可能的值。</strong> 骰子没有"最可能的面"（均匀分布）。期望 3.5 是对长期平均的预测——掷一万次取平均，结果趋向 3.5。不是对下一次掷几点的预测。</p>
 
-<h3>连续版的期望</h3>
-<p>$$\mathbb{E}[X] = \int_{-\infty}^{\infty} x \cdot f(x)\,dx$$</p>
-<p>把离散的求和变成积分。</p>
+<p><strong>连续版：</strong> 把求和换成积分：$\mathbb{E}[X] = \int_{-\infty}^{\infty} x \cdot f(x)\,dx$。每个 $x$ 用它的概率密度加权。</p>
 
 <hr>
 
-<h2>二、方差：数据有多散</h2>
+<h2>二、方差：射飞镖的散布程度</h2>
 
-<p>$$\text{Var}(X) = \mathbb{E}[(X - \mu)^2]$$</p>
+<p><strong>画面：</strong> 你和朋友比赛扔飞镖。你们俩的平均命中点都在靶心（期望都是 0），但你的飞镖散布得很开——满靶子都是孔——而朋友的飞镖全挤在靶心周围。谁的方差大？你的大。差多少？方差给出精确的数字。</p>
 
-<p>拆开看：$X - \mu$ = 每个数据点离均值多远。平方（消除正负抵消）。取平均。</p>
+$$\text{Var}(X) = \mathbb{E}[(X - \mu)^2]$$
 
-<p><strong>画面：</strong> 班上同学的身高。均值 165cm。有人 150，有人 180。方差度量了整体「散开」的程度。方差大 = 身高参差不齐；方差小 = 大家都差不多。</p>
+<p><strong>逐符号拆开：</strong></p>
+<ul>
+  <li>$X - \mu$：每个数据点偏离均值多少（可正可负）</li>
+  <li>平方 $(X-\mu)^2$：消除正负抵消（偏左和偏右不能互相抵消——都是"偏离"）</li>
+  <li>$\mathbb{E}[\cdot]$：取所有偏离平方的加权平均</li>
+</ul>
 
-<p><strong>计算捷径：</strong> $$\text{Var}(X) = \mathbb{E}[X^2] - \mu^2$$。用平方的平均值减去平均值的平方。手算时比一个个减均值再平方快得多。</p>
+<p><strong>计算捷径：</strong> $\text{Var}(X) = \mathbb{E}[X^2] - \mu^2$——用"平方的平均"减去"平均的平方"。手算时方便很多，不用先减均值再平方。</p>
 
-<h3>标准差：把方差单位调回正常</h3>
-<p>$$\sigma = \sqrt{\text{Var}(X)}$$</p>
-<p>方差单位是原单位平方（比如「平方厘米」），标准差单位和原数据一致（「厘米」）。</p>
+<p><strong>标准差 $\sigma = \sqrt{\text{Var}(X)}$：</strong> 方差单位是原单位平方（比如「平方厘米」），开根号后单位和原数据一致（「厘米」）。σ 就是天然的距离尺子。</p>
 
 <hr>
 
-<h2>三、两条重要性质</h2>
+<h2>三、两条硬核性质</h2>
 
-<h3>期望是线性的</h3>
-<p>$$\mathbb{E}[aX + b] = a\mathbb{E}[X] + b$$</p>
+<h3>期望是线性的——不管独不独立</h3>
+<p>$$\mathbb{E}[aX + b] = a\cdot\mathbb{E}[X] + b$$</p>
 <p>$$\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]$$</p>
-<p><strong>不管 X 和 Y 是否独立，期望的加法都成立。</strong></p>
+<p><strong>不管 $X$ 和 $Y$ 是否独立，期望的加法都成立。</strong>这是期望最强大的性质。</p>
 
-<h3>方差不线性</h3>
-<p>$$\text{Var}(aX + b) = a^2\text{Var}(X)$$</p>
-<p><strong>常数 b 消失了！</strong> 因为方差度量的是分散程度，整体平移不改变分散程度——全班同时长高 10cm，身高的差异一点没变。但 a 被平方了——如果全班身高都翻倍，差异也会翻倍再翻倍（平方）。</p>
+<h3>方差不是线性的——平移被吃掉</h3>
+<p>$$\text{Var}(aX + b) = a^2\cdot\text{Var}(X)$$</p>
 
-<hr>
+<p><strong>常数 $b$ 消失了！</strong> 全班所有人同时长高 10cm——每个人离均值的距离完全不变，方差当然不变。<strong>平移不改变分散程度。</strong></p>
 
-<h2>四、深度学习里的应用</h2>
-
-<table>
-<tr><th>场景</th><th>用到什么</th></tr>
-<tr><td><strong>BatchNorm</strong></td><td>每批次数据减均值（$\mu$）除标准差（$\sigma$）→ 稳定训练</td></tr>
-<tr><td><strong>参数初始化</strong></td><td>Xavier：$W \sim N(0, 1/\sqrt{n_{in}})$，保证每层输出的方差一致</td></tr>
-<tr><td><strong>MSE 损失</strong></td><td>$\frac{1}{n}\sum(y_i - \hat{y}_i)^2$ 就是误差平方的经验期望</td></tr>
-</table>
+<p>$a$ 被平方了：如果全班身高翻倍（a=2），方差变成原来的 4 倍。不仅散得更开，而且<strong>平方放大</strong>了差异。</p>
 
 <hr>
 
@@ -76,39 +69,34 @@
 <pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
 np.random.seed(<span class="hl-number">42</span>)
-<span class="hl-comment"># 从 N(μ=5, σ=2) 抽 100000 样本</span>
+<span class="hl-comment"># 从 N(μ=5, σ=2) 抽 100000 个样本</span>
+<span class="hl-comment"># loc=μ(均值), scale=σ(标准差), size=样本数</span>
 samples = np.random.normal(loc=<span class="hl-number">5</span>, scale=<span class="hl-number">2</span>, size=<span class="hl-number">100000</span>)
 
-<span class="hl-comment"># 期望 ≈ 样本均值</span>
-mu_hat = np.mean(samples)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"期望 μ: 理论=5, 样本={mu_hat:.4f}"</span>)
-
-<span class="hl-comment"># 方差：np.var(ddof=0) 是总体方差（除以 n）</span>
-<span class="hl-comment"># ddof=1 是样本方差（除以 n-1，无偏估计）</span>
-var_hat = np.var(samples, ddof=<span class="hl-number">0</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"方差 σ²: 理论=4, 样本={var_hat:.4f}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"标准差 σ: 理论=2, 样本={np.std(samples, ddof=0):.4f}"</span>)
+mu = np.mean(samples)          <span class="hl-comment"># 样本均值 ≈ 期望</span>
+var = np.var(samples, ddof=<span class="hl-number">0</span>)  <span class="hl-comment"># ddof=0: 除以 n（总体方差）</span>
+                               <span class="hl-comment"># ddof=1: 除以 n-1（样本无偏估计）</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"μ≈{mu:.3f} σ²≈{var:.3f} σ≈{np.std(samples,ddof=0):.3f}"</span>)
 
 <span class="hl-comment"># 验证 E[aX+b] = aE[X]+b</span>
 a, b = <span class="hl-number">3</span>, <span class="hl-number">10</span>
 trans = a * samples + b
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\nE[aX+b] = {np.mean(trans):.2f} = aE[X]+b = {a*mu_hat+b:.2f} ✓"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\nE[aX+b]={np.mean(trans):.1f} = aE[X]+b={a*mu+b:.1f} ✓"</span>)
 
-<span class="hl-comment"># 验证 Var(aX+b) = a²Var(X)</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"Var(aX+b) = {np.var(trans,ddof=0):.2f} = a²Var(X) = {a**2*var_hat:.2f} ✓"</span>)
-<span class="hl-comment"># b=10 对结果毫无影响——平移不改变散开程度</span>
+<span class="hl-comment"># 验证 Var(aX+b) = a²Var(X)，b 消失</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"Var(aX+b)={np.var(trans,ddof=0):.1f} = a²Var(X)={a**2*var:.1f} ✓"</span>)
 
-<span class="hl-comment"># 掷骰子验证：E[X]=3.5, Var(X)≈2.917</span>
-dice = np.random.randint(<span class="hl-number">1</span>, <span class="hl-number">7</span>, size=<span class="hl-number">100000</span>)
+<span class="hl-comment"># 掷骰子：理论 E=3.5, Var≈2.917</span>
+dice = np.random.randint(<span class="hl-number">1</span>,<span class="hl-number">7</span>,size=<span class="hl-number">100000</span>)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"\n骰子: E[X]≈{np.mean(dice):.3f} Var≈{np.var(dice,ddof=0):.3f}"</span>)</code></pre>
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
 
 <hr>
 <h2>💭 概念题</h2>
 <ol>
-<li>方差用 $(X-\mu)^2$ 而不是 $|X-\mu|$。数学上为什么平方更好用？——考察：可导性（平方处处可导，绝对值在 0 处不可导）、与正态分布的解析对应</li>
-<li>BatchNorm 减均值除标准差后，这层输出的均值和方差分别是多少？——考察：归一化的统计效果（均值为 0，方差为 1）</li>
-<li>为什么 Var(aX + b) 里 b 消失了？几何直觉上怎么理解？——考察：方差 = 分散程度，平移不改变形状</li>
+<li>方差用平方 $(X-\mu)^2$ 而不是绝对值 $|X-\mu|$。一个重要的原因是：平方函数处处光滑可导，绝对值在 0 处有个尖角（不可导）。这一点对梯度下降有多重要？——考察：损失函数的光滑性（本课跳过，但概念题可以稍微延伸：想象你在尖角上不知道该往左还是往右）</li>
+<li>全班 40 人身高的方差是 100 cm²。如果所有人同时长高 5cm，方差变成多少？如果所有人都变成原来的 1.1 倍（均值和差异都放大），方差变成多少？——考察：Var(aX+b)的性质（本课讲过 b 被吃掉，a 被平方）</li>
+<li>BatchNorm 处理一批数据时做这件事：每个样本减均值、除以标准差。处理完后这批数据的均值和标准差大约是多少？——考察：归一化的统计效果（本课在应用场景表里提过 BatchNorm）</li>
 </ol>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">

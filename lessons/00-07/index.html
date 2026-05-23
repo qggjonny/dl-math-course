@@ -14,148 +14,137 @@
 
 <h1>00-07 连续分布</h1>
 
-<p>上节课 PMF 用柱子高度表示概率。但这招对「气温 25.317°C」完全没用——它有无限精度，你没法给每一个可能的气温画一根柱子。连续分布需要换一种思考方式。</p>
+<p>上节课的 PMF 用柱子高度表示概率。但这招对「气温 25.317°C」完全没用——它有无限精度，你没法给每一个可能的气温画一根柱子。连续分布需要换一种思考方式。</p>
 
 <hr>
 
-<h2>一、单点概率 = 0，概率 = 面积</h2>
+<h2>一、单点概率 = 0：一根针尖戳不到一个点</h2>
 
 <blockquote><strong>连续随机变量取任意一个确定值的概率 = 0。</strong></blockquote>
 
-<p>不是说「气温恰好 25°C 不可能发生」——而是说在数学的无限精度下，恰好等于 25.0000... 是个零测集。想象一根针尖去戳一张纸：针尖戳到某个点的概率是 0（点没有面积），但针尖戳到某个<strong>区域</strong>的概率可以通过区域面积来算。</p>
+<p><strong>画面：</strong> 闭着眼睛往一张纸上扔一根针。针尖恰好戳中坐标 (3.1415926535..., 2.7182818284...) 的概率是多少？零。因为纸上无穷多个点，针尖恰好戳中<em>某特定一个点</em>在数学上是零概率事件。</p>
+
+<p>但针尖戳中一个<strong>区域</strong>——比如戳中左边三分之一——概率就是 1/3。因为区域有面积，而点没有面积。</p>
 
 <p>所以连续分布的概率不看「柱子的高度」，而是看 <strong>PDF 曲线下方的面积</strong>：</p>
 
 <figure>
 <img src="assets/uniform_area.png" alt="概率 = 面积">
-<figcaption>均匀分布 U(1,4)：PDF 高度 = 1/3。子区间 [c,d] 的概率 = (d−c)/(b−a)，就是长度占比</figcaption>
+<figcaption>均匀分布 U(1,4)：面积 = 宽 × 高 = 1。子区间 [c,d] 的概率 = (d−c)/(b−a)</figcaption>
 </figure>
 
 <p>$$P(a \le X \le b) = \int_a^b f(x)\,dx$$</p>
 
-<p>翻译成人话：$X$ 落在 $[a,b]$ 里的概率 = 曲线下面、$x=a$ 和 $x=b$ 两条竖线夹出来的<strong>面积</strong>。</p>
+<p>翻译：$X$ 落在 $[a,b]$ 的概率 = 曲线下方、$x=a$ 到 $x=b$ 夹出来的<strong>面积</strong>。</p>
 
 <div class="callout callout-info">
 <strong>PDF 两条铁律：</strong><br>
 ① $f(x) \ge 0$ — 密度不能是负数<br>
-② $\int_{-\infty}^{\infty} f(x)\,dx = 1$ — 总面积恰好等于 1
+② $\int_{-\infty}^{\infty} f(x)\,dx = 1$ — 总面积恰好 = 1（所有情况概率之和）
 </div>
 
 <hr>
 
-<h2>二、均匀分布——最诚实的分布</h2>
-
-<p>区间 [a,b] 里每个点的密度一模一样。PDF 是一段水平线。</p>
-
-<p>$$f(x) = \begin{cases} \frac{1}{b-a}, & a \le x \le b \\ 0, & \text{其他地方} \end{cases}$$</p>
-
-<p>宽 $(b-a)$ × 高 $1/(b-a)$ = 面积 1。没有任何偏好——这是最大熵分布。</p>
+<h2>二、均匀分布：诚实的「没有偏好」</h2>
+<p>$[a,b]$ 内每个点的密度一样。PDF 是一段水平线。没有任何偏好——如果你完全不知道气温可能是多少，均匀分布是最诚实的假设。</p>
 
 <hr>
 
-<h2>三、正态分布——深度学习里最重要的钟</h2>
+<h2>三、正态分布：深度学习里最重要的钟</h2>
 
 <p>两个数字决定一切：</p>
 
 <figure>
 <img src="assets/normal_mu.png" alt="μ 控制中心">
-<figcaption>μ 控制中心位置。σ 相同 → 形状不变，只是平移</figcaption>
+<figcaption>μ 控制中心。σ 相同 → 形状不变，只是左右平移</figcaption>
 </figure>
 
 <figure>
 <img src="assets/normal_sigma.png" alt="σ 控制胖瘦">
-<figcaption>σ 控制胖瘦。μ 相同 → σ 越大钟越矮越胖。总面积 = 1 的铁律下，胖了就得矮</figcaption>
+<figcaption>σ 控制胖瘦。σ 越大越矮越胖。总面积恒为 1，胖了就得矮</figcaption>
 </figure>
 
-<h3>公式逐零件拆开：</h3>
+<h3>公式拆零件：</h3>
 
-<p>$$f(x) = \frac{1}{\sigma\sqrt{2\pi}} \exp\!\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)$$</p>
+$$f(x) = \frac{1}{\sigma\sqrt{2\pi}} \exp\!\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)$$
 
 <table>
-<tr><th>零件</th><th>它在干什么</th></tr>
-<tr><td>$(x-\mu)^2$</td><td>离中心有多远的平方。远处→平方很大→指数部分很负→exp 后趋近 0→密度很小</td></tr>
-<tr><td>$2\sigma^2$（分母）</td><td>σ 越大，同样的距离被更大的分母「稀释」→衰减变慢→钟变胖</td></tr>
-<tr><td>$\frac{1}{\sigma\sqrt{2\pi}}$</td><td>归一化系数。σ 翻倍→系数减半，把变胖的钟拉矮确保证总面积 = 1</td></tr>
+<tr><th>零件</th><th>在干什么</th></tr>
+<tr><td>$(x-\mu)^2$</td><td>离中心多远。远处→平方很大→exp 里很负→密度≈0</td></tr>
+<tr><td>$2\sigma^2$（分母）</td><td>σ 越大，同样距离被大分母稀释→衰减变慢→钟变胖</td></tr>
+<tr><td>$\frac{1}{\sigma\sqrt{2\pi}}$</td><td>归一化。σ 翻倍→系数减半，把胖钟拉矮保持面积=1</td></tr>
 </table>
 
-<div class="callout callout-tip">
-<strong>核心直觉：</strong> σ 翻倍 → 钟宽了一倍 → 为了总面积不变，高度必须减半。$\sigma=1$ 时 $f(0)=0.399$，$\sigma=2$ 时 $f(0)=0.199$——正好是一半。
-</div>
+<p><strong>验证直觉：</strong> σ=1 → f(0)≈0.399。σ=2 → f(0)≈0.199。恰好减半！因为钟宽了一倍，高度必须减半来保持总面积。</p>
 
-<h2>四、CDF：累积分布函数——一路扫过去</h2>
+<hr>
 
-<p>从 $-\infty$ 出发，往右扫，把 PDF 下的面积不断<strong>累加</strong>。</p>
+<h2>四、CDF：一把刷子从左扫到右</h2>
+
+<p><strong>画面：</strong> 一把刷子从最左边往右刷，每刷过一段曲线，就把下面的颜料扫进桶里。桶从空的（F(-∞)=0）慢慢涨，到最右边刚好满（F(+∞)=1）。</p>
 
 <figure>
-<img src="assets/normal_cdf.png" alt="CDF 曲线">
-<figcaption>CDF 从 0 单调升到 1，永不下降。$F(\mu)=0.5$</figcaption>
+<img src="assets/normal_cdf.png" alt="CDF">
+<figcaption>CDF 从 0 单调升到 1，永不下降。F(μ)=0.5</figcaption>
 </figure>
 
-<p><strong>画面：</strong> 一把刷子从最左边往右刷，每经过一段曲线，就把颜料扫进桶里。桶从空慢慢装满，到最右边刚好满。</p>
+<hr>
 
 <h2>五、68-95-99.7 法则</h2>
 
 <figure>
-<img src="assets/normal_68_95_99.png" alt="68-95-99.7 法则">
-<figcaption>±1σ → 68.3% &emsp; ±2σ → 95.5% &emsp; ±3σ → 99.7%</figcaption>
+<img src="assets/normal_68_95_99.png" alt="68-95-99.7">
+<figcaption>±1σ→68.3% &emsp; ±2σ→95.5% &emsp; ±3σ→99.7%</figcaption>
 </figure>
 
-<p>σ 就是天然的尺子：1σ 是正常波动，2σ 少见，3σ 极端。不是线性增长——正态尾部指数衰减，超出 3σ 的概率微乎其微。</p>
+<p>σ 是天然尺子。1σ=正常，2σ=少见，3σ=极端。<strong>不是线性增长</strong>——钟的尾巴指数衰减，3σ 之外概率微乎其微。</p>
 
 <hr>
-
-<h2>🖥️ 完整代码</h2>
+<h2>🖥️ 代码</h2>
 <pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
 <span class="hl-comment"># ===== 均匀分布 U(0,1) =====</span>
 a, b = <span class="hl-number">0.0</span>, <span class="hl-number">1.0</span>
-<span class="hl-comment"># PDF 高度 = 1/(b-a)，使矩形面积 = 宽 × 高 = 1</span>
-h = <span class="hl-number">1.0</span> / (b - a)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"U(0,1) PDF 高度 = {h}"</span>)
-<span class="hl-comment"># 子区间 [0.2, 0.5] 概率 = 长度占比</span>
+h = <span class="hl-number">1.0</span> / (b - a)                <span class="hl-comment"># PDF 高度 = 1/宽</span>
 c, d = <span class="hl-number">0.2</span>, <span class="hl-number">0.5</span>
-prob = (d - c) / (b - a)
+prob = (d-c) / (b-a)            <span class="hl-comment"># 概率 = 长度占比</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"P({c}≤X≤{d}) = {prob}"</span>)
 
-<span class="hl-comment"># numpy 验证：抽 10 万样本，频率逼近概率</span>
+<span class="hl-comment"># 模拟验证</span>
 np.random.seed(<span class="hl-number">42</span>)
 samples = np.random.uniform(a, b, <span class="hl-number">100000</span>)
-in_int = np.<span class="hl-builtin">sum</span>((samples >= c) & (samples <= d))
+in_int = np.<span class="hl-builtin">sum</span>((samples>=c) & (samples<=d))
 <span class="hl-builtin">print</span>(<span class="hl-string">f"模拟 P = {in_int/100000:.4f}"</span>)
 
-<span class="hl-comment"># ===== 正态分布 PDF（手工实现） =====</span>
+<span class="hl-comment"># ===== 正态 PDF（手工实现） =====</span>
 <span class="hl-keyword">def</span> <span class="hl-func">normal_pdf</span>(x, mu, sigma):
-    <span class="hl-string">"""正态密度 f(x;μ,σ) = exp(-(x-μ)²/2σ²) / (σ√(2π))"""</span>
-    coeff = <span class="hl-number">1.0</span> / (sigma * np.sqrt(<span class="hl-number">2</span> * np.pi))
-    exponent = -<span class="hl-number">0.5</span> * ((x - mu) / sigma) ** <span class="hl-number">2</span>
-    <span class="hl-keyword">return</span> coeff * np.exp(exponent)
+    c = <span class="hl-number">1.0</span>/(sigma*np.sqrt(<span class="hl-number">2</span>*np.pi))
+    e = -<span class="hl-number">0.5</span>*((x-mu)/sigma)**<span class="hl-number">2</span>
+    <span class="hl-keyword">return</span> c * np.exp(e)
 
 <span class="hl-comment"># 验证 σ 减半效应</span>
-<span class="hl-keyword">for</span> s <span class="hl-keyword">in</span> [<span class="hl-number">0.5</span>, <span class="hl-number">1.0</span>, <span class="hl-number">2.0</span>]:
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"σ={s}: f(0)={normal_pdf(0,0,s):.4f}"</span>)
+<span class="hl-keyword">for</span> s <span class="hl-keyword">in</span> [<span class="hl-number">0.5</span>,<span class="hl-number">1.0</span>,<span class="hl-number">2.0</span>]:
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"σ={s:.1f}: f(0)={normal_pdf(0,0,s):.4f}"</span>)
 
-<span class="hl-comment"># ===== 模拟验证 68-95-99.7 =====</span>
-np.random.seed(<span class="hl-number">42</span>)
-sn = np.random.normal(<span class="hl-number">0</span>, <span class="hl-number">1</span>, <span class="hl-number">100000</span>)
+<span class="hl-comment"># ===== 模拟 68-95-99.7 =====</span>
+sn = np.random.normal(<span class="hl-number">0</span>,<span class="hl-number">1</span>,<span class="hl-number">100000</span>)
 <span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>,<span class="hl-number">2</span>,<span class="hl-number">3</span>]:
-    r = np.mean((sn >= -k) & (sn <= k))
+    r = np.mean((sn>=-k)&(sn<=k))
     t = {<span class="hl-number">1</span>:<span class="hl-number">0.6827</span>,<span class="hl-number">2</span>:<span class="hl-number">0.9545</span>,<span class="hl-number">3</span>:<span class="hl-number">0.9973</span>}[k]
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"±{k}σ: 模拟{r:.4f} 理论{t:.4f}"</span>)
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"±{k}σ: sim={r:.4f} theory={t:.4f}"</span>)
 
-<span class="hl-comment"># ===== CDF 数值积分 =====</span>
+<span class="hl-comment"># CDF 数值积分</span>
 xg = np.linspace(-<span class="hl-number">4</span>,<span class="hl-number">4</span>,<span class="hl-number">501</span>)
-pdf = normal_pdf(xg, <span class="hl-number">0</span>, <span class="hl-number">1</span>)
-dx = xg[<span class="hl-number">1</span>]-xg[<span class="hl-number">0</span>]
-cdf = np.cumsum(pdf) * dx
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\nF(-2)≈{cdf[125]:.4f} F(0)≈{cdf[250]:.4f} F(2)≈{cdf[375]:.4f}"</span>)</code></pre>
-<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
+cdf = np.cumsum(normal_pdf(xg,<span class="hl-number">0</span>,<span class="hl-number">1</span>)) * (xg[<span class="hl-number">1</span>]-xg[<span class="hl-number">0</span>])
+<span class="hl-builtin">print</span>(<span class="hl-string">f"F(-2)≈{cdf[125]:.4f} F(0)≈{cdf[250]:.4f} F(2)≈{cdf[375]:.4f}"</span>)</code></pre>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
 
 <hr>
 <h2>💭 概念题</h2>
 <ol>
-<li>连续随机变量取任何一个确定值的概率 = 0。但现实中气温「25°C」完全可以发生。矛盾吗？——考察：数学理想化 vs 测量精度</li>
-<li>σ 翻倍时钟变矮变胖。从总面积 = 1 这个硬约束，精确算一下 σ=2 时 f(0) 应该是 σ=1 时的几分之几。——考察：归一化系数的直观验证</li>
-<li>68-95-99.7 为什么不是线性？为什么 ±3σ 不是 68.3%×3？——考察：正态尾部指数衰减</li>
+<li>"取一个确定值的概率 = 0"但现实中气温 25°C 完全可以发生。用「针尖戳纸」的比喻解释为什么不矛盾。——考察：数学理想化 vs 测量精度（本课讲过针尖戳不到特定点）</li>
+<li>从总面积 = 1 的硬约束出发：如果 σ 从 1 翻到 2，钟变胖了。峰值 f(0) 应该是原来的几分之几？——考察：归一化系数 1/(σ√2π) 的直觉（本课验证过恰好减半）</li>
+<li>为什么 68-95-99.7 不是线性？±3σ 为什么不等于 3×68.3%？用"钟的尾巴指数衰减"来解释。——考察：正态分布的尾部衰减速度（本课讲过指数衰减）</li>
 </ol>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">

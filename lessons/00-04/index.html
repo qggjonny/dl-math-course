@@ -14,103 +14,100 @@
 
 <h1>00-04 导数、偏导数、梯度</h1>
 
-<p>这节是深度学习的心脏——训练的本质就是沿着梯度反方向走下去。</p>
+<hr>
+
+<h2>一、导数：山路的坡度</h2>
+
+<p><strong>画面：</strong> 你开车走盘山公路。仪表盘上的坡度计指着 15°。如果你继续往前开 1 公里，高度大约会上升 $\tan(15°)\times 1\text{km} \approx 270\text{m}$。</p>
+
+<p>导数就是这个「坡度」——<strong>在某一点，你往前走一点点，高度变化的速率。</strong></p>
+
+$$f'(x) = \lim_{\epsilon \to 0} \frac{f(x+\epsilon) - f(x)}{\epsilon}$$
+
+<p><strong>逐符号拆开：</strong></p>
+<ul>
+  <li>$f(x+\epsilon)$：你现在在 $x$ 位置，往前走一丁点 $\epsilon$ 后到达的新位置上的函数值</li>
+  <li>$f(x+\epsilon) - f(x)$：往前走 $\epsilon$ 后，函数值变化了多少（可能是上升、下降、或不变）</li>
+  <li>除以 $\epsilon$：归一化——不管走了多远，算出"每走 1 单位"的变化率</li>
+  <li>$\lim_{\epsilon \to 0}$：$\epsilon$ 无限趋近 0——我要的是<strong>这一点的瞬时坡度</strong>，不是一段路的平均坡度</li>
+</ul>
+
+<p>回到开车的比喻：导数 &gt; 0 = 正在上坡（往前走高度会增加），导数 &lt; 0 = 正在下坡，导数 = 0 = 到了山顶或山谷（坡度为零）。</p>
 
 <hr>
 
-<h2>一、导数：曲线的「坡度」</h2>
+<h2>二、偏导数：只看一个踏板</h2>
 
-<p><strong>画面：</strong> 你开车上山。看仪表盘上的坡度计：正在 15° 上坡。如果你现在踩油门往山上再开 1 公里，高度大约上升 $\tan(15°) \times 1\text{km} \approx 270\text{m}$。</p>
-
-<p>导数就是这个「坡度」——在某一点，函数值随着输入变化的<strong>瞬时比率</strong>。</p>
-
-<p>$$f'(x) = \lim_{\epsilon \to 0} \frac{f(x+\epsilon) - f(x)}{\epsilon}$$</p>
-
-<p><strong>拆开看：</strong></p>
-<ul>
-  <li>分子 $f(x+\epsilon) - f(x)$：往前走一丁点，函数值变了多少</li>
-  <li>分母 $\epsilon$：走了多远</li>
-  <li>比值 = 每走 1 单位，函数值变多少 = 坡度</li>
-  <li>$\lim_{\epsilon \to 0}$：$\epsilon$ 无限趋近 0，得到<strong>瞬时</strong>坡度（不是一段路的平均坡度）</li>
-</ul>
-
-<div class="callout callout-info">
-<strong>导数 &gt; 0 → 切线向上斜 → 往右走函数变大。</strong><br>
-<strong>导数 &lt; 0 → 切线向下斜 → 往右走函数变小。</strong><br>
-<strong>导数 = 0 → 切线水平 → 局部极值点（山顶或山谷）。</strong>
-</div>
-
-<h2>二、偏导数：多变量的坡度</h2>
-
-<p>如果函数有两个输入 $f(x,y)$，你只问「$x$ 方向上的坡度是多少（$y$ 先不动）」，这就是偏导数。</p>
+<p>如果函数有两个输入 $f(x,y)$——就像开车同时有<strong>油门</strong>和<strong>方向盘</strong>。偏导数就是问：「我只踩油门（$x$ 变），方向盘不动（$y$ 不变），高度变化多快？」</p>
 
 <p>$$\frac{\partial f}{\partial x} = \lim_{\epsilon \to 0} \frac{f(x+\epsilon, y) - f(x, y)}{\epsilon}$$</p>
 
-<p>$\partial$（读"round"）这个符号只是提醒你「不止一个变量」。算法上跟普通导数一模一样。</p>
+<p>$\partial$（读作 "round d"）这个符号只是提醒你：不止一个变量，但我现在只看这一个。</p>
 
-<h2>三、梯度：所有方向的坡度合到一个向量里</h2>
+<hr>
+
+<h2>三、梯度：最陡的方向</h2>
+
+<p>把所有偏导数拼成一个向量——这就是梯度。</p>
 
 <p>$$\nabla f = \left[\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n}\right]$$</p>
 
-<p><strong>核心直觉：梯度向量指向函数值上升<em>最快</em>的方向。</strong>它的每个分量告诉你「沿着这个坐标轴走，坡有多陡」；合在一起，它指向全局最陡的上坡方向。</p>
+<p><strong>核心直觉：梯度向量指向函数值上升<em>最快</em>的方向。</strong></p>
+
+<p><strong>画面：</strong> 你站在山谷里，四周都是坡。你原地转一圈，总有一个方向是<strong>最陡的上坡</strong>——那就是梯度指的方向。梯度的大小 = 那个方向的坡度有多陡。梯度的反方向 = 最陡的下坡路。</p>
 
 <div class="callout callout-tip">
-<strong>梯度下降 = 沿着梯度反方向走一小步，不断重复。</strong>
+<strong>梯度下降 = 闭着眼睛，每一步都往最陡的下坡方向踩一脚。</strong>
 $$\theta_{t+1} = \theta_t - \eta \cdot \nabla f(\theta_t)$$
 <ul>
-  <li>$\theta_t$：当前的参数位置</li>
-  <li>$\nabla f(\theta_t)$：当前位置的梯度（最陡上坡方向）</li>
-  <li>负号：因为我们想<strong>下降</strong>，所以反着走</li>
-  <li>$\eta$（学习率）：走多大步。太大 → 可能跳过最小值；太小 → 收敛太慢</li>
+  <li>$\theta_t$：你现在站的位置</li>
+  <li>$\nabla f(\theta_t)$：这个位置的最陡上坡方向</li>
+  <li><strong>负号</strong>：因为我们想<strong>下降</strong>，所以反着走</li>
+  <li>$\eta$（学习率）：走多大步。太大→可能跨过山谷冲到对面山上去了；太小→半天走不到底</li>
 </ul>
 </div>
 
 <hr>
 
-<h2>🖥️ 代码：从手算导数到梯度下降</h2>
-
+<h2>🖥️ 代码</h2>
 <pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
-<span class="hl-comment"># ===== 1. 数值微分：验证链式法则的手算 =====</span>
-<span class="hl-keyword">def</span> <span class="hl-func">numerical_grad</span>(f, x, eps=<span class="hl-number">1e-5</span>):
-    <span class="hl-string">"""中央差分法求 f 在 x 处的导数
-    (f(x+eps) - f(x-eps)) / (2*eps) 
-    精度 O(eps²)，比单边差分的 O(eps) 高一个数量级
+<span class="hl-comment"># ===== 数值微分：用代码算坡度 =====</span>
+<span class="hl-keyword">def</span> <span class="hl-func">num_grad</span>(f, x, eps=<span class="hl-number">1e-5</span>):
+    <span class="hl-string">"""中央差分：往前走一丁点，往后退一丁点，算平均坡度
+    (f(x+eps)-f(x-eps)) / (2*eps) 
+    精度比单边高：单边只看"往前"，中央看了"前后"然后取平均，误差抵消了一部分
     """</span>
     <span class="hl-keyword">return</span> (f(x + eps) - f(x - eps)) / (<span class="hl-number">2</span> * eps)
 
-<span class="hl-comment"># 测试 f(x) = x² → f'(x) = 2x</span>
-<span class="hl-keyword">def</span> <span class="hl-func">square</span>(x):
-    <span class="hl-keyword">return</span> x ** <span class="hl-number">2</span>  <span class="hl-comment"># x 的平方</span>
+<span class="hl-comment"># 测试 f(x)=x²，理论导数 = 2x</span>
+<span class="hl-keyword">def</span> <span class="hl-func">sq</span>(x):
+    <span class="hl-keyword">return</span> x ** <span class="hl-number">2</span>
 
 <span class="hl-keyword">for</span> x <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>]:
-    num = numerical_grad(square, x)  <span class="hl-comment"># 数值近似</span>
-    theory = <span class="hl-number">2</span> * x                      <span class="hl-comment"># 理论 f'(x) = 2x</span>
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"f'({x}) 数值={num:.6f}  理论={theory}"</span>)
+    n = num_grad(sq, x)           <span class="hl-comment"># 数值近似</span>
+    t = <span class="hl-number">2</span> * x                      <span class="hl-comment"># 理论：f'(x)=2x</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"f'({x}) 数值={n:.6f}  理论={t}"</span>)
 
-<span class="hl-comment"># ===== 2. 梯度下降：找 f(x)=x²-4x+4 的最小值 =====</span>
-<span class="hl-comment"># 理论最小值在 x=2（f'(x)=2x-4=0 → x=2）</span>
-x = <span class="hl-number">0.0</span>                    <span class="hl-comment"># 从 0 出发</span>
-lr = <span class="hl-number">0.1</span>                   <span class="hl-comment"># 学习率 η</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\n出发: x={x:.1f}"</span>)
+<span class="hl-comment"># ===== 梯度下降：从山顶走到山谷 =====</span>
+<span class="hl-comment"># f(x)=x²-4x+4 的最小值在 x=2（f'(x)=2x-4=0 → x=2）</span>
+x = <span class="hl-number">0.0</span>                    <span class="hl-comment"># 站在 x=0 的位置</span>
+lr = <span class="hl-number">0.1</span>                   <span class="hl-comment"># 学习率：每步走 0.1 倍的坡度</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n从 x=0 出发，目标 x=2"</span>)
 <span class="hl-keyword">for</span> step <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">30</span>):
-    grad = <span class="hl-number">2</span>*x - <span class="hl-number">4</span>          <span class="hl-comment"># f'(x) = 2x - 4</span>
-    x = x - lr * grad       <span class="hl-comment"># 沿梯度反方向走</span>
+    grad = <span class="hl-number">2</span>*x - <span class="hl-number">4</span>          <span class="hl-comment"># 当前位置的坡度</span>
+    x = x - lr * grad       <span class="hl-comment"># 沿着坡度反方向走一步</span>
     <span class="hl-keyword">if</span> step % <span class="hl-number">5</span> == <span class="hl-number">0</span>:
-        <span class="hl-builtin">print</span>(<span class="hl-string">f"  第{step:2d}步: x={x:.4f}  grad={grad:.4f}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"  最终: x={x:.4f} (理论=2)"</span>)
-<span class="hl-comment"># x 从 0 逐渐滑到 2，梯度也从 -4 逐渐变成 0</span></code></pre>
-
+        <span class="hl-builtin">print</span>(<span class="hl-string">f"  第{step:2d}步: x={x:.4f}  坡度={grad:+.4f}"</span>)
+        <span class="hl-comment"># 坡度从 -4 逐渐变成 0，x 从 0 逐渐滑到 2</span></code></pre>
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
 
 <hr>
-
 <h2>💭 概念题</h2>
-
 <ol>
-<li>梯度指向上升最快方向。为什么是"最快"？提示：任意方向的方向导数 = 梯度与该方向单位向量的点乘。——考察：方向导数的几何意义</li>
-<li>学习率太大时梯度下降会振荡甚至发散。为什么？用 x² 的例子，如果 lr=1.5 在 x=1 处会发生什么？——考察：梯度下降收敛条件</li>
-<li>中央差分 f(x+eps) - f(x-eps) 为什么比单边差分 f(x+eps) - f(x) 更精确？——考察：泰勒展开的偶次项抵消</li>
+<li>梯度指向上升最快方向。为什么是"最快"？用方向导数 = 梯度与方向向量的点乘来解释。提示：$\cos\theta$ 在 $\theta=0°$（同向）时最大。——考察：方向导数的几何直觉（本课讲过"原地转一圈找最陡上坡"）</li>
+<li>学习率太大的后果：画面上你站在山谷一边，步子太大跨到对面山上去了，再一步又跨回来，来回振荡——永远到不了谷底。试算一下 lr=1.5 在 x=1 处会发生什么。梯度是 $f'(1)=2\times1-4=-2$，更新后 x 变成多少？——考察：梯度下降的发散条件（本课讲过学习率太大跨过山谷）</li>
+<li>中央差分为什么比单边差分更精确？中央用 $(x+\epsilon)$ 和 $(x-\epsilon)$ 两边的信息取平均，单边只用一边。在你心里过一遍：x² 的中央差分计算结果比单边差分更接近 2x 吗？——考察：对称差分抵消误差（本课代码注释解释了中央差分的原理）</li>
 </ol>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
