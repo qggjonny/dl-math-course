@@ -63,6 +63,31 @@ s = np.array(<span class="hl-number">3.14</span>)    <span class="hl-comment"># 
 
 <p>向量就是"一张表"——你有一个学生三门课的成绩表，装在这个向量里。每个位置固定代表一门课：第 0 位是语文，第 1 位是数学，第 2 位是英语。</p>
 
+<div class="callout callout-important">
+<h3>同一个箭头，两种容器：rank-1 vs rank-2</h3>
+
+<p><code>[85, 92, 78]</code> 这根箭可以装在两种容器里：</p>
+
+<table>
+<tr><th></th><th>rank-1 向量</th><th>rank-2 列矩阵</th></tr>
+<tr><td>代码</td><td><code>np.array([85,92,78])</code></td><td><code>np.array([[85],[92],[78]])</code></td></tr>
+<tr><td>shape</td><td><code>(3,)</code> — 一个数</td><td><code>(3,1)</code> — 两个数</td></tr>
+<tr><td>画面</td><td>一根 3D 空间的箭</td><td>同一根箭，但装在表格里</td></tr>
+</table>
+
+<p><strong>rank = shape 里有几个数。</strong> <code>()</code> 是 rank-0（标量），<code>(3,)</code> 是 rank-1（向量），<code>(3,1)</code> 是 rank-2（矩阵）。</p>
+
+<p><strong>关键区别：</strong> rank-1 向量的 <code>.T</code>（转置）<strong>不生效</strong>——它没有"行"和"列"的概念，转置还是自己。rank-2 列矩阵转置后会变成行矩阵 <code>(1,3)</code>。</p>
+
+<pre><code>a = np.array([1, 2, 3])       # rank-1: (3,)
+b = np.array([[1],[2],[3]])   # rank-2: (3,1)
+
+print(a.T)   # 输出: [1 2 3] ——没变！rank-1 没有转置概念
+print(b.T)   # 输出: [[1 2 3]] ——从 (3,1) 变成了 (1,3)</code></pre>
+
+<p>箭的分量一样（都是 1,2,3），但<strong>容器的 rank 不同，numpy 对待它们的方式就不一样。</strong>这个概念后面学广播和矩阵乘法时会反复出现。</p>
+</div>
+
 <hr>
 
 <h2>三、矩阵 Matrix — 不是数据，是"操作手册"</h2>

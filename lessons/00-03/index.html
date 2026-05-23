@@ -94,6 +94,20 @@ l1 = eigvals[<span class="hl-number">0</span>]               <span class="hl-com
 <span class="hl-builtin">print</span>(<span class="hl-string">f"λ×v = {l1 * v1}"</span>)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"相等? {np.allclose(A @ v1, l1 * v1)}"</span>)  <span class="hl-comment"># True</span></code></pre>
 
+<div class="callout callout-info">
+<h3>特例：对角矩阵——最简单的特征值</h3>
+
+<p>如果矩阵长成这样（只有对角线上有数，其余全是 0）：</p>
+
+$$A = \begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}$$
+
+<p><strong>特征值直接就是对角线上的数：2 和 3。</strong>特征向量就是坐标轴方向：$[1,0]$ 和 $[0,1]$。</p>
+
+<p>为什么？回到橡胶皮画面：这个矩阵把 x 方向拉长到 2 倍，y 方向拉长到 3 倍——但<strong>没有任何扭转</strong>。所以坐标轴本身就是特征方向，拉伸倍数就是对角线上的数。</p>
+
+<p><strong>这是一个重要的思维捷径：</strong>看到对角矩阵 → 特征值就在对角线上，不用算。这个性质在很多地方会用到。</p>
+</div>
+
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
 
 <hr>

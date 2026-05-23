@@ -56,6 +56,26 @@ $$f'(x) = \lim_{\epsilon \to 0} \frac{f(x+\epsilon) - f(x)}{\epsilon}$$
 
 <p><strong>画面：</strong> 你站在山谷里，四周都是坡。你原地转一圈，总有一个方向是<strong>最陡的上坡</strong>——那就是梯度指的方向。梯度的大小 = 那个方向的坡度有多陡。梯度的反方向 = 最陡的下坡路。</p>
 
+<div class="callout callout-info">
+<h3>为什么是最快？——方向导数</h3>
+
+<p>你沿着<strong>任意方向</strong>走一小步，上升多快？这个速率叫做<strong>方向导数</strong>。它的公式很简单：</p>
+
+$$\text{方向导数} = \nabla f \cdot \mathbf{u}$$
+
+<p>$\nabla f$ 是梯度向量，$\mathbf{u}$ 是你选择的方向（长度=1 的单位向量）。</p>
+
+<p>点乘公式告诉我们：$\nabla f \cdot \mathbf{u} = \|\nabla f\| \cdot 1 \cdot \cos\theta$。$\theta$ 是梯度和你走的方向之间的夹角。</p>
+
+<ul>
+  <li>$\theta = 0°$（和梯度<strong>同向</strong>）→ $\cos\theta=1$ → 上升最快</li>
+  <li>$\theta = 90°$（和梯度<strong>垂直</strong>）→ $\cos\theta=0$ → 高度不变（沿等高线走）</li>
+  <li>$\theta = 180°$（和梯度<strong>反向</strong>）→ $\cos\theta=-1$ → 下降最快（这就是梯度下降！）</li>
+</ul>
+
+<p>所以梯度指的方向是最快上升方向——这不是定义，而是<strong>点乘取最大值的自然结果</strong>（$\cos\theta$ 在 $\theta=0°$ 时最大）。</p>
+</div>
+
 <div class="callout callout-tip">
 <strong>梯度下降 = 闭着眼睛，每一步都往最陡的下坡方向踩一脚。</strong>
 $$\theta_{t+1} = \theta_t - \eta \cdot \nabla f(\theta_t)$$
