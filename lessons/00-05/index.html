@@ -62,7 +62,7 @@ $$\frac{dz}{dx} = \frac{\partial z}{\partial y_1} \cdot \frac{dy_1}{dx} + \frac{
 
 <h2>三、手算一个例子：$(wx-y)^2$ 的导数</h2>
 
-<p>$L = (wx - y)^2$。假设 $y$ 是常数（类似"正确答案"），我们想知道 $w$ 变一点损失 $L$ 变多少。</p>
+<p>$L = (wx - y)^2$。假设 $y$ 是常数（一个目标值），我们想知道 $w$ 变一点，$L$ 变多少。</p>
 
 <ul>
   <li>内层：$u(w) = wx - y$，$\frac{du}{dw} = x$</li>
@@ -90,24 +90,24 @@ x = <span class="hl-number">1.5</span>
 <span class="hl-comment"># ===== 线性回归：一步梯度下降 =====</span>
 w, x_val, y = <span class="hl-number">0.5</span>, <span class="hl-number">2.0</span>, <span class="hl-number">1.0</span>
 
-<span class="hl-comment"># 前向：输入 → 预测 → 损失</span>
+<span class="hl-comment"># 前向：输入 → 预测 → 差值</span>
 pred = w * x_val               <span class="hl-comment"># 预测 = 0.5×2.0 = 1.0</span>
-loss = (pred - y) ** <span class="hl-number">2</span>        <span class="hl-comment"># 损失 = (1.0-1.0)² = 0.0</span>
+L = (pred - y) ** <span class="hl-number">2</span>           <span class="hl-comment"># 差值的平方 = (1.0-1.0)² = 0.0</span>
 
-<span class="hl-comment"># 反向：从损失往回，用链式法则求 ∂L/∂w</span>
+<span class="hl-comment"># 从外层往内层，用链式法则求 ∂L/∂w</span>
 dloss_dpred = <span class="hl-number">2</span> * (pred - y)  <span class="hl-comment"># 外层：∂L/∂pred</span>
 dpred_dw = x_val               <span class="hl-comment"># 内层：∂pred/∂w = x</span>
 dloss_dw = dloss_dpred * dpred_dw  <span class="hl-comment"># 链式！∂L/∂w</span>
 
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\nL={loss:.3f}  ∂L/∂w={dloss_dw:.3f}"</span>)</code></pre>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\nL={L:.3f}  ∂L/∂w={dloss_dw:.3f}"</span>)</code></pre>
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
 
 <hr>
 <h2>💭 概念题</h2>
-   107|<ol>
-   108|<li>用齿轮比喻解释：如果每一级齿轮的传动比都是 0.25（减速），100 级串联后，拧第一个齿轮 10000 圈，最后一个转几圈？——考察：连乘的指数衰减效应</li>
-   109|<li>为什么求 $h(x)=f(g(x))$ 的导数时必须先算出 $g(x)$ 的值？用齿轮比喻：你必须知道第二个齿轮现在卡在哪个齿上，才能算这一级的传动比。——考察：复合函数求导的计算顺序</li>
-   110|<li>$h(x) = (2x+1)^3$，用链式法则手算 $h'(x)$。先分别写出外导和内导，再乘起来。——考察：链式法则的手算练习</li>
+<ol>
+<li>用齿轮比喻解释：如果每一级齿轮的传动比都是 0.25（减速），100 级串联后，拧第一个齿轮 10000 圈，最后一个转几圈？——考察：连乘的指数衰减效应</li>
+<li>为什么求 $h(x)=f(g(x))$ 的导数时必须先算出 $g(x)$ 的值？用齿轮比喻：你必须知道第二个齿轮现在卡在哪个齿上，才能算这一级的传动比。——考察：复合函数求导的计算顺序</li>
+<li>$h(x) = (2x+1)^3$，用链式法则手算 $h'(x)$。先分别写出外导和内导，再乘起来。——考察：链式法则的手算练习</li>
 </ol>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
