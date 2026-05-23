@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>00-01 标量、向量、矩阵、张量 · 深度学习数学</title>
+<link rel="stylesheet" href="../../css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head><body>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-01</span>
+<span><a href="../../">目录</a> &nbsp; <a href="../00-02/">下一课 →</a></span></nav>
+<div class="container">
+<h1>00-01 标量、向量、矩阵、张量</h1>
+
+<p>深度学习中每一个数字都有形状。这节课把四种数据结构看清楚。</p>
+
+<h2>一、标量 Scalar</h2>
+<p>一个单独的数。温度 25°C、损失值 0.37、学习率 0.001——都是标量。</p>
+<p>形状：<code>()</code>——空括号，零维。在 numpy 里是 <code>np.array(3.14)</code>。</p>
+
+<h2>二、向量 Vector</h2>
+<p><strong>几何直觉：空间里的一根箭头。</strong></p>
+<p>$\mathbf{v} = [v_1, v_2, v_3]$ 是从原点到 $(v_1, v_2, v_3)$ 的箭头。长度 = 箭头的模，方向 = 箭头指哪。</p>
+<p>形状：<code>(n,)</code>——一维。比如一个 3 维词向量：<code>np.array([0.2, -0.5, 0.8])</code>。</p>
+
+<div class="callout callout-info">
+<strong>深度学习里向量无处不在：</strong>词嵌入是一个向量，隐藏层输出是一个向量，一个样本的特征也是一个向量。
+</div>
+
+<h2>三、矩阵 Matrix</h2>
+<p><strong>几何直觉：空间变换的"操作手册"。</strong></p>
+<p>矩阵不是数据，是<strong>对向量做操作的规则</strong>。$\mathbf{y} = \mathbf{W}\mathbf{x}$ 的意思是：把向量 $\mathbf{x}$ 按照 $\mathbf{W}$ 规定的规则，扭成新向量 $\mathbf{y}$。</p>
+<p>形状：<code>(m, n)</code>——二维。$m$ 行 $n$ 列。全连接层权重 <code>W.shape = (512, 256)</code> 意思是：输入 256 维向量 → 输出 512 维向量。</p>
+
+<table>
+<tr><th>矩阵运算</th><th>直觉</th><th>形状规则</th></tr>
+<tr><td>$\mathbf{W}\mathbf{x}$</td><td>线性变换：旋转+缩放</td><td>$(m,n) \times (n,) \to (m,)$</td></tr>
+<tr><td>$\mathbf{W}_2\mathbf{W}_1$</td><td>两次变换复合</td><td>$(p,m) \times (m,n) \to (p,n)$</td></tr>
+<tr><td>$\mathbf{W}^T$</td><td>行列互换</td><td>$(m,n) \to (n,m)$</td></tr>
+</table>
+
+<h2>四、张量 Tensor</h2>
+<p><strong>三维及以上的数组统称张量。</strong></p>
+<p>一张 224×224 的 RGB 图片：形状 <code>(3, 224, 224)</code>——3 个通道，每个 224×224。</p>
+<p>一批 32 张图片：<code>(32, 3, 224, 224)</code>——四维张量。第 0 维是 batch。</p>
+
+<div class="callout callout-tip">
+<strong>记住就四个：</strong>标量 = 零维，向量 = 一维箭头，矩阵 = 二维变换，张量 = 三维以上容器。深度学习的全部数据都是这四种。
+</div>
+
+<h2>🖥️ 代码</h2>
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 标量：零维数组，形状是空元组 ()</span>
+s = np.array(<span class="hl-number">3.14</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"标量: 值={s}, 形状={s.shape}"</span>)  <span class="hl-comment"># 形状=()</span>
+
+<span class="hl-comment"># 向量：一维数组，形状 (n,)</span>
+v = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>])
+<span class="hl-builtin">print</span>(<span class="hl-string">f"向量: {v}, 形状={v.shape}"</span>)  <span class="hl-comment"># 形状=(3,)</span>
+
+<span class="hl-comment"># 矩阵：二维数组，形状 (行, 列)</span>
+M = np.array([[<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>], [<span class="hl-number">4</span>, <span class="hl-number">5</span>, <span class="hl-number">6</span>]])
+<span class="hl-builtin">print</span>(<span class="hl-string">f"矩阵:\n{M}\n形状={M.shape}"</span>)  <span class="hl-comment"># 形状=(2,3)</span>
+
+<span class="hl-comment"># 张量：三维数组，形状 (depth, rows, cols)</span>
+T = np.ones((<span class="hl-number">2</span>, <span class="hl-number">3</span>, <span class="hl-number">4</span>))
+<span class="hl-builtin">print</span>(<span class="hl-string">f"张量: 形状={T.shape}"</span>)  <span class="hl-comment"># 形状=(2,3,4)</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"  总元素数={T.size}"</span>)       <span class="hl-comment"># 2×3×4=24</span></code></pre>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
+
+<h2>💭 概念题</h2>
+<ol>
+<li>全连接层 $W$ 形状是 (128, 64)。如果输入向量 $\mathbf{x}$ 形状是 (64,)，输出 $\mathbf{y}=W\mathbf{x}$ 的形状是什么？——考察：矩阵乘的形状规则</li>
+<li>为什么深度学习把图片存成 (C, H, W) 而不是 (H, W, C)？两种存法在内存布局上有什么区别？——考察：张量维度顺序的工程考量</li>
+</ol>
+
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../../">📖 目录</a><a href="../00-02/">00-02 矩阵运算 →</a></nav>
+</div></body></html>

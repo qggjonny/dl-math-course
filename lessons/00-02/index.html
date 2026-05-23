@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>00-02 矩阵运算 · 深度学习数学</title>
+<link rel="stylesheet" href="../../css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head><body>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-02</span>
+<span><a href="../00-01/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-03/">下一课 →</a></span></nav>
+<div class="container">
+<h1>00-02 矩阵运算</h1>
+
+<h2>一、点乘 (Dot Product)</h2>
+<p><strong>几何直觉：两个向量在同一方向上的投影长度。</strong></p>
+<p>$$\mathbf{a} \cdot \mathbf{b} = a_1b_1 + a_2b_2 + \cdots + a_nb_n = \|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$$</p>
+<p>$\cos\theta = 1$（同向）→ 点乘最大；$\cos\theta = -1$（反向）→ 点乘最小；$\cos\theta = 0$（垂直）→ 点乘 = 0。</p>
+
+<h2>二、矩阵乘法</h2>
+<p>$$C_{ij} = \sum_k A_{ik} \cdot B_{kj}$$</p>
+<p>$C$ 的第 $i$ 行第 $j$ 列 = $A$ 的第 $i$ 行 与 $B$ 的第 $j$ 列的<strong>点乘</strong>。</p>
+<p><strong>铁律：</strong>$(m \times n) \times (n \times p) \to (m \times p)$。内维必须匹配。</p>
+
+<h2>三、转置</h2>
+<p>$$(A^T)_{ij} = A_{ji}$$</p>
+<p>行变列，列变行。$(m \times n)^T \to (n \times m)$。</p>
+
+<h2>四、Hadamard 积（逐元素乘）</h2>
+<p>$$(A \odot B)_{ij} = A_{ij} \times B_{ij}$$</p>
+<p>形状必须完全一致。深度学习里到处是它：dropout 掩码、attention mask、门控机制。</p>
+
+<h2>五、广播 (Broadcasting)</h2>
+<p>不同形状的数组做运算时，numpy 自动"拉伸"小数组。规则：从最后一维向前对齐，维度为 1 的可以扩展。</p>
+<p><code>(3, 1) + (1, 4) → (3, 4)</code>——两个都从 1 维扩展。</p>
+
+<h2>🖥️ 代码</h2>
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 点乘：对应位置相乘再求和</span>
+a = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>])
+b = np.array([<span class="hl-number">4</span>, <span class="hl-number">5</span>, <span class="hl-number">6</span>])
+dot = np.dot(a, b)  <span class="hl-comment"># 1×4 + 2×5 + 3×6 = 32</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"点乘: {dot}"</span>)
+
+<span class="hl-comment"># 矩阵乘：A(2,3) × B(3,2) → (2,2)</span>
+A = np.array([[<span class="hl-number">1</span>,<span class="hl-number">2</span>,<span class="hl-number">3</span>],[<span class="hl-number">4</span>,<span class="hl-number">5</span>,<span class="hl-number">6</span>]])  <span class="hl-comment"># 形状 (2,3)</span>
+B = np.array([[<span class="hl-number">7</span>,<span class="hl-number">8</span>],[<span class="hl-number">9</span>,<span class="hl-number">10</span>],[<span class="hl-number">11</span>,<span class="hl-number">12</span>]]) <span class="hl-comment"># 形状 (3,2)</span>
+C = A @ B  <span class="hl-comment"># @ 是矩阵乘法的运算符</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"矩阵乘:\n{C}\n形状={C.shape}"</span>)  <span class="hl-comment"># (2,2)</span>
+
+<span class="hl-comment"># 转置：行变列，列变行</span>
+At = A.T  <span class="hl-comment"># (2,3) → (3,2)</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"转置:\n{At}\n形状={At.shape}"</span>)
+
+<span class="hl-comment"># Hadamard 积：逐元素相乘，形状必须一致</span>
+H = A * np.array([[<span class="hl-number">2</span>,<span class="hl-number">2</span>,<span class="hl-number">2</span>],[<span class="hl-number">3</span>,<span class="hl-number">3</span>,<span class="hl-number">3</span>]])  <span class="hl-comment"># 形状=(2,3)</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"Hadamard:\n{H}"</span>)
+
+<span class="hl-comment"># 广播：(3,1) + (1,4) → (3,4)</span>
+x = np.array([[<span class="hl-number">1</span>],[<span class="hl-number">2</span>],[<span class="hl-number">3</span>]])    <span class="hl-comment"># 形状 (3,1)</span>
+y = np.array([[<span class="hl-number">10</span>,<span class="hl-number">20</span>,<span class="hl-number">30</span>,<span class="hl-number">40</span>]])  <span class="hl-comment"># 形状 (1,4)</span>
+z = x + y  <span class="hl-comment"># numpy 自动广播：x 重复 4 列，y 重复 3 行</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"广播结果:\n{z}\n形状={z.shape}"</span>)  <span class="hl-comment"># (3,4)</span></code></pre>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
+
+<h2>💭 概念题</h2>
+<ol>
+<li>两个向量点乘为 0 说明什么几何关系？点乘为正/负呢？——考察：点乘的几何含义</li>
+<li>为什么 $(AB)^T = B^T A^T$ 而不是 $A^T B^T$？用手算一个 2×2 例子验证。——考察：转置与乘法顺序</li>
+</ol>
+
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-01/">← 00-01</a><a href="../../">📖 目录</a><a href="../00-03/">00-03 →</a></nav>
+</div></body></html>

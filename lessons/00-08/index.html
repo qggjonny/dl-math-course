@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>00-08 期望与方差 · 深度学习数学</title>
+<link rel="stylesheet" href="../../css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head><body>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-08</span>
+<span><a href="../00-07/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="#">下一课 →</a></span></nav>
+<div class="container">
+<h1>00-08 期望与方差</h1>
+
+<h2>一、期望：概率加权平均</h2>
+<p><strong>离散：</strong> $$\mathbb{E}[X] = \sum_i x_i \cdot P(X = x_i)$$</p>
+<p><strong>连续：</strong> $$\mathbb{E}[X] = \int_{-\infty}^{\infty} x \cdot f(x)\,dx$$</p>
+<p><strong>直觉：</strong> 如果重复实验无限次，结果的平均值往哪里收敛。不是"最可能的值"——那是众数。</p>
+
+<table><tr><th>概念</th><th>含义</th><th>例子：抛骰子</th></tr>
+<tr><td>期望 $\mu$</td><td>长期平均</td><td>3.5</td></tr>
+<tr><td>中位数</td><td>正中间的值</td><td>3.5</td></tr>
+<tr><td>众数</td><td>最常出现的值</td><td>任一（均匀分布无众数）</td></tr></table>
+
+<h2>二、方差：分散程度</h2>
+<p>$$\text{Var}(X) = \mathbb{E}[(X - \mu)^2] = \mathbb{E}[X^2] - \mu^2$$</p>
+<p><strong>直觉：</strong> 数据点离均值有多远，平方后取平均。方差大 = 数据散得开；方差小 = 数据聚在均值附近。</p>
+
+<h2>三、标准差：方差的平方根</h2>
+<p>$$\sigma = \sqrt{\text{Var}(X)}$$</p>
+<p>方差单位是原单位的平方（比如"平方摄氏度"），标准差单位和原数据一致。</p>
+
+<div class="callout callout-info">
+<strong>深度学习关键应用：</strong>
+<ul>
+<li><strong>BatchNorm：</strong> 对每批数据减均值除标准差 → 稳定训练</li>
+<li><strong>参数初始化：</strong> Xavier/He 初始化用方差控制信号传播</li>
+<li><strong>损失函数：</strong> MSE = 期望(预测-真实)²</li>
+</ul>
+</div>
+
+<h2>四、期望的线性性质</h2>
+<p>$$\mathbb{E}[aX + b] = a\mathbb{E}[X] + b$$</p>
+<p>$$\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]$$</p>
+<p>期望是线性算子——不管 X 和 Y 是否独立。</p>
+
+<p><strong>方差不线性：</strong> $$\text{Var}(aX + b) = a^2\text{Var}(X)$$（常数 b 被消掉了）</p>
+
+<h2>🖥️ 代码</h2>
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+np.random.seed(<span class="hl-number">42</span>)
+
+<span class="hl-comment"># 从 N(μ=5, σ=2) 抽 100000 个样本</span>
+<span class="hl-comment"># loc=均值, scale=标准差, size=样本数</span>
+samples = np.random.normal(loc=<span class="hl-number">5</span>, scale=<span class="hl-number">2</span>, size=<span class="hl-number">100000</span>)
+
+<span class="hl-comment"># 期望：np.mean 算样本均值，近似理论期望</span>
+mu_hat = np.mean(samples)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"期望 μ: 理论=5, 样本={mu_hat:.4f}"</span>)
+
+<span class="hl-comment"># 方差：np.var(ddof=1) 算样本方差（ddof=1 是无偏估计）</span>
+<span class="hl-comment"># ddof=0 是总体方差（除以 n），ddof=1 是样本方差（除以 n-1）</span>
+var_hat = np.var(samples, ddof=<span class="hl-number">0</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"方差 σ²: 理论=4, 样本={var_hat:.4f}"</span>)
+
+<span class="hl-comment"># 标准差</span>
+sigma_hat = np.std(samples, ddof=<span class="hl-number">0</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"标准差 σ: 理论=2, 样本={sigma_hat:.4f}"</span>)
+
+<span class="hl-comment"># 验证期望的线性性质</span>
+a, b = <span class="hl-number">3</span>, <span class="hl-number">10</span>
+transformed = a * samples + b  <span class="hl-comment"># aX + b</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\nE[aX+b] = {np.mean(transformed):.2f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"aE[X]+b = {a*mu_hat + b:.2f}"</span>)  <span class="hl-comment"># 应该相等</span>
+
+<span class="hl-comment"># 方差不线性：Var(aX+b) = a²Var(X)</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\nVar(aX+b) = {np.var(transformed, ddof=0):.2f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"a²Var(X)  = {a**2 * var_hat:.2f}"</span>)  <span class="hl-comment"># 应该相等</span></code></pre>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
+
+<h2>🖥️ 代码练习</h2>
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+np.random.seed(<span class="hl-number">42</span>)
+<span class="hl-comment"># 抛骰子：离散均匀分布 {1,2,3,4,5,6}</span>
+dice = np.random.randint(<span class="hl-number">1</span>, <span class="hl-number">7</span>, size=<span class="hl-number">100000</span>)
+<span class="hl-comment"># randint(low, high, size) 抽 [low, high) 的整数</span>
+<span class="hl-comment"># 所以 high=7 才能包含 6</span>
+
+mu = np.mean(dice)
+var = np.var(dice, ddof=<span class="hl-number">0</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"骰子期望={mu:.4f} (理论=3.5)"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"骰子方差={var:.4f} (理论≈2.917)"</span>)
+<span class="hl-comment"># 理论：E[X]=3.5, Var(X)=E[X²]-E[X]²=91/6-12.25≈2.917</span></code></pre>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
+
+<h2>💭 概念题</h2>
+<ol>
+<li>方差用平方而不是绝对值 $(X-\mu)^2$ vs $|X-\mu|$。数学上为什么平方更"好用"？——考察：可导性、凸性、与正态分布的对应</li>
+<li>BatchNorm 减均值除标准差后，输出均值和方差是多少？为什么这样做能稳定训练？——考察：归一化的统计效应</li>
+<li>为什么 Var(aX+b) 里常数 b 消失了？直觉解释。——考察：平移不变性</li>
+</ol>
+
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-07/">← 00-07 连续分布</a><a href="../../">📖 目录</a><span></span></nav>
+</div></body></html>

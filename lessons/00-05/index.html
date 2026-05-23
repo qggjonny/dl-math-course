@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>00-05 链式法则 · 深度学习数学</title>
+<link rel="stylesheet" href="../../css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head><body>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-05</span>
+<span><a href="../00-04/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-06/">下一课 →</a></span></nav>
+<div class="container">
+<h1>00-05 链式法则</h1>
+
+<h2>反向传播的核心引擎</h2>
+<p>链式法则就是<strong>复合函数求导的规则</strong>。深度学习 100 层的网络，梯度怎么从最后一层传到第一层？答案就是链式法则一层一层乘回去。</p>
+
+<h2>一、单变量链式法则</h2>
+<p>$$h(x) = f(g(x)) \quad\Rightarrow\quad h'(x) = f'(g(x)) \cdot g'(x)$$</p>
+<p><strong>"外函数的导数 × 内函数的导数"</strong>。像剥洋葱：外层求导（内层先不动），乘以内层求导。</p>
+
+<h2>二、多变量链式法则</h2>
+<p>$$z = f(y_1, y_2, \ldots), \quad y_i = g_i(x)$$</p>
+<p>$$\frac{dz}{dx} = \sum_i \frac{\partial z}{\partial y_i} \cdot \frac{dy_i}{dx}$$</p>
+<p><strong>所有路径的导数之和。</strong> x 通过 $y_1, y_2, \ldots$ 多条路径影响 z，每条路径贡献一个乘积，全部加起来。</p>
+
+<div class="callout callout-info">
+<strong>反向传播的本质：</strong> 前向算输出 → 算损失 → 从最后一层开始，用链式法则把梯度一层层往回传。每一层只需要知道"自己这层的局部导数"和"从后面传来的梯度"，乘起来传下去。
+</div>
+
+<h2>🖥️ 代码</h2>
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 手算链式法则：h(x) = sin(x²)</span>
+<span class="hl-comment"># 外层 f(u)=sin(u), f'(u)=cos(u)</span>
+<span class="hl-comment"># 内层 g(x)=x²,    g'(x)=2x</span>
+<span class="hl-comment"># h'(x) = cos(x²) * 2x</span>
+
+<span class="hl-keyword">def</span> <span class="hl-func">h</span>(x):
+    <span class="hl-keyword">return</span> np.sin(x ** <span class="hl-number">2</span>)
+
+<span class="hl-keyword">def</span> <span class="hl-func">h_grad_analytic</span>(x):
+    <span class="hl-keyword">return</span> np.cos(x ** <span class="hl-number">2</span>) * <span class="hl-number">2</span> * x
+
+<span class="hl-comment"># 中央差分数值验证</span>
+<span class="hl-keyword">def</span> <span class="hl-func">numerical_grad</span>(f, x, eps=<span class="hl-number">1e-5</span>):
+    <span class="hl-keyword">return</span> (f(x + eps) - f(x - eps)) / (<span class="hl-number">2</span> * eps)
+
+x = <span class="hl-number">1.5</span>
+num = numerical_grad(h, x)
+ana = h_grad_analytic(x)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"h'(1.5) 数值={num:.5f} 解析={ana:.5f}"</span>)
+
+<span class="hl-comment"># 模拟反向传播：损失 L = (wx - y)²</span>
+<span class="hl-comment"># dL/dw = 2(wx - y) * x</span>
+w, x, y = <span class="hl-number">0.5</span>, <span class="hl-number">2.0</span>, <span class="hl-number">1.0</span>
+pred = w * x                       <span class="hl-comment"># 前向</span>
+loss = (pred - y) ** <span class="hl-number">2</span>            <span class="hl-comment"># 损失</span>
+dloss_dpred = <span class="hl-number">2</span> * (pred - y)        <span class="hl-comment"># ∂L/∂pred（外层求导）</span>
+dpred_dw = x                       <span class="hl-comment"># ∂pred/∂w（内层求导）</span>
+dloss_dw = dloss_dpred * dpred_dw  <span class="hl-comment"># 链式法则！</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n损失 L={loss:.3f}, dL/dw={dloss_dw:.3f}"</span>)</code></pre>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
+
+<h2>💭 概念题</h2>
+<ol>
+<li>链式法则是乘法。如果中间某层导数接近 0，整个梯度会怎样？——考察：梯度消失的数学根源</li>
+<li>100 层网络的反向传播，有多少个偏导数相乘？如果每个都在 0~1 之间，积会趋近于什么？——考察：深层网络的数值稳定性</li>
+</ol>
+
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-04/">← 00-04</a><a href="../../">📖 目录</a><a href="../00-06/">00-06 →</a></nav>
+</div></body></html>

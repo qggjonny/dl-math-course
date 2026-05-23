@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>00-04 导数与梯度 · 深度学习数学</title>
+<link rel="stylesheet" href="../../css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head><body>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-04</span>
+<span><a href="../00-03/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-05/">下一课 →</a></span></nav>
+<div class="container">
+<h1>00-04 导数、偏导数、梯度</h1>
+
+<h2>一、导数：变化率</h2>
+<p><strong>几何直觉：曲线在某点的切线斜率。</strong></p>
+<p>$$f'(x) = \lim_{\epsilon \to 0} \frac{f(x+\epsilon) - f(x)}{\epsilon}$$</p>
+<p>切线向上斜（导数 &gt; 0）→ 往右走函数变大。这就是梯度下降的基础：<strong>沿导数反方向走，函数值下降。</strong></p>
+
+<h2>二、偏导数</h2>
+<p>多变量函数 $f(x,y)$，固定其他变量，只对一个变量求导。</p>
+<p>$$\frac{\partial f}{\partial x} = \lim_{\epsilon \to 0} \frac{f(x+\epsilon, y) - f(x, y)}{\epsilon}$$</p>
+
+<h2>三、梯度：所有偏导数的向量</h2>
+<p>$$\nabla f = \left[\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \cdots, \frac{\partial f}{\partial x_n}\right]$$</p>
+<p><strong>几何直觉：指向函数上升最快的方向。</strong> 梯度方向 = 最陡上坡。反方向 = 最陡下坡。梯度大小 = 坡度有多陡。</p>
+
+<div class="callout callout-tip">
+<strong>梯度下降 = 沿梯度反方向走一小步，反复。</strong>
+$$\theta_{t+1} = \theta_t - \eta \cdot \nabla f(\theta_t)$$
+$\eta$ 是学习率，控制每步大小。
+</div>
+
+<h2>🖥️ 代码</h2>
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 中央差分求导：f'(x) ≈ (f(x+eps) - f(x-eps)) / (2*eps)</span>
+<span class="hl-comment"># 精度 O(eps²)，优于单边差分的 O(eps)</span>
+<span class="hl-keyword">def</span> <span class="hl-func">numerical_grad</span>(f, x, eps=<span class="hl-number">1e-5</span>):
+    <span class="hl-keyword">return</span> (f(x + eps) - f(x - eps)) / (<span class="hl-number">2</span> * eps)
+
+<span class="hl-comment"># f(x)=x²，理论导数 f'(x)=2x</span>
+<span class="hl-keyword">def</span> <span class="hl-func">f</span>(x):
+    <span class="hl-keyword">return</span> x ** <span class="hl-number">2</span>
+
+<span class="hl-keyword">for</span> x <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>]:
+    num = numerical_grad(f, x)
+    theory = <span class="hl-number">2</span> * x
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"f'({x}) 数值={num:.5f} 理论={theory}"</span>)
+
+<span class="hl-comment"># 梯度下降：找 f(x)=x²-4x+4 的最小值（x=2）</span>
+x = <span class="hl-number">0.0</span>             <span class="hl-comment"># 初始值</span>
+lr = <span class="hl-number">0.1</span>            <span class="hl-comment"># 学习率 η</span>
+<span class="hl-keyword">for</span> step <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">30</span>):
+    grad = <span class="hl-number">2</span>*x - <span class="hl-number">4</span>     <span class="hl-comment"># f'(x) = 2x - 4</span>
+    x = x - lr * grad  <span class="hl-comment"># 沿反方向走</span>
+    <span class="hl-keyword">if</span> step % <span class="hl-number">5</span> == <span class="hl-number">0</span>:
+        <span class="hl-builtin">print</span>(<span class="hl-string">f"第{step:2d}步: x={x:.4f}"</span>)  <span class="hl-comment"># 0→2</span></code></pre>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
+
+<h2>💭 概念题</h2>
+<ol>
+<li>梯度指向上升最快方向。为什么是"最快"而不只是"快"？——考察：方向导数与梯度的点乘关系</li>
+<li>学习率太大的后果（几何直觉）？太小呢？——考察：梯度下降收敛动力学</li>
+</ol>
+
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-03/">← 00-03</a><a href="../../">📖 目录</a><a href="../00-05/">00-05 →</a></nav>
+</div></body></html>
