@@ -18,95 +18,142 @@
 
 <h2>一、范数：箭有多长，看你怎么量</h2>
 
-<p>向量 $\mathbf{v} = [3, -4]$ 有多"大"？这取决于你是<strong>开车</strong>还是<strong>走路</strong>。</p>
+<p>向量 $\mathbf{v} = [3, -4]$ 有多"大"？取决于你是<strong>开车</strong>还是<strong>坐直升机</strong>。</p>
 
 <h3>L1 范数：曼哈顿的出租车</h3>
 
-<p><strong>画面：</strong> 你在纽约曼哈顿。街道全是横平竖直的网格，不能斜穿街区。从 $(0,0)$ 到 $(3,-4)$，只能先往东开 3 条街，再往南开 4 条街。一共走了 7 个街区。</p>
+<p><strong>画面：</strong> 你在纽约曼哈顿。街道全是横平竖直的网格，不能斜穿街区。从 $(0,0)$ 到 $(3,-4)$，只能先往东开 3 条街，再往南开 4 条街。一共走了 7 个街区。这就是 L1：把每个分量的绝对值加起来。</p>
 
-<p>$$\|\mathbf{v}\|_1 = |3| + |-4| = 7$$</p>
+$$\|\mathbf{v}\|_1 = |3| + |-4| = 7$$
 
-<div class="callout callout-info">
-<strong>L1 和 L2 在优化中的不同表现：</strong> 假设你在找一个数 $x$ 使误差 $(x-a)^2$ 最小，但同时也希望 $x$ 本身尽量小。你可以在误差后面附加一项：L1 附加 $\lambda|x|$，L2 附加 $\lambda x^2$。
-<br><br>
-<strong>为什么 L1 会把 $x$ 推到精确 0？</strong> 总目标 $f(x) = (x-a)^2 + \lambda|x|$。$|x|$ 的导数在 $x>0$ 时是 $+1$，$x<0$ 时是 $-1$（$x=0$ 处不可导）。当 $x$ 接近 0 时，$\lambda$ 这项的推力<strong>恒为 $\pm\lambda$，不会减弱</strong>——所以 $x$ 被一路推到精确的 0。
-<br><br>
-<strong>为什么 L2 只把 $x$ 推到接近 0？</strong> 总目标 $f(x) = (x-a)^2 + \lambda x^2$。$x^2$ 的导数是 $2\lambda x$——$x$ 越小，这项推力越弱。所以 $x$ 趋向 0 但永远不会精确到达（越接近 0 推力越弱，推不动了）。
-<br><br>
-这个性质在曲线拟合中很重要：给 $n$ 个点可以拟合任意弯曲的曲线，但弯曲越大→系数越大→越不稳定。附加 $\sum|x_i|$ 会迫使许多系数精确为 0（只用少量关键系数），附加 $\sum x_i^2$ 会让所有系数都变小但不消失。
-</div>
-
-<figure><img src="assets/l1_l2_balls.png" alt="L1 vs L2 单位圆"><figcaption>L2 是圆（处处光滑），L1 是菱形（有尖角）。菱形尖角碰到坐标轴 → 精确零</figcaption></figure>
-
-<h3>曲线拟合中的"简单 vs 复杂"</h3>
-<p>给你 5 个数据点，你可以用一条弯弯曲曲的高次曲线穿过每一个点——看起来完美，但系数巨大，两个点之间剧烈波动。你也可以用一条直线大致穿过——有误差，但系数小，曲线平滑。</p>
-<p>附加 $\lambda\sum|x_i|$（L1）到拟合误差里，就等于告诉数学：「尽量用最少的系数」。附加 $\lambda\sum x_i^2$（L2）等于说：「系数都给我小一点」。两种都是让曲线变简单的方法。这一点是范数在优化中最核心的应用。</p>
+<p><strong>为什么用绝对值？</strong> 因为往南走了 4 条街——走的距离是 4，不是 -4。绝对值吃掉正负号，只留"走了多远"。</p>
 
 <h3>L2 范数：坐直升机</h3>
 
-<p><strong>画面：</strong> 这次你不管什么街道了，直接坐直升机从起点飞到终点。这就是你脑子里那个"两点之间最短"的距离。</p>
+<p><strong>画面：</strong> 这次你不管什么街道了，直接坐直升机从起点飞到终点。这就是你脑子里那个"两点之间最短"的距离——初中就学过的勾股定理。</p>
 
-<p>$$\|\mathbf{v}\|_2 = \sqrt{3^2 + (-4)^2} = \sqrt{9 + 16} = 5$$</p>
+$$\|\mathbf{v}\|_2 = \sqrt{3^2 + (-4)^2} = \sqrt{9 + 16} = 5$$
 
-<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<p>L2 就是直线距离。负号在平方里自动消失（$(-4)^2 = 16$），所以不用额外取绝对值。</p>
 
-v = np.array([<span class="hl-number">3</span>, -<span class="hl-number">4</span>])
+<pre><code>import numpy as np
 
-<span class="hl-comment"># L1：绝对值求和（出租车走过的街区数）</span>
-l1 = np.<span class="hl-builtin">sum</span>(np.<span class="hl-builtin">abs</span>(v))
-<span class="hl-builtin">print</span>(<span class="hl-string">f"L1 = {l1}"</span>)  <span class="hl-comment"># 7</span>
+v = np.array([3, -4])
 
-<span class="hl-comment"># L2：直线距离（直升机飞的）</span>
-l2 = np.linalg.norm(v)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"L2 = {l2}"</span>)  <span class="hl-comment"># 5.0</span></code></pre>
+# L1：绝对值求和（出租车走过的街区数）
+l1 = np.sum(np.abs(v))       # np.abs(v) → [3, 4] → 求和 = 7
+print(f"L1 = {l1}")           # 7
+
+# L2：直线距离（直升机飞的）
+l2 = np.linalg.norm(v)        # np.linalg.norm 默认算 L2
+print(f"L2 = {l2}")           # 5.0</code></pre>
+
+<h3>L1 和 L2 的形状有什么不同？</h3>
+
+<p>把所有长度为 1 的向量画出来：L1 画出来是一个<strong>菱形</strong>，L2 画出来是一个<strong>圆</strong>。</p>
+
+<figure><img src="assets/l1_l2_balls.png" alt="L1 vs L2 单位圆"><figcaption>L2 是光滑的圆，L1 是带尖角的菱形。菱形尖角就坐落在坐标轴上</figcaption></figure>
+
+<p>为什么这个形状重要？菱形有四个<strong>尖角</strong>，恰好戳在坐标轴上——这个性质意味着 L1 天然"喜欢"让某些分量精确为 0。圆没有尖角，L2 只会让分量变小但不会精确到 0。这个区别在后面的优化课里会变得非常重要。</p>
 
 <hr>
 
-<h2>二、特征值与特征向量：矩阵的"指纹"</h2>
+<h2>二、矩阵对空间做了什么</h2>
 
-<p><strong>画面：</strong> 想象你有一块方形的橡胶皮。你用两根手指扯住它的对角，往外拉。橡胶皮上的图案被扯变形了。</p>
+<p>00-01 学过：矩阵是一本"操作手册"——把一个向量扭成另一个向量。现在把这个想法放大：<strong>矩阵不只是扭一个箭头，它扭的是整个空间。</strong></p>
 
-<p><strong>但有些方向只是被拉长，没有被扭曲。</strong> 如果你在橡胶皮上画了一个沿着对角线的箭头，拉完之后它还是沿着对角线的方向——只是变长了。这个方向就是<strong>特征方向</strong>。变长的倍数就是<strong>特征值</strong>。</p>
+<p><strong>画面：</strong> 想象桌面上铺了一张方格坐标纸。矩阵 $A$ 就是一只无形的手——它把整张纸抓住，<strong>扯一扯、扭一扭</strong>。纸上的每个点都被拉到了新位置。</p>
 
-<p>用数学写：</p>
+<p>我们来看矩阵 $A = \begin{bmatrix} 2 & 1 \\ 0 & 1 \end{bmatrix}$ 对空间做了什么。取四个特殊点——单位正方形的四个角：</p>
+
+$$
+(0,0) \rightarrow (0,0) \qquad
+(1,0) \rightarrow (2,0) \qquad
+(0,1) \rightarrow (1,1) \qquad
+(1,1) \rightarrow (3,1)
+$$
+
+<p>正方形被<strong>推歪了</strong>，变成了一个平行四边形。原来的面积是 1，现在的面积是多少？这就是<strong>行列式</strong>要回答的问题。</p>
+
+<h3>行列式：面积放大镜</h3>
+
+<p><strong>画面：</strong> 矩阵把单位正方形（面积=1）扭成了平行四边形。行列式 $\det(A)$ 就是这个平行四边形的面积——也就是<strong>面积放大了几倍</strong>。</p>
+
+<p>对 2×2 矩阵 $\begin{bmatrix} a & b \\ c & d \end{bmatrix}$：</p>
+
+$$\det(A) = ad - bc$$
+
+<p>刚才那个矩阵：$\det = 2\times1 - 1\times0 = 2$。面积放大了 2 倍。</p>
+
+<p>行列式 <strong>= 0</strong> 意味着什么？正方形成了<strong>一条线</strong>——面积=0，信息丢了一维。行列式 <strong>= 负数</strong> 意味着空间被<strong>翻转</strong>了（像把纸翻到背面）。</p>
+
+<hr>
+
+<h2>三、特征值与特征向量：不扭的方向</h2>
+
+<p>矩阵把整个空间扭了。但空间里有一些<strong>特殊的方向</strong>——扭完之后，它还在自己的方向上，只是被拉长（或压短、或翻转）了。</p>
+
+<p><strong>画面：</strong> 回到橡胶皮。你扯住对角往外拉。皮上画了一个箭头，如果这个箭头恰好沿着对角线——拉完之后它还在对角线上，只是变长了。如果这个箭头斜着画——拉完之后方向就偏了。</p>
+
+<p>那个<strong>不偏</strong>的方向，就是特征向量 $\mathbf{v}$。被拉长（或压短）的倍数，就是特征值 $\lambda$。</p>
 
 $$A\mathbf{v} = \lambda \mathbf{v}$$
 
-<p>$A$ 是变换（扯橡胶皮），$\mathbf{v}$ 是特征向量（不被扭的方向），$\lambda$ 是特征值（拉长了几倍）。</p>
+<p>读作：矩阵 $A$ 作用在 $\mathbf{v}$ 上，效果只是把 $\mathbf{v}$ 缩放 $\lambda$ 倍。方向不变，长度变。</p>
 
-<p>如果 $\lambda=2$：这个方向被拉长到原来的 2 倍。<br>
-如果 $\lambda=0.5$：被压扁到原来的一半。<br>
-如果 $\lambda=0$：被压成了一条线（那个方向的信息消失了）。<br>
-如果 $\lambda$ 是负数：不仅拉长，还<strong>翻转</strong>了方向。</p>
+<h3>特征值的含义</h3>
 
-<pre><code>A = np.array([[<span class="hl-number">4</span>, <span class="hl-number">1</span>], [<span class="hl-number">2</span>, <span class="hl-number">3</span>]])
+<p>回到空间变换的画面。一个 2×2 矩阵有两个特征值 $\lambda_1$ 和 $\lambda_2$——对应两个不扭的方向。</p>
 
-<span class="hl-comment"># eig 返回两样：eigvals=特征值数组, eigvecs=特征向量（每列一个）</span>
+<table>
+<tr><th>特征值</th><th>几何含义</th><th>例子</th></tr>
+<tr><td>$\lambda = 2$</td><td>这个方向被拉长到 2 倍</td><td>扯橡胶皮</td></tr>
+<tr><td>$\lambda = 0.5$</td><td>这个方向被压扁到一半</td><td>挤压</td></tr>
+<tr><td>$\lambda = 0$</td><td><strong>这个方向被压成零</strong>——信息消失了</td><td>整张纸被压成一条线！</td></tr>
+<tr><td>$\lambda < 0$</td><td>不仅拉长，还<strong>翻转</strong>方向</td><td>箭头倒过来了</td></tr>
+</table>
+
+<h3>特征值与行列式的关系</h3>
+
+<p>行列式 = <strong>所有特征值相乘</strong>：</p>
+
+$$\det(A) = \lambda_1 \times \lambda_2 \times \cdots \times \lambda_n$$
+
+<p>如果有一个特征值 = 0，行列式就是 0——空间被压扁了。面积放大倍数 = 每个方向放大倍数的乘积。多直观！</p>
+
+<pre><code>A = np.array([[4, 1], [2, 3]])
+
+# np.linalg.eig 返回两样：
+#   eigvals → 特征值数组
+#   eigvecs → 特征向量（每列是一个特征向量）
 eigvals, eigvecs = np.linalg.eig(A)
 
-<span class="hl-builtin">print</span>(<span class="hl-string">f"特征值: {eigvals}"</span>)        <span class="hl-comment"># 5 和 2</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"特征向量:\n{eigvecs}"</span>)
+print(f"特征值: {eigvals}")         # [5. 2.]
+# 解释：一个方向被拉长 5 倍，另一个被拉长 2 倍
 
-<span class="hl-comment"># 验证：A@v 应该 = λ×v</span>
-v1 = eigvecs[:, <span class="hl-number">0</span>]            <span class="hl-comment"># 第一个特征向量</span>
-l1 = eigvals[<span class="hl-number">0</span>]               <span class="hl-comment"># 第一个特征值</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"A@v = {A @ v1}"</span>)       <span class="hl-comment"># 应该 = λ×v</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"λ×v = {l1 * v1}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"相等? {np.allclose(A @ v1, l1 * v1)}"</span>)  <span class="hl-comment"># True</span></code></pre>
+print(f"行列式 = {np.linalg.det(A):.0f}")  # 10 = 5×2 ✓
 
-<div class="callout callout-info">
-<h3>特例：对角矩阵——最简单的特征值</h3>
+# 验证：A@v 应该 = λ×v
+v1 = eigvecs[:, 0]              # 第一个特征向量（第0列）
+l1 = eigvals[0]                  # 第一个特征值
+print(f"A@v1 = {A @ v1}")       # 扭一下
+print(f"λ×v1 = {l1 * v1}")      # 单纯缩放
+print(f"相等? {np.allclose(A @ v1, l1 * v1)}")  # True</code></pre>
 
-<p>如果矩阵长成这样（只有对角线上有数，其余全是 0）：</p>
+<h3>特例：对角矩阵</h3>
+
+<p>如果矩阵只有对角线上有数，其余全是 0：</p>
 
 $$A = \begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}$$
 
-<p><strong>特征值直接就是对角线上的数：2 和 3。</strong>特征向量就是坐标轴方向：$[1,0]$ 和 $[0,1]$。</p>
+<p>这个矩阵把 x 方向拉长 2 倍，y 方向拉长 3 倍——<strong>没有任何扭转</strong>。所以：</p>
 
-<p>为什么？回到橡胶皮画面：这个矩阵把 x 方向拉长到 2 倍，y 方向拉长到 3 倍——但<strong>没有任何扭转</strong>。所以坐标轴本身就是特征方向，拉伸倍数就是对角线上的数。</p>
+<ul>
+  <li>特征值 = 2 和 3（就是对角线上的数）</li>
+  <li>特征向量 = $[1,0]$ 和 $[0,1]$（就是坐标轴方向）</li>
+</ul>
 
-<p><strong>这是一个重要的思维捷径：</strong>看到对角矩阵 → 特征值就在对角线上，不用算。这个性质在很多地方会用到。</p>
-</div>
+<p>看到对角矩阵 → 特征值就在对角线上，不用算。</p>
 
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
 
@@ -115,9 +162,9 @@ $$A = \begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}$$
 <h2>💭 概念题</h2>
 
 <ol>
-<li>从导数角度解释：为什么在 $(x-a)^2$ 后附加 $\lambda|x|$ 会把 $x$ 推到精确 0，而附加 $\lambda x^2$ 只推到接近 0？——考察：绝对值函数的常数导数 vs 平方函数的线性导数</li>
-<li>找特征向量就像找橡胶皮上"只被拉长不被扭"的方向。如果特征值 = 0，那个方向上的东西在变换后会变成什么？——考察：零特征值的几何含义</li>
-<li>用 np.linalg.eig 验证：把 A 改成 [[2,0],[0,3]]，特征值和特征向量各是什么？为什么这么简单？——考察：对角矩阵的特征值就是对角元素</li>
+<li>L1 和 L2 都用 v=[3,-4] 算过了。如果换成 v=[5,0]，L1 和 L2 各是多少？它们相等吗？什么时候 L1 和 L2 相等？——考察：L1/L2 的区别与特殊情况</li>
+<li>矩阵把单位正方形扭成平行四边形。行列式为 0 时，平行四边形变成了什么？——考察：行列式=0 的几何含义</li>
+<li>用 np.linalg.eig 验证：把 A 改成 [[2,0],[0,3]]，特征值和特征向量各是什么？行列式是多少？行列式和特征值之间有什么关系？——考察：对角矩阵特征值 + 行列式 = 特征值乘积</li>
 </ol>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
