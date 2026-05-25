@@ -113,6 +113,46 @@ $$A\mathbf{v} = \lambda \mathbf{v}$$
 <tr><td>$\lambda < 0$</td><td>不仅拉长，还<strong>翻转</strong>方向</td><td>箭头倒过来了</td></tr>
 </table>
 
+<h3>怎么算？——特征方程</h3>
+
+<p><code>np.linalg.eig</code> 帮我们算了，但它背后做了什么？</p>
+
+<p>回到定义：$A\mathbf{v} = \lambda\mathbf{v}$。我们不知道 $\lambda$ 和 $\mathbf{v}$，但可以这样想：</p>
+
+$$A\mathbf{v} - \lambda\mathbf{v} = \mathbf{0}$$
+
+$$(A - \lambda I)\mathbf{v} = \mathbf{0}$$
+
+<p>$I$ 是单位矩阵（对角线上全是 1，其余是 0）。比如 2×2 的 $I = \begin{bmatrix}1&0\\0&1\end{bmatrix}$。乘以 $I$ 什么都不变——就像乘以 1。</p>
+
+<p>这个方程有一个<strong>非零解</strong> $\mathbf{v}$ 的条件是：$(A - \lambda I)$ 这个矩阵把 $\mathbf{v}$ 压扁了——也就是它的行列式为 0。</p>
+
+$$\det(A - \lambda I) = 0$$
+
+<p>这个方程叫<strong>特征方程</strong>。对 2×2 矩阵：</p>
+
+$$A = \begin{bmatrix} a & b \\ c & d \end{bmatrix}, \quad
+A - \lambda I = \begin{bmatrix} a-\lambda & b \\ c & d-\lambda \end{bmatrix}$$
+
+$$\det(A - \lambda I) = (a-\lambda)(d-\lambda) - bc = \lambda^2 - (a+d)\lambda + (ad-bc) = 0$$
+
+<p>这是一个关于 $\lambda$ 的二次方程！$a+d$ 叫<strong>迹</strong>（trace），$ad-bc$ 就是行列式。</p>
+
+<p><strong>走一遍例子：</strong> $A = \begin{bmatrix} 4 & 1 \\ 2 & 3 \end{bmatrix}$</p>
+
+$$\det(A - \lambda I) = \det\begin{bmatrix} 4-\lambda & 1 \\ 2 & 3-\lambda \end{bmatrix} = (4-\lambda)(3-\lambda) - 2 = \lambda^2 - 7\lambda + 10 = 0$$
+
+<p>解二次方程：$\lambda = \frac{7 \pm \sqrt{49-40}}{2} = \frac{7 \pm 3}{2}$ → $\lambda_1 = 5$，$\lambda_2 = 2$。</p>
+
+<p><strong>验算：</strong> 迹 = 4+3 = 7，确实 = $\lambda_1+\lambda_2 = 5+2$。行列式 = 4×3−1×2 = 10，确实 = $\lambda_1\times\lambda_2 = 5\times 2$。</p>
+
+<div class="callout callout-info">
+<strong>两个恒等式记住了：</strong><br>
+① $\lambda_1 + \lambda_2 = \text{迹}$（对角线元素之和）<br>
+② $\lambda_1 \times \lambda_2 = \det(A)$（行列式）<br>
+这两个等式提供了快速验算特征值的方法——算完 λ 之后，加起来看看是不是等于迹，乘起来看看是不是等于行列式。
+</div>
+
 <h3>特征值与行列式的关系</h3>
 
 <p>行列式 = <strong>所有特征值相乘</strong>：</p>
@@ -164,7 +204,7 @@ $$A = \begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}$$
 <ol>
 <li>L1 和 L2 都用 v=[3,-4] 算过了。如果换成 v=[5,0]，L1 和 L2 各是多少？它们相等吗？什么时候 L1 和 L2 相等？——考察：L1/L2 的区别与特殊情况</li>
 <li>矩阵把单位正方形扭成平行四边形。行列式为 0 时，平行四边形变成了什么？——考察：行列式=0 的几何含义</li>
-<li>用 np.linalg.eig 验证：把 A 改成 [[2,0],[0,3]]，特征值和特征向量各是什么？行列式是多少？行列式和特征值之间有什么关系？——考察：对角矩阵特征值 + 行列式 = 特征值乘积</li>
+<li>用特征方程手算 $A = \begin{bmatrix} 3 & 0 \\ 0 & 5 \end{bmatrix}$ 的特征值和特征向量。行列式是多少？验证 $\lambda_1+\lambda_2=$ 迹 和 $\lambda_1\lambda_2=$ 行列式。——考察：对角矩阵特征值 + 迹/行列式恒等式</li>
 </ol>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
