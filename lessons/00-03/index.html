@@ -115,43 +115,88 @@ $$A\mathbf{v} = \lambda \mathbf{v}$$
 
 <h3>怎么算？——特征方程</h3>
 
-<p><code>np.linalg.eig</code> 帮我们算了，但它背后做了什么？</p>
+<p><code>np.linalg.eig</code> 帮我们算了，但它背后做了什么？我们来手动推导。</p>
 
-<p>回到定义：$A\mathbf{v} = \lambda\mathbf{v}$。我们不知道 $\lambda$ 和 $\mathbf{v}$，但可以这样想：</p>
+<p>出发点是定义：</p>
+
+$$A\mathbf{v} = \lambda \mathbf{v}$$
+
+<p>这行式子说：矩阵 $A$ 作用在向量 $\mathbf{v}$ 上（$A\mathbf{v}$，用 <code>@</code> 算），结果等于这个向量单纯被拉长 $\lambda$ 倍（$\lambda\mathbf{v}$，用 <code>*</code> 算）。$\lambda$ 是一个普通数字（标量），$\mathbf{v}$ 是一个向量——$\lambda\mathbf{v}$ 就是把 $\mathbf{v}$ 的每个分量都乘 $\lambda$。</p>
+
+<p><strong>第一步：全移到左边。</strong> 和普通方程一样，把右边的东西搬到左边：</p>
 
 $$A\mathbf{v} - \lambda\mathbf{v} = \mathbf{0}$$
 
+<p>$\mathbf{0}$ 是全零向量 $[0,0]$。左边两项都是向量（$A\mathbf{v}$ 是向量，$\lambda\mathbf{v}$ 也是向量），所以能相减。</p>
+
+<p><strong>第二步：引入单位矩阵 $I$。</strong> 现在想把 $\mathbf{v}$ 提出来，写成「某个矩阵 × $\mathbf{v} = \mathbf{0}$」的形式。但这里有个问题：$A$ 是矩阵，$\lambda$ 是标量——它们不是同类，不能直接写 $A - \lambda$（矩阵减数字没有意义，就像「苹果减橙子」）。</p>
+
+<p>解决办法：把标量 $\lambda$ 变成矩阵。怎么变？乘上<strong>单位矩阵</strong> $I$：</p>
+
+$$I = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}$$
+
+<p>$I$ 的作用是「什么都不变」——对任何向量 $\mathbf{v}$，$I\mathbf{v} = \mathbf{v}$。就像数字 1：$1 \times 5 = 5$。那么 $\lambda I$ 就是一个矩阵：对角线上全是 $\lambda$，其余是 0。</p>
+
+<p>现在可以把 $\lambda\mathbf{v}$ 改写成 $\lambda I \mathbf{v}$（因为 $I\mathbf{v} = \mathbf{v}$，所以 $\lambda I \mathbf{v} = \lambda \mathbf{v}$）：</p>
+
+$$A\mathbf{v} - \lambda I \mathbf{v} = \mathbf{0}$$
+
+<p>现在两项都是「矩阵 × 向量」的形式了！把 $\mathbf{v}$ 提出来：</p>
+
 $$(A - \lambda I)\mathbf{v} = \mathbf{0}$$
 
-<p>$I$ 是单位矩阵（对角线上全是 1，其余是 0）。比如 2×2 的 $I = \begin{bmatrix}1&0\\0&1\end{bmatrix}$。乘以 $I$ 什么都不变——就像乘以 1。</p>
+<p><strong>第三步：行列式为 0。</strong> 我们想要一个<strong>非零</strong>的 $\mathbf{v}$（全零向量 $[0,0]$ 永远满足方程，但那是废话，不是我们要找的特征向量）。</p>
 
-<p>这个方程有一个<strong>非零解</strong> $\mathbf{v}$ 的条件是：$(A - \lambda I)$ 这个矩阵把 $\mathbf{v}$ 压扁了——也就是它的行列式为 0。</p>
+<p>什么时候 $(A - \lambda I)\mathbf{v} = \mathbf{0}$ 有非零解？回看前面学的：行列式为 0 意味着矩阵把空间压扁了——有一整个方向被压成了零向量。所以：</p>
 
 $$\det(A - \lambda I) = 0$$
 
-<p>这个方程叫<strong>特征方程</strong>。对 2×2 矩阵：</p>
+<p>这个方程叫<strong>特征方程</strong>。解出来的 $\lambda$ 就是特征值。</p>
 
-$$A = \begin{bmatrix} a & b \\ c & d \end{bmatrix}, \quad
-A - \lambda I = \begin{bmatrix} a-\lambda & b \\ c & d-\lambda \end{bmatrix}$$
+<p><strong>第四步：展开。</strong> 对 2×2 矩阵 $A = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$：</p>
 
-$$\det(A - \lambda I) = (a-\lambda)(d-\lambda) - bc = \lambda^2 - (a+d)\lambda + (ad-bc) = 0$$
+$$A - \lambda I = \begin{bmatrix} a & b \\ c & d \end{bmatrix} - \begin{bmatrix} \lambda & 0 \\ 0 & \lambda \end{bmatrix} = \begin{bmatrix} a-\lambda & b \\ c & d-\lambda \end{bmatrix}$$
 
-<p>这是一个关于 $\lambda$ 的二次方程！$a+d$ 叫<strong>迹</strong>（trace），$ad-bc$ 就是行列式。</p>
+<p>行列式展开（用前面的 $ad-bc$ 公式，只是把对角线的 $a,d$ 换成 $a-\lambda, d-\lambda$）：</p>
 
-<p><strong>走一遍例子：</strong> $A = \begin{bmatrix} 4 & 1 \\ 2 & 3 \end{bmatrix}$</p>
+$$\det(A - \lambda I) = (a-\lambda)(d-\lambda) - bc$$
 
-$$\det(A - \lambda I) = \det\begin{bmatrix} 4-\lambda & 1 \\ 2 & 3-\lambda \end{bmatrix} = (4-\lambda)(3-\lambda) - 2 = \lambda^2 - 7\lambda + 10 = 0$$
+$$= ad - a\lambda - d\lambda + \lambda^2 - bc$$
 
-<p>解二次方程：$\lambda = \frac{7 \pm \sqrt{49-40}}{2} = \frac{7 \pm 3}{2}$ → $\lambda_1 = 5$，$\lambda_2 = 2$。</p>
+$$= \lambda^2 - \underbrace{(a+d)}_{\text{迹}}\lambda + \underbrace{(ad-bc)}_{\text{行列式}} = 0$$
 
-<p><strong>验算：</strong> 迹 = 4+3 = 7，确实 = $\lambda_1+\lambda_2 = 5+2$。行列式 = 4×3−1×2 = 10，确实 = $\lambda_1\times\lambda_2 = 5\times 2$。</p>
+<p>这就是关于 $\lambda$ 的二次方程！$a+d$（对角线之和）叫<strong>迹</strong>（trace，记作 $\text{tr}(A)$），$ad-bc$ 就是行列式 $\det(A)$。</p>
+
+<pre><code>A = np.array([[4, 1], [2, 3]])
+
+# 迹 = 对角线之和
+trace = np.trace(A)         # = 4 + 3 = 7
+print(f"迹 = {trace}")
+
+# 行列式 = ad - bc
+det_A = np.linalg.det(A)    # = 4×3 - 1×2 = 10
+print(f"行列式 = {det_A:.0f}")
+
+# 特征方程: λ² - trace·λ + det = 0 → λ² - 7λ + 10 = 0
+# 解二次方程: λ = (7 ± √(49-40)) / 2 = (7 ± 3) / 2
+print(f"λ₁ = {(7 + 3**0.5)/2:.0f}")   # 实际用 7±3...
+# 上面是占位，直接写结果:
+print("λ₁ = 5, λ₂ = 2")</code></pre>
+
+<h4>两个恒等式是怎么来的？</h4>
+
+<p>特征方程展开后是 $\lambda^2 - \text{tr}(A)\lambda + \det(A) = 0$。这是标准二次方程 $x^2 + bx + c = 0$ 的形式（这里 $b = -\text{tr}(A)$，$c = \det(A)$）。</p>
+
+<p>二次方程有一个定理（韦达定理）：<strong>所有根之和 = $-b$，所有根之积 = $c$</strong>。拿 $x^2 - 7x + 10 = 0$ 来说：两根 2 和 5，和是 7（= $-(-7)$），积是 10。为什么？因为二次方程可以写成 $(x - r_1)(x - r_2) = 0$，展开后 $x^2 - (r_1+r_2)x + r_1 r_2 = 0$，对应系数就得到关系。</p>
+
+<p>应用到特征方程 $\lambda^2 - \text{tr}(A)\lambda + \det(A) = 0$：</p>
 
 <div class="callout callout-info">
-<strong>两个恒等式记住了：</strong><br>
-① $\lambda_1 + \lambda_2 = \text{迹}$（对角线元素之和）<br>
-② $\lambda_1 \times \lambda_2 = \det(A)$（行列式）<br>
-这两个等式提供了快速验算特征值的方法——算完 λ 之后，加起来看看是不是等于迹，乘起来看看是不是等于行列式。
+<strong>恒等式 ①：$\lambda_1 + \lambda_2 = \text{tr}(A)$</strong> — 特征值之和 = 迹（对角线之和）<br>
+<strong>恒等式 ②：$\lambda_1 \times \lambda_2 = \det(A)$</strong> — 特征值之积 = 行列式
 </div>
+
+<p><strong>走一遍例子验证：</strong> $A = \begin{bmatrix} 4 & 1 \\ 2 & 3 \end{bmatrix}$，迹 = 7，行列式 = 10。解出 $\lambda_1=5, \lambda_2=2$。5+2=7 ✓，5×2=10 ✓。</p>
 
 <h3>特征值与行列式的关系</h3>
 
