@@ -54,7 +54,11 @@ print(f"L2 = {l2}")           # 5.0</code></pre>
 
 <figure><img src="assets/l1_l2_balls.png" alt="L1 vs L2 单位圆"><figcaption>L2 是光滑的圆，L1 是带尖角的菱形。菱形尖角就坐落在坐标轴上</figcaption></figure>
 
-<p>为什么这个形状重要？菱形有四个<strong>尖角</strong>，恰好戳在坐标轴上——这个性质意味着 L1 天然"喜欢"让某些分量精确为 0。圆没有尖角，L2 只会让分量变小但不会精确到 0。这个区别在后面的优化课里会变得非常重要。</p>
+<p>为什么这个形状重要？菱形有四个<strong>尖角</strong>，恰好戳在坐标轴上——这个性质意味着 L1 天然"喜欢"让某些分量精确为 0。圆没有尖角，L2 只会让分量变小但不会精确到 0。</p>
+
+<div class="callout callout-info">
+<strong>💡 为什么尖角意味着零分量？</strong> 想象你用一个圆形的 L2 球去"碰"一条线——接触点一般是光滑的，对应两个分量都不为零。但用菱形的 L1 球去碰——菱形的尖角刚好戳在坐标轴上，<strong>最优化时最先碰到尖角，导致某个分量为零</strong>。这就是 L1 正则化产生稀疏解（稀疏 = 很多零分量）的几何直觉，在后面的优化课里会变得非常重要。
+</div>
 
 <hr>
 
@@ -82,6 +86,29 @@ $$
 <p>对 2×2 矩阵 $\begin{bmatrix} a & b \\ c & d \end{bmatrix}$：</p>
 
 $$\det(A) = ad - bc$$
+
+<h4>🧮 推导：为什么是 ad−bc？——列向量张成的平行四边形面积</h4>
+
+<p>把矩阵的两列看作两个向量：</p>
+
+$$\mathbf{v}_1 = \begin{bmatrix} a \\ c \end{bmatrix}, \quad
+  \mathbf{v}_2 = \begin{bmatrix} b \\ d \end{bmatrix}$$
+
+<p>矩阵作用在单位正方形上：第一列 $\mathbf{v}_1$ 就是原来 $(1,0)$ 被扭到的新位置，第二列 $\mathbf{v}_2$ 就是原来 $(0,1)$ 被扭到的新位置。所以变换后的平行四边形 <strong>就是 $\mathbf{v}_1$ 和 $\mathbf{v}_2$ 张成的平行四边形</strong>。</p>
+
+<p>现在求这个平行四边形的面积。最直接的方法是<strong>底 × 高</strong>，但高不好算（$\mathbf{v}_2$ 不一定是竖直的）。换个角度——用<strong>叉积</strong>：</p>
+
+$$\text{面积} = |\mathbf{v}_1 \times \mathbf{v}_2|$$
+
+<p>在二维平面上，两个向量的叉积（标量，即"有向面积"）定义为：</p>
+
+$$\mathbf{v}_1 \times \mathbf{v}_2 = a \cdot d - c \cdot b = ad - bc$$
+
+<p><strong>一步一步来：</strong> 把 $\mathbf{v}_1$ 和 $\mathbf{v}_2$ 拼成矩阵 $M = [\mathbf{v}_1 \;\; \mathbf{v}_2] = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$。叉积公式来自「$\mathbf{v}_1$ 的 x 分量 × $\mathbf{v}_2$ 的 y 分量」减去「$\mathbf{v}_1$ 的 y 分量 × $\mathbf{v}_2$ 的 x 分量」——本质上就是 $ad - bc$。取绝对值就是平行四边形的面积，正负号表示 $\mathbf{v}_1$ 到 $\mathbf{v}_2$ 的旋转方向（逆时针为正）。</p>
+
+<div class="callout callout-info">
+<strong>小结：</strong> $\det(A) = ad - bc$ 不是死记的公式——它就是矩阵两列作为向量所张成平行四边形的<strong>有向面积</strong>。$ad$ 是"主对角线乘积"（$\mathbf{v}_1$ 的水平分量 × $\mathbf{v}_2$ 的竖直分量），$bc$ 是"副对角线乘积"（$\mathbf{v}_1$ 的竖直分量 × $\mathbf{v}_2$ 的水平分量），两者之差就是面积。
+</div>
 
 <p>刚才那个矩阵：$\det = 2\times1 - 1\times0 = 2$。面积放大了 2 倍。</p>
 
@@ -151,6 +178,10 @@ $$(A - \lambda I)\mathbf{v} = \mathbf{0}$$
 
 $$\det(A - \lambda I) = 0$$
 
+<div class="callout callout-info">
+<strong>🔗 等价链：</strong> $\det(M) = 0 \iff M$ 不可逆 $\iff$ 存在非零向量 $\mathbf{v}$ 使得 $M\mathbf{v} = \mathbf{0}$。这三个说法是同一个意思：矩阵把某个方向"压扁"了，所以回不去了（不可逆），也意味着被压扁的那个方向上的向量满足 $M\mathbf{v} = \mathbf{0}$。特征方程的巧妙之处在于：我们主动要求 $\det(A-\lambda I)=0$，目的就是<strong>找到那个被压扁的方向</strong>——那个方向上的向量就是特征向量。
+</div>
+
 <p>这个方程叫<strong>特征方程</strong>。解出来的 $\lambda$ 就是特征值。</p>
 
 <p><strong>第四步：展开。</strong> 对 2×2 矩阵 $A = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$：</p>
@@ -166,6 +197,10 @@ $$= ad - a\lambda - d\lambda + \lambda^2 - bc$$
 $$= \lambda^2 - \underbrace{(a+d)}_{\text{迹}}\lambda + \underbrace{(ad-bc)}_{\text{行列式}} = 0$$
 
 <p>这就是关于 $\lambda$ 的二次方程！$a+d$（对角线之和）叫<strong>迹</strong>（trace，记作 $\text{tr}(A)$），$ad-bc$ 就是行列式 $\det(A)$。</p>
+
+<div class="callout callout-info">
+<strong>🔍 迹的直观比喻：</strong> 迹 = 对角线之和 = <strong>各方向拉伸率之和</strong>。回忆对角矩阵 $\begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}$——x 方向拉长 2 倍，y 方向拉长 3 倍，迹 = 2+3 = 5。而特征值之积 = 行列式（面积放大倍数），特征值之和 = 迹（拉伸率总和）。一个管<strong>乘法</strong>（体积怎么变），一个管<strong>加法</strong>（各方向拉了多少）。
+</div>
 
 <pre><code>A = np.array([[4, 1], [2, 3]])
 
@@ -203,6 +238,12 @@ print("λ₁ = 5, λ₂ = 2")</code></pre>
 <p>行列式 = <strong>所有特征值相乘</strong>：</p>
 
 $$\det(A) = \lambda_1 \times \lambda_2 \times \cdots \times \lambda_n$$
+
+<div class="callout callout-info">
+<strong>📐 推广到 n×n：</strong> 对于 2×2，我们从特征方程 $\lambda^2 - \text{tr}(A)\lambda + \det(A) = 0$ 的<strong>常数项</strong>得到了 $\det(A) = \lambda_1\lambda_2$。对于 n×n 矩阵，特征多项式展开后是：
+$$\det(A - \lambda I) = (-\lambda)^n + \text{tr}(A)(-\lambda)^{n-1} + \cdots + \det(A)$$
+常数项（令 $\lambda=0$）恰好是 $\det(A)$。同时多项式可以因式分解为 $(\lambda_1 - \lambda)(\lambda_2 - \lambda)\cdots(\lambda_n - \lambda)$，展开后的常数项是 $\lambda_1\lambda_2\cdots\lambda_n$。两者相等，所以 <strong>$\det(A) = \prod_{i=1}^n \lambda_i$ 对任意 n×n 矩阵都成立</strong>。
+</div>
 
 <p>如果有一个特征值 = 0，行列式就是 0——空间被压扁了。面积放大倍数 = 每个方向放大倍数的乘积。多直观！</p>
 

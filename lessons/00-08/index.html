@@ -7,6 +7,24 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+<style>
+  .derivation {
+    background: #f8fafb;
+    border-left: 4px solid #6c8ebf;
+    margin: 1.2rem 0;
+    padding: 0.8rem 1.2rem;
+    border-radius: 0 6px 6px 0;
+  }
+  .derivation summary {
+    font-weight: bold;
+    color: #4a6d8c;
+    cursor: pointer;
+    font-size: 1.02em;
+  }
+  .derivation summary:hover { color: #2b4f6e; }
+  .derivation .step { margin: 0.35rem 0 0.35rem 1.5rem; }
+  .derivation .comment { color: #888; font-size: 0.9em; margin-left: 3rem; }
+</style>
 </head><body>
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-08</span>
 <span><a href="../00-07/">← 上一课</a> &nbsp; <a href="../../">目录</a></span></nav>
@@ -30,6 +48,28 @@ $$\mathbb{E}[X] = 1\times\frac{1}{6} + 2\times\frac{1}{6} + \cdots + 6\times\fra
 
 <p><strong>连续版：</strong> 把求和换成积分：$\mathbb{E}[X] = \int_{-\infty}^{\infty} x \cdot f(x)\,dx$。每个 $x$ 用它的概率密度加权。</p>
 
+<!-- ====== 推导 5：离散→连续的黎曼和桥接 ====== -->
+<details class="derivation">
+<summary>📐 推导：从离散期望到连续期望（黎曼和桥接）</summary>
+
+<p>离散期望的定义是对所有可能取值概率加权求和：</p>
+
+$$\mathbb{E}[X] = \sum_i x_i \cdot P(X = x_i) = \sum_i x_i \cdot p_i$$
+
+<p>过渡到连续情形时，把实数轴切成宽度为 $\Delta x$ 的小段。$X$ 落在 $[x, x+\Delta x]$ 内的概率近似为 $f(x) \cdot \Delta x$（密度 × 宽度）：</p>
+
+$$\mathbb{E}[X] \approx \sum_k x_k \cdot f(x_k) \cdot \Delta x$$
+
+<p class="step">这就是<strong>黎曼和</strong>的形式：每个小区间里的 $x$ 值，用该点的概率密度 × 区间宽度来加权。</p>
+
+<p>令 $\Delta x \to 0$，黎曼和的极限就是定积分：</p>
+
+$$\mathbb{E}[X] = \lim_{\Delta x \to 0} \sum_k x_k \cdot f(x_k) \cdot \Delta x = \int_{-\infty}^{\infty} x \cdot f(x)\,dx$$
+
+<p class="comment">核心直觉：$p_i$（概率质量）→ $f(x)\,dx$（概率密度 × 无穷小宽度）。$\sum$ 变成 $\int$，一切照旧。</p>
+
+</details>
+
 <hr>
 
 <h2>二、方差：射飞镖的散布程度</h2>
@@ -46,6 +86,25 @@ $$\text{Var}(X) = \mathbb{E}[(X - \mu)^2]$$
 </ul>
 
 <p><strong>计算捷径：</strong> $\text{Var}(X) = \mathbb{E}[X^2] - \mu^2$——用"平方的平均"减去"平均的平方"。手算时方便很多，不用先减均值再平方。</p>
+
+<!-- ====== 推导 3：Var(X) = E[X²] - μ² ====== -->
+<details class="derivation">
+<summary>📐 推导：$\text{Var}(X) = \mathbb{E}[X^2] - \mu^2$</summary>
+
+<p>从定义出发，展开平方：</p>
+
+$$\begin{aligned}
+\text{Var}(X) &= \mathbb{E}\big[(X - \mu)^2\big] \\[4pt]
+&= \mathbb{E}\big[X^2 - 2\mu X + \mu^2\big] \quad \text{(展开平方)} \\[4pt]
+&= \mathbb{E}[X^2] - 2\mu\,\mathbb{E}[X] + \mu^2 \quad \text{(期望的线性性质)} \\[4pt]
+&= \mathbb{E}[X^2] - 2\mu \cdot \mu + \mu^2 \quad (\mathbb{E}[X] = \mu) \\[4pt]
+&= \mathbb{E}[X^2] - 2\mu^2 + \mu^2 \\[4pt]
+&= \mathbb{E}[X^2] - \mu^2
+\end{aligned}$$
+
+<p class="comment">关键两步都在用<strong>期望的线性</strong>：$\mathbb{E}[X^2 - 2\mu X + \mu^2] = \mathbb{E}[X^2] - 2\mu\mathbb{E}[X] + \mu^2$。常数 $\mu^2$ 的期望就是它自己（$\mathbb{E}[c] = c$）。</p>
+
+</details>
 
 <div class="callout callout-info">
 <h3>为什么用平方不用绝对值？</h3>
@@ -73,7 +132,45 @@ $$\text{Var}(X) = \mathbb{E}[(X - \mu)^2]$$
 
 <h3>期望是线性的——不管独不独立</h3>
 <p>$$\mathbb{E}[aX + b] = a\cdot\mathbb{E}[X] + b$$</p>
+
+<!-- ====== 推导 1：E[aX+b] = aE[X] + b ====== -->
+<details class="derivation">
+<summary>📐 推导：$\mathbb{E}[aX + b] = a\,\mathbb{E}[X] + b$</summary>
+
+<p>从离散期望的 $\Sigma$ 定义展开：</p>
+
+$$\begin{aligned}
+\mathbb{E}[aX + b] &= \sum_i (a x_i + b) \cdot P(X = x_i) \\[4pt]
+&= \sum_i \big(a x_i \cdot p_i + b \cdot p_i\big) \\[4pt]
+&= a \sum_i x_i \cdot p_i \;+\; b \sum_i p_i \\[4pt]
+&= a \cdot \mathbb{E}[X] \;+\; b \cdot 1 \\[4pt]
+&= a\,\mathbb{E}[X] + b
+\end{aligned}$$
+
+<p class="comment">第二行拆括号：$(ax_i + b)p_i = a x_i p_i + b p_i$。第三行把 $a$ 和 $b$ 分别提到求和外面。第四行用 $\sum p_i = 1$（概率归一化）。</p>
+
+</details>
+
 <p>$$\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]$$</p>
+
+<!-- ====== 推导 2：E[X+Y] = E[X] + E[Y]（联合分布展开） ====== -->
+<details class="derivation">
+<summary>📐 推导：$\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]$（从联合分布展开，不要求独立）</summary>
+
+<p>从联合概率质量函数 $P(X=x, Y=y)$ 出发：</p>
+
+$$\begin{aligned}
+\mathbb{E}[X + Y] &= \sum_x \sum_y (x + y) \cdot P(X = x,\; Y = y) \\[4pt]
+&= \sum_x \sum_y x \cdot P(X = x, Y = y) \;+\; \sum_x \sum_y y \cdot P(X = x, Y = y) \\[4pt]
+&= \sum_x x \underbrace{\sum_y P(X = x, Y = y)}_{=\,P(X = x)} \;+\; \sum_y y \underbrace{\sum_x P(X = x, Y = y)}_{=\,P(Y = y)} \\[4pt]
+&= \sum_x x \cdot P(X = x) \;+\; \sum_y y \cdot P(Y = y) \\[4pt]
+&= \mathbb{E}[X] + \mathbb{E}[Y]
+\end{aligned}$$
+
+<p class="comment"><strong>关键：</strong>第三步对 $y$ 求和（边缘化）得到 $X$ 的边缘分布 $P(X=x)$。这一步<strong>不依赖 $X$ 和 $Y$ 是否独立</strong>——边缘化总是成立的。这就是为什么期望的加法不需要独立性假设。</p>
+
+</details>
+
 <p><strong>不管 $X$ 和 $Y$ 是否独立，期望的加法都成立。</strong>这是期望最强大的性质。</p>
 
 <h3>方差不是线性的——平移被吃掉</h3>
@@ -82,6 +179,29 @@ $$\text{Var}(X) = \mathbb{E}[(X - \mu)^2]$$
 <p><strong>常数 $b$ 消失了！</strong> 全班所有人同时长高 10cm——每个人离均值的距离完全不变，方差当然不变。<strong>平移不改变分散程度。</strong></p>
 
 <p>$a$ 被平方了：如果全班身高翻倍（a=2），方差变成原来的 4 倍。不仅散得更开，而且<strong>平方放大</strong>了差异。</p>
+
+<!-- ====== 推导 4：Var(aX+b) = a²Var(X) ====== -->
+<details class="derivation">
+<summary>📐 推导：$\text{Var}(aX + b) = a^2\,\text{Var}(X)$（注意 $b$ 如何抵消）</summary>
+
+<p>令 $\mu = \mathbb{E}[X]$。首先算变换后的期望（用推导 1 的结果）：</p>
+
+$$\mathbb{E}[aX + b] = a\mu + b$$
+
+<p>代入方差的定义：</p>
+
+$$\begin{aligned}
+\text{Var}(aX + b) &= \mathbb{E}\Big[\big(aX + b - \mathbb{E}[aX + b]\big)^2\Big] \\[4pt]
+&= \mathbb{E}\Big[\big(aX + b - (a\mu + b)\big)^2\Big] \\[4pt]
+&= \mathbb{E}\Big[\big(aX - a\mu\big)^2\Big] \quad \text{（$b$ 和 $b$ 相消！）} \\[4pt]
+&= \mathbb{E}\big[a^2 (X - \mu)^2\big] \\[4pt]
+&= a^2 \cdot \mathbb{E}\big[(X - \mu)^2\big] \\[4pt]
+&= a^2 \cdot \text{Var}(X)
+\end{aligned}$$
+
+<p class="comment">第三步是核心：$+b$ 在 $aX+b$ 里和 $-b$ 在 $-(a\mu+b)$ 里正好抵消。<strong>平移量 $b$ 完全不进入方差</strong>——因为它同时作用于每个点和均值，差值不变。第五步 $a^2$ 被提到期望外面（$a^2$ 是常数）。</p>
+
+</details>
 
 <hr>
 

@@ -48,7 +48,7 @@ s = np.array(<span class="hl-number">3.14</span>)    <span class="hl-comment"># 
 
 <p>如果箭头落在 $(3, 4)$：</p>
 <ul>
-  <li>箭的<strong>长度</strong> = $\sqrt{3^2 + 4^2} = 5$（从原点到箭头尖的直线距离）</li>
+  <li>箭的<strong>长度</strong> = $\sqrt{3^2 + 4^2} = 5$<br><em>为什么是平方和开根号？勾股定理——从原点走到 (3,4)：先往右走 3，再往上走 4，这两段和斜线构成直角三角形。斜边² = 直角边²之和 = 3² + 4² = 25，所以斜边 = √25 = 5。</em></li>
   <li>箭的<strong>方向</strong> = 箭头指的那个朝向</li>
 </ul>
 
@@ -77,7 +77,7 @@ s = np.array(<span class="hl-number">3.14</span>)    <span class="hl-comment"># 
 
 <p><strong>rank = shape 里有几个数。</strong> <code>()</code> 是 rank-0（标量），<code>(3,)</code> 是 rank-1（向量），<code>(3,1)</code> 是 rank-2（矩阵）。</p>
 
-<p><strong>关键区别：</strong> rank-1 向量的 <code>.T</code>（转置）<strong>不生效</strong>——它没有"行"和"列"的概念，转置还是自己。rank-2 列矩阵转置后会变成行矩阵 <code>(1,3)</code>。</p>
+<p><strong>关键区别：</strong> rank-1 向量的 <code>.T</code>（转置）<strong>不生效</strong>——它没有"行"和"列"的概念，转置还是自己。<strong>为什么？</strong> <code>.T</code> 的本质是「交换轴 0 和轴 1」——但 rank-1 只有轴 0，没有轴 1。没东西可交换，所以 <code>.T</code> 什么都不做。rank-2 列矩阵有两个轴（行和列），转置会交换它们：<code>(3,1)</code> → <code>(1,3)</code>。</p>
 
 <pre><code>a = np.array([1, 2, 3])       # rank-1: (3,)
 b = np.array([[1],[2],[3]])   # rank-2: (3,1)
@@ -94,7 +94,7 @@ print(b.T)   # 输出: [[1 2 3]] ——从 (3,1) 变成了 (1,3)</code></pre>
 
 <p><strong>画面：</strong> 你有一块橡皮泥，捏成箭头的样子。你想把它<strong>扭一下、拉一下</strong>，变成另一个形状。你需要一个"操作手册"告诉机器：旧箭头的每个分量怎么搅和到一起产生新箭头的分量。</p>
 
-<p><strong>矩阵就是这本操作手册。</strong></p>
+<p><strong>矩阵就是这本操作手册。</strong> <em>（注意：矩阵不总是操作手册——比如协方差矩阵就是数据关系表，不是操作。但在深度学习中，权重矩阵、投影矩阵确实都是对数据做变换的，用「操作手册」来理解它们特别合适。）</em></p>
 
 <p>比如你想把箭头 $[1, 2]$ 变成 $[4, 6]$，用这个矩阵：</p>
 
@@ -103,6 +103,8 @@ $$\mathbf{W} = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}$$
 <p>把它"作用"到箭头上——矩阵乘向量：</p>
 
 $$\mathbf{y} = \mathbf{W}\mathbf{x} = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix} \begin{bmatrix} 1 \\ 2 \end{bmatrix} = \begin{bmatrix} 2\times 1 + 1\times 2 \\ 0\times 1 + 3\times 2 \end{bmatrix} = \begin{bmatrix} 4 \\ 6 \end{bmatrix}$$
+
+<p><em>怎么算的？第 1 个分量 = W 第 1 行 [2,1] 和 x [1,2]「对应位置相乘再求和」→ 2×1+1×2=4。第 2 个分量同理。这个操作叫<strong>点乘</strong>（下一课详讲），这里先记住「行 × 列 = 一个数」就行。</em></p>
 
 <p><strong>箭头被扭了。</strong> 原来指 $(1,2)$，现在指 $(4,6)$。</p>
 

@@ -57,23 +57,57 @@ $$f'(x) = \lim_{\epsilon \to 0} \frac{f(x+\epsilon) - f(x)}{\epsilon}$$
 <p><strong>画面：</strong> 你站在山谷里，四周都是坡。你原地转一圈，总有一个方向是<strong>最陡的上坡</strong>——那就是梯度指的方向。梯度的大小 = 那个方向的坡度有多陡。梯度的反方向 = 最陡的下坡路。</p>
 
 <div class="callout callout-info">
-<h3>为什么是最快？——方向导数</h3>
+<h3>为什么梯度方向最快？——方向导数完整推导</h3>
 
-<p>你沿着<strong>任意方向</strong>走一小步，上升多快？这个速率叫做<strong>方向导数</strong>。它的公式很简单：</p>
+<p><strong>第一步：方向导数的定义。</strong></p>
 
-$$\text{方向导数} = \nabla f \cdot \mathbf{u}$$
+<p>你站在 $(x, y)$ 点，选一个方向 $\mathbf{u} = (u_x, u_y)$（单位向量，模=1）。往前走 $\epsilon$ 步——也就是 $x$ 变到 $x + \epsilon u_x$，$y$ 变到 $y + \epsilon u_y$。函数值变了多少？</p>
 
-<p>$\nabla f$ 是梯度向量，$\mathbf{u}$ 是你选择的方向（长度=1 的单位向量）。</p>
+$$D_{\mathbf{u}} f = \lim_{\epsilon \to 0} \frac{f(x + \epsilon u_x,\; y + \epsilon u_y) - f(x, y)}{\epsilon}$$
 
-<p>点乘公式告诉我们：$\nabla f \cdot \mathbf{u} = \|\nabla f\| \cdot 1 \cdot \cos\theta$。$\theta$ 是梯度和你走的方向之间的夹角。</p>
+<p>这就是方向导数的<strong>定义</strong>。注意：如果你选的方向是 $(1, 0)$（沿 $x$ 轴走），方向导数就退化成普通偏导数 $\partial f / \partial x$。</p>
 
+<p><strong>第二步：把方向导数拆成偏导数的组合，推出公式。</strong></p>
+
+<p>关键技巧——把「沿斜线走一步」拆成「先沿 $x$ 走一步，再沿 $y$ 走一步」：</p>
+
+$$
+\begin{aligned}
+f(x + \epsilon u_x, y + \epsilon u_y) - f(x, y)
+&= \underbrace{[f(x + \epsilon u_x, y + \epsilon u_y) - f(x, y + \epsilon u_y)]}_{\text{纯 x-变化量}}
+ + \underbrace{[f(x, y + \epsilon u_y) - f(x, y)]}_{\text{纯 y-变化量}}
+\end{aligned}
+$$
+
+<p>当 $\epsilon \to 0$ 时：</p>
 <ul>
-  <li>$\theta = 0°$（和梯度<strong>同向</strong>）→ $\cos\theta=1$ → 上升最快</li>
-  <li>$\theta = 90°$（和梯度<strong>垂直</strong>）→ $\cos\theta=0$ → 高度不变（沿等高线走）</li>
-  <li>$\theta = 180°$（和梯度<strong>反向</strong>）→ $\cos\theta=-1$ → 下降最快（这就是梯度下降！）</li>
+  <li>纯 x-变化量 $\approx \epsilon u_x \cdot \frac{\partial f}{\partial x}$（走了 $\epsilon u_x$ 这么多，乘上 $x$ 方向的坡度）</li>
+  <li>纯 y-变化量 $\approx \epsilon u_y \cdot \frac{\partial f}{\partial y}$（同理）</li>
 </ul>
 
-<p>所以梯度指的方向是最快上升方向——这不是定义，而是<strong>点乘取最大值的自然结果</strong>（$\cos\theta$ 在 $\theta=0°$ 时最大）。</p>
+<p>全部代入方向导数的定义：</p>
+
+$$D_{\mathbf{u}} f = \lim_{\epsilon \to 0} \frac{\epsilon u_x \frac{\partial f}{\partial x} + \epsilon u_y \frac{\partial f}{\partial y}}{\epsilon}
+= u_x \frac{\partial f}{\partial x} + u_y \frac{\partial f}{\partial y}
+= \nabla f \cdot \mathbf{u}$$
+
+<p><strong>结论：方向导数 = 梯度 · 方向向量。</strong>这不是直接甩公式——是从定义出发，拆成偏导数组合，一步步推出来的。到这里还没有用到任何「最快」的说法，只是推导出了一个<strong>计算任意方向变化率的公式</strong>。</p>
+
+<p><strong>第三步：用点乘的几何意义回答「哪个方向最快」。</strong></p>
+
+<p>有了 $D_{\mathbf{u}}f = \nabla f \cdot \mathbf{u}$ 之后，看它的几何含义：</p>
+
+$$\nabla f \cdot \mathbf{u} = \|\nabla f\| \cdot \|\mathbf{u}\| \cdot \cos\theta = \|\nabla f\| \cdot \cos\theta$$
+
+<p>（$\|\mathbf{u}\|=1$ 因为 $\mathbf{u}$ 是单位向量。$\theta$ 是梯度和你的方向 $\mathbf{u}$ 之间的夹角。）</p>
+
+<ul>
+  <li>$\theta = 0°$（和梯度<strong>同向</strong>）→ $\cos 0° = 1$ → $D_{\mathbf{u}}f = \|\nabla f\|$ → <strong>最大</strong></li>
+  <li>$\theta = 90°$（和梯度<strong>垂直</strong>）→ $\cos 90° = 0$ → $D_{\mathbf{u}}f = 0$ → 高度不变（沿等高线走）</li>
+  <li>$\theta = 180°$（和梯度<strong>反向</strong>）→ $\cos 180° = -1$ → $D_{\mathbf{u}}f = -\|\nabla f\|$ → <strong>下降最快</strong>（这就是梯度下降！）</li>
+</ul>
+
+<p><strong>推导链完整：</strong>定义 → 拆成偏导数组合 → 推出 $\nabla f \cdot \mathbf{u}$ → 点乘在 $\theta=0°$ 最大 → 所以梯度方向最快。每一步都有出处，没有循环。</p>
 </div>
 
 <div class="callout callout-tip">
@@ -85,6 +119,36 @@ $$\theta_{t+1} = \theta_t - \eta \cdot \nabla f(\theta_t)$$
   <li><strong>负号</strong>：因为我们想<strong>下降</strong>，所以反着走</li>
   <li>$\eta$（学习率）：走多大步。太大→可能跨过山谷冲到对面山上去了；太小→半天走不到底</li>
 </ul>
+</div>
+
+<div class="callout callout-warning">
+<h3>学习率多大算太大？——发散条件推导</h3>
+
+<p>不是说「学习率大了就会跨过山谷」——要多<strong>大</strong>才会跨过去？用二次函数来算。</p>
+
+<p><strong>拿我们代码里的例子：</strong>$f(x) = x^2 - 4x + 4$，导数 $f'(x) = 2x - 4$（斜率是一条直线），最小值在 $x=2$（因为 $f'(2)=0$）。</p>
+
+<p>梯度下降更新：</p>
+
+$$x_{t+1} = x_t - \eta \cdot (2x_t - 4) = (1 - 2\eta) x_t + 4\eta$$
+
+<p>关心的是<strong>离谷底还有多远</strong>：定义误差 $e_t = x_t - 2$（当前离最小值 2 的距离）。</p>
+
+$$e_{t+1} = x_{t+1} - 2 = (1-2\eta)x_t + 4\eta - 2 = (1-2\eta)(x_t - 2) = (1-2\eta) \cdot e_t$$
+
+<p>所以每一步误差乘以 $(1-2\eta)$：</p>
+
+<ul>
+  <li>$|1-2\eta| < 1$ → 误差越来越小 → <strong>收敛</strong>。解出来：$-1 < 1-2\eta < 1$ → $0 < \eta < 1$</li>
+  <li>$|1-2\eta| = 1$ → 误差不变 → 来回跳但不缩小（$\eta=1$ 时原地振荡）</li>
+  <li>$|1-2\eta| > 1$ → 误差越来越大 → <strong>发散！</strong></li>
+</ul>
+
+<p><strong>验证：</strong>题目里 $\eta = 1.5$，$1-2\eta = 1-3 = -2$，$|{-2}| = 2 > 1$ → 发散。</p>
+
+<p>$x_0 = 1$，误差 $e_0 = 1-2 = -1$（谷底在右边）。$e_1 = (-2) \times (-1) = 2$，$|e_1| = 2 > |e_0| = 1$。直接验证：$x_1 = 1 - 1.5 \times (-2) = 1 + 3 = 4$，确实从谷底左边直接跳到右边更远的地方——典型的发散。</p>
+
+<p><strong>一般结论：</strong>对于二次函数 $f(x) = ax^2 + bx + c$（其中 $a>0$，开口朝上），收敛条件是 $0 < \eta < 1/a$。$f''(x) = 2a$ 越大（函数越弯），允许的学习率越小。</p>
 </div>
 
 <figure><img src="assets/gradient_descent.png" alt="梯度下降"><figcaption>小球从起点沿最陡下坡方向逐步滚到谷底。每一步的坡度越来越缓</figcaption></figure>
@@ -123,6 +187,46 @@ lr = <span class="hl-number">0.1</span>                   <span class="hl-commen
         <span class="hl-builtin">print</span>(<span class="hl-string">f"  第{step:2d}步: x={x:.4f}  坡度={grad:+.4f}"</span>)
         <span class="hl-comment"># 坡度从 -4 逐渐变成 0，x 从 0 逐渐滑到 2</span></code></pre>
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
+
+<div class="callout callout-info">
+<h3>为什么中央差分比单边更精确？——泰勒展开揭密</h3>
+
+<p>代码注释说「误差抵消了一部分」——到底怎么抵消的？用泰勒展开来算。</p>
+
+<p><strong>单边差分（只看往前）：</strong></p>
+
+$$f(x+\epsilon) = f(x) + \epsilon f'(x) + \frac{\epsilon^2}{2} f''(x) + \frac{\epsilon^3}{6} f'''(x) + O(\epsilon^4)$$
+
+<p>移项：</p>
+
+$$\frac{f(x+\epsilon)-f(x)}{\epsilon} = f'(x) + \underbrace{\frac{\epsilon}{2}f''(x) + O(\epsilon^2)}_{\text{误差项：首项是 } O(\epsilon)}$$
+
+<p>误差的主导项是 $\frac{\epsilon}{2}f''(x)$——和 $\epsilon$ 成正比。$\epsilon$ 缩小 10 倍，误差大约缩小 10 倍。</p>
+
+<p><strong>中央差分（看前后）：</strong>写出 $f(x+\epsilon)$ 和 $f(x-\epsilon)$ 两个泰勒展开：</p>
+
+$$
+\begin{aligned}
+f(x+\epsilon) &= f(x) + \epsilon f'(x) + \frac{\epsilon^2}{2} f''(x) + \frac{\epsilon^3}{6} f'''(x) + \frac{\epsilon^4}{24} f''''(x) + \cdots \\[4pt]
+f(x-\epsilon) &= f(x) - \epsilon f'(x) + \frac{\epsilon^2}{2} f''(x) - \frac{\epsilon^3}{6} f'''(x) + \frac{\epsilon^4}{24} f''''(x) - \cdots
+\end{aligned}
+$$
+
+<p><strong>相减：</strong>$f(x+\epsilon) - f(x-\epsilon)$：</p>
+
+<ul>
+  <li>$f(x)$ 消掉（都有，相减得 0）</li>
+  <li>$\epsilon f'(x) - (-\epsilon f'(x)) = 2\epsilon f'(x)$ ← 保留</li>
+  <li>$\frac{\epsilon^2}{2}f''(x) - \frac{\epsilon^2}{2}f''(x) = 0$ ← <strong>抵！消！了！</strong></li>
+  <li>$\frac{\epsilon^3}{6}f'''(x) - (-\frac{\epsilon^3}{6}f'''(x)) = \frac{\epsilon^3}{3}f'''(x)$</li>
+</ul>
+
+$$\frac{f(x+\epsilon)-f(x-\epsilon)}{2\epsilon} = f'(x) + \underbrace{\frac{\epsilon^2}{6}f'''(x) + O(\epsilon^4)}_{\text{误差项：首项是 } O(\epsilon^2)}$$
+
+<p><strong>关键：</strong>相减时 $\epsilon^2$ 项<strong>同号抵消</strong>了！剩余误差主导项是 $\frac{\epsilon^2}{6}f'''(x)$——和 $\epsilon^2$ 成正比。$\epsilon$ 缩小 10 倍，误差缩小 100 倍。这就是为什么中央差分比单边差分高一个精度量级。</p>
+
+<p><strong>直观理解：</strong>单边差分就像只看了看你前方一毫米的地形，就猜整条路的坡度——局部信息有限。中央差分同时看了前方和后方，左右信息对称，把「地形弯曲」带来的偏差对消掉了。</p>
+</div>
 
 <hr>
 <h2>💭 概念题</h2>

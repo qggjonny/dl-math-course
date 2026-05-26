@@ -20,13 +20,45 @@
 
 <p><strong>画面：</strong> 正午大太阳。你站在操场上，太阳在你头顶正上方。你的影子有多长？取决于你站得多直：笔直站 → 影子为一团（最短），斜躺 → 影子拉得老长。</p>
 
-<figure><img src="assets/dot_product_angle.png" alt="点乘夹角"><figcaption>$\mathbf{a}\cdot\mathbf{b}=\|\mathbf{a}\|\|\mathbf{b}\|\cos	heta$。$	heta=0°$→最大，$	heta=90°$→0，$	heta=180°$→最小</figcaption></figure>
+<figure><img src="assets/dot_product_angle.png" alt="点乘夹角"><figcaption>$\mathbf{a}\cdot\mathbf{b}=\|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$。$\theta=0°$→最大，$\theta=90°$→0，$\theta=180°$→最小</figcaption></figure>
 
 <p>这就是点乘的几何含义：<strong>两个向量各自有多长，乘起来，再按夹角打一个折。</strong></p>
 
-<p>也可以这样看：把 a "投"到 b 的方向上，投影长度 = ‖a‖cosθ，<strong>再乘以 b 的长度</strong>。反过来也行——把 b 投到 a 上，再乘以 a 的长度。两种看法结果一样。</p>
+<p>也可以这样看：把 a "投"到 b 的方向上。<strong>投影怎么算？</strong> a、投影、垂线构成直角三角形——a 是斜边，投影是邻边。直角三角形中，邻边 = 斜边 × cosθ，所以投影长度 = ‖a‖cosθ，<strong>再乘以 b 的长度</strong>。反过来也行——把 b 投到 a 上，再乘以 a 的长度。两种看法结果一样。</p>
+
+<p><strong>注意：</strong> 当 θ > 90° 时 cosθ &lt; 0，「投影」落在 b 的<strong>反方向</strong>上，点乘为负——这说明两个向量总体上在「互相背离」。当 θ &lt; 90° 时 cosθ > 0，投影在 b 的方向上，点乘为正——两个向量总体上在「互相帮助」。当 θ = 90° 时 cosθ = 0，投影长度为 0——两个向量垂直，谁也不影响谁。</p>
 
 $$\mathbf{a} \cdot \mathbf{b} = a_1b_1 + a_2b_2 + \cdots + a_nb_n = \|\mathbf{a}\|\,\|\mathbf{b}\|\,\cos\theta$$
+
+<div class="callout callout-info">
+<h3>为什么「分量乘完求和」=「长度×长度×cos」？</h3>
+
+<p><strong>三步推导，只需要余弦定理：</strong></p>
+
+<p><strong>第 1 步——画出三角形。</strong> 向量 $\mathbf{a}$ 和 $\mathbf{b}$ 的差 $\mathbf{a}-\mathbf{b}$ 构成三角形第三条边。余弦定理告诉我们第三条边的长度平方：</p>
+
+$$\|\mathbf{a} - \mathbf{b}\|^2 = \|\mathbf{a}\|^2 + \|\mathbf{b}\|^2 - 2\|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$$
+
+<p><strong>第 2 步——用代数定义展开左边。</strong> 注意：$\|\mathbf{v}\|^2$ 就是 $\mathbf{v}\cdot\mathbf{v}$（自己点乘自己 = 各分量平方求和）：</p>
+
+$$
+\begin{aligned}
+\|\mathbf{a} - \mathbf{b}\|^2 &= (\mathbf{a}-\mathbf{b})\cdot(\mathbf{a}-\mathbf{b}) \\
+&= \mathbf{a}\cdot\mathbf{a} + \mathbf{b}\cdot\mathbf{b} - 2(\mathbf{a}\cdot\mathbf{b}) \\
+&= \|\mathbf{a}\|^2 + \|\mathbf{b}\|^2 - 2(\mathbf{a}\cdot\mathbf{b})
+\end{aligned}
+$$
+
+<p><strong>第 3 步——对比左右两边。</strong> 第 1 步和第 2 步都等于 $\|\mathbf{a}-\mathbf{b}\|^2$，所以它们相等：</p>
+
+$$\cancel{\|\mathbf{a}\|^2 + \|\mathbf{b}\|^2} - 2(\mathbf{a}\cdot\mathbf{b}) = \cancel{\|\mathbf{a}\|^2 + \|\mathbf{b}\|^2} - 2\|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$$
+
+<p>消去相同项：</p>
+
+$$\mathbf{a}\cdot\mathbf{b} = \|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$$
+
+<p><strong>所以「对应分量乘完求和」和「长度×长度×夹角余弦」是同一个东西——不是分别定义，是余弦定理推导出来的等价关系。</strong></p>
+</div>
 
 <p>拆开看：</p>
 <ul>
@@ -56,6 +88,8 @@ cos_theta = dot / (np.linalg.norm(a) * np.linalg.norm(b))
 <h2>二、矩阵乘法 — 流水生产线</h2>
 
 <p><strong>画面：</strong> 工厂里一条生产线。第一台机器把原材料处理成半成品（$A$ 的变换），第二台机器把半成品加工成成品（$B$ 的变换）。两台机器首尾相连——这就是 $C = BA$。矩阵乘就是两张"操作手册"的接力。</p>
+
+<p><strong>为什么是"行×列"？</strong> 从流水线角度看：输入向量 $\mathbf{x}$ 先经过 $A$，第 $j$ 个中间分量 = $A$ 第 $j$ 行 · $\mathbf{x}$。然后 $B$ 拿这些中间分量做加权组合——$B$ 第 $i$ 列上的数字就是第 $i$ 个输出的各权重。两步合起来：$(BA)\mathbf{x}$ 的第 $i$ 分量 = $\sum_j B_{ij} \cdot (A$ 第 $j$ 行 · $\mathbf{x})$。去掉 $\mathbf{x}$，剩下 $(BA)_{ij} = B$ 第 $i$ 行 · $A$ 第 $j$ 列。所以"行乘列"规则不是硬记的——它是<strong>变换复合的自然结果</strong>。</p>
 
 <p><strong>怎么算：</strong> $C$ 的第 $i$ 行第 $j$ 列 = $A$ 的第 $i$ 行 <strong>与</strong> $B$ 的第 $j$ 列 <strong>做点乘</strong>。</p>
 

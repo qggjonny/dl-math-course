@@ -32,6 +32,33 @@
 
 $$h(x) = f(g(x)) \quad\Rightarrow\quad h'(x) = f'(g(x)) \cdot g'(x)$$
 
+<div class="callout callout-info">
+<h3>推导：为什么是乘法？为什么是 f'(g(x)) 而不是 f'(x)？</h3>
+
+<p><strong>从定义出发：</strong></p>
+
+$$h'(x) = \lim_{\Delta x \to 0} \frac{f(g(x+\Delta x)) - f(g(x))}{\Delta x}$$
+
+<p>令 $\Delta u = g(x+\Delta x) - g(x)$（中间变量因为 $x$ 变而变的量）。则 $g(x+\Delta x) = g(x) + \Delta u$，代入：</p>
+
+$$h'(x) = \lim_{\Delta x \to 0} \frac{f(g(x)+\Delta u) - f(g(x))}{\Delta x}$$
+
+<p><strong>关键技巧——凑出两个差商的乘积：</strong></p>
+
+$$= \lim_{\Delta x \to 0} \underbrace{\frac{f(g(x)+\Delta u) - f(g(x))}{\Delta u}}_{\text{外层 f 在 g(x) 处的导数}} \cdot \underbrace{\frac{\Delta u}{\Delta x}}_{\text{内层 g 的差商}}$$
+
+<p>当 $\Delta x \to 0$ 时，$\Delta u \to 0$（因为 $g$ 可导则连续），所以：</p>
+
+$$h'(x) = f'(g(x)) \cdot g'(x)$$
+
+<p><strong>推导同时回答了三个问题：</strong></p>
+<ol>
+  <li><strong>为什么是乘法？</strong> 因为我们凑出了两个差商的乘积——外层的 $\frac{\Delta f}{\Delta u}$ 和内层的 $\frac{\Delta u}{\Delta x}$。</li>
+  <li><strong>为什么是 $f'(g(x))$ 而不是 $f'(x)$？</strong> 外层的差商是 $\frac{f(g(x)+\Delta u)-f(g(x))}{\Delta u}$——外层 $f$ 是在 <strong>$u=g(x)$ 处</strong>取值，不是在 $x$ 处取值。</li>
+  <li><strong>从几何上看：</strong> $x$ 变一点 → $u$ 变 $g'(x)$ 倍 → $y$ 变 $f'(u)$ 倍。两步放大倍数相乘 = 总放大倍数。函数图像上：复合函数在 $x$ 处的切线斜率 = 外层在 $u=g(x)$ 处的切线斜率 × 内层在 $x$ 处的切线斜率。</li>
+</ol>
+</div>
+
 <ul>
   <li>$g'(x)$：拧输入 $x$，中间结果 $g(x)$ 怎么变（第一个传动比）</li>
   <li>$f'(g(x))$：中间结果 $g(x)$ 变一点，最终输出怎么变（第二个传动比）</li>
@@ -54,10 +81,35 @@ $$h(x) = f(g(x)) \quad\Rightarrow\quad h'(x) = f'(g(x)) \cdot g'(x)$$
 
 $$\frac{dz}{dx} = \frac{\partial z}{\partial y_1} \cdot \frac{dy_1}{dx} + \frac{\partial z}{\partial y_2} \cdot \frac{dy_2}{dx} + \cdots$$
 
+<div class="callout callout-info">
+<h3>推导：为什么是求和？</h3>
+
+<p>设 $z = f(y_1(x), y_2(x))$——最终输出 $z$ 通过两个中间变量 $y_1, y_2$ 依赖于 $x$。</p>
+
+<p><strong>全微分：</strong> $x$ 变 $\Delta x$，导致 $y_1$ 变 $\Delta y_1 \approx \frac{dy_1}{dx}\Delta x$，$y_2$ 变 $\Delta y_2 \approx \frac{dy_2}{dx}\Delta x$。</p>
+
+<p>$y_1$ 和 $y_2$ 各自的变化都会影响 $z$——总变化 = 各路径贡献之和：</p>
+
+$$\Delta z \approx \frac{\partial z}{\partial y_1} \cdot \Delta y_1 + \frac{\partial z}{\partial y_2} \cdot \Delta y_2$$
+
+<p>代入 $\Delta y_1$ 和 $\Delta y_2$ 的表达式：</p>
+
+$$\Delta z \approx \frac{\partial z}{\partial y_1} \cdot \frac{dy_1}{dx}\Delta x + \frac{\partial z}{\partial y_2} \cdot \frac{dy_2}{dx}\Delta x$$
+
+<p>两边除以 $\Delta x$，取极限 $\Delta x \to 0$：</p>
+
+$$\frac{dz}{dx} = \frac{\partial z}{\partial y_1} \cdot \frac{dy_1}{dx} + \frac{\partial z}{\partial y_2} \cdot \frac{dy_2}{dx}$$
+
+<p><strong>直觉：</strong> 就像两条水渠汇入一个水库——上游放水，两条渠各自带走一部分水，水库水位变化 = 两条渠的贡献加起来。链式法则的加法来自<strong>各路径独立贡献的叠加</strong>。</p>
+</div>
+
 <p><strong>画面：</strong> 发动机驱动两条传送带，两条传送带都汇到一个包装箱。发动机加速 → 两条传送带都加速 → 包装箱加速。总效应 = 两条路径的效应相加。</p>
 
 <div class="callout callout-info">
-<strong>多级齿轮的启示：</strong> 100 级齿轮咬合在一起。如果每级传动比都 &lt; 1（比如 0.25），100 次连乘后 → 0.25¹⁰⁰ ≈ 0——第一个齿轮拧 10000 圈，最后一个纹丝不动。如果每级都 &gt; 1，最后一个会疯狂加速。链式法则的乘法性质意味着：<strong>连乘 100 次的结果对每一级的传动比极度敏感</strong>——这就是为什么深层复合函数的导数要么趋近 0，要么爆炸。
+<h3>多级齿轮的启示：连乘导致极度敏感</h3>
+<p>100 级齿轮咬合在一起。如果每级传动比都 &lt; 1（比如 0.25），100 次连乘后 → $0.25^{100} \approx 0$——第一个齿轮拧 10000 圈，最后一个纹丝不动。如果每级都 &gt; 1，最后一个会疯狂加速。</p>
+
+<p><strong>这和深度学习有什么关系？</strong> 神经网络的反向传播就是在用链式法则求梯度——每一层的局部导数连乘起来。100 层网络 → 100 个因子连乘。大多数因子 &lt; 1 → 梯度指数衰减（<strong>梯度消失</strong>，浅层学不到东西）；大多数因子 &gt; 1 → 梯度指数爆炸（<strong>梯度爆炸</strong>，更新一步跨太远）。深层网络训练困难的根源就在这里——不是网络不聪明，是链式法则的乘法性质让深层梯度对每一层的缩放极其敏感。</p>
 </div>
 
 <hr>

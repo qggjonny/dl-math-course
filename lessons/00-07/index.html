@@ -26,6 +26,14 @@
 
 <p>但针尖戳中一个<strong>区域</strong>——比如戳中左边三分之一——概率就是 1/3。因为区域有面积，而点没有面积。</p>
 
+<div class="callout callout-info">
+<strong>📐 推导：为什么单点概率严格为 0？</strong><br>
+积分就是求面积。对于任意单点 $x=a$：
+$$P(X=a) = \int_a^a f(x)\,dx = 0$$
+积分上下限相同 → 区间宽度为零 → 面积必为零。无论 $f(a)$ 有多高，乘上宽度 0，结果就是 0。<br><br>
+<strong>类比：</strong> 一根线段有长度，但线段上的一个「点」长度为零。连续分布的概率由<em>区间长度</em>承载，单点不贡献任何概率。
+</div>
+
 <p>所以连续分布的概率不看「柱子的高度」，而是看 <strong>PDF 曲线下方的面积</strong>：</p>
 
 <figure>
@@ -47,6 +55,13 @@
 
 <h2>二、均匀分布：诚实的「没有偏好」</h2>
 <p>$[a,b]$ 内每个点的密度一样。PDF 是一段水平线。没有任何偏好——如果你完全不知道气温可能是多少，均匀分布是最诚实的假设。</p>
+
+<div class="callout callout-info">
+<strong>📐 推导：PDF 的高度从哪来？</strong><br>
+设 PDF 在 $[a,b]$ 内为常数 $c$，区间外为 0。由总面积 = 1：
+$$\int_a^b c\,dx = c \cdot (b-a) = 1 \quad\Rightarrow\quad c = \frac{1}{b-a}$$
+直观：宽 $(b-a)$ 的矩形面积要等于 1，高度自然就是 $\frac{1}{b-a}$。区间越宽，密度越矮；区间越窄，密度越高。这就是「均匀」的数学含义——每个子区间的概率正比于它的长度，和位置无关。
+</div>
 
 <hr>
 
@@ -77,11 +92,29 @@ $$f(x) = \frac{1}{\sigma\sqrt{2\pi}} \exp\!\left(-\frac{(x-\mu)^2}{2\sigma^2}\ri
 
 <p><strong>验证直觉：</strong> σ=1 → f(0)≈0.399。σ=2 → f(0)≈0.199。恰好减半！因为钟宽了一倍，高度必须减半来保持总面积。</p>
 
+<div class="callout callout-info">
+<strong>📐 推导：$\pi$ 从哪冒出来的？</strong><br>
+你可能好奇：明明是概率分布，为什么杀出来一个圆周率 $\pi$？它来自<strong>高斯积分</strong>的归一化：
+$$\int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}$$
+推导技巧：把平方积分转到极坐标——
+$$\left(\int_{-\infty}^{\infty} e^{-x^2}dx\right)^2 = \int_{-\infty}^{\infty}\int_{-\infty}^{\infty} e^{-(x^2+y^2)}dx\,dy = \int_0^{2\pi}\int_0^{\infty} e^{-r^2}r\,dr\,d\theta = \pi$$
+角度积分一圈 $\int_0^{2\pi}d\theta = 2\pi$，$r$ 的积分贡献 $\frac{1}{2}$，合起来就是 $\pi$。正态分布的系数 $\frac{1}{\sigma\sqrt{2\pi}}$ 就是把这个 $\sqrt{\pi}$ 摊平成总面积 = 1 的结果。
+</div>
+
 <hr>
 
 <h2>四、CDF：一把刷子从左扫到右</h2>
 
 <p><strong>画面：</strong> 一把刷子从最左边往右刷，每刷过一段曲线，就把下面的颜料扫进桶里。桶从空的（F(-∞)=0）慢慢涨，到最右边刚好满（F(+∞)=1）。</p>
+
+<div class="callout callout-info">
+<strong>📐 推导：PDF 与 CDF 的微积分关系</strong><br>
+CDF $F(x)$ 是 PDF $f(t)$ 从 $-\infty$ 到 $x$ 的累积：
+$$F(x) = \int_{-\infty}^x f(t)\,dt$$
+反过来，PDF 是 CDF 的导数——CDF 的瞬时变化率就是该点的密度：
+$$f(x) = F'(x)$$
+<strong>直觉：</strong> 刷子扫过某一点时桶里进颜料的「速度」就是那一点的密度值。密度高处进得快（CDF 陡），密度低处进得慢（CDF 平）。所以 CDF 永远单调不减——颜料只进不出。
+</div>
 
 <figure>
 <img src="assets/normal_cdf.png" alt="CDF">
@@ -99,7 +132,47 @@ $$f(x) = \frac{1}{\sigma\sqrt{2\pi}} \exp\!\left(-\frac{(x-\mu)^2}{2\sigma^2}\ri
 
 <p>σ 是天然尺子。1σ=正常，2σ=少见，3σ=极端。<strong>不是线性增长</strong>——钟的尾巴指数衰减，3σ 之外概率微乎其微。</p>
 
+<div class="callout callout-info">
+<strong>📐 推导：为什么 68 → 95 → 99.7 不是线性？用密度值说话</strong><br>
+标准正态 $\mathcal{N}(0,1)$ 在各点的密度：
+<table>
+<tr><th>$x$（离中心几 σ）</th><th>$f(x)$（该点密度）</th><th>相对中心的比例</th></tr>
+<tr><td>0</td><td>0.3989</td><td>100% — 最高</td></tr>
+<tr><td>1</td><td>0.2420</td><td>60.7% — 降了近四成</td></tr>
+<tr><td>2</td><td>0.0540</td><td>13.5% — 只剩一成多</td></tr>
+<tr><td>3</td><td>0.0044</td><td>1.1% — 几乎没了</td></tr>
+</table>
+每往外走 1σ，密度以 $e^{-x^2/2}$ 的速度指数暴跌。±3σ 处的密度只有中心的约 1%，所以再往外面积几乎不增长。<br><br>
+<strong>结论：</strong> 从 ±1σ 到 ±2σ，概率增加了 27.2%（因为密度还不太低），但从 ±2σ 到 ±3σ 只增加了 4.2%（因为密度已经微乎其微）。不是线性比例——这是指数衰减的直接后果。
+</div>
+
 <hr>
+
+<h2>六、正态分布为什么无处不在：中心极限定理导引</h2>
+
+<p><strong>画面：米粒堆山丘。</strong> 往桌上倒一堆米，米粒会堆成一座山丘——中间高、四周低，轮廓像钟形曲线。为什么？</p>
+
+<p>每粒米落下时是随机的（可能偏左、可能偏右），但成千上万粒米叠加后，「偏左」和「偏右」互相抵消，最终大多数米稳定在中心附近。每次多倒一粒，山丘就更接近完美的钟形。</p>
+
+<div class="callout callout-info">
+<strong>中心极限定理（CLT）的直觉表述：</strong><br>
+大量<strong>独立</strong>随机变量的<strong>和</strong>，无论各自原本是什么分布（均匀、指数、甚至离散），加起来后的分布趋向于<strong>正态分布</strong>。<br><br>
+$$\frac{X_1 + X_2 + \cdots + X_n - n\mu}{\sigma\sqrt{n}} \;\xrightarrow{d}\; \mathcal{N}(0,1)$$
+<strong>关键条件：</strong> 每个变量方差有限、互相独立。现实中绝大多数「总量」型变量都满足——身高 = 基因 + 营养 + 环境 + 测量误差，每一项都是独立的小因素，叠加后就变成正态。
+</div>
+
+<p><strong>深度学习的应用：</strong></p>
+<ul>
+<li><strong>权重初始化：</strong> Xavier/He 初始化从正态分布采样，确保信号在前向传播中不爆炸不消失</li>
+<li><strong>Batch Normalization：</strong> 把每层输出强行拉回均值 0 方差 1，利用正态的稳定性质</li>
+<li><strong>VAE 潜在空间：</strong> 编码器输出 $\mu$ 和 $\sigma$，解码器从 $\mathcal{N}(\mu,\sigma^2)$ 采样——假设潜在变量天然服从正态</li>
+<li><strong>扩散模型：</strong> 每一步加高斯噪声、每一步去高斯噪声，整个生成过程围绕正态分布构建</li>
+</ul>
+
+<p>正态分布之所以是「默认分布」，不是因为数学家偏爱它——而是<strong>大量微小随机因素叠加后，数学上必然如此</strong>。米粒堆山丘，数据堆正态。</p>
+
+<hr>
+
 <h2>🖥️ 代码</h2>
 <pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
@@ -145,6 +218,8 @@ cdf = np.cumsum(normal_pdf(xg,<span class="hl-number">0</span>,<span class="hl-n
 <li>"取一个确定值的概率 = 0"但现实中气温 25°C 完全可以发生。用「针尖戳纸」的比喻解释为什么不矛盾。——考察：数学理想化 vs 测量精度</li>
 <li>从总面积 = 1 的硬约束出发：如果 σ 从 1 翻到 2，钟变胖了。峰值 f(0) 应该是原来的几分之几？——考察：归一化系数 1/(σ√2π) 的直觉</li>
 <li>为什么 68-95-99.7 不是线性？±3σ 为什么不等于 3×68.3%？用"钟的尾巴指数衰减"来解释。——考察：正态分布的尾部衰减速度</li>
+<li>均匀分布的 PDF 高度 c=1/(b-a) 是怎么推导出来的？——考察：总面积=1 的约束</li>
+<li>米粒堆山丘的比喻体现了哪个定理？列举两个深度学习中的实际应用。——考察：中心极限定理的理解与迁移</li>
 </ol>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
