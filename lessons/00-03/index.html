@@ -87,7 +87,7 @@ $$
 
 $$\det(A) = ad - bc$$
 
-<h4>🧮 推导：为什么是 ad−bc？——列向量张成的平行四边形面积</h4>
+<h4>🧮 推导：为什么是 ad−bc？——纯几何证明</h4>
 
 <p>把矩阵的两列看作两个向量：</p>
 
@@ -96,18 +96,26 @@ $$\mathbf{v}_1 = \begin{bmatrix} a \\ c \end{bmatrix}, \quad
 
 <p>矩阵作用在单位正方形上：第一列 $\mathbf{v}_1$ 就是原来 $(1,0)$ 被扭到的新位置，第二列 $\mathbf{v}_2$ 就是原来 $(0,1)$ 被扭到的新位置。所以变换后的平行四边形 <strong>就是 $\mathbf{v}_1$ 和 $\mathbf{v}_2$ 张成的平行四边形</strong>。</p>
 
-<p>现在求这个平行四边形的面积。最直接的方法是<strong>底 × 高</strong>，但高不好算（$\mathbf{v}_2$ 不一定是竖直的）。换个角度——用<strong>叉积</strong>：</p>
+<p>怎么求这个平行四边形的面积？<strong>底 × 高。</strong></p>
 
-$$\text{面积} = |\mathbf{v}_1 \times \mathbf{v}_2|$$
+<p><strong>第 1 步——底：</strong> 以 $\mathbf{v}_1$ 为底。$\mathbf{v}_1 = (a, c)$，底长 = $\sqrt{a^2 + c^2}$（勾股定理）。</p>
 
-<p>在二维平面上，两个向量的叉积（标量，即"有向面积"）定义为：</p>
+<p><strong>第 2 步——高：</strong> $\mathbf{v}_1$ 所在直线过原点，法向量 $(c, -a)$，直线方程 $cx - ay = 0$。$\mathbf{v}_2$ 的终点 $(b, d)$ 到这条直线的距离（点到直线距离公式）：</p>
 
-$$\mathbf{v}_1 \times \mathbf{v}_2 = a \cdot d - c \cdot b = ad - bc$$
+$$\text{高} = \frac{|c \cdot b - a \cdot d|}{\sqrt{a^2 + c^2}} = \frac{|ad - bc|}{\sqrt{a^2 + c^2}}$$
 
-<p><strong>一步一步来：</strong> 把 $\mathbf{v}_1$ 和 $\mathbf{v}_2$ 拼成矩阵 $M = [\mathbf{v}_1 \;\; \mathbf{v}_2] = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$。叉积公式来自「$\mathbf{v}_1$ 的 x 分量 × $\mathbf{v}_2$ 的 y 分量」减去「$\mathbf{v}_1$ 的 y 分量 × $\mathbf{v}_2$ 的 x 分量」——本质上就是 $ad - bc$。取绝对值就是平行四边形的面积，正负号表示 $\mathbf{v}_1$ 到 $\mathbf{v}_2$ 的旋转方向（逆时针为正）。</p>
+<p>（分子取绝对值因为距离非负，分母 $\sqrt{a^2 + c^2}$ 是法向量的长度。）</p>
+
+<p><strong>第 3 步——底 × 高：</strong></p>
+
+$$\text{面积} = \cancel{\sqrt{a^2 + c^2}} \cdot \frac{|ad - bc|}{\cancel{\sqrt{a^2 + c^2}}} = |ad - bc|$$
+
+<p><strong>两个根号恰好消掉！</strong> $ad-bc$ 自然出现，不是硬凑的公式。</p>
+
+<p><strong>符号的含义：</strong> 去掉绝对值，$ad - bc$ 的正负号表示 $\mathbf{v}_1$ 到 $\mathbf{v}_2$ 的<strong>旋转方向</strong>——逆时针为正（$ad-bc > 0$），顺时针为负（$ad-bc < 0$）。所以行列式是<strong>有向面积</strong>。</p>
 
 <div class="callout callout-info">
-<strong>小结：</strong> $\det(A) = ad - bc$ 不是死记的公式——它就是矩阵两列作为向量所张成平行四边形的<strong>有向面积</strong>。$ad$ 是"主对角线乘积"（$\mathbf{v}_1$ 的水平分量 × $\mathbf{v}_2$ 的竖直分量），$bc$ 是"副对角线乘积"（$\mathbf{v}_1$ 的竖直分量 × $\mathbf{v}_2$ 的水平分量），两者之差就是面积。
+<strong>直觉补充——矩形减法：</strong> 你也可以用大矩形减去四个角上的三角形来证明（像剪纸一样，把平行四边形框在一个矩形里，减掉多余的部分，剩下的就是面积）。两种方法殊途同归：底×高告诉你「怎么算」，矩形减法告诉你「为什么是这个形状」。这里用底×高法是因为推导最简洁——点到直线距离公式一步到位，根号消掉，$ad-bc$ 自己蹦出来。
 </div>
 
 <p>刚才那个矩阵：$\det = 2\times1 - 1\times0 = 2$。面积放大了 2 倍。</p>
