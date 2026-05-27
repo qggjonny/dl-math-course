@@ -220,11 +220,13 @@ print(f"迹 = {trace}")
 det_A = np.linalg.det(A)    # = 4×3 - 1×2 = 10
 print(f"行列式 = {det_A:.0f}")
 
-# 特征方程: λ² - trace·λ + det = 0 → λ² - 7λ + 10 = 0
-# 解二次方程: λ = (7 ± √(49-40)) / 2 = (7 ± 3) / 2
-print(f"λ₁ = {(7 + 3**0.5)/2:.0f}")   # 实际用 7±3...
-# 上面是占位，直接写结果:
-print("λ₁ = 5, λ₂ = 2")</code></pre>
+# 特征方程: λ² - 7λ + 10 = 0
+# 二次方程求根: λ = (7 ± √(49-40)) / 2 = (7 ± 3) / 2
+import math
+discriminant = math.sqrt(7**2 - 4*10)  # √(b²-4ac) = √(49-40) = 3
+lambda1 = (7 + discriminant) / 2       # = 5
+lambda2 = (7 - discriminant) / 2       # = 2
+print(f"λ₁ = {lambda1}, λ₂ = {lambda2}")</code></pre>
 
 <h4>两个恒等式是怎么来的？</h4>
 
@@ -254,6 +256,30 @@ $$\det(A - \lambda I) = (-\lambda)^n + \text{tr}(A)(-\lambda)^{n-1} + \cdots + \
 </div>
 
 <p>如果有一个特征值 = 0，行列式就是 0——空间被压扁了。面积放大倍数 = 每个方向放大倍数的乘积。多直观！</p>
+
+<h3>求出 λ 之后，怎么求特征向量 v？</h3>
+
+<p>有了特征值，把每个 λ 代回 $(A - \lambda I)\mathbf{v} = \mathbf{0}$，解出 v。</p>
+
+<p><strong>对 λ₁ = 5：</strong></p>
+
+$$A - 5I = \begin{bmatrix} 4-5 & 1 \\ 2 & 3-5 \end{bmatrix} = \begin{bmatrix} -1 & 1 \\ 2 & -2 \end{bmatrix}$$
+
+<p>解 $\begin{bmatrix} -1 & 1 \\ 2 & -2 \end{bmatrix} \begin{bmatrix} v_x \\ v_y \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$。第一行：$-v_x + v_y = 0$，所以 $v_y = v_x$。第二行 $2v_x - 2v_y = 0$ 是同一回事（第一行 × (-2)）。也就是说，只要 $v_y = v_x$ 就行——有无穷多解，取最简单的一个：</p>
+
+$$\mathbf{v}_1 = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$$
+
+<p><strong>对 λ₂ = 2：</strong></p>
+
+$$A - 2I = \begin{bmatrix} 4-2 & 1 \\ 2 & 3-2 \end{bmatrix} = \begin{bmatrix} 2 & 1 \\ 2 & 1 \end{bmatrix}$$
+
+<p>第一行：$2v_x + v_y = 0$，所以 $v_y = -2v_x$。取 $v_x = 1$：</p>
+
+$$\mathbf{v}_2 = \begin{bmatrix} 1 \\ -2 \end{bmatrix}$$
+
+<p><strong>验证：</strong> $A\mathbf{v}_1 = \begin{bmatrix} 4&1\\2&3 \end{bmatrix} \begin{bmatrix} 1\\1 \end{bmatrix} = \begin{bmatrix} 5\\5 \end{bmatrix} = 5 \cdot \begin{bmatrix} 1\\1 \end{bmatrix}$ ✓。$A\mathbf{v}_2 = \begin{bmatrix} 4&1\\2&3 \end{bmatrix} \begin{bmatrix} 1\\-2 \end{bmatrix} = \begin{bmatrix} 2\\-4 \end{bmatrix} = 2 \cdot \begin{bmatrix} 1\\-2 \end{bmatrix}$ ✓。</p>
+
+<p><strong>推导链完整：</strong> 特征方程 → 二次方程求 λ → 代入 $(A-\lambda I)\mathbf{v}=0$ → 解线性方程组 → 得到 v。下面用代码验证全过程：</p>
 
 <pre><code>A = np.array([[4, 1], [2, 3]])
 
