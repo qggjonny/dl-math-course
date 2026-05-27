@@ -206,6 +206,18 @@ $$= \lambda^2 - \underbrace{(a+d)}_{\text{迹}}\lambda + \underbrace{(ad-bc)}_{\
 
 <p>这就是关于 $\lambda$ 的二次方程！$a+d$（对角线之和）叫<strong>迹</strong>（trace，记作 $\text{tr}(A)$），$ad-bc$ 就是行列式 $\det(A)$。</p>
 
+<p><strong>用二次方程求根公式解出 λ 的通解：</strong></p>
+
+$$\lambda = \frac{\text{tr}(A) \pm \sqrt{\text{tr}(A)^2 - 4 \cdot \det(A)}}{2}$$
+
+<p>代入 $\text{tr}(A) = 7$，$\det(A) = 10$：</p>
+
+$$\lambda = \frac{7 \pm \sqrt{7^2 - 4 \times 10}}{2} = \frac{7 \pm \sqrt{49 - 40}}{2} = \frac{7 \pm 3}{2}$$
+
+$$\lambda_1 = \frac{7 + 3}{2} = 5, \quad \lambda_2 = \frac{7 - 3}{2} = 2$$
+
+<p>对任意 2×2 矩阵，特征值就是两个数：$\frac{\text{tr} \pm \sqrt{\text{tr}^2 - 4\det}}{2}$。判别式 $\text{tr}^2 - 4\det$ 决定：正 → 两个实根，零 → 重根，负 → 复根。</p>
+
 <div class="callout callout-info">
 <strong>🔍 迹的直观比喻：</strong> 迹 = 对角线之和 = <strong>各方向拉伸率之和</strong>。回忆对角矩阵 $\begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}$——x 方向拉长 2 倍，y 方向拉长 3 倍，迹 = 2+3 = 5。而特征值之积 = 行列式（面积放大倍数），特征值之和 = 迹（拉伸率总和）。一个管<strong>乘法</strong>（体积怎么变），一个管<strong>加法</strong>（各方向拉了多少）。
 </div>
