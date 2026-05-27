@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>00-07 连续分布 · 深度学习数学</title>
+<title>00-07 梯度与方向导数 · 深度学习数学</title>
 <link rel="stylesheet" href="../../css/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
@@ -12,216 +12,92 @@
 <span><a href="../00-06/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-08/">下一课 →</a></span></nav>
 <div class="container">
 
-<h1>00-07 连续分布</h1>
-
-<p>上节课的 PMF 用柱子高度表示概率。但这招对「气温 25.317°C」完全没用——它有无限精度，你没法给每一个可能的气温画一根柱子。连续分布需要换一种思考方式。</p>
+<h1>00-07 梯度与方向导数</h1>
 
 <hr>
 
-<h2>一、单点概率 = 0：一根针尖戳不到一个点</h2>
+<h2>一、梯度：最陡的方向</h2>
 
-<blockquote><strong>连续随机变量取任意一个确定值的概率 = 0。</strong></blockquote>
+<p>把所有偏导数拼成一个向量——这就是梯度。</p>
 
-<p><strong>画面：</strong> 闭着眼睛往一张纸上扔一根针。针尖恰好戳中坐标 (3.1415926535..., 2.7182818284...) 的概率是多少？零。因为纸上无穷多个点，针尖恰好戳中<em>某特定一个点</em>在数学上是零概率事件。</p>
+<p>$$\nabla f = \left[\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n}\right]$$</p>
 
-<p>但针尖戳中一个<strong>区域</strong>——比如戳中左边三分之一——概率就是 1/3。因为区域有面积，而点没有面积。</p>
+<p><strong>核心直觉：梯度向量指向函数值上升<em>最快</em>的方向。</strong></p>
 
-<div class="callout callout-info">
-<strong>📐 推导：为什么单点概率严格为 0？</strong><br>
-积分就是求面积。对于任意单点 $x=a$：
-$$P(X=a) = \int_a^a f(x)\,dx = 0$$
-积分上下限相同 → 区间宽度为零 → 面积必为零。无论 $f(a)$ 有多高，乘上宽度 0，结果就是 0。<br><br>
-<strong>类比：</strong> 一根线段有长度，但线段上的一个「点」长度为零。连续分布的概率由<em>区间长度</em>承载，单点不贡献任何概率。
-</div>
-
-<p>所以连续分布的概率不看「柱子的高度」，而是看 <strong>PDF 曲线下方的面积</strong>：</p>
-
-<figure>
-<img src="assets/uniform_area.png" alt="概率 = 面积">
-<figcaption>均匀分布 U(1,4)：面积 = 宽 × 高 = 1。子区间 [c,d] 的概率 = (d−c)/(b−a)</figcaption>
-</figure>
-
-<p>$$P(a \le X \le b) = \int_a^b f(x)\,dx$$</p>
-
-<p>翻译：$X$ 落在 $[a,b]$ 的概率 = 曲线下方、$x=a$ 到 $x=b$ 夹出来的<strong>面积</strong>。</p>
+<p><strong>画面：</strong> 你站在山谷里，四周都是坡。你原地转一圈，总有一个方向是<strong>最陡的上坡</strong>——那就是梯度指的方向。梯度的大小 = 那个方向的坡度有多陡。梯度的反方向 = 最陡的下坡路。</p>
 
 <div class="callout callout-info">
-<strong>PDF 两条铁律：</strong><br>
-① $f(x) \ge 0$ — 密度不能是负数<br>
-② $\int_{-\infty}^{\infty} f(x)\,dx = 1$ — 总面积恰好 = 1（所有情况概率之和）
-</div>
+<h3>为什么梯度方向最快？——方向导数完整推导</h3>
 
-<hr>
+<p><strong>第一步：方向导数的定义。</strong></p>
 
-<h2>二、均匀分布：诚实的「没有偏好」</h2>
-<p>$[a,b]$ 内每个点的密度一样。PDF 是一段水平线。没有任何偏好——如果你完全不知道气温可能是多少，均匀分布是最诚实的假设。</p>
+<p>你站在 $(x, y)$ 点，选一个方向 $\mathbf{u} = (u_x, u_y)$（单位向量，模=1）。往前走 $\epsilon$ 步——也就是 $x$ 变到 $x + \epsilon u_x$，$y$ 变到 $y + \epsilon u_y$。函数值变了多少？</p>
 
-<div class="callout callout-info">
-<strong>📐 推导：PDF 的高度从哪来？</strong><br>
-设 PDF 在 $[a,b]$ 内为常数 $c$，区间外为 0。由总面积 = 1：
-$$\int_a^b c\,dx = c \cdot (b-a) = 1 \quad\Rightarrow\quad c = \frac{1}{b-a}$$
-直观：宽 $(b-a)$ 的矩形面积要等于 1，高度自然就是 $\frac{1}{b-a}$。区间越宽，密度越矮；区间越窄，密度越高。这就是「均匀」的数学含义——每个子区间的概率正比于它的长度，和位置无关。
-</div>
+$$D_{\mathbf{u}} f = \lim_{\epsilon \to 0} \frac{f(x + \epsilon u_x,\; y + \epsilon u_y) - f(x, y)}{\epsilon}$$
 
-<hr>
+<p>这就是方向导数的<strong>定义</strong>。注意：如果你选的方向是 $(1, 0)$（沿 $x$ 轴走），方向导数就退化成普通偏导数 $\partial f / \partial x$。</p>
 
-<h2>三、正态分布：最常用的钟形曲线</h2>
+<p><strong>第二步：把方向导数拆成偏导数的组合，推出公式。</strong></p>
 
-<p>两个数字决定一切：</p>
+<p>关键技巧——把「沿斜线走一步」拆成「先沿 $x$ 走一步，再沿 $y$ 走一步」：</p>
 
-<figure>
-<img src="assets/normal_mu.png" alt="μ 控制中心">
-<figcaption>μ 控制中心。σ 相同 → 形状不变，只是左右平移</figcaption>
-</figure>
+$$
+\begin{aligned}
+f(x + \epsilon u_x, y + \epsilon u_y) - f(x, y)
+&= \underbrace{[f(x + \epsilon u_x, y + \epsilon u_y) - f(x, y + \epsilon u_y)]}_{\text{纯 x-变化量}}
+ + \underbrace{[f(x, y + \epsilon u_y) - f(x, y)]}_{\text{纯 y-变化量}}
+\end{aligned}
+$$
 
-<figure>
-<img src="assets/normal_sigma.png" alt="σ 控制胖瘦">
-<figcaption>σ 控制胖瘦。σ 越大越矮越胖。总面积恒为 1，胖了就得矮</figcaption>
-</figure>
-
-<h3>公式拆零件：</h3>
-
-$$f(x) = \frac{1}{\sigma\sqrt{2\pi}} \exp\!\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)$$
-
-<table>
-<tr><th>零件</th><th>在干什么</th></tr>
-<tr><td>$(x-\mu)^2$</td><td>离中心多远。远处→平方很大→exp 里很负→密度≈0</td></tr>
-<tr><td>$2\sigma^2$（分母）</td><td>σ 越大，同样距离被大分母稀释→衰减变慢→钟变胖</td></tr>
-<tr><td>$\frac{1}{\sigma\sqrt{2\pi}}$</td><td>归一化。σ 翻倍→系数减半，把胖钟拉矮保持面积=1</td></tr>
-</table>
-
-<p><strong>验证直觉：</strong> σ=1 → f(0)≈0.399。σ=2 → f(0)≈0.199。恰好减半！因为钟宽了一倍，高度必须减半来保持总面积。</p>
-
-<div class="callout callout-info">
-<strong>📐 推导：$\pi$ 从哪冒出来的？</strong><br>
-你可能好奇：明明是概率分布，为什么杀出来一个圆周率 $\pi$？它来自<strong>高斯积分</strong>的归一化：
-$$\int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}$$
-推导技巧：把平方积分转到极坐标——
-$$\left(\int_{-\infty}^{\infty} e^{-x^2}dx\right)^2 = \int_{-\infty}^{\infty}\int_{-\infty}^{\infty} e^{-(x^2+y^2)}dx\,dy = \int_0^{2\pi}\int_0^{\infty} e^{-r^2}r\,dr\,d\theta = \pi$$
-角度积分一圈 $\int_0^{2\pi}d\theta = 2\pi$，$r$ 的积分贡献 $\frac{1}{2}$，合起来就是 $\pi$。正态分布的系数 $\frac{1}{\sigma\sqrt{2\pi}}$ 就是把这个 $\sqrt{\pi}$ 摊平成总面积 = 1 的结果。
-</div>
-
-<hr>
-
-<h2>四、CDF：一把刷子从左扫到右</h2>
-
-<p><strong>画面：</strong> 一把刷子从最左边往右刷，每刷过一段曲线，就把下面的颜料扫进桶里。桶从空的（F(-∞)=0）慢慢涨，到最右边刚好满（F(+∞)=1）。</p>
-
-<div class="callout callout-info">
-<strong>📐 推导：PDF 与 CDF 的微积分关系</strong><br>
-CDF $F(x)$ 是 PDF $f(t)$ 从 $-\infty$ 到 $x$ 的累积：
-$$F(x) = \int_{-\infty}^x f(t)\,dt$$
-反过来，PDF 是 CDF 的导数——CDF 的瞬时变化率就是该点的密度：
-$$f(x) = F'(x)$$
-<strong>直觉：</strong> 刷子扫过某一点时桶里进颜料的「速度」就是那一点的密度值。密度高处进得快（CDF 陡），密度低处进得慢（CDF 平）。所以 CDF 永远单调不减——颜料只进不出。
-</div>
-
-<figure>
-<img src="assets/normal_cdf.png" alt="CDF">
-<figcaption>CDF 从 0 单调升到 1，永不下降。F(μ)=0.5</figcaption>
-</figure>
-
-<hr>
-
-<h2>五、68-95-99.7 法则</h2>
-
-<figure>
-<img src="assets/normal_68_95_99.png" alt="68-95-99.7">
-<figcaption>±1σ→68.3% &emsp; ±2σ→95.5% &emsp; ±3σ→99.7%</figcaption>
-</figure>
-
-<p>σ 是天然尺子。1σ=正常，2σ=少见，3σ=极端。<strong>不是线性增长</strong>——钟的尾巴指数衰减，3σ 之外概率微乎其微。</p>
-
-<div class="callout callout-info">
-<strong>📐 推导：为什么 68 → 95 → 99.7 不是线性？用密度值说话</strong><br>
-标准正态 $\mathcal{N}(0,1)$ 在各点的密度：
-<table>
-<tr><th>$x$（离中心几 σ）</th><th>$f(x)$（该点密度）</th><th>相对中心的比例</th></tr>
-<tr><td>0</td><td>0.3989</td><td>100% — 最高</td></tr>
-<tr><td>1</td><td>0.2420</td><td>60.7% — 降了近四成</td></tr>
-<tr><td>2</td><td>0.0540</td><td>13.5% — 只剩一成多</td></tr>
-<tr><td>3</td><td>0.0044</td><td>1.1% — 几乎没了</td></tr>
-</table>
-每往外走 1σ，密度以 $e^{-x^2/2}$ 的速度指数暴跌。±3σ 处的密度只有中心的约 1%，所以再往外面积几乎不增长。<br><br>
-<strong>结论：</strong> 从 ±1σ 到 ±2σ，概率增加了 27.2%（因为密度还不太低），但从 ±2σ 到 ±3σ 只增加了 4.2%（因为密度已经微乎其微）。不是线性比例——这是指数衰减的直接后果。
-</div>
-
-<hr>
-
-<h2>六、正态分布为什么无处不在：中心极限定理导引</h2>
-
-<p><strong>画面：米粒堆山丘。</strong> 往桌上倒一堆米，米粒会堆成一座山丘——中间高、四周低，轮廓像钟形曲线。为什么？</p>
-
-<p>每粒米落下时是随机的（可能偏左、可能偏右），但成千上万粒米叠加后，「偏左」和「偏右」互相抵消，最终大多数米稳定在中心附近。每次多倒一粒，山丘就更接近完美的钟形。</p>
-
-<div class="callout callout-info">
-<strong>中心极限定理（CLT）的直觉表述：</strong><br>
-大量<strong>独立</strong>随机变量的<strong>和</strong>，无论各自原本是什么分布（均匀、指数、甚至离散），加起来后的分布趋向于<strong>正态分布</strong>。<br><br>
-$$\frac{X_1 + X_2 + \cdots + X_n - n\mu}{\sigma\sqrt{n}} \;\xrightarrow{d}\; \mathcal{N}(0,1)$$
-<strong>关键条件：</strong> 每个变量方差有限、互相独立。现实中绝大多数「总量」型变量都满足——身高 = 基因 + 营养 + 环境 + 测量误差，每一项都是独立的小因素，叠加后就变成正态。
-</div>
-
-<p><strong>深度学习的应用：</strong></p>
+<p>当 $\epsilon \to 0$ 时：</p>
 <ul>
-<li><strong>权重初始化：</strong> Xavier/He 初始化从正态分布采样，确保信号在前向传播中不爆炸不消失</li>
-<li><strong>Batch Normalization：</strong> 把每层输出强行拉回均值 0 方差 1，利用正态的稳定性质</li>
-<li><strong>VAE 潜在空间：</strong> 编码器输出 $\mu$ 和 $\sigma$，解码器从 $\mathcal{N}(\mu,\sigma^2)$ 采样——假设潜在变量天然服从正态</li>
-<li><strong>扩散模型：</strong> 每一步加高斯噪声、每一步去高斯噪声，整个生成过程围绕正态分布构建</li>
+  <li>纯 x-变化量 $\approx \epsilon u_x \cdot \frac{\partial f}{\partial x}$（走了 $\epsilon u_x$ 这么多，乘上 $x$ 方向的坡度）</li>
+  <li>纯 y-变化量 $\approx \epsilon u_y \cdot \frac{\partial f}{\partial y}$（同理）</li>
 </ul>
 
-<p>正态分布之所以是「默认分布」，不是因为数学家偏爱它——而是<strong>大量微小随机因素叠加后，数学上必然如此</strong>。米粒堆山丘，数据堆正态。</p>
+<p>全部代入方向导数的定义：</p>
+
+$$D_{\mathbf{u}} f = \lim_{\epsilon \to 0} \frac{\epsilon u_x \frac{\partial f}{\partial x} + \epsilon u_y \frac{\partial f}{\partial y}}{\epsilon}
+= u_x \frac{\partial f}{\partial x} + u_y \frac{\partial f}{\partial y}
+= \nabla f \cdot \mathbf{u}$$
+
+<p><strong>结论：方向导数 = 梯度 · 方向向量。</strong>这不是直接甩公式——是从定义出发，拆成偏导数组合，一步步推出来的。到这里还没有用到任何「最快」的说法，只是推导出了一个<strong>计算任意方向变化率的公式</strong>。</p>
+
+<p><strong>第三步：用点乘的几何意义回答「哪个方向最快」。</strong></p>
+
+<p>有了 $D_{\mathbf{u}}f = \nabla f \cdot \mathbf{u}$ 之后，看它的几何含义：</p>
+
+$$\nabla f \cdot \mathbf{u} = \|\nabla f\| \cdot \|\mathbf{u}\| \cdot \cos\theta = \|\nabla f\| \cdot \cos\theta$$
+
+<p>（$\|\mathbf{u}\|=1$ 因为 $\mathbf{u}$ 是单位向量。$\theta$ 是梯度和你的方向 $\mathbf{u}$ 之间的夹角。）</p>
+
+<ul>
+  <li>$\theta = 0°$（和梯度<strong>同向</strong>）→ $\cos 0° = 1$ → $D_{\mathbf{u}}f = \|\nabla f\|$ → <strong>最大</strong></li>
+  <li>$\theta = 90°$（和梯度<strong>垂直</strong>）→ $\cos 90° = 0$ → $D_{\mathbf{u}}f = 0$ → 高度不变（沿等高线走）</li>
+  <li>$\theta = 180°$（和梯度<strong>反向</strong>）→ $\cos 180° = -1$ → $D_{\mathbf{u}}f = -\|\nabla f\|$ → <strong>下降最快</strong>（这就是梯度下降！）</li>
+</ul>
+
+<p><strong>推导链完整：</strong>定义 → 拆成偏导数组合 → 推出 $\nabla f \cdot \mathbf{u}$ → 点乘在 $\theta=0°$ 最大 → 所以梯度方向最快。每一步都有出处，没有循环。</p>
+</div>
+
+<div class="callout callout-tip">
+<strong>梯度下降 = 闭着眼睛，每一步都往最陡的下坡方向踩一脚。</strong>
+$$\theta_{t+1} = \theta_t - \eta \cdot \nabla f(\theta_t)$$
+<ul>
+  <li>$\theta_t$：你现在站的位置</li>
+  <li>$\nabla f(\theta_t)$：这个位置的最陡上坡方向</li>
+  <li><strong>负号</strong>：因为我们想<strong>下降</strong>，所以反着走</li>
+  <li>$\eta$（学习率）：走多大步。太大→可能跨过山谷冲到对面山上去了；太小→半天走不到底</li>
+</ul>
+</div>
 
 <hr>
 
-<h2>🖥️ 代码</h2>
-<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-
-<span class="hl-comment"># ===== 均匀分布 U(0,1) =====</span>
-a, b = <span class="hl-number">0.0</span>, <span class="hl-number">1.0</span>
-h = <span class="hl-number">1.0</span> / (b - a)                <span class="hl-comment"># PDF 高度 = 1/宽</span>
-c, d = <span class="hl-number">0.2</span>, <span class="hl-number">0.5</span>
-prob = (d-c) / (b-a)            <span class="hl-comment"># 概率 = 长度占比</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"P({c}≤X≤{d}) = {prob}"</span>)
-
-<span class="hl-comment"># 模拟验证</span>
-np.random.seed(<span class="hl-number">42</span>)
-samples = np.random.uniform(a, b, <span class="hl-number">100000</span>)
-in_int = np.<span class="hl-builtin">sum</span>((samples>=c) & (samples<=d))
-<span class="hl-builtin">print</span>(<span class="hl-string">f"模拟 P = {in_int/100000:.4f}"</span>)
-
-<span class="hl-comment"># ===== 正态 PDF（手工实现） =====</span>
-<span class="hl-keyword">def</span> <span class="hl-func">normal_pdf</span>(x, mu, sigma):
-    c = <span class="hl-number">1.0</span>/(sigma*np.sqrt(<span class="hl-number">2</span>*np.pi))
-    e = -<span class="hl-number">0.5</span>*((x-mu)/sigma)**<span class="hl-number">2</span>
-    <span class="hl-keyword">return</span> c * np.exp(e)
-
-<span class="hl-comment"># 验证 σ 减半效应</span>
-<span class="hl-keyword">for</span> s <span class="hl-keyword">in</span> [<span class="hl-number">0.5</span>,<span class="hl-number">1.0</span>,<span class="hl-number">2.0</span>]:
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"σ={s:.1f}: f(0)={normal_pdf(0,0,s):.4f}"</span>)
-
-<span class="hl-comment"># ===== 模拟 68-95-99.7 =====</span>
-sn = np.random.normal(<span class="hl-number">0</span>,<span class="hl-number">1</span>,<span class="hl-number">100000</span>)
-<span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>,<span class="hl-number">2</span>,<span class="hl-number">3</span>]:
-    r = np.mean((sn>=-k)&(sn<=k))
-    t = {<span class="hl-number">1</span>:<span class="hl-number">0.6827</span>,<span class="hl-number">2</span>:<span class="hl-number">0.9545</span>,<span class="hl-number">3</span>:<span class="hl-number">0.9973</span>}[k]
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"±{k}σ: sim={r:.4f} theory={t:.4f}"</span>)
-
-<span class="hl-comment"># CDF 数值积分</span>
-xg = np.linspace(-<span class="hl-number">4</span>,<span class="hl-number">4</span>,<span class="hl-number">501</span>)
-cdf = np.cumsum(normal_pdf(xg,<span class="hl-number">0</span>,<span class="hl-number">1</span>)) * (xg[<span class="hl-number">1</span>]-xg[<span class="hl-number">0</span>])
-<span class="hl-builtin">print</span>(<span class="hl-string">f"F(-2)≈{cdf[125]:.4f} F(0)≈{cdf[250]:.4f} F(2)≈{cdf[375]:.4f}"</span>)</code></pre>
-<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
-
-<hr>
 <h2>💭 概念题</h2>
 <ol>
-<li>"取一个确定值的概率 = 0"但现实中气温 25°C 完全可以发生。用「针尖戳纸」的比喻解释为什么不矛盾。——考察：数学理想化 vs 测量精度</li>
-<li>从总面积 = 1 的硬约束出发：如果 σ 从 1 翻到 2，钟变胖了。峰值 f(0) 应该是原来的几分之几？——考察：归一化系数 1/(σ√2π) 的直觉</li>
-<li>为什么 68-95-99.7 不是线性？±3σ 为什么不等于 3×68.3%？用"钟的尾巴指数衰减"来解释。——考察：正态分布的尾部衰减速度</li>
-<li>均匀分布的 PDF 高度 c=1/(b-a) 是怎么推导出来的？——考察：总面积=1 的约束</li>
-<li>米粒堆山丘的比喻体现了哪个定理？列举两个深度学习中的实际应用。——考察：中心极限定理的理解与迁移</li>
+<li>梯度指向上升最快方向。为什么是"最快"？用方向导数 = 梯度与方向向量的点乘来解释。提示：$\cos\theta$ 在 $\theta=0°$（同向）时最大。——考察：方向导数的几何直觉</li>
 </ol>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-06/">← 00-06</a><a href="../../">📖 目录</a><a href="../00-08/">00-08 →</a></nav>
+<a href="../00-06/">← 00-06</a><a href="../../">📖 目录</a><a href="../00-08/">下一课 →</a></nav>
 </div></body></html>

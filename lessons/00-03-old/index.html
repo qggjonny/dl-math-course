@@ -1,18 +1,134 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>00-05 特征值与特征向量 · 深度学习数学</title>
+<title>00-03 范数与特征值 · 深度学习数学</title>
 <link rel="stylesheet" href="../../css/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 </head><body>
-<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-05</span>
-<span><a href="../00-04/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-06/">下一课 →</a></span></nav>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-03</span>
+<span><a href="../00-02/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-04/">下一课 →</a></span></nav>
 <div class="container">
 
-<h1>00-05 特征值与特征向量</h1>
+<h1>00-03 范数与特征值</h1>
+
+<hr>
+
+<h2>一、范数：箭有多长，看你怎么量</h2>
+
+<p>向量 $\mathbf{v} = [3, -4]$ 有多"大"？取决于你是<strong>开车</strong>还是<strong>坐直升机</strong>。</p>
+
+<h3>L1 范数：曼哈顿的出租车</h3>
+
+<p><strong>画面：</strong> 你在纽约曼哈顿。街道全是横平竖直的网格，不能斜穿街区。从 $(0,0)$ 到 $(3,-4)$，只能先往东开 3 条街，再往南开 4 条街。一共走了 7 个街区。这就是 L1：把每个分量的绝对值加起来。</p>
+
+$$\|\mathbf{v}\|_1 = |3| + |-4| = 7$$
+
+<p><strong>为什么用绝对值？</strong> 因为往南走了 4 条街——走的距离是 4，不是 -4。绝对值吃掉正负号，只留"走了多远"。</p>
+
+<h3>L2 范数：坐直升机</h3>
+
+<p><strong>画面：</strong> 这次你不管什么街道了，直接坐直升机从起点飞到终点。这就是你脑子里那个"两点之间最短"的距离——初中就学过的勾股定理。</p>
+
+$$\|\mathbf{v}\|_2 = \sqrt{3^2 + (-4)^2} = \sqrt{9 + 16} = 5$$
+
+<p>L2 就是直线距离。负号在平方里自动消失（$(-4)^2 = 16$），所以不用额外取绝对值。</p>
+
+<pre><code>import numpy as np
+
+v = np.array([3, -4])
+
+# L1：绝对值求和（出租车走过的街区数）
+l1 = np.sum(np.abs(v))       # np.abs(v) → [3, 4] → 求和 = 7
+print(f"L1 = {l1}")           # 7
+
+# L2：直线距离（直升机飞的）
+l2 = np.linalg.norm(v)        # np.linalg.norm 默认算 L2
+print(f"L2 = {l2}")           # 5.0</code></pre>
+
+<h3>L1 和 L2 的形状有什么不同？</h3>
+
+<p>把所有长度为 1 的向量画出来：L1 画出来是一个<strong>菱形</strong>，L2 画出来是一个<strong>圆</strong>。</p>
+
+<figure><img src="assets/l1_l2_balls.png" alt="L1 vs L2 单位圆"><figcaption>L2 是光滑的圆，L1 是带尖角的菱形。菱形尖角就坐落在坐标轴上</figcaption></figure>
+
+<p>为什么这个形状重要？菱形有四个<strong>尖角</strong>，恰好戳在坐标轴上——这个性质意味着 L1 天然"喜欢"让某些分量精确为 0。圆没有尖角，L2 只会让分量变小但不会精确到 0。</p>
+
+<div class="callout callout-info">
+<strong>💡 为什么尖角意味着零分量？</strong> 想象你用一个圆形的 L2 球去"碰"一条线——接触点一般是光滑的，对应两个分量都不为零。但用菱形的 L1 球去碰——菱形的尖角刚好戳在坐标轴上，<strong>最优化时最先碰到尖角，导致某个分量为零</strong>。这就是 L1 正则化产生稀疏解（稀疏 = 很多零分量）的几何直觉，在后面的优化课里会变得非常重要。
+</div>
+
+<hr>
+
+<h2>二、矩阵对空间做了什么</h2>
+
+<p>00-01 学过：矩阵是一本"操作手册"——把一个向量扭成另一个向量。现在把这个想法放大：<strong>矩阵不只是扭一个箭头，它扭的是整个空间。</strong></p>
+
+<p><strong>画面：</strong> 想象桌面上铺了一张方格坐标纸。矩阵 $A$ 就是一只无形的手——它把整张纸抓住，<strong>扯一扯、扭一扭</strong>。纸上的每个点都被拉到了新位置。</p>
+
+<p>我们来看矩阵 $A = \begin{bmatrix} 2 & 1 \\ 0 & 1 \end{bmatrix}$ 对空间做了什么。取四个特殊点——单位正方形的四个角：</p>
+
+$$
+(0,0) \rightarrow (0,0) \qquad
+(1,0) \rightarrow (2,0) \qquad
+(0,1) \rightarrow (1,1) \qquad
+(1,1) \rightarrow (3,1)
+$$
+
+<p>正方形被<strong>推歪了</strong>，变成了一个平行四边形。原来的面积是 1，现在的面积是多少？这就是<strong>行列式</strong>要回答的问题。</p>
+
+<h3>行列式：面积放大镜</h3>
+
+<p><strong>画面：</strong> 矩阵把单位正方形（面积=1）扭成了平行四边形。行列式 $\det(A)$ 就是这个平行四边形的面积——也就是<strong>面积放大了几倍</strong>。</p>
+
+<p>对 2×2 矩阵 $\begin{bmatrix} a & b \\ c & d \end{bmatrix}$：</p>
+
+$$\det(A) = ad - bc$$
+
+<h4>🧮 推导：为什么是 ad−bc？——纯几何证明</h4>
+
+<p>把矩阵的两列看作两个向量：</p>
+
+$$\mathbf{v}_1 = \begin{bmatrix} a \\ c \end{bmatrix}, \quad
+  \mathbf{v}_2 = \begin{bmatrix} b \\ d \end{bmatrix}$$
+
+<p>矩阵作用在单位正方形上：第一列 $\mathbf{v}_1$ 就是原来 $(1,0)$ 被扭到的新位置，第二列 $\mathbf{v}_2$ 就是原来 $(0,1)$ 被扭到的新位置。所以变换后的平行四边形 <strong>就是 $\mathbf{v}_1$ 和 $\mathbf{v}_2$ 张成的平行四边形</strong>。</p>
+
+<p>怎么求这个平行四边形的面积？<strong>底 × 高。</strong></p>
+
+<p><strong>第 1 步——底：</strong> 以 $\mathbf{v}_1$ 为底。$\mathbf{v}_1 = (a, c)$，底长 = $\sqrt{a^2 + c^2}$（勾股定理）。</p>
+
+<p><strong>第 2 步——高：</strong> $\mathbf{v}_1$ 所在直线过原点，法向量 $(c, -a)$，直线方程 $cx - ay = 0$。$\mathbf{v}_2$ 的终点 $(b, d)$ 到这条直线的距离（点到直线距离公式）：</p>
+
+$$\text{高} = \frac{|c \cdot b - a \cdot d|}{\sqrt{a^2 + c^2}} = \frac{|ad - bc|}{\sqrt{a^2 + c^2}}$$
+
+<p>（分子取绝对值因为距离非负，分母 $\sqrt{a^2 + c^2}$ 是法向量的长度。）</p>
+
+<p><strong>第 3 步——底 × 高：</strong></p>
+
+$$\text{面积} = \cancel{\sqrt{a^2 + c^2}} \cdot \frac{|ad - bc|}{\cancel{\sqrt{a^2 + c^2}}} = |ad - bc|$$
+
+<p><strong>两个根号恰好消掉！</strong> $ad-bc$ 自然出现，不是硬凑的公式。</p>
+
+<p><strong>符号的含义：</strong> 去掉绝对值，$ad - bc$ 的正负号表示 $\mathbf{v}_1$ 到 $\mathbf{v}_2$ 的<strong>旋转方向</strong>——逆时针为正（$ad-bc > 0$），顺时针为负（$ad-bc < 0$）。所以行列式是<strong>有向面积</strong>。</p>
+
+<div class="callout callout-info">
+<strong>🔲 直观证明——矩形减法：</strong> 不用点到直线距离，也可以用纯几何来验证。把平行四边形框在一个大矩形里（宽 $a+b$，高 $c+d$），面积 = $(a+b)(c+d) = ac + ad + bc + bd$。多余的部分由<strong>两个小矩形 + 四个小三角形</strong>组成（像剪纸一样，沿着平行四边形的边剪掉多余部分）：
+
+<ul>
+  <li>2 个三角形 $\frac{1}{2}ac$（上下各一个）→ 合计 $ac$</li>
+  <li>2 个<strong>矩形</strong> $bc$（左右各一个）→ 合计 $2bc$</li>
+  <li>2 个三角形 $\frac{1}{2}bd$（左右各一个）→ 合计 $bd$</li>
+</ul>
+
+<p>减掉：$(ac + ad + bc + bd) - (ac + 2bc + bd) = ad - bc$。多余部分恰好消掉，剩下 $ad-bc$。两种方法殊途同归：底×高最快，矩形减法最直观。</p>
+</div>
+
+<p>刚才那个矩阵：$\det = 2\times1 - 1\times0 = 2$。面积放大了 2 倍。</p>
+
+<p>行列式 <strong>= 0</strong> 意味着什么？正方形成了<strong>一条线</strong>——面积=0，信息丢了一维。行列式 <strong>= 负数</strong> 意味着空间被<strong>翻转</strong>了（像把纸翻到背面）。</p>
 
 <hr>
 
@@ -226,9 +342,11 @@ $$A = \begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}$$
 <h2>💭 概念题</h2>
 
 <ol>
+<li>L1 和 L2 都用 v=[3,-4] 算过了。如果换成 v=[5,0]，L1 和 L2 各是多少？它们相等吗？什么时候 L1 和 L2 相等？——考察：L1/L2 的区别与特殊情况</li>
+<li>矩阵把单位正方形扭成平行四边形。行列式为 0 时，平行四边形变成了什么？——考察：行列式=0 的几何含义</li>
 <li>用特征方程手算 $A = \begin{bmatrix} 3 & 0 \\ 0 & 5 \end{bmatrix}$ 的特征值和特征向量。行列式是多少？验证 $\lambda_1+\lambda_2=$ 迹 和 $\lambda_1\lambda_2=$ 行列式。——考察：对角矩阵特征值 + 迹/行列式恒等式</li>
 </ol>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-04/">← 00-04</a><a href="../../">📖 目录</a><a href="../00-06/">下一课 →</a></nav>
+<a href="../00-02/">← 00-02</a><a href="../../">📖 目录</a><a href="../00-04/">00-04 →</a></nav>
 </div></body></html>
