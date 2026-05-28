@@ -85,7 +85,96 @@ cos_theta = dot / (np.linalg.norm(a) * np.linalg.norm(b))
 
 <hr>
 
-<h2>二、矩阵乘法 — 流水生产线</h2>
+<h2>二、矩阵×向量 — 变换机器</h2>
+
+<p><strong>画面：</strong> 一台数控机床。你把一块钢板（向量 $\mathbf{x}$）放进去，机器按照操作手册（矩阵 $A$）上的指令——每一行告诉机器「输出的这个分量，等于原料的各分量按这些系数组合」——输出一个加工好的零件（向量 $\mathbf{y}$）。矩阵就是这张操作手册。不同的矩阵 = 不同的加工方式：有的拉伸，有的旋转，有的剪切。</p>
+
+<p>这就是矩阵最核心的功能：<strong>把一个向量变成另一个向量。</strong> 深度学习里每一层神经网络都在干这件事——只不过矩阵特别大、叠了很多层而已。</p>
+
+<h3>怎么算？——每一行和输入做点乘</h3>
+
+<p>矩阵 $A$ 有 $m$ 行 $n$ 列，向量 $\mathbf{x}$ 有 $n$ 个分量。输出 $\mathbf{y} = A\mathbf{x}$ 有 $m$ 个分量，<strong>第 $i$ 个分量 = $A$ 的第 $i$ 行 与 $\mathbf{x}$ 做点乘</strong>：</p>
+
+$$y_i = A\text{ 第 }i\text{ 行} \;\cdot\; \mathbf{x}$$
+
+<p>这个规则不是新东西——<strong>它就是把刚才学的点乘用在了矩阵的每一行上。</strong> 矩阵有 $m$ 行，就做 $m$ 次点乘，得到 $m$ 个输出分量。</p>
+
+<p>拿具体例子算：</p>
+
+$$A = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}, \quad
+  \mathbf{x} = \begin{bmatrix} 5 \\ 6 \end{bmatrix}$$
+
+<p><strong>第 1 个输出分量</strong> = 第 1 行 · $\mathbf{x}$：</p>
+
+$$y_1 = \begin{bmatrix}2 & 1\end{bmatrix} \cdot \begin{bmatrix}5 \\ 6\end{bmatrix}
+      = 2\times5 + 1\times6 = 16$$
+
+<p><strong>第 2 个输出分量</strong> = 第 2 行 · $\mathbf{x}$：</p>
+
+$$y_2 = \begin{bmatrix}0 & 3\end{bmatrix} \cdot \begin{bmatrix}5 \\ 6\end{bmatrix}
+      = 0\times5 + 3\times6 = 18$$
+
+<p>拼起来：</p>
+
+$$A\mathbf{x} = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}
+                \begin{bmatrix} 5 \\ 6 \end{bmatrix}
+              = \begin{bmatrix} 16 \\ 18 \end{bmatrix}$$
+
+<p><strong>等号左边的写法要记住：</strong> $A\mathbf{x}$ 不写点乘符号（不是 $A\cdot\mathbf{x}$），矩阵和向量并排写就表示乘法。$\mathbf{x}$ 默认是列向量——竖着写。输入 (5,6) 变成了输出 (16,18)。</p>
+
+<h3>形状规则</h3>
+
+<p>$(m \times n)$ 的矩阵 × $(n \times 1)$ 的向量 → $(m \times 1)$ 的向量。</p>
+
+<p>直观理解：$A$ 的列数（$n$）= 输入向量的分量数，对不上就没法做点乘。$A$ 的行数（$m$）= 输出向量的分量数——有多少行，就输出多少个分量。</p>
+
+<h3>几何含义：矩阵把向量"扭"到新位置</h3>
+
+<p>$A = \begin{bmatrix}2&1\\0&3\end{bmatrix}$ 把输入 (5,6) 扭到了 (16,18)。整个平面都被这张"操作手册"重新安排了——有些方向被拉伸，有些方向被旋转。</p>
+
+<p>不同的矩阵做不同的事：</p>
+
+$$
+\begin{aligned}
+\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}
+&= \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}
+&&\text{——单位矩阵：什么也不做} \\[8pt]
+\begin{bmatrix} k & 0 \\ 0 & k \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}
+&= \begin{bmatrix} kx_1 \\ kx_2 \end{bmatrix}
+&&\text{——缩放矩阵：均匀放大/缩小 k 倍} \\[8pt]
+\begin{bmatrix} 0 & -1 \\ 1 & 0 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}
+&= \begin{bmatrix} -x_2 \\ x_1 \end{bmatrix}
+&&\text{——旋转矩阵：逆时针转 90°}
+\end{aligned}
+$$
+
+<p>以后学到特征值和特征向量时，会深入讲不同矩阵把平面"怎样扭"——哪里是拉伸方向，哪里是压缩方向。</p>
+
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+A = np.array([[<span class="hl-number">2</span>, <span class="hl-number">1</span>],
+              [<span class="hl-number">0</span>, <span class="hl-number">3</span>]])     <span class="hl-comment"># (2,2) 矩阵——操作手册</span>
+x = np.array([<span class="hl-number">5</span>, <span class="hl-number">6</span>])           <span class="hl-comment"># (2,) 向量——原料</span>
+
+y = A @ x  <span class="hl-comment"># @ 是 Python 3.5+ 的矩阵乘法运算符</span>
+          <span class="hl-comment"># 等价于 np.dot(A, x)</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"A·x = {y}"</span>)
+<span class="hl-comment"># 输出: A·x = [16 18]</span>
+
+<span class="hl-comment"># 单位矩阵：什么也不做</span>
+I = np.eye(<span class="hl-number">2</span>)            <span class="hl-comment"># 2×2 单位矩阵 [[1,0],[0,1]]</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"I·x = {I @ x}"</span>)
+<span class="hl-comment"># 输出: I·x = [5 6]  ← 原封不动</span>
+
+<span class="hl-comment"># 旋转 90°：逆时针转</span>
+R = np.array([[<span class="hl-number">0</span>, -<span class="hl-number">1</span>],
+              [<span class="hl-number">1</span>,  <span class="hl-number">0</span>]])    <span class="hl-comment"># 2×2 旋转矩阵</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"R·x = {R @ x}"</span>)
+<span class="hl-comment"># 输出: R·x = [-6  5]  ← (5,6) 转到了 (-6,5)</span></code></pre>
+
+<hr>
+
+<h2>三、矩阵乘法 — 流水生产线</h2>
 
 <p><strong>画面：</strong> 工厂里一条生产线。第一台机器把原材料处理成半成品（$A$ 的变换），第二台机器把半成品加工成成品（$B$ 的变换）。两台机器首尾相连——这就是 $C = BA$。矩阵乘就是两张"操作手册"的接力。</p>
 
@@ -123,27 +212,27 @@ $$C = BA = \begin{bmatrix} 1&0 \\ 4&2 \end{bmatrix}
                   \begin{bmatrix} 2&1 \\ 0&3 \end{bmatrix}
         = \begin{bmatrix} 2 & 1 \\ 8 & 10 \end{bmatrix}$$
 
-<h3>为什么是行 × 列？——变换复合的角度</h3>
+<h3>为什么是行 × 列？——变换复合（用上一节的知识验证）</h3>
 
-<p>算完之后回头看<strong>为什么</strong>是这个规则。矩阵的本质是对向量做变换：$A\mathbf{x}$ 把 $\mathbf{x}$ 扭一下，$B(A\mathbf{x})$ 再扭一下。把这两步合成一步就是 $(BA)\mathbf{x}$。拿一个具体向量 $\mathbf{x} = \begin{bmatrix}5\\6\end{bmatrix}$ 验证：</p>
+<p>算完之后回头看<strong>为什么</strong>是这个规则——<strong>答案就在上一节的「矩阵×向量」里。</strong></p>
 
-<p>先算 $A\mathbf{x}$（第一台机器）：</p>
+<p>上一节讲了：$A\mathbf{x}$ 是把向量 $\mathbf{x}$ 扭一次。现在有两台机器——先用 $A$ 扭，再用 $B$ 扭。拿一个具体向量验证：</p>
+
+<p><strong>两步走：</strong> 先算 $A\mathbf{x}$（第一台机器，矩阵×向量），再把结果交给 $B$（第二台机器）：</p>
 
 $$A\mathbf{x} = \begin{bmatrix}2&1\\0&3\end{bmatrix}\begin{bmatrix}5\\6\end{bmatrix}
             = \begin{bmatrix}16\\18\end{bmatrix}$$
 
-<p>再算 $B(A\mathbf{x})$（第二台机器）：</p>
-
 $$B(A\mathbf{x}) = \begin{bmatrix}1&0\\4&2\end{bmatrix}\begin{bmatrix}16\\18\end{bmatrix}
                 = \begin{bmatrix}16\\100\end{bmatrix}$$
 
-<p>一步到位用 $C$：</p>
+<p><strong>一步走：</strong> 用 $C = BA$ 直接把 $\mathbf{x}$ 扭到位：</p>
 
 $$C\mathbf{x} = \begin{bmatrix}2&1\\8&10\end{bmatrix}\begin{bmatrix}5\\6\end{bmatrix}
              = \begin{bmatrix}2\times5+1\times6\\8\times5+10\times6\end{bmatrix}
              = \begin{bmatrix}16\\100\end{bmatrix} \;\checkmark$$
 
-<p>两步走和一步走结果一样。所以"行×列"不是硬记的公式——它是$B$和$A$作为变换<strong>复合</strong>时自然出现的计算方式。$B$的第$i$行决定「中间结果的各分量怎样组合成第$i$个输出」，$A$的第$j$列决定「输入的第$j$个分量如何分配到各中间结果」，两者的点乘恰好就是$c_{ij}$。</p>
+<p>两步走和一步走结果一样。所以「行×列」不是硬记的公式——它是 $B$ 和 $A$ 作为变换<strong>接力</strong>时自然出现的计算方式。$B$ 的第 $i$ 行决定「中间结果（$A\mathbf{x}$）的各分量怎样组合成第 $i$ 个输出」，$A$ 的第 $j$ 列决定「输入的第 $j$ 个分量如何分配到各中间结果」，两者的点乘恰好就是 $c_{ij}$——也就是「不做中间产物、直接一步到位」的规则。</p>
 
 <p><strong>铁律：内维咬合。</strong> $(m, \cancel{n}) \times (\cancel{n}, p) = (m, p)$。$A$ 的列数 = $B$ 的行数，否则接口对不上。</p>
 
@@ -157,7 +246,7 @@ C = A @ B  <span class="hl-comment"># (2,3)×(3,2) → (2,2)</span>
 
 <hr>
 
-<h2>三、广播 — 自动"复印"</h2>
+<h2>四、广播 — 自动"复印"</h2>
 
 <p><strong>画面：</strong> 老师发卷子。讲台上只有一份卷子，但老师把它"复印"了 40 份，每人一份——每一份的内容一模一样。广播就是 numpy 帮你自动"复印"小数组去匹配大数组的形状。</p>
 
@@ -261,6 +350,7 @@ w = np.array([10, 20, 30])               # (3,)
 
 <ol>
 <li>点乘为 0 意味着两个向量在几何上是什么关系？如果点乘为正呢？如果为负呢？——考察：点乘公式 $\|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$ 的直观含义</li>
+<li>矩阵 $A$ 是 (3,4) 的形状，向量 $\mathbf{x}$ 有 5 个分量。$A\mathbf{x}$ 能算吗？为什么？——考察：矩阵×向量的内维匹配规则</li>
 <li>$A$ 是 (3,4) 的矩阵，$B$ 是 (5,3) 的矩阵。$AB$ 和 $BA$ 分别能算吗？——考察：矩阵乘法内维匹配的铁律</li>
 <li>为什么 (3,2) + (3,) 会报错，但 (3,2) + (1,2) 不会？用广播规则解释。——考察：广播对齐规则</li>
 </ol>
