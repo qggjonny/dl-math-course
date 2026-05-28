@@ -89,11 +89,62 @@ cos_theta = dot / (np.linalg.norm(a) * np.linalg.norm(b))
 
 <p><strong>画面：</strong> 工厂里一条生产线。第一台机器把原材料处理成半成品（$A$ 的变换），第二台机器把半成品加工成成品（$B$ 的变换）。两台机器首尾相连——这就是 $C = BA$。矩阵乘就是两张"操作手册"的接力。</p>
 
-<p><strong>为什么是"行×列"？</strong> 从流水线角度看：输入向量 $\mathbf{x}$ 先经过 $A$，第 $j$ 个中间分量 = $A$ 第 $j$ 行 · $\mathbf{x}$。然后 $B$ 拿这些中间分量做加权组合——$B$ 第 $i$ 列上的数字就是第 $i$ 个输出的各权重。两步合起来：$(BA)\mathbf{x}$ 的第 $i$ 分量 = $\sum_j B_{ij} \cdot (A$ 第 $j$ 行 · $\mathbf{x})$。去掉 $\mathbf{x}$，剩下 $(BA)_{ij} = B$ 第 $i$ 行 · $A$ 第 $j$ 列。所以"行乘列"规则不是硬记的——它是<strong>变换复合的自然结果</strong>。</p>
+<h3>走一个具体例子</h3>
 
-<p><strong>怎么算：</strong> $C$ 的第 $i$ 行第 $j$ 列 = $A$ 的第 $i$ 行 <strong>与</strong> $B$ 的第 $j$ 列 <strong>做点乘</strong>。</p>
+<p>两台机器：</p>
 
-<p><strong>铁律：内维咬合。</strong> $(m, \cancel{n}) \times (\cancel{n}, p) = (m, p)$。就像两台机器必须接口对上才能串联——$A$ 输出的宽度 = $B$ 输入的宽度。</p>
+$$A = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}, \quad
+  B = \begin{bmatrix} 1 & 0 \\ 4 & 2 \end{bmatrix}$$
+
+<p>送一个原材料 $\mathbf{x} = \begin{bmatrix} 5 \\ 6 \end{bmatrix}$ 进去。</p>
+
+<p><strong>第一台机器 $A$：</strong> 输出半成品 $\mathbf{y} = A\mathbf{x}$。怎么算？ </p>
+
+$$\mathbf{y} = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}
+            \begin{bmatrix} 5 \\ 6 \end{bmatrix}
+          = \begin{bmatrix} 2\times5 + 1\times6 \\ 0\times5 + 3\times6 \end{bmatrix}
+          = \begin{bmatrix} 16 \\ 18 \end{bmatrix}$$
+
+<p>每个输出分量 = $A$ 的一行和 $\mathbf{x}$ 做点乘。第一行 $(2,1)$ 点乘 $(5,6)$ = 16，第二行 $(0,3)$ 点乘 $(5,6)$ = 18。</p>
+
+<p><strong>第二台机器 $B$：</strong> 半成品 $\mathbf{y}$ 继续往前走：</p>
+
+$$\mathbf{z} = B\mathbf{y} = \begin{bmatrix} 1 & 0 \\ 4 & 2 \end{bmatrix}
+                          \begin{bmatrix} 16 \\ 18 \end{bmatrix}
+                        = \begin{bmatrix} 1\times16 + 0\times18 \\ 4\times16 + 2\times18 \end{bmatrix}
+                        = \begin{bmatrix} 16 \\ 100 \end{bmatrix}$$
+
+<p><strong>两步并一步——复合矩阵 $C=BA$：</strong> 能不能跳过中间 $\mathbf{y}$，直接从 $\mathbf{x}$ 一步到 $\mathbf{z}$？可以——把 $B$ 和 $A$ "焊"成一台机器 $C=BA$：</p>
+
+$$C = BA = \begin{bmatrix} 1 & 0 \\ 4 & 2 \end{bmatrix}
+                    \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}$$
+
+<p>$C$ 的每个元素怎么算？看 $C$ 的第一行第一列：它要回答「$\mathbf{x}$ 的第一个分量通过两台机器后，最终对 $\mathbf{z}$ 的第一个分量贡献多少」。</p>
+
+<ul>
+  <li>$\mathbf{x}$ 的第一个分量 $x_1$ 经过 $A$ → 变成 $\mathbf{y}$ 的第一个分量的一部分（系数是 $a_{11}=2$）</li>
+  <li>这个中间值经过 $B$ → 变成 $\mathbf{z}$ 的第一个分量的一部分（系数是 $b_{11}=1$）</li>
+  <li>所以 $x_1$ 对 $z_1$ 的净贡献 = $1 \times 2 = 2$</li>
+</ul>
+
+<p>同样，$x_2$ 对 $z_1$ 的贡献 = $b_{11}\times a_{12} + b_{12}\times a_{22} = 1\times1 + 0\times3 = 1$。所以：</p>
+
+$$c_{11} = b_{11}a_{11} + b_{12}a_{21} = 1\times2 + 0\times0 = 2$$
+
+<p><strong>这就是"行×列"。</strong> $c_{ij}$ = $B$ 的第 $i$ 行 · $A$ 的第 $j$ 列（做点乘）：</p>
+
+$$\begin{aligned}
+C &= \begin{bmatrix} 1&0 \\ 4&2 \end{bmatrix}
+      \begin{bmatrix} 2&1 \\ 0&3 \end{bmatrix} \\[8pt]
+  &= \begin{bmatrix} 1\times2+0\times0 & 1\times1+0\times3 \\ 4\times2+2\times0 & 4\times1+2\times3 \end{bmatrix} \\[8pt]
+  &= \begin{bmatrix} 2 & 1 \\ 8 & 10 \end{bmatrix}
+\end{aligned}$$
+
+<p>验证：$C\mathbf{x} = \begin{bmatrix}2&1\\8&10\end{bmatrix}\begin{bmatrix}5\\6\end{bmatrix} = \begin{bmatrix}16\\100\end{bmatrix}$，和两步走结果一致 ✓。</p>
+
+<p><strong>行×列不是硬记的规则——它是"两台机器接力"这个想法的自然结果。</strong> $B$ 的第 $i$ 行决定「各中间分量怎么加权得到 $z_i$」，$A$ 的第 $j$ 列决定「$x_j$ 被分配到各中间分量上的比例」，两者的点乘就是 $x_j$ 对 $z_i$ 的净贡献。</p>
+
+<p><strong>铁律：内维咬合。</strong> $(m, \cancel{n}) \times (\cancel{n}, p) = (m, p)$。$A$ 的列数 = $B$ 的行数，否则接口对不上。</p>
 
 <pre><code>A = np.array([[<span class="hl-number">1</span>,<span class="hl-number">2</span>,<span class="hl-number">3</span>], [<span class="hl-number">4</span>,<span class="hl-number">5</span>,<span class="hl-number">6</span>]])  <span class="hl-comment"># (2,3)</span>
 B = np.array([[<span class="hl-number">7</span>,<span class="hl-number">8</span>], [<span class="hl-number">9</span>,<span class="hl-number">10</span>], [<span class="hl-number">11</span>,<span class="hl-number">12</span>]])  <span class="hl-comment"># (3,2)：列数 3 = A 的行数 3 ✓</span>
