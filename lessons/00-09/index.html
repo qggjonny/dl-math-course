@@ -52,6 +52,8 @@ $$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \frac{f'''(a)}{3!}(x-a)^
 
 <p><strong>泰勒展开的威力：</strong> 如果 $f$ 无限可导，这个无穷级数<strong>精确等于</strong>原函数（在收敛半径内）。实践中，我们通常只取前几项就够用了——比如中央差分只用到二阶展开，已经足够让 $\epsilon^2$ 项抵消。</p>
 
+<figure><img src="assets/taylor_approx.png" alt="泰勒展开逐阶逼近"><figcaption>$\sin x$ 在 $x=0$ 处的泰勒展开。1 阶（红线）只是切线；3 阶（绿线）已经能追上一段曲线；5 阶（橙线）几乎重合。阶数越高，在展开点附近越精确。</figcaption></figure>
+
 <hr>
 
 <h2>🖥️ 代码</h2>
