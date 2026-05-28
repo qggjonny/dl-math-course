@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>01-01 什么是机器学习 · 深度学习数学</title>
+<link rel="stylesheet" href="../../css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head><body>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 01-01</span>
+<span><a href="../00-13/">← 上一课</a> &nbsp; <a href="../../">目录</a></span></nav>
+<div class="container">
+
+<h1>01-01 什么是机器学习</h1>
+
+<hr>
+
+<h2>一、教小孩认猫</h2>
+
+<p><strong>画面：</strong> 你有一个三岁的小侄子。你想让他学会认猫。</p>
+
+<p>你怎么教？拿手机翻 100 张猫的照片给他看，每张都告诉他：「这是猫。」再翻 50 张狗的照片：「这不是猫，是狗。」然后你翻到一张他<strong>从没见过的</strong>猫的照片，问他：「这是什么？」他说：「猫。」——他学会了。</p>
+
+<p>这个小侄子就是一个机器学习模型。</p>
+
+<ul>
+  <li>100 张猫照片 + 50 张狗照片 → <strong>训练数据</strong></li>
+  <li>「这是猫」「这不是猫」→ <strong>标签（label）</strong></li>
+  <li>照片里的信息（耳朵形状、毛色、体型）→ <strong>特征（feature）</strong></li>
+  <li>从没见过的照片也能认对 → <strong>泛化（generalization）</strong></li>
+</ul>
+
+<p>机器学习就是：<strong>给机器喂数据+答案，让它自己找到从特征到标签的映射规律，然后对没见过的新数据做出预测。</strong></p>
+
+<div class="box callout">
+<p><strong>关键区分：</strong> 传统编程是你写规则（「如果耳朵尖+胡须长→猫」），机器学习是机器从数据里<em>自己学出</em>规则。不用你写 if-else，你只需要提供足够多的 (特征, 标签) 对。</p>
+</div>
+
+<hr>
+
+<h2>二、三种学习方式</h2>
+
+<h3>📝 监督学习（Supervised Learning）</h3>
+
+<p><strong>有标准答案。</strong> 教小孩认猫就是监督学习：每个训练样本都带着标签。</p>
+
+<table>
+  <tr><th>场景</th><th>特征（输入）</th><th>标签（输出）</th></tr>
+  <tr><td>识别猫</td><td>图片像素</td><td>猫 / 不是猫</td></tr>
+  <tr><td>预测房价</td><td>面积、楼层、地段</td><td>价格（数字）</td></tr>
+  <tr><td>反欺诈</td><td>交易金额、时间、地点</td><td>正常 / 欺诈</td></tr>
+  <tr><td>鸢尾花分类</td><td>花瓣长度、宽度</td><td>Setosa / Versicolor / Virginica</td></tr>
+</table>
+
+<p>标签是类别 → <strong>分类</strong>（认猫、反欺诈）。标签是数字 → <strong>回归</strong>（预测房价）。</p>
+
+<h3>🔍 无监督学习（Unsupervised Learning）</h3>
+
+<p><strong>没有标准答案。</strong> 给你一堆照片，但没人告诉你哪些是猫哪些是狗。机器自己找出它们之间的相似性和分组。</p>
+
+<p><strong>比喻：</strong> 你去一个陌生城市，没人给你地图。你逛了两天，自己形成了「商业区分那边，住宅区分这边」的认知。这就是无监督——在没标签的数据里找结构。</p>
+
+<p>常见类型：<strong>聚类</strong>（把相似的分一组）、<strong>降维</strong>（把高维数据压到 2D/3D 可视化）。</p>
+
+<h3>🎮 强化学习（Reinforcement Learning）</h3>
+
+<p><strong>试错得分。</strong> 投篮：投进了 +1 分，没进 0 分。你不断调整姿势，最终找到命中率最高的动作。</p>
+
+<p>机器不和固定数据集打交道——它和<strong>环境</strong>互动：做出动作 → 收到奖励/惩罚 → 调整策略 → 再做动作。AlphaGo 下围棋、自动驾驶都是这种模式。</p>
+
+<p>本课程重点在<strong>监督学习</strong>（阶段 1-3），强化学习在阶段 4-5 涉及。</p>
+
+<hr>
+
+<h2>三、泛化：真正的考验</h2>
+
+<p><strong>画面：</strong> 期末考试有三种可能——</p>
+
+<table>
+  <tr><th>情况</th><th>考试内容</th><th>你的表现</th><th>说明</th></tr>
+  <tr><td>考原题</td><td>和作业一模一样</td><td>100 分</td><td>背答案，不是真学会</td></tr>
+  <tr><td>考变体</td><td>同知识点、新数字</td><td>90 分</td><td>学会了规律 → <strong>泛化</strong></td></tr>
+  <tr><td>考超纲</td><td>没讲过的内容</td><td>30 分</td><td>正常，不能要求没学的也会</td></tr>
+</table>
+
+<p>机器学习的目标是第二种：<strong>在训练数据上学会规律，在没见过的测试数据上也能做对。</strong></p>
+
+<p>如果模型把训练数据里的噪音都「背」下来了，遇到新数据反而做不对——这叫<strong>过拟合（overfitting）</strong>，后续课程会详细讲。</p>
+
+<blockquote>
+<p><strong>核心公式（记住这个就够了）：</strong> 机器学习 = 数据 + 标签 → 训练 → 模型 → 新数据 → 预测。整个深度学习大厦就是围绕这个流程建起来的。</p>
+</blockquote>
+
+<hr>
+
+<h2>四、代码演示：认鸢尾花</h2>
+
+<p>来看一个「监督学习 · 分类」的最小完整例子。用 iris 数据集——根据花瓣和花萼的长宽，判断一朵鸢尾花属于哪个品种。</p>
+
+<pre><code># === 01-01 监督学习最小例子：鸢尾花分类 ===
+import numpy as np                          # 数值计算（虽然这课数据不大，导入放着）
+from sklearn.datasets import load_iris      # sklearn 自带的 iris 数据集
+from sklearn.model_selection import train_test_split  # 把数据分成「训练用的」和「测试用的」
+from sklearn.neighbors import KNeighborsClassifier    # K 近邻分类器：看离最近的几个邻居是什么品种
+
+# 1. 加载数据
+iris = load_iris()                          # load_iris() 返回一个 Bunch 对象（类似字典）
+X = iris.data                               # 特征矩阵：150行 × 4列
+                                             #   4列 = 花萼长度、花萼宽度、花瓣长度、花瓣宽度
+y = iris.target                             # 标签向量：150个数字（0=Setosa, 1=Versicolor, 2=Virginica）
+target_names = iris.target_names            # ['setosa' 'versicolor' 'virginica']，把数字翻译成品种名
+feature_names = iris.feature_names          # 4个特征的中文名
+
+print("=== 数据总览 ===")
+print(f"样本数: {X.shape[0]}")              # 150 朵花的记录
+print(f"特征数: {X.shape[1]}")              # 每朵花用 4 个数字描述
+print(f"特征名: {feature_names}")
+print(f"品种: {target_names}")
+print(f"\n前3个样本的特征+标签：")
+for i in range(3):
+    # zip 把特征名和对应的数值配对，方便打印
+    feats = ", ".join(f"{name}={X[i][j]:.1f}" for j, name in enumerate(feature_names))
+    print(f"  样本{i+1}: {feats} → 标签={int(y[i])} ({target_names[y[i]]})")
+
+# 2. 划分训练集和测试集
+# test_size=0.3 表示 30% 数据留作「期末考试」，70% 用于「平时练习」
+# random_state=42 固定随机种子，确保每次运行划分结果一样（可复现）
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+print(f"\n=== 数据划分 ===")
+print(f"训练集: {X_train.shape[0]} 个样本（用来学规律）")
+print(f"测试集: {X_test.shape[0]} 个样本（用来检验泛化）")
+
+# 3. 训练模型
+# KNeighborsClassifier: K 近邻分类器
+# n_neighbors=3 表示看最近的 3 个邻居，少数服从多数来决定新花的品种
+model = KNeighborsClassifier(n_neighbors=3)
+model.fit(X_train, y_train)                 # fit() 就是「学习」——记住训练数据的特征和标签
+print("\n✅ 训练完成！模型已经「学会」了如何根据花瓣花萼判断品种。")
+
+# 4. 测试泛化能力
+y_pred = model.predict(X_test)              # predict() 对测试集做预测，返回预测的标签
+accuracy = (y_pred == y_test).mean()        # 逐元素比较预测和真实标签，True=1, False=0，平均=准确率
+print(f"\n=== 测试结果 ===")
+print(f"准确率: {accuracy:.2%}")            # 约 95%+，说明模型泛化得很好
+
+# 5. 预测一朵新花
+# 模拟一朵「没见过的新花」：花瓣短小 + 花萼窄短
+new_flower = np.array([[4.5, 2.3, 1.3, 0.3]])  # 形状 (1, 4)：1个样本 × 4个特征
+pred_label = model.predict(new_flower)[0]       # [0] 取出预测结果（只有一个样本）
+pred_name = target_names[pred_label]            # 把数字标签翻译成品种名
+print(f"\n=== 预测新花 ===")
+print(f"新花特征: 花萼长=4.5, 花萼宽=2.3, 花瓣长=1.3, 花瓣宽=0.3")
+print(f"预测品种: {pred_name}")
+
+# 6. 看一眼数据长什么样
+print(f"\n=== 各类别样本数 ===")
+for i, name in enumerate(target_names):
+    count = (y == i).sum()                   # 统计标签为 i 的样本数
+    print(f"  {name}: {count} 朵")
+print("\n这 4 个特征 + 150 朵花 + 3 个品种 = 你写的第一个机器学习程序 🎉")</code></pre>
+
+<p><strong>这 40 行代码就是监督学习的核心流水线：</strong> 加载数据 → 划分训练/测试 → 训练（fit）→ 预测（predict）→ 评估准确率。后面 64 课不断变化的只是「模型复杂度」和「数据形态」，这个流水线框架不变。</p>
+
+<hr>
+
+<h2>练习</h2>
+
+<h3>🖥️ 代码题</h3>
+
+<p>把上面的代码复制到 <a href="https://www.online-python.com/" target="_blank">online-python.com</a> 运行，然后把输出贴过来。如果你本地有 Python 环境也可以直接跑。</p>
+
+<p>跑完后，试试改动：</p>
+<ol>
+  <li>把 <code>n_neighbors=3</code> 改成 <code>n_neighbors=1</code>，准确率变了吗？</li>
+  <li>把 <code>test_size=0.3</code> 改成 <code>test_size=0.5</code>（一半训练一半测试），准确率怎么变？</li>
+  <li>改一下 <code>new_flower</code> 的四个特征值，看看预测结果怎么变——花瓣宽 2.3 的花是哪个品种？</li>
+</ol>
+
+<h3>💭 概念题</h3>
+
+<p><strong>1.</strong> 小孩认猫的例子中，「给他看的 100 张带标签的猫照片」「他自己认新照片」「你告诉他这是猫」分别对应机器学习的哪三个环节？——考察：训练数据/测试/标签的概念对应</p>
+
+<p><strong>2.</strong> 有一个模型在训练集上准确率 99.9%，在测试集上只有 60%。这是什么问题？用期末考试来比喻解释。——考察：过拟合直觉</p>
+
+<p><strong>3.</strong> 下面哪些是监督学习，哪些是无监督学习？（不需要写代码，只用判断）——考察：监督/无监督的区别</p>
+<ul>
+  <li>(a) 根据过去的房价数据预测新房子的价格</li>
+  <li>(b) 把一堆新闻文章自动分成「体育」「财经」「娱乐」几类（事先不知道类别）</li>
+  <li>(c) 识别信用卡交易是不是欺诈</li>
+  <li>(d) 给客户画像，自动分成高价值/中价值/低价值三群（没人事先告诉你怎么分）</li>
+</ul>
+
+</div>
+</body>
+</html>
