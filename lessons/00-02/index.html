@@ -89,60 +89,61 @@ cos_theta = dot / (np.linalg.norm(a) * np.linalg.norm(b))
 
 <p><strong>画面：</strong> 工厂里一条生产线。第一台机器把原材料处理成半成品（$A$ 的变换），第二台机器把半成品加工成成品（$B$ 的变换）。两台机器首尾相连——这就是 $C = BA$。矩阵乘就是两张"操作手册"的接力。</p>
 
-<h3>走一个具体例子</h3>
+<h3>怎么算？——行 × 列做点乘</h3>
 
-<p>两台机器：</p>
+<p>两个矩阵相乘：</p>
 
 $$A = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}, \quad
   B = \begin{bmatrix} 1 & 0 \\ 4 & 2 \end{bmatrix}$$
 
-<p>送一个原材料 $\mathbf{x} = \begin{bmatrix} 5 \\ 6 \end{bmatrix}$ 进去。</p>
+<p>算 $C = BA$。$C$ 的第 $i$ 行第 $j$ 列 = <strong>$B$ 的第 $i$ 行</strong> 与 <strong>$A$ 的第 $j$ 列</strong> 做点乘：</p>
 
-<p><strong>第一台机器 $A$：</strong> 输出半成品 $\mathbf{y} = A\mathbf{x}$。怎么算？ </p>
+$$c_{ij} = B \text{ 第 } i \text{ 行} \;\cdot\; A \text{ 第 } j \text{ 列}$$
 
-$$\mathbf{y} = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}
-            \begin{bmatrix} 5 \\ 6 \end{bmatrix}
-          = \begin{bmatrix} 2\times5 + 1\times6 \\ 0\times5 + 3\times6 \end{bmatrix}
-          = \begin{bmatrix} 16 \\ 18 \end{bmatrix}$$
-
-<p>每个输出分量 = $A$ 的一行和 $\mathbf{x}$ 做点乘。第一行 $(2,1)$ 点乘 $(5,6)$ = 16，第二行 $(0,3)$ 点乘 $(5,6)$ = 18。</p>
-
-<p><strong>第二台机器 $B$：</strong> 半成品 $\mathbf{y}$ 继续往前走：</p>
-
-$$\mathbf{z} = B\mathbf{y} = \begin{bmatrix} 1 & 0 \\ 4 & 2 \end{bmatrix}
-                          \begin{bmatrix} 16 \\ 18 \end{bmatrix}
-                        = \begin{bmatrix} 1\times16 + 0\times18 \\ 4\times16 + 2\times18 \end{bmatrix}
-                        = \begin{bmatrix} 16 \\ 100 \end{bmatrix}$$
-
-<p><strong>两步并一步——复合矩阵 $C=BA$：</strong> 能不能跳过中间 $\mathbf{y}$，直接从 $\mathbf{x}$ 一步到 $\mathbf{z}$？可以——把 $B$ 和 $A$ "焊"成一台机器 $C=BA$：</p>
-
-$$C = BA = \begin{bmatrix} 1 & 0 \\ 4 & 2 \end{bmatrix}
-                    \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}$$
-
-<p>$C$ 的每个元素怎么算？看 $C$ 的第一行第一列：它要回答「$\mathbf{x}$ 的第一个分量通过两台机器后，最终对 $\mathbf{z}$ 的第一个分量贡献多少」。</p>
-
-<ul>
-  <li>$\mathbf{x}$ 的第一个分量 $x_1$ 经过 $A$ → 变成 $\mathbf{y}$ 的第一个分量的一部分（系数是 $a_{11}=2$）</li>
-  <li>这个中间值经过 $B$ → 变成 $\mathbf{z}$ 的第一个分量的一部分（系数是 $b_{11}=1$）</li>
-  <li>所以 $x_1$ 对 $z_1$ 的净贡献 = $1 \times 2 = 2$</li>
-</ul>
-
-<p>同样，$x_2$ 对 $z_1$ 的贡献 = $b_{11}\times a_{12} + b_{12}\times a_{22} = 1\times1 + 0\times3 = 1$。所以：</p>
-
-$$c_{11} = b_{11}a_{11} + b_{12}a_{21} = 1\times2 + 0\times0 = 2$$
-
-<p><strong>这就是"行×列"。</strong> $c_{ij}$ = $B$ 的第 $i$ 行 · $A$ 的第 $j$ 列（做点乘）：</p>
+<p><strong>逐个算：</strong></p>
 
 $$\begin{aligned}
-C &= \begin{bmatrix} 1&0 \\ 4&2 \end{bmatrix}
-      \begin{bmatrix} 2&1 \\ 0&3 \end{bmatrix} \\[8pt]
-  &= \begin{bmatrix} 1\times2+0\times0 & 1\times1+0\times3 \\ 4\times2+2\times0 & 4\times1+2\times3 \end{bmatrix} \\[8pt]
-  &= \begin{bmatrix} 2 & 1 \\ 8 & 10 \end{bmatrix}
+c_{11} &= B\text{ 第1行} \cdot A\text{ 第1列}
+       = \begin{bmatrix}1 & 0\end{bmatrix} \cdot \begin{bmatrix}2 \\ 0\end{bmatrix}
+       = 1\times2 + 0\times0 = 2 \\[8pt]
+c_{12} &= B\text{ 第1行} \cdot A\text{ 第2列}
+       = \begin{bmatrix}1 & 0\end{bmatrix} \cdot \begin{bmatrix}1 \\ 3\end{bmatrix}
+       = 1\times1 + 0\times3 = 1 \\[8pt]
+c_{21} &= B\text{ 第2行} \cdot A\text{ 第1列}
+       = \begin{bmatrix}4 & 2\end{bmatrix} \cdot \begin{bmatrix}2 \\ 0\end{bmatrix}
+       = 4\times2 + 2\times0 = 8 \\[8pt]
+c_{22} &= B\text{ 第2行} \cdot A\text{ 第2列}
+       = \begin{bmatrix}4 & 2\end{bmatrix} \cdot \begin{bmatrix}1 \\ 3\end{bmatrix}
+       = 4\times1 + 2\times3 = 10
 \end{aligned}$$
 
-<p>验证：$C\mathbf{x} = \begin{bmatrix}2&1\\8&10\end{bmatrix}\begin{bmatrix}5\\6\end{bmatrix} = \begin{bmatrix}16\\100\end{bmatrix}$，和两步走结果一致 ✓。</p>
+<p>拼起来：</p>
 
-<p><strong>行×列不是硬记的规则——它是"两台机器接力"这个想法的自然结果。</strong> $B$ 的第 $i$ 行决定「各中间分量怎么加权得到 $z_i$」，$A$ 的第 $j$ 列决定「$x_j$ 被分配到各中间分量上的比例」，两者的点乘就是 $x_j$ 对 $z_i$ 的净贡献。</p>
+$$C = BA = \begin{bmatrix} 1&0 \\ 4&2 \end{bmatrix}
+                  \begin{bmatrix} 2&1 \\ 0&3 \end{bmatrix}
+        = \begin{bmatrix} 2 & 1 \\ 8 & 10 \end{bmatrix}$$
+
+<h3>为什么是行 × 列？——变换复合的角度</h3>
+
+<p>算完之后回头看<strong>为什么</strong>是这个规则。矩阵的本质是对向量做变换：$A\mathbf{x}$ 把 $\mathbf{x}$ 扭一下，$B(A\mathbf{x})$ 再扭一下。把这两步合成一步就是 $(BA)\mathbf{x}$。拿一个具体向量 $\mathbf{x} = \begin{bmatrix}5\\6\end{bmatrix}$ 验证：</p>
+
+<p>先算 $A\mathbf{x}$（第一台机器）：</p>
+
+$$A\mathbf{x} = \begin{bmatrix}2&1\\0&3\end{bmatrix}\begin{bmatrix}5\\6\end{bmatrix}
+            = \begin{bmatrix}16\\18\end{bmatrix}$$
+
+<p>再算 $B(A\mathbf{x})$（第二台机器）：</p>
+
+$$B(A\mathbf{x}) = \begin{bmatrix}1&0\\4&2\end{bmatrix}\begin{bmatrix}16\\18\end{bmatrix}
+                = \begin{bmatrix}16\\100\end{bmatrix}$$
+
+<p>一步到位用 $C$：</p>
+
+$$C\mathbf{x} = \begin{bmatrix}2&1\\8&10\end{bmatrix}\begin{bmatrix}5\\6\end{bmatrix}
+             = \begin{bmatrix}2\times5+1\times6\\8\times5+10\times6\end{bmatrix}
+             = \begin{bmatrix}16\\100\end{bmatrix} \;\checkmark$$
+
+<p>两步走和一步走结果一样。所以"行×列"不是硬记的公式——它是$B$和$A$作为变换<strong>复合</strong>时自然出现的计算方式。$B$的第$i$行决定「中间结果的各分量怎样组合成第$i$个输出」，$A$的第$j$列决定「输入的第$j$个分量如何分配到各中间结果」，两者的点乘恰好就是$c_{ij}$。</p>
 
 <p><strong>铁律：内维咬合。</strong> $(m, \cancel{n}) \times (\cancel{n}, p) = (m, p)$。$A$ 的列数 = $B$ 的行数，否则接口对不上。</p>
 
