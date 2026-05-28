@@ -154,77 +154,25 @@ print(f"λ₁ = {lambda1}, λ₂ = {lambda2}")</code></pre>
 $$\det(A) = \lambda_1 \times \lambda_2 \times \cdots \times \lambda_n$$
 
 <div class="callout callout-info">
-<strong>📐 从 2×2 → 3×3 → n×n——一步步走：</strong>
+<strong>📐 从 2×2 → n×n：</strong>
 
-<p><strong>① 2×2 回顾。</strong> 上面已经推导过：特征方程 $\lambda^2 - \text{tr}(A)\lambda + \det(A) = 0$。常数项（不含 $\lambda$ 的那一项）就是 $\det(A)$。</p>
+<p><strong>① 2×2 回顾。</strong> 特征方程 $\lambda^2 - \text{tr}(A)\lambda + \det(A) = 0$，常数项 = $\det(A)$。同时因式分解 $(\lambda_1 - \lambda)(\lambda_2 - \lambda)$ 展开后常数项 = $\lambda_1\lambda_2$。同一多项式两种写法 → $\det(A) = \lambda_1\lambda_2$。</p>
 
-<p>同时，如果两根是 $\lambda_1, \lambda_2$，多项式也可以因式分解写成 $(\lambda_1 - \lambda)(\lambda_2 - \lambda)$。展开它：</p>
-
-$$\underbrace{(\lambda_1 - \lambda)(\lambda_2 - \lambda)}_{\text{因式分解形式}} = \underbrace{\lambda^2 - (\lambda_1 + \lambda_2)\lambda + \lambda_1\lambda_2}_{\text{展开形式}}$$
-
-<p>常数项 = $\lambda_1\lambda_2$。同一個多项式，两种写法，常数项必须相等 → $\det(A) = \lambda_1\lambda_2$。这就是 2×2 的结论。</p>
-
-<p><strong>② 3×3——引入行列式展开。</strong> 2×2 用 $ad-bc$ 一招搞定。3×3 怎么算行列式？方法叫<strong>降阶展开</strong>（拉普拉斯展开）：把 3×3 拆成几个 2×2 来算。</p>
-
-<p>拿一个具体矩阵：</p>
-
-$$A = \begin{bmatrix} 3 & 1 & 0 \\ 1 & 2 & 1 \\ 0 & 1 & 3 \end{bmatrix}$$
-
-<p>算 $\det(A-\lambda I)$，先把 $\lambda$ 减到对角线上：</p>
-
-$$A - \lambda I = \begin{bmatrix} 3-\lambda & 1 & 0 \\ 1 & 2-\lambda & 1 \\ 0 & 1 & 3-\lambda \end{bmatrix}$$
-
-<p><strong>降阶展开——沿第一行：</strong> 第一行有三个元素：$(3-\lambda)$、$1$、$0$。沿第一行展开的意思是：</p>
-
-<ol>
-  <li>拿第一个元素 $(3-\lambda)$，<strong>删掉它所在的行和列</strong>，剩下一个 2×2 子矩阵，算它的行列式。符号为正（因为它在第 1 行第 1 列，$1+1=2$ 是偶数）。</li>
-  <li>拿第二个元素 $1$，删掉所在行和列，剩下的 2×2 行列式。符号为<strong>负</strong>（第 1 行第 2 列，$1+2=3$ 是奇数）。</li>
-  <li>第三个元素 $0$，无论剩下的行列式是多少，乘 0 就没了。</li>
-</ol>
-
-<p><strong>用竖线表示行列式</strong>（写起来比「det(矩阵)」省地方）：</p>
+<p><strong>② 3×3 验证。</strong> 用 00-04 学的降阶展开，算一个具体例子——矩阵 $A = \begin{bmatrix} 3 & 1 & 0 \\ 1 & 2 & 1 \\ 0 & 1 & 3 \end{bmatrix}$ 的特征多项式：</p>
 
 $$\begin{aligned}
-\begin{vmatrix} 3-\lambda & 1 & 0 \\ 1 & 2-\lambda & 1 \\ 0 & 1 & 3-\lambda \end{vmatrix}
-&= (3-\lambda) \cdot \begin{vmatrix} 2-\lambda & 1 \\ 1 & 3-\lambda \end{vmatrix} \\
-&\quad - 1 \cdot \begin{vmatrix} 1 & 1 \\ 0 & 3-\lambda \end{vmatrix} \\
-&\quad + 0 \cdot (\cdots)
+\det(A-\lambda I) &= \begin{vmatrix} 3-\lambda & 1 & 0 \\ 1 & 2-\lambda & 1 \\ 0 & 1 & 3-\lambda \end{vmatrix} \\[4pt]
+&= (3-\lambda)\!\begin{vmatrix}2-\lambda&1\\1&3-\lambda\end{vmatrix} - 1\!\begin{vmatrix}1&1\\0&3-\lambda\end{vmatrix} + 0 \\[4pt]
+&= (3-\lambda)[(2-\lambda)(3-\lambda)-1] - (3-\lambda) \\[4pt]
+&= (3-\lambda)(\lambda^2 - 5\lambda + 4) \\[4pt]
+&= (3-\lambda)(\lambda-1)(\lambda-4)
 \end{aligned}$$
 
-<p>第三项没了。现在算两个 2×2 行列式——这回到我们熟悉的 $ad-bc$：</p>
+<p>令 $\lambda=0$，常数项 = $\det(A) = 3 \times (-1) \times (-4) = 12$。因式分解给出的特征值 $1,3,4$，乘积也是 12 ✓。</p>
 
-$$\begin{aligned}
-\begin{vmatrix} 2-\lambda & 1 \\ 1 & 3-\lambda \end{vmatrix} &= (2-\lambda)(3-\lambda) - 1 \cdot 1 \\[4pt]
-&= (6 - 2\lambda - 3\lambda + \lambda^2) - 1 = \lambda^2 - 5\lambda + 5 \\[12pt]
-\begin{vmatrix} 1 & 1 \\ 0 & 3-\lambda \end{vmatrix} &= 1 \cdot (3-\lambda) - 1 \cdot 0 = 3-\lambda
-\end{aligned}$$
+<p><strong>③ n×n——同样的逻辑。</strong> 降阶展开把 $\det(A-\lambda I)$ 拆成 $ad-bc$ 的组合。令 $\lambda=0$，所有含 $\lambda$ 的项消失，<strong>常数项恰好等于 $\det(A)$</strong>。同时特征多项式因式分解为 $(\lambda_1-\lambda)\cdots(\lambda_n-\lambda)$，令 $\lambda=0$，常数项 = $\lambda_1\cdots\lambda_n$。</p>
 
-<p>代回去：</p>
-
-$$\begin{aligned}
-\det(A-\lambda I) &= (3-\lambda)(\lambda^2 - 5\lambda + 5) - (3-\lambda) \\
-&= (3-\lambda)(\lambda^2 - 5\lambda + 5 - 1) \quad \text{——提公因式 } (3-\lambda)\\
-&= (3-\lambda)(\lambda^2 - 5\lambda + 4)
-\end{aligned}$$
-
-<p>括号里的二次式继续分解：$\lambda^2 - 5\lambda + 4 = (\lambda - 1)(\lambda - 4)$。所以：</p>
-
-$$\boxed{\det(A-\lambda I) = (3-\lambda)(\lambda-1)(\lambda-4)}$$
-
-<p><strong>核对常数项。</strong> 令 $\lambda = 0$，行列式 = $3 \times (-1) \times (-4) = 12$。这是 $\det(A)$ 本身——不用 $\lambda$ 直接算：$3 \cdot (2 \cdot 3 - 1 \cdot 1) - 1 \cdot (1 \cdot 3 - 0) = 3 \cdot 5 - 3 = 12$ ✓。</p>
-
-<p>同时，因式分解形式给出了特征值 $\lambda_1=1, \lambda_2=3, \lambda_3=4$。乘积 $1 \times 3 \times 4 = 12$ = 行列式 ✓。</p>
-
-<p><strong>③ n×n——规律不变。</strong> 降阶展开可以一直做下去：4×4 降成 3×3，再降成 2×2，一层层拆到 $ad-bc$。展开 $\det(A-\lambda I)$ 时：</p>
-
-<ul>
-  <li>含 $\lambda$ 的项来自对角线上的 $(a_{ii}-\lambda)$，乘出来会产生 $\lambda^n, \lambda^{n-1}, \dots$</li>
-  <li><strong>常数项</strong>（令所有 $\lambda=0$）永远等于 $\det(A)$——因为把 $\lambda$ 全设成 0，剩下的就是 $\det(A-0\cdot I) = \det(A)$</li>
-</ul>
-
-<p>同时，特征多项式因式分解为 $(\lambda_1 - \lambda)(\lambda_2 - \lambda)\cdots(\lambda_n - \lambda)$。令 $\lambda=0$，常数项 = $\lambda_1\lambda_2\cdots\lambda_n$。</p>
-
-<p><strong>同一個多项式，两种写法，常数项必须相等 → $\det(A) = \prod_{i=1}^n \lambda_i$。</strong> 这个等式对任意 n×n 矩阵都成立。</p>
+<p><strong>同一個多项式，两种写法，常数项必须相等 → $\det(A) = \prod_{i=1}^n \lambda_i$。</strong></p>
 
 </div>
 

@@ -84,12 +84,76 @@ $$\text{面积} = \cancel{\sqrt{a^2 + c^2}} \cdot \frac{|ad - bc|}{\cancel{\sqrt
 
 <p>行列式 <strong>= 0</strong> 意味着什么？正方形成了<strong>一条线</strong>——面积=0，信息丢了一维。行列式 <strong>= 负数</strong> 意味着空间被<strong>翻转</strong>了（像把纸翻到背面）。</p>
 
+<h3>3×3 行列式的定义——降阶展开</h3>
+
+<p>行列式是一个<strong>从方阵到数字的函数</strong>：喂给它一个 n×n 方阵，吐出一个数。2×2 的定义你已经会了：$ad-bc$。</p>
+
+<p><strong>3×3 怎么定义？</strong> 方法是<strong>降阶展开</strong>（拉普拉斯展开）：把 3×3 拆成几个 2×2 来算——3×3 的定义建立在 2×2 之上。</p>
+
+<p>沿第一行展开：每个元素 × 删掉它所在行和列后剩下的 2×2 行列式，再带上交替的正负号（位置 $(i,j)$ 的符号 = $(-1)^{i+j}$，棋盘格）：</p>
+
+$$
+\det\begin{bmatrix} a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \\ a_{31} & a_{32} & a_{33} \end{bmatrix}
+= a_{11}\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}
+- a_{12}\begin{vmatrix}a_{21}&a_{23}\\a_{31}&a_{33}\end{vmatrix}
++ a_{13}\begin{vmatrix}a_{21}&a_{22}\\a_{31}&a_{32}\end{vmatrix}
+$$
+
+<p><strong>竖线</strong> $\begin{vmatrix}\cdot\end{vmatrix}$ 就是行列式的简写——比写「$\det($矩阵$)$」省地方。</p>
+
+<p><strong>走一个例子：</strong></p>
+
+$$A = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix}$$
+
+<p>沿第一行展开：</p>
+
+$$\begin{aligned}
+\det(A) &= 1 \cdot \begin{vmatrix}5&6\\8&9\end{vmatrix}
+        - 2 \cdot \begin{vmatrix}4&6\\7&9\end{vmatrix}
+        + 3 \cdot \begin{vmatrix}4&5\\7&8\end{vmatrix} \\[8pt]
+        &= 1 \cdot (5\cdot9 - 6\cdot8)
+         - 2 \cdot (4\cdot9 - 6\cdot7)
+         + 3 \cdot (4\cdot8 - 5\cdot7) \\[8pt]
+        &= 1 \cdot (-3) - 2 \cdot (-6) + 3 \cdot (-3) \\[8pt]
+        &= -3 + 12 - 9 = 0
+\end{aligned}$$
+
+<p>行列式 = 0！这意味着这个矩阵把三维空间压扁了——实际上它的第三行 = 第一行 × 2 − 第二行，三行不独立，体积被压没了。</p>
+
+<div class="callout callout-info">
+<strong>💡 降阶展开可以沿任意一行或一列。</strong> 沿第一列展开的话：
+$$\det(A) = a_{11}\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}
+          - a_{21}\begin{vmatrix}a_{12}&a_{13}\\a_{32}&a_{33}\end{vmatrix}
+          + a_{31}\begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}$$
+结果一样。通常选含 0 最多的行或列，省计算。
+</div>
+
+<h3>n×n 行列式——套路不变</h3>
+
+<p>4×4 降成 3×3（四个 3×3 行列式），每个 3×3 再降成 2×2……一层层拆下去，<strong>最终全是 $ad-bc$ 的组合</strong>。</p>
+
+<div class="callout callout-info">
+<strong>📐 行列式的递归定义：</strong> n×n 行列式 = 沿任一行展开的 n 个 (n−1)×(n−1) 行列式的带符号和。一路递归到 2×2 的 $ad-bc$ 为止。
+</div>
+
+<pre><code>import numpy as np
+
+A = np.array([[1, 2, 3],
+              [4, 5, 6],
+              [7, 8, 9]])
+
+# 手算：1·(45-48) - 2·(36-42) + 3·(32-35) = -3+12-9 = 0
+det_manual = 1*(5*9 - 6*8) - 2*(4*9 - 6*7) + 3*(4*8 - 5*7)
+print(f"手算行列式: {det_manual}")
+print(f"np.linalg.det: {np.linalg.det(A):.0f}")</code></pre>
+
 <hr>
 
 <h2>💭 概念题</h2>
 
 <ol>
 <li>矩阵把单位正方形扭成平行四边形。行列式为 0 时，平行四边形变成了什么？——考察：行列式=0 的几何含义</li>
+<li>用降阶展开手算 $\begin{bmatrix}2&0&1\\0&3&0\\1&0&2\end{bmatrix}$ 的行列式。提示：中间那列有两个 0，沿第二行或第二列展开最省事。——考察：3×3 降阶展开</li>
 </ol>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
