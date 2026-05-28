@@ -27,12 +27,69 @@ $$f'(x) = \lim_{\epsilon \to 0} \frac{f(x+\epsilon) - f(x)}{\epsilon}$$
 <p><strong>逐符号拆开：</strong></p>
 <ul>
   <li>$f(x+\epsilon)$：你现在在 $x$ 位置，往前走一丁点 $\epsilon$ 后到达的新位置上的函数值</li>
-  <li>$f(x+\epsilon) - f(x)$：往前走 $\epsilon$ 后，函数值变化了多少（可能是上升、下降、或不变）</li>
+  <li>$f(x+\epsilon) - f(x)$：往前走 $\epsilon$ 后，函数值变化了多少（上升、下降、或不变）</li>
   <li>除以 $\epsilon$：归一化——不管走了多远，算出"每走 1 单位"的变化率</li>
   <li>$\lim_{\epsilon \to 0}$：$\epsilon$ 无限趋近 0——我要的是<strong>这一点的瞬时坡度</strong>，不是一段路的平均坡度</li>
 </ul>
 
 <p>回到开车的比喻：导数 &gt; 0 = 正在上坡（往前走高度会增加），导数 &lt; 0 = 正在下坡，导数 = 0 = 到了山顶或山谷（坡度为零）。</p>
+
+<h3>从定义推导求导规则</h3>
+
+<p>定义是好，但每次都用极限算太慢了。从定义出发，推几个最常用的规则。</p>
+
+<p><strong>$f(x) = x^2$ 的导数。</strong> 代入定义：</p>
+
+$$\begin{aligned}
+f'(x) &= \lim_{\epsilon \to 0} \frac{(x+\epsilon)^2 - x^2}{\epsilon} \\[4pt]
+&= \lim_{\epsilon \to 0} \frac{x^2 + 2x\epsilon + \epsilon^2 - x^2}{\epsilon} \\[4pt]
+&= \lim_{\epsilon \to 0} \frac{2x\epsilon + \epsilon^2}{\epsilon} = \lim_{\epsilon \to 0} (2x + \epsilon) = 2x
+\end{aligned}$$
+
+<p>所以 $(x^2)' = 2x$。每步做了什么：① 展开平方 ② 消掉 $x^2$ ③ 提出 $\epsilon$ 消掉 ④ $\epsilon \to 0$ 时 $\epsilon$ 项消失。</p>
+
+<p><strong>$f(x) = x^n$ 的通式（幂函数求导）：</strong> 同样的套路，展开 $(x+\epsilon)^n$ 用二项式定理，第一项 $x^n$ 消掉，$\epsilon$ 提出后剩下 $nx^{n-1}$。结果是：</p>
+
+$$\boxed{(x^n)' = n \cdot x^{n-1}}$$
+
+<p>例子：$(x^3)' = 3x^2$，$(x)' = 1 \cdot x^0 = 1$，$(5)' = 0$（常数斜率永远是 0——一条水平线没有坡度）。</p>
+
+<div class="callout callout-info">
+<strong>🔗 求和与常数倍的规则：</strong> 求导是线性运算。
+<ul>
+  <li>$(f+g)' = f' + g'$ —— 和的导数 = 导数之和</li>
+  <li>$(c \cdot f)' = c \cdot f'$ —— 常数可以提到外面</li>
+</ul>
+<p>这意味着 $(3x^2 + 2x + 5)' = 3 \cdot 2x + 2 \cdot 1 + 0 = 6x + 2$。逐项求导再拼起来就行。</p>
+</div>
+
+<h3>代码验证：数值微分</h3>
+
+<p>定义里的 $\lim_{\epsilon \to 0}$ 在计算机上没法真正做到——但取一个很小的 $\epsilon$（比如 $10^{-5}$），差商 $\frac{f(x+\epsilon)-f(x)}{\epsilon}$ 会非常接近真实导数。这叫<strong>数值微分</strong>。</p>
+
+<pre><code>import numpy as np
+
+def f(x):
+    """f(x) = x²"""
+    return x ** 2
+
+def numerical_derivative(f, x, eps=1e-5):
+    """用定义算 f'(x)：取一个很小的 eps，算差商"""
+    return (f(x + eps) - f(x)) / eps  # (f(x+ε) - f(x)) / ε
+
+# 在 x=1, 2, 3 处验证
+# 理论值：f'(x) = 2x
+for x in [1, 2, 3]:
+    num = numerical_derivative(f, x)   # 数值近似
+    exact = 2 * x                       # 理论值
+    print(f"f'({x})  数值={num:.6f}  理论={exact}  误差={abs(num-exact):.2e}")
+
+# 输出：
+# f'(1)  数值=2.000010  理论=2  误差=1.00e-05
+# f'(2)  数值=4.000010  理论=4  误差=1.00e-05
+# f'(3)  数值=6.000010  理论=6  误差=1.00e-05</code></pre>
+
+<p>误差约 $10^{-5}$——和 $\epsilon$ 同一量级。定义不是空洞的，是能在计算机上跑通的。</p>
 
 <hr>
 
@@ -44,13 +101,68 @@ $$f'(x) = \lim_{\epsilon \to 0} \frac{f(x+\epsilon) - f(x)}{\epsilon}$$
 
 <p>$\partial$（读作 "round d"）这个符号只是提醒你：不止一个变量，但我现在只看这一个。</p>
 
+<p><strong>偏导数的计算规则——简单到离谱：</strong> 对 $x$ 求偏导时，把 $y$ 当成常数就行（就像把 $y$ 当成数字 5）。</p>
+
+<p>例子：$f(x,y) = x^2 + 3xy + y^3$。</p>
+
+<ul>
+  <li>对 $x$ 求偏导：$\frac{\partial f}{\partial x} = 2x + 3y + 0$。$y^3$ 看成常数 → 导数 = 0</li>
+  <li>对 $y$ 求偏导：$\frac{\partial f}{\partial y} = 0 + 3x + 3y^2$。$x^2$ 看成常数 → 导数 = 0</li>
+</ul>
+
+<h3>代码验证：偏导数数值计算</h3>
+
+<pre><code>import numpy as np
+
+def g(x, y):
+    """f(x,y) = x² + 3xy + y³"""
+    return x**2 + 3*x*y + y**3
+
+def partial_x(f, x, y, eps=1e-5):
+    """对 x 的偏导：只动 x，y 不动"""
+    return (f(x + eps, y) - f(x, y)) / eps
+
+def partial_y(f, x, y, eps=1e-5):
+    """对 y 的偏导：只动 y，x 不动"""
+    return (f(x, y + eps) - f(x, y)) / eps
+
+# 在点 (2, 3) 验证
+x0, y0 = 2.0, 3.0
+
+# 理论：∂f/∂x = 2x + 3y = 4 + 9 = 13
+# 理论：∂f/∂y = 3x + 3y² = 6 + 27 = 33
+px_num = partial_x(g, x0, y0)
+py_num = partial_y(g, x0, y0)
+print(f"∂f/∂x  数值={px_num:.6f}  理论=13")
+print(f"∂f/∂y  数值={py_num:.6f}  理论=33")</code></pre>
+
+<p>把 $y$ 当成常数——这个规则不是死记的，是「只动 $x$，$y$ 不动」这个定义的直接结果。</p>
+
+<hr>
+
+<h2>三、梯度：把所有偏导数打包</h2>
+
+<p>偏导数一个个算完之后，把它们装进一个向量里——这就是<strong>梯度</strong>：</p>
+
+$$\nabla f = \begin{bmatrix} \frac{\partial f}{\partial x} \\[4pt] \frac{\partial f}{\partial y} \end{bmatrix}$$
+
+<p>对 $f(x,y) = x^2 + 3xy + y^3$，梯度 = $\begin{bmatrix} 2x+3y \\ 3x+3y^2 \end{bmatrix}$。</p>
+
+<p>在点 $(2,3)$ 处，梯度 = $\begin{bmatrix} 13 \\ 33 \end{bmatrix}$。</p>
+
+<p>梯度的几何含义是下一课（00-07）的主题——这里先知道它就是把所有偏导打包成一个向量。</p>
+
 <hr>
 
 <h2>💭 概念题</h2>
+
 <ol>
-<li>导数 $f'(3) = -2$ 意味着什么？在 $x=3$ 附近，$x$ 增大一点，$f(x)$ 会怎样变化？</li>
-<li>偏导数 $\frac{\partial f}{\partial x}\big|_{(2,5)} = 0$ 意味着什么？——考察：偏导数为零时，沿该方向走，函数值不变</li>
+<li>导数 $f'(3) = -2$ 意味着什么？在 $x=3$ 附近，$x$ 增大一点，$f(x)$ 会怎样变化？——考察：导数的符号含义</li>
+<li>$f(x) = 7$（常数函数）的导数是多少？从「坡度」的角度解释——考察：常数的导数为零的直觉</li>
+<li>对 $f(x,y) = x^2y + \sin(x)$，分别求 $\frac{\partial f}{\partial x}$ 和 $\frac{\partial f}{\partial y}$——考察：偏导数把另一变量当常数</li>
 </ol>
+
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
 <a href="../00-05/">← 00-05</a><a href="../../">📖 目录</a><a href="../00-07/">下一课 →</a></nav>
