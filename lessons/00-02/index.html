@@ -237,7 +237,7 @@ $$C\mathbf{x} = \begin{bmatrix}2&1\\8&10\end{bmatrix}\begin{bmatrix}5\\6\end{bma
 <p><strong>铁律：内维咬合。</strong> $(m, \cancel{n}) \times (\cancel{n}, p) = (m, p)$。$A$ 的列数 = $B$ 的行数，否则接口对不上。</p>
 
 <pre><code>A = np.array([[<span class="hl-number">1</span>,<span class="hl-number">2</span>,<span class="hl-number">3</span>], [<span class="hl-number">4</span>,<span class="hl-number">5</span>,<span class="hl-number">6</span>]])  <span class="hl-comment"># (2,3)</span>
-B = np.array([[<span class="hl-number">7</span>,<span class="hl-number">8</span>], [<span class="hl-number">9</span>,<span class="hl-number">10</span>], [<span class="hl-number">11</span>,<span class="hl-number">12</span>]])  <span class="hl-comment"># (3,2)：列数 3 = A 的行数 3 ✓</span>
+B = np.array([[<span class="hl-number">7</span>,<span class="hl-number">8</span>], [<span class="hl-number">9</span>,<span class="hl-number">10</span>], [<span class="hl-number">11</span>,<span class="hl-number">12</span>]])  <span class="hl-comment"># (3,2)：行数 3 = A 的列数 3 ✓</span>
 
 C = A @ B  <span class="hl-comment"># (2,3)×(3,2) → (2,2)</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"C = A@B:\n{C}"</span>)
