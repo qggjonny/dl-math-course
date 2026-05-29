@@ -1,105 +1,196 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>00-07 梯度与方向导数 · 深度学习数学</title>
-<link rel="stylesheet" href="../../css/style.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
-</head><body>
-<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-07</span>
-<span><a href="../00-06/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-08/">下一课 →</a></span></nav>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>00-07 SVD（下）：低秩近似与伪逆</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <span class="title">🧠 深度学习数学</span>
+  <a href="../../index.html">目录</a>
+</nav>
+
 <div class="container">
 
-<h1>00-07 梯度与方向导数</h1>
+<p style="color:var(--text-light);font-size:0.9em">🌱 阶段 0 · 第 7 课</p>
+<h1>SVD（下）：低秩近似与伪逆</h1>
 
-<hr>
+<h2>一、截断 SVD：扔掉不重要的部分</h2>
 
-<h2>一、梯度：最陡的方向</h2>
+<p><strong>画面：</strong> 上节课讲的圆变椭圆。如果椭圆某个轴的方向拉伸倍数极小（$\sigma \approx 0$），那个方向上的信息几乎被压扁了——<strong>扔掉它对整体影响微乎其微</strong>。</p>
 
-<p>把所有偏导数拼成一个向量——这就是梯度。</p>
+<p>把 SVD 展开写：</p>
 
-<p>$$\nabla f = \left[\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n}\right]$$</p>
+$$A = U\Sigma V^T = \sum_{i=1}^r \sigma_i \,\mathbf{u}_i \mathbf{v}_i^T$$
 
-<p><strong>核心直觉：梯度向量指向函数值上升<em>最快</em>的方向。</strong></p>
+<p>其中 $r$ 是非零奇异值的个数（矩阵的<strong>秩</strong>）。每一项 $\sigma_i \mathbf{u}_i \mathbf{v}_i^T$ 是一个<strong>秩为 1 的矩阵</strong>——可以理解为一张"图层"。</p>
 
-<p><strong>画面：</strong> 你站在山谷里，四周都是坡。你原地转一圈，总有一个方向是<strong>最陡的上坡</strong>——那就是梯度指的方向。梯度的大小 = 那个方向的坡度有多陡。梯度的反方向 = 最陡的下坡路。</p>
+<p>如果只保留前 $k$ 个最大的奇异值：</p>
 
-<figure><img src="assets/gradient_contour.png" alt="梯度方向垂直于等高线"><figcaption>等高线越密坡越陡。梯度方向（红色箭头）始终<strong>垂直于等高线</strong>——这就是最陡上坡方向。沿等高线走（蓝色箭头）高度不变。</figcaption></figure>
+$$A_k = \sum_{i=1}^k \sigma_i \,\mathbf{u}_i \mathbf{v}_i^T$$
+
+<p>$A_k$ 是 $A$ 的<strong>最佳 $k$ 秩近似</strong>——在所有秩 ≤ $k$ 的矩阵中，$A_k$ 和原矩阵的误差最小。（这就是 Eckart–Young 定理）</p>
 
 <div class="callout callout-info">
-<h3>为什么梯度方向最快？——方向导数完整推导</h3>
-
-<p><strong>第一步：方向导数的定义。</strong></p>
-
-<p>你站在 $(x, y)$ 点，选一个方向 $\mathbf{u} = (u_x, u_y)$（单位向量，模=1）。往前走 $\epsilon$ 步——也就是 $x$ 变到 $x + \epsilon u_x$，$y$ 变到 $y + \epsilon u_y$。函数值变了多少？</p>
-
-$$D_{\mathbf{u}} f = \lim_{\epsilon \to 0} \frac{f(x + \epsilon u_x,\; y + \epsilon u_y) - f(x, y)}{\epsilon}$$
-
-<p>这就是方向导数的<strong>定义</strong>。注意：如果你选的方向是 $(1, 0)$（沿 $x$ 轴走），方向导数就退化成普通偏导数 $\partial f / \partial x$。</p>
-
-<p><strong>第二步：把方向导数拆成偏导数的组合，推出公式。</strong></p>
-
-<p>关键技巧——把「沿斜线走一步」拆成「先沿 $x$ 走一步，再沿 $y$ 走一步」：</p>
-
-$$
-\begin{aligned}
-f(x + \epsilon u_x, y + \epsilon u_y) - f(x, y)
-&= \underbrace{[f(x + \epsilon u_x, y + \epsilon u_y) - f(x, y + \epsilon u_y)]}_{\text{纯 x-变化量}}
- + \underbrace{[f(x, y + \epsilon u_y) - f(x, y)]}_{\text{纯 y-变化量}}
-\end{aligned}
-$$
-
-<p>当 $\epsilon \to 0$ 时：</p>
-<ul>
-  <li>纯 x-变化量 $\approx \epsilon u_x \cdot \frac{\partial f}{\partial x}$（走了 $\epsilon u_x$ 这么多，乘上 $x$ 方向的坡度）</li>
-  <li>纯 y-变化量 $\approx \epsilon u_y \cdot \frac{\partial f}{\partial y}$（同理）</li>
-</ul>
-
-<p>全部代入方向导数的定义：</p>
-
-$$D_{\mathbf{u}} f = \lim_{\epsilon \to 0} \frac{\epsilon u_x \frac{\partial f}{\partial x} + \epsilon u_y \frac{\partial f}{\partial y}}{\epsilon}
-= u_x \frac{\partial f}{\partial x} + u_y \frac{\partial f}{\partial y}
-= \nabla f \cdot \mathbf{u}$$
-
-<p><strong>结论：方向导数 = 梯度 · 方向向量。</strong>这不是直接甩公式——是从定义出发，拆成偏导数组合，一步步推出来的。到这里还没有用到任何「最快」的说法，只是推导出了一个<strong>计算任意方向变化率的公式</strong>。</p>
-
-<p><strong>第三步：用点乘的几何意义回答「哪个方向最快」。</strong></p>
-
-<p>有了 $D_{\mathbf{u}}f = \nabla f \cdot \mathbf{u}$ 之后，看它的几何含义：</p>
-
-$$\nabla f \cdot \mathbf{u} = \|\nabla f\| \cdot \|\mathbf{u}\| \cdot \cos\theta = \|\nabla f\| \cdot \cos\theta$$
-
-<p>（$\|\mathbf{u}\|=1$ 因为 $\mathbf{u}$ 是单位向量。$\theta$ 是梯度和你的方向 $\mathbf{u}$ 之间的夹角。）</p>
-
-<ul>
-  <li>$\theta = 0°$（和梯度<strong>同向</strong>）→ $\cos 0° = 1$ → $D_{\mathbf{u}}f = \|\nabla f\|$ → <strong>最大</strong></li>
-  <li>$\theta = 90°$（和梯度<strong>垂直</strong>）→ $\cos 90° = 0$ → $D_{\mathbf{u}}f = 0$ → 高度不变（沿等高线走）</li>
-  <li>$\theta = 180°$（和梯度<strong>反向</strong>）→ $\cos 180° = -1$ → $D_{\mathbf{u}}f = -\|\nabla f\|$ → <strong>下降最快</strong>（这就是梯度下降！）</li>
-</ul>
-
-<p><strong>推导链完整：</strong>定义 → 拆成偏导数组合 → 推出 $\nabla f \cdot \mathbf{u}$ → 点乘在 $\theta=0°$ 最大 → 所以梯度方向最快。每一步都有出处，没有循环。</p>
+<strong>类比：</strong> 就像用三原色画一幅画。相比 256 色调色板，只用红黄蓝三种颜料损失了很多细节——但画面的大致色调还在。奇异值最大的那几个方向就是"最重要的颜料"。
 </div>
+
+<h2>二、图像压缩：眼见为实</h2>
+
+<p>用一张灰度图来展示截断 SVD 的效果。灰度图就是一个矩阵——每个元素是像素灰度值（0~255）。</p>
+
+<pre><code><span class="hl-comment"># 00-07 图像 SVD 压缩 — 只用前 k 个奇异值重建图像</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 生成一个"玩具图像"：10×10 的十字图案</span>
+<span class="hl-comment"># 实际应用中可以用 plt.imread 读真实图像</span>
+img = np.zeros((<span class="hl-number">10</span>, <span class="hl-number">10</span>))            <span class="hl-comment"># 10×10 全零矩阵（黑色）</span>
+img[<span class="hl-number">4</span>:<span class="hl-number">6</span>, :] = <span class="hl-number">1.0</span>                   <span class="hl-comment"># 中间两行设为白色（水平线）</span>
+img[:, <span class="hl-number">4</span>:<span class="hl-number">6</span>] = <span class="hl-number">1.0</span>                   <span class="hl-comment"># 中间两列设为白色（竖直线）</span>
+                                       <span class="hl-comment"># 结果：一个白色十字架图案</span>
+
+<span class="hl-comment"># SVD 分解</span>
+U, s, VT = np.linalg.svd(img)          <span class="hl-comment"># s 是 1D 奇异值数组，从大到小排列</span>
+
+<span class="hl-builtin">print</span>(<span class="hl-string">"奇异值:"</span>, np.round(s, <span class="hl-number">2</span>))
+<span class="hl-builtin">print</span>(<span class="hl-string">"非零奇异值个数 ="</span>, np.sum(s > <span class="hl-number">1e-10</span>))
+
+<span class="hl-comment"># 只用前 k 个奇异值重建</span>
+<span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>, <span class="hl-number">5</span>]:
+    <span class="hl-comment"># A_k = sum_{i=0}^{k-1} σᵢ · uᵢ · vᵢ^T</span>
+    <span class="hl-comment"># np.outer(a, b) 计算 a 和 b 的外积 a b^T</span>
+    A_k = <span class="hl-builtin">sum</span>(s[i] * np.outer(U[:, i], VT[i, :])
+               <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(k))
+    
+    <span class="hl-comment"># 计算重建误差（Frobenius 范数）</span>
+    error = np.linalg.norm(img - A_k)   <span class="hl-comment"># 默认就是 Frobenius 范数</span>
+    
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"\nk={k}:"</span>)
+    <span class="hl-builtin">print</span>(np.round(A_k, <span class="hl-number">1</span>))
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"误差: {error:.3f}"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<p>运行就能看到：只用 2 个奇异值，十字架的大致轮廓就恢复了；用 3 个，几乎完美。而原图有 9 个非零奇异值——<strong>前 3 个就携带了绝大部分信息。</strong></p>
+
+<h2>三、伪逆：长方形矩阵怎么"求逆"</h2>
+
+<p><strong>问题：</strong> 只有方阵才有逆矩阵。长方形的 $A$（比如 $3 \times 2$）不能直接求逆。但很多时候我们需要解 $A\mathbf{x} = \mathbf{b}$——比如线性回归里找最小二乘解。</p>
+
+<p><strong>答案：伪逆</strong> $A^+$（读作"A dagger"），通过 SVD 定义：</p>
+
+$$A^+ = V \Sigma^+ U^T$$
+
+<p>其中 $\Sigma^+$ 是把 $\Sigma$ 的所有<strong>非零奇异值取倒数</strong>，然后转置：</p>
+
+$$\Sigma = \begin{bmatrix} \sigma_1 & 0 \\ 0 & \sigma_2 \\ 0 & 0 \end{bmatrix}_{3\times2}
+\quad\Longrightarrow\quad
+\Sigma^+ = \begin{bmatrix} 1/\sigma_1 & 0 & 0 \\ 0 & 1/\sigma_2 & 0 \end{bmatrix}_{2\times3}$$
+
+<pre><code><span class="hl-comment"># 00-07 伪逆 — 长方形矩阵的"逆"</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 3×2 长方形矩阵，列数 > 行数时方程可能无解</span>
+<span class="hl-comment"># 但伪逆给出最小二乘解：min ||Ax - b||</span>
+A = np.array([[<span class="hl-number">1</span>, <span class="hl-number">2</span>],
+              [<span class="hl-number">3</span>, <span class="hl-number">4</span>],
+              [<span class="hl-number">5</span>, <span class="hl-number">6</span>]])
+
+b = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>])         <span class="hl-comment"># 目标向量</span>
+
+<span class="hl-comment"># 方法1：numpy 内置</span>
+x_pinv = np.linalg.pinv(A) @ b         <span class="hl-comment"># pinv 返回伪逆 A^+</span>
+
+<span class="hl-comment"># 方法2：手搓 SVD 伪逆</span>
+U, s, VT = np.linalg.svd(A)             <span class="hl-comment"># U:3×3, s:[σ₁,σ₂], VT:2×2</span>
+r = np.<span class="hl-builtin">sum</span>(s > <span class="hl-number">1e-10</span>)                    <span class="hl-comment"># 非零奇异值个数</span>
+S_inv = np.diag(<span class="hl-number">1.0</span> / s[:r])            <span class="hl-comment"># Σ⁺ 的核心：非零奇异值取倒数</span>
+                                        <span class="hl-comment"># diag 把 1D 数组变成对角矩阵</span>
+S_inv_full = np.zeros((<span class="hl-number">2</span>, <span class="hl-number">3</span>))          <span class="hl-comment"># Σ⁺ 是 2×3（Σ 是 3×2）</span>
+S_inv_full[:r, :r] = S_inv              <span class="hl-comment"># 非零部分填入</span>
+A_plus = VT.T @ S_inv_full @ U.T        <span class="hl-comment"># A⁺ = V Σ⁺ U^T</span>
+                                       <span class="hl-comment"># VT.T = V, U.T = U^T</span>
+
+x_manual = A_plus @ b                   <span class="hl-comment"># 解 A⁺ b</span>
+
+<span class="hl-builtin">print</span>(<span class="hl-string">"numpy pinv:"</span>, x_pinv)
+<span class="hl-builtin">print</span>(<span class="hl-string">"手搓 SVD:"</span>, x_manual)
+<span class="hl-builtin">print</span>(<span class="hl-string">"一致?"</span>, np.allclose(x_pinv, x_manual))
+
+<span class="hl-comment"># 验证：Ax 应该尽量接近 b（最小二乘意义下）</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"\nAx ="</span>, A @ x_pinv)
+<span class="hl-builtin">print</span>(<span class="hl-string">"b  ="</span>, b)
+<span class="hl-builtin">print</span>(<span class="hl-string">"||Ax-b|| ="</span>, np.linalg.norm(A @ x_pinv - b))
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<h2>四、伪逆和最小二乘</h2>
+
+<p>对 $A\mathbf{x} = \mathbf{b}$（$A$ 是 $m \times n$），分两种情况：</p>
+
+<table>
+  <tr><th>情况</th><th>方程数</th><th>解的性质</th></tr>
+  <tr>
+    <td>$m > n$（高瘦矩阵）</td>
+    <td>方程多于未知数</td>
+    <td>一般无精确解。伪逆给出<strong>最小二乘解</strong>：$\min \|A\mathbf{x} - \mathbf{b}\|$</td>
+  </tr>
+  <tr>
+    <td>$m < n$（矮胖矩阵）</td>
+    <td>未知数多于方程</td>
+    <td>无穷多解。伪逆给出<strong>最小范数解</strong>：所有解中 $\|\mathbf{x}\|$ 最小的那个</td>
+  </tr>
+</table>
+
+<p>线性回归就是第一种情况：样本数 >> 特征数，用伪逆找最小二乘拟合。</p>
 
 <div class="callout callout-tip">
-<strong>梯度下降 = 闭着眼睛，每一步都往最陡的下坡方向踩一脚。</strong>
-$$\theta_{t+1} = \theta_t - \eta \cdot \nabla f(\theta_t)$$
+<strong>截断 SVD 在深度学习中的应用：</strong>
 <ul>
-  <li>$\theta_t$：你现在站的位置</li>
-  <li>$\nabla f(\theta_t)$：这个位置的最陡上坡方向</li>
-  <li><strong>负号</strong>：因为我们想<strong>下降</strong>，所以反着走</li>
-  <li>$\eta$（学习率）：走多大步。太大→可能跨过山谷冲到对面山上去了；太小→半天走不到底</li>
+  <li><strong>LoRA</strong>：不更新整个权重矩阵 $W$，而是加一个低秩增量 $\Delta W = BA$，只训练 $A$ 和 $B$。本质：假设更新只在最大的几个奇异值方向上</li>
+  <li><strong>模型压缩</strong>：对全连接层的权重做 SVD，只保留前 k 个奇异值——压缩 10 倍但精度损失 < 1%</li>
+  <li><strong>权重初始化</strong>：一些方法用 SVD 初始化权重，确保初始时各方向拉伸均匀</li>
 </ul>
 </div>
 
-<hr>
-
 <h2>💭 概念题</h2>
-<ol>
-<li>梯度指向上升最快方向。为什么是"最快"？用方向导数 = 梯度与方向向量的点乘来解释。提示：$\cos\theta$ 在 $\theta=0°$（同向）时最大。——考察：方向导数的几何直觉</li>
-</ol>
 
-<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-06/">← 00-06</a><a href="../../">📖 目录</a><a href="../00-08/">下一课 →</a></nav>
-</div></body></html>
+<div class="exercise">
+<h3>1. 截断的直觉</h3>
+<p>一张 1000×1000 的灰度图像，SVD 后有 500 个非零奇异值。只保留前 20 个重建，图像看起来模糊但轮廓清晰。为什么前 20 个奇异值能保留主要的视觉信息？后面 480 个奇异值携带了什么？</p>
+<p>——考察：奇异值大小 = 信息重要性、截断 = 丢弃细节保留结构</p>
+</div>
+
+<div class="exercise">
+<h3>2. 伪逆 vs 普通逆</h3>
+<p>如果 $A$ 是 $n \times n$ 可逆方阵，$A^+$ 和 $A^{-1}$ 是什么关系？用 SVD 验证：当所有奇异值都非零且 $A$ 是方阵时，$A^+ = A^{-1}$。</p>
+<p>——考察：伪逆是普通逆的推广</p>
+</div>
+
+<div class="exercise">
+<h3>3. 秩和奇异值</h3>
+<p>一个 $5 \times 5$ 矩阵只有 3 个非零奇异值。这个矩阵的秩是多少？用 numpy 生成一个秩为 3 的矩阵，验证 `np.linalg.matrix_rank(A)` 和非零奇异值个数一致。</p>
+<p>——考察：秩 = 非零奇异值个数</p>
+</div>
+
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  });
+</script>
+</body>
+</html>

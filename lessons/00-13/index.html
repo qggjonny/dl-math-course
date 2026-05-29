@@ -1,244 +1,222 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>00-13 期望与方差 · 深度学习数学</title>
-<link rel="stylesheet" href="../../css/style.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
-<style>
-  .derivation {
-    background: #f8fafb;
-    border-left: 4px solid #6c8ebf;
-    margin: 1.2rem 0;
-    padding: 0.8rem 1.2rem;
-    border-radius: 0 6px 6px 0;
-  }
-  .derivation summary {
-    font-weight: bold;
-    color: #4a6d8c;
-    cursor: pointer;
-    font-size: 1.02em;
-  }
-  .derivation summary:hover { color: #2b4f6e; }
-  .derivation .step { margin: 0.35rem 0 0.35rem 1.5rem; }
-  .derivation .comment { color: #888; font-size: 0.9em; margin-left: 3rem; }
-</style>
-</head><body>
-<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-13</span>
-<span><a href="../00-12/">← 上一课</a> &nbsp; <a href="../../">目录</a></span></nav>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>00-13 凸性与优化</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <span class="title">🧠 深度学习数学</span>
+  <a href="../../index.html">目录</a>
+</nav>
+
 <div class="container">
 
-<h1>00-13 期望与方差</h1>
+<p style="color:var(--text-light);font-size:0.9em">🌱 阶段 0 · 第 13 课</p>
+<h1>凸性与优化</h1>
 
-<hr>
+<h2>一、梯度下降的"体检报告"</h2>
 
-<h2>一、期望：平衡木的支点</h2>
+<p>00-10 学了梯度下降——小球沿坡度往下滚，每一步往梯度反方向走。但有一个问题没回答：</p>
 
-<p><strong>画面：</strong> 一根长木条，上面站着六个小人，分别站在位置 1, 2, 3, 4, 5, 6（骰子的六个面）。你在这根木条下面放一个支点，放在哪个位置木条刚好平衡不倾斜？</p>
+<blockquote>
+<strong>小球最后停在哪里？是全局最低点，还是某个坑里？</strong>
+</blockquote>
 
-<p>当所有人都一样重时（公平骰子），支点放在正中间 3.5 的位置。这就是期望——<strong>概率加权的平衡支点</strong>。</p>
+<p>这完全取决于"地形"是不是<strong>凸的</strong>。</p>
 
-$$\mathbb{E}[X] = 1\times\frac{1}{6} + 2\times\frac{1}{6} + \cdots + 6\times\frac{1}{6} = 3.5$$
+<h2>二、凸函数的几何画面</h2>
 
-<p><strong>期望 ≠ 最可能的值。</strong> 骰子没有"最可能的面"（均匀分布）。期望 3.5 是对长期平均的预测——掷一万次取平均，结果趋向 3.5。不是对下一次掷几点的预测。</p>
+<p><strong>画面：</strong> 拿一根橡皮筋，两端固定在曲线上。如果函数是凸的，<strong>橡皮筋永远在曲线的上方</strong>（或重合）。</p>
 
-<figure><img src="assets/balance_beam.png" alt="平衡木期望"><figcaption>六个等重小人站在 1~6 的位置。支点在 3.5 处刚好平衡——这就是期望</figcaption></figure>
+<p>换成数学：对任意两点 $x_1, x_2$ 和任意比例 $t \in [0, 1]$：</p>
 
-<p><strong>连续版：</strong> 把求和换成积分：$\mathbb{E}[X] = \int_{-\infty}^{\infty} x \cdot f(x)\,dx$。每个 $x$ 用它的概率密度加权。</p>
+$$f(tx_1 + (1-t)x_2) \le t f(x_1) + (1-t) f(x_2)$$
 
-<!-- ====== 推导 5：离散→连续的黎曼和桥接 ====== -->
-<details class="derivation">
-<summary>📐 推导：从离散期望到连续期望（黎曼和桥接）</summary>
+<p>左边是<strong>曲线上</strong>的函数值，右边是<strong>弦上</strong>的值。凸函数就是「弦在曲线上方」。</p>
 
-<p>离散期望的定义是对所有可能取值概率加权求和：</p>
+<p><strong>一句话：</strong>凸函数的图像像一个碗，随便选两个点，连线的中点比两个端点的函数值平均值低。</p>
 
-$$\mathbb{E}[X] = \sum_i x_i \cdot P(X = x_i) = \sum_i x_i \cdot p_i$$
+<h2>三、正例和反例</h2>
 
-<p>过渡到连续情形时，把实数轴切成宽度为 $\Delta x$ 的小段。$X$ 落在 $[x, x+\Delta x]$ 内的概率近似为 $f(x) \cdot \Delta x$（密度 × 宽度）：</p>
+<table>
+  <tr><th>函数</th><th>凸？</th><th>画面</th></tr>
+  <tr><td>$f(x) = x^2$</td><td>✅ 凸</td><td>U 形碗，只有一个底</td></tr>
+  <tr><td>$f(x) = e^x$</td><td>✅ 凸</td><td>指数增长，越来越陡</td></tr>
+  <tr><td>$f(x) = -\ln x$（$x > 0$）</td><td>✅ 凸</td><td>递减但向下弯，像滑雪坡</td></tr>
+  <tr><td>$f(x) = x^3$</td><td>❌ 非凸</td><td>S 形，左边凸右边凹</td></tr>
+  <tr><td>$f(x) = \sin x$</td><td>❌ 非凸</td><td>波浪形，有无穷多个坑</td></tr>
+</table>
 
-$$\mathbb{E}[X] \approx \sum_k x_k \cdot f(x_k) \cdot \Delta x$$
+<pre><code><span class="hl-comment"># 00-13 凸 vs 非凸 — 用二阶导数判断</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
-<p class="step">这就是<strong>黎曼和</strong>的形式：每个小区间里的 $x$ 值，用该点的概率密度 × 区间宽度来加权。</p>
+<span class="hl-keyword">def</span> <span class="hl-func">is_convex_1d</span>(f, xs):
+    <span class="hl-comment">"""对一维函数采样，检查弦在曲线上方（数值验证凸性）</span>
+<span class="hl-comment">    f: 待检查的函数</span>
+<span class="hl-comment">    xs: 采样点数组</span>
+<span class="hl-comment">    返回: True 表示在这些采样点上看起来是凸的</span>
+<span class="hl-comment">    """</span>
+    n = <span class="hl-builtin">len</span>(xs)
+    <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(n):
+        <span class="hl-keyword">for</span> j <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(i+<span class="hl-number">1</span>, n):
+            <span class="hl-keyword">for</span> t <span class="hl-keyword">in</span> [<span class="hl-number">0.25</span>, <span class="hl-number">0.5</span>, <span class="hl-number">0.75</span>]:
+                xi, xj = xs[i], xs[j]        <span class="hl-comment"># 选两个端点</span>
+                x_mid = t*xi + (<span class="hl-number">1</span>-t)*xj      <span class="hl-comment"># 弦上的一点</span>
+                <span class="hl-comment"># 凸函数条件：f(中间点) ≤ t*f(xi) + (1-t)*f(xj)</span>
+                <span class="hl-keyword">if</span> f(x_mid) > t*f(xi) + (<span class="hl-number">1</span>-t)*f(xj) + <span class="hl-number">1e-10</span>:
+                    <span class="hl-keyword">return</span> <span class="hl-builtin">False</span>
+    <span class="hl-keyword">return</span> <span class="hl-builtin">True</span>
 
-<p>令 $\Delta x \to 0$，黎曼和的极限就是定积分：</p>
+xs = np.linspace(-<span class="hl-number">3</span>, <span class="hl-number">3</span>, <span class="hl-number">30</span>)
 
-$$\mathbb{E}[X] = \lim_{\Delta x \to 0} \sum_k x_k \cdot f(x_k) \cdot \Delta x = \int_{-\infty}^{\infty} x \cdot f(x)\,dx$$
+<span class="hl-builtin">print</span>(<span class="hl-string">"x² 凸?"</span>, is_convex_1d(<span class="hl-keyword">lambda</span> x: x**<span class="hl-number">2</span>, xs))             <span class="hl-comment"># True</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"x³ 凸?"</span>, is_convex_1d(<span class="hl-keyword">lambda</span> x: x**<span class="hl-number">3</span>, xs))             <span class="hl-comment"># False</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"sin(x) 凸?"</span>, is_convex_1d(np.sin, xs))              <span class="hl-comment"># False</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"eˣ 凸?"</span>, is_convex_1d(np.exp, xs))                 <span class="hl-comment"># True</span>
+</code></pre>
 
-<p class="comment">核心直觉：$p_i$（概率质量）→ $f(x)\,dx$（概率密度 × 无穷小宽度）。$\sum$ 变成 $\int$，一切照旧。</p>
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 
-</details>
+<h2>四、二阶导数判定法</h2>
 
-<hr>
+<p>一维函数判断凸性有个简单方法：看<strong>二阶导数</strong>。</p>
 
-<h2>二、方差：射飞镖的散布程度</h2>
+$$f''(x) \ge 0 \text{ 对所有 } x \quad\Longleftrightarrow\quad f \text{ 是凸函数}$$
 
-<p><strong>画面：</strong> 你和朋友比赛扔飞镖。你们俩的平均命中点都在靶心（期望都是 0），但你的飞镖散布得很开——满靶子都是孔——而朋友的飞镖全挤在靶心周围。谁的方差大？你的大。差多少？方差给出精确的数字。</p>
+<p><strong>直觉：</strong> $f''(x)$ 是<strong>坡度的变化率</strong>。$f'' \ge 0$ 意味着<strong>越往前走坡越陡</strong>——函数向上弯。就像碗的侧面：从碗边走到碗底，坡度从陡变缓再变陡，但没有"反向弯"。</p>
 
-$$\text{Var}(X) = \mathbb{E}[(X - \mu)^2]$$
+$$f''(x) < 0 \quad\Longrightarrow\quad \text{上凸，凹的（像倒扣的碗）}$$
 
-<p><strong>逐符号拆开：</strong></p>
+<pre><code><span class="hl-comment"># 二阶导验证凸性</span>
+<span class="hl-keyword">def</span> <span class="hl-func">check_convexity_2nd</span>(f, f_dd, xs):
+    <span class="hl-comment">"""给定函数的解析二阶导数，验证凸性</span>
+<span class="hl-comment">    f: 原函数</span>
+<span class="hl-comment">    f_dd: 二阶导函数</span>
+<span class="hl-comment">    xs: 检查点</span>
+<span class="hl-comment">    """</span>
+    <span class="hl-keyword">for</span> x <span class="hl-keyword">in</span> xs:
+        dd = f_dd(x)                     <span class="hl-comment"># 二阶导数值</span>
+        <span class="hl-keyword">if</span> dd < -<span class="hl-number">1e-10</span>:                     <span class="hl-comment"># 如果有个点的二阶导 < 0</span>
+            <span class="hl-builtin">print</span>(<span class="hl-string">f"  x={x:.1f}: f''={dd:.2f} < 0 → 非凸"</span>)
+            <span class="hl-keyword">return</span> <span class="hl-builtin">False</span>
+    <span class="hl-keyword">return</span> <span class="hl-builtin">True</span>
+
+xs = np.linspace(-<span class="hl-number">3</span>, <span class="hl-number">3</span>, <span class="hl-number">20</span>)
+
+<span class="hl-builtin">print</span>(<span class="hl-string">"x²: 二阶导 = 2 ≥ 0"</span>,
+      <span class="hl-string">"→ 凸"</span> <span class="hl-keyword">if</span> check_convexity_2nd(<span class="hl-keyword">lambda</span> x: x**<span class="hl-number">2</span>,
+                                            <span class="hl-keyword">lambda</span> x: <span class="hl-number">2</span>, xs)
+      <span class="hl-keyword">else</span> <span class="hl-string">"→ 非凸"</span>)
+                                   <span class="hl-comment"># f(x)=x², f''(x)=2 恒≥0</span>
+
+<span class="hl-builtin">print</span>(<span class="hl-string">"\nx³: 二阶导 = 6x，可正可负"</span>,
+      <span class="hl-string">"→ 凸"</span> <span class="hl-keyword">if</span> check_convexity_2nd(<span class="hl-keyword">lambda</span> x: x**<span class="hl-number">3</span>,
+                                            <span class="hl-keyword">lambda</span> x: <span class="hl-number">6</span>*x, xs)
+      <span class="hl-keyword">else</span> <span class="hl-string">"→ 非凸"</span>)
+                                   <span class="hl-comment"># f(x)=x³, f''(x)=6x: x<0时负,x>0时正</span>
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<h2>五、多元函数：Hessian 矩阵</h2>
+
+<p>对多元函数 $f(\mathbf{x})$，二阶导变成一个<strong>矩阵</strong>——Hessian：</p>
+
+$$H_{ij} = \frac{\partial^2 f}{\partial x_i \partial x_j}$$
+
+<p><strong>画面：</strong> 一维时 $f''(x) \ge 0$ 说明碗向上弯。多元时，所有方向都向上弯 = Hessian 是<strong>半正定矩阵</strong>。</p>
+
+<p>回到 00-05 特征值的直觉：半正定 = 所有特征值 ≥ 0。等价于沿任何方向 $\mathbf{v}$，都有 $\mathbf{v}^T H \mathbf{v} \ge 0$（二阶方向导数非负）。</p>
+
+<pre><code><span class="hl-comment"># 多元凸函数：f(x,y) = x² + y²（抛物面）</span>
+<span class="hl-keyword">def</span> <span class="hl-func">f</span>(X):
+    <span class="hl-comment">"""f(x,y) = x² + y²，X 是 2 维向量 [x, y]</span>
+<span class="hl-comment">    二阶导矩阵（Hessian）= [[2, 0], [0, 2]]</span>
+<span class="hl-comment">    特征值 = 2, 2 → 都 ≥ 0 → 凸 ✅</span>
+<span class="hl-comment">    """</span>
+    <span class="hl-keyword">return</span> X[<span class="hl-number">0</span>]**<span class="hl-number">2</span> + X[<span class="hl-number">1</span>]**<span class="hl-number">2</span>
+
+<span class="hl-keyword">def</span> <span class="hl-func">f2</span>(X):
+    <span class="hl-comment">"""f(x,y) = x² − y²（马鞍面）</span>
+<span class="hl-comment">    Hessian = [[2, 0], [0, -2]]</span>
+<span class="hl-comment">    特征值 = 2, −2 → 有负的 → 非凸 ❌</span>
+<span class="hl-comment">    """</span>
+    <span class="hl-keyword">return</span> X[<span class="hl-number">0</span>]**<span class="hl-number">2</span> - X[<span class="hl-number">1</span>]**<span class="hl-number">2</span>
+
+<span class="hl-comment"># 用有限差分近似 Hessian</span>
+eps = <span class="hl-number">1e-5</span>
+<span class="hl-keyword">for</span> name, func <span class="hl-keyword">in</span> [(<span class="hl-string">"x²+y²"</span>, f), (<span class="hl-string">"x²−y²"</span>, f2)]:
+    x0 = np.array([<span class="hl-number">1.0</span>, <span class="hl-number">1.0</span>])             <span class="hl-comment"># 在 (1, 1) 处算 Hessian</span>
+    <span class="hl-comment"># 手动计算 2×2 Hessian 矩阵的每个元素</span>
+    <span class="hl-comment"># H[0,0] = ∂²f/∂x²: 对 x 做两次差分</span>
+    f0 = func(x0)
+    x1 = x0 + np.array([eps, <span class="hl-number">0</span>])        <span class="hl-comment"># x+eps, y 不变</span>
+    x2 = x0 - np.array([eps, <span class="hl-number">0</span>])        <span class="hl-comment"># x-eps, y 不变</span>
+    H00 = (func(x1) - <span class="hl-number">2</span>*f0 + func(x2)) / eps**<span class="hl-number">2</span>
+    <span class="hl-comment"># 同理 H[1,1] = ∂²f/∂y²</span>
+    y1 = x0 + np.array([<span class="hl-number">0</span>, eps])
+    y2 = x0 - np.array([<span class="hl-number">0</span>, eps])
+    H11 = (func(y1) - <span class="hl-number">2</span>*f0 + func(y2)) / eps**<span class="hl-number">2</span>
+    <span class="hl-comment"># 交叉项用中心差分近似</span>
+    H = np.array([[H00, <span class="hl-number">0</span>], [<span class="hl-number">0</span>, H11]])
+    eigs = np.linalg.eigvals(H)          <span class="hl-comment"># Hessian 特征值</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"{name}: Hessian 特征值 = {np.round(eigs,2)}, 凸? {np.all(eigs >= 0)}"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<h2>六、凸 = 梯度下降保证收敛到全局最优</h2>
+
+<p><strong>结论：</strong> 如果损失函数是凸的，梯度下降<strong>一定会</strong>走到全局最低点——不管从哪个起点出发。</p>
+
+<p><strong>如果不是凸的（神经网络就是这样）：</strong></p>
 <ul>
-  <li>$X - \mu$：每个数据点偏离均值多少（可正可负）</li>
-  <li>平方 $(X-\mu)^2$：消除正负抵消（偏左和偏右不能互相抵消——都是"偏离"）</li>
-  <li>$\mathbb{E}[\cdot]$：取所有偏离平方的加权平均</li>
+  <li>可能卡在<strong>局部最优</strong>（local minimum）——附近最低但不是全局最低</li>
+  <li>可能卡在<strong>鞍点</strong>（saddle point）——某个方向是谷底、另一个方向是山脊</li>
+  <li>好在实践中，大网络的鞍点和局部最优往往没那么差——这是深度学习的"蜜汁好运"</li>
 </ul>
 
-<p><strong>计算捷径：</strong> $\text{Var}(X) = \mathbb{E}[X^2] - \mu^2$——用"平方的平均"减去"平均的平方"。手算时方便很多，不用先减均值再平方。</p>
-
-<!-- ====== 推导 3：Var(X) = E[X²] - μ² ====== -->
-<details class="derivation">
-<summary>📐 推导：$\text{Var}(X) = \mathbb{E}[X^2] - \mu^2$</summary>
-
-<p>从定义出发，展开平方：</p>
-
-$$\begin{aligned}
-\text{Var}(X) &= \mathbb{E}\big[(X - \mu)^2\big] \\[4pt]
-&= \mathbb{E}\big[X^2 - 2\mu X + \mu^2\big] \quad \text{(展开平方)} \\[4pt]
-&= \mathbb{E}[X^2] - 2\mu\,\mathbb{E}[X] + \mu^2 \quad \text{(期望的线性性质)} \\[4pt]
-&= \mathbb{E}[X^2] - 2\mu \cdot \mu + \mu^2 \quad (\mathbb{E}[X] = \mu) \\[4pt]
-&= \mathbb{E}[X^2] - 2\mu^2 + \mu^2 \\[4pt]
-&= \mathbb{E}[X^2] - \mu^2
-\end{aligned}$$
-
-<p class="comment">关键两步都在用<strong>期望的线性</strong>：$\mathbb{E}[X^2 - 2\mu X + \mu^2] = \mathbb{E}[X^2] - 2\mu\mathbb{E}[X] + \mu^2$。常数 $\mu^2$ 的期望就是它自己（$\mathbb{E}[c] = c$）。</p>
-
-</details>
-
-<div class="callout callout-info">
-<h3>为什么用平方不用绝对值？</h3>
-
-<p>方差还有另一种写法：$\mathbb{E}[|X-\mu|]$——用绝对值度量偏离。为什么不用这种？</p>
-
-<p><strong>关键原因：光滑性。</strong></p>
-
-<p>画一下 $|x|$ 和 $x^2$ 的图像你就懂了：</p>
-<ul>
-  <li><strong>绝对值曲线</strong>在 $x=0$ 处有个<strong>尖角</strong>（V 字形）。尖角处<strong>不可导</strong>——要优化它，站在尖角上不知道该往左还是往右</li>
-  <li><strong>平方曲线</strong>在 $x=0$ 处是<strong>光滑的碗底</strong>（U 字形）。处处可导——要优化它，碗底的坡一步步把你引向最小值</li>
-</ul>
-
-<p>想象你在一个尖角上站着（绝对值），一脚踩下去不知道该往哪边滑。光滑的碗底（平方）就不会有这个问题——每一步都明确知道要往哪个方向走。</p>
-
-<p>这个性质在优化里至关重要。所有用梯度的方法（梯度下降）都要求函数是可导的。平方让方差变得「可优化」，绝对值不行。这就是方差不用绝对值的深层原因——不仅是为了消除正负抵消，还是为了让优化器能在光滑的坡上安心走路。</p>
+<div class="callout callout-warn">
+<strong>为什么凸性重要：</strong> 线性回归的 MSE 是凸函数 → 一定有唯一解析解。逻辑回归的交叉熵是凸函数 → 梯度下降一定收敛。但神经网络没有这个保证——一切靠经验调参。
 </div>
 
-<p><strong>标准差 $\sigma = \sqrt{\text{Var}(X)}$：</strong> 方差单位是原单位平方（比如「平方厘米」），开根号后单位和原数据一致（「厘米」）。σ 就是天然的距离尺子。</p>
-
-<hr>
-
-<h2>三、两条硬核性质</h2>
-
-<h3>期望是线性的——不管独不独立</h3>
-<p>$$\mathbb{E}[aX + b] = a\cdot\mathbb{E}[X] + b$$</p>
-
-<!-- ====== 推导 1：E[aX+b] = aE[X] + b ====== -->
-<details class="derivation">
-<summary>📐 推导：$\mathbb{E}[aX + b] = a\,\mathbb{E}[X] + b$</summary>
-
-<p>从离散期望的 $\Sigma$ 定义展开：</p>
-
-$$\begin{aligned}
-\mathbb{E}[aX + b] &= \sum_i (a x_i + b) \cdot P(X = x_i) \\[4pt]
-&= \sum_i \big(a x_i \cdot p_i + b \cdot p_i\big) \\[4pt]
-&= a \sum_i x_i \cdot p_i \;+\; b \sum_i p_i \\[4pt]
-&= a \cdot \mathbb{E}[X] \;+\; b \cdot 1 \\[4pt]
-&= a\,\mathbb{E}[X] + b
-\end{aligned}$$
-
-<p class="comment">第二行拆括号：$(ax_i + b)p_i = a x_i p_i + b p_i$。第三行把 $a$ 和 $b$ 分别提到求和外面。第四行用 $\sum p_i = 1$（概率归一化）。</p>
-
-</details>
-
-<p>$$\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]$$</p>
-
-<!-- ====== 推导 2：E[X+Y] = E[X] + E[Y]（联合分布展开） ====== -->
-<details class="derivation">
-<summary>📐 推导：$\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]$（从联合分布展开，不要求独立）</summary>
-
-<p>从联合概率质量函数 $P(X=x, Y=y)$ 出发：</p>
-
-$$\begin{aligned}
-\mathbb{E}[X + Y] &= \sum_x \sum_y (x + y) \cdot P(X = x,\; Y = y) \\[4pt]
-&= \sum_x \sum_y x \cdot P(X = x, Y = y) \;+\; \sum_x \sum_y y \cdot P(X = x, Y = y) \\[4pt]
-&= \sum_x x \underbrace{\sum_y P(X = x, Y = y)}_{=\,P(X = x)} \;+\; \sum_y y \underbrace{\sum_x P(X = x, Y = y)}_{=\,P(Y = y)} \\[4pt]
-&= \sum_x x \cdot P(X = x) \;+\; \sum_y y \cdot P(Y = y) \\[4pt]
-&= \mathbb{E}[X] + \mathbb{E}[Y]
-\end{aligned}$$
-
-<p class="comment"><strong>关键：</strong>第三步对 $y$ 求和（边缘化）得到 $X$ 的边缘分布 $P(X=x)$。这一步<strong>不依赖 $X$ 和 $Y$ 是否独立</strong>——边缘化总是成立的。这就是为什么期望的加法不需要独立性假设。</p>
-
-</details>
-
-<p><strong>不管 $X$ 和 $Y$ 是否独立，期望的加法都成立。</strong>这是期望最强大的性质。</p>
-
-<h3>方差不是线性的——平移被吃掉</h3>
-<p>$$\text{Var}(aX + b) = a^2\cdot\text{Var}(X)$$</p>
-
-<p><strong>常数 $b$ 消失了！</strong> 全班所有人同时长高 10cm——每个人离均值的距离完全不变，方差当然不变。<strong>平移不改变分散程度。</strong></p>
-
-<p>$a$ 被平方了：如果全班身高翻倍（a=2），方差变成原来的 4 倍。不仅散得更开，而且<strong>平方放大</strong>了差异。</p>
-
-<!-- ====== 推导 4：Var(aX+b) = a²Var(X) ====== -->
-<details class="derivation">
-<summary>📐 推导：$\text{Var}(aX + b) = a^2\,\text{Var}(X)$（注意 $b$ 如何抵消）</summary>
-
-<p>令 $\mu = \mathbb{E}[X]$。首先算变换后的期望（用推导 1 的结果）：</p>
-
-$$\mathbb{E}[aX + b] = a\mu + b$$
-
-<p>代入方差的定义：</p>
-
-$$\begin{aligned}
-\text{Var}(aX + b) &= \mathbb{E}\Big[\big(aX + b - \mathbb{E}[aX + b]\big)^2\Big] \\[4pt]
-&= \mathbb{E}\Big[\big(aX + b - (a\mu + b)\big)^2\Big] \\[4pt]
-&= \mathbb{E}\Big[\big(aX - a\mu\big)^2\Big] \quad \text{（$b$ 和 $b$ 相消！）} \\[4pt]
-&= \mathbb{E}\big[a^2 (X - \mu)^2\big] \\[4pt]
-&= a^2 \cdot \mathbb{E}\big[(X - \mu)^2\big] \\[4pt]
-&= a^2 \cdot \text{Var}(X)
-\end{aligned}$$
-
-<p class="comment">第三步是核心：$+b$ 在 $aX+b$ 里和 $-b$ 在 $-(a\mu+b)$ 里正好抵消。<strong>平移量 $b$ 完全不进入方差</strong>——因为它同时作用于每个点和均值，差值不变。第五步 $a^2$ 被提到期望外面（$a^2$ 是常数）。</p>
-
-</details>
-
-<hr>
-
-<h2>🖥️ 代码</h2>
-<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-
-np.random.seed(<span class="hl-number">42</span>)
-<span class="hl-comment"># 从 N(μ=5, σ=2) 抽 100000 个样本</span>
-<span class="hl-comment"># loc=μ(均值), scale=σ(标准差), size=样本数</span>
-samples = np.random.normal(loc=<span class="hl-number">5</span>, scale=<span class="hl-number">2</span>, size=<span class="hl-number">100000</span>)
-
-mu = np.mean(samples)          <span class="hl-comment"># 样本均值 ≈ 期望</span>
-var = np.var(samples, ddof=<span class="hl-number">0</span>)  <span class="hl-comment"># ddof=0: 除以 n（总体方差）</span>
-                               <span class="hl-comment"># ddof=1: 除以 n-1（样本无偏估计）</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"μ≈{mu:.3f} σ²≈{var:.3f} σ≈{np.std(samples,ddof=0):.3f}"</span>)
-
-<span class="hl-comment"># 验证 E[aX+b] = aE[X]+b</span>
-a, b = <span class="hl-number">3</span>, <span class="hl-number">10</span>
-trans = a * samples + b
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\nE[aX+b]={np.mean(trans):.1f} = aE[X]+b={a*mu+b:.1f} ✓"</span>)
-
-<span class="hl-comment"># 验证 Var(aX+b) = a²Var(X)，b 消失</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"Var(aX+b)={np.var(trans,ddof=0):.1f} = a²Var(X)={a**2*var:.1f} ✓"</span>)
-
-<span class="hl-comment"># 掷骰子：理论 E=3.5, Var≈2.917</span>
-dice = np.random.randint(<span class="hl-number">1</span>,<span class="hl-number">7</span>,size=<span class="hl-number">100000</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\n骰子: E[X]≈{np.mean(dice):.3f} Var≈{np.var(dice,ddof=0):.3f}"</span>)</code></pre>
-<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
-
-<hr>
 <h2>💭 概念题</h2>
-<ol>
-<li>方差用平方 $(X-\mu)^2$ 而不是绝对值 $|X-\mu|$。一个重要原因：平方函数处处光滑可导，绝对值在 0 处有个尖角（不可导）。想象你在一个尖角上站着，不知道该往左还是往右——光滑的坡就没有这个问题。——考察：函数光滑性对优化的影响</li>
-<li>全班 40 人身高的方差是 100 cm²。如果所有人同时长高 5cm，方差变成多少？如果所有人都变成原来的 1.1 倍（均值和差异都放大），方差变成多少？——考察：Var(aX+b)的性质</li>
-<li>如果你有一个数据集，把每个数都减去均值、除以标准差，处理完后的数据均值是多少？方差是多少？——考察：标准化的统计效果（每减均值 → 新均值为 0；每除标准差 → 新方差为 1）</li>
-</ol>
 
-<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-12/">← 00-12</a><a href="../../">📖 目录</a><span></span></nav>
-</div></body></html>
+<div class="exercise">
+<h3>1. 凸函数的局部 vs 全局</h3>
+<p>凸函数如果有局部最小值，那一定是全局最小值。为什么？从"弦在曲线上方"这个定义出发解释。</p>
+<p>——考察：凸函数定义的推论</p>
+</div>
+
+<div class="exercise">
+<h3>2. 神经网络为什么非凸</h3>
+<p>一个最简单的两层神经网络 $f(x) = \sigma(w_2 \cdot \sigma(w_1 x))$，其中 $\sigma$ 是 ReLU。为什么它的损失函数几乎不可能是凸的？给出直觉。</p>
+<p>——考察：非线性激活函数破坏凸性</p>
+</div>
+
+<div class="exercise">
+<h3>3. 凸函数求和</h3>
+<p>$f(x)=x^2$ 是凸的，$g(x)=e^x$ 也是凸的。$h(x) = f(x) + g(x) = x^2 + e^x$ 是凸的吗？验证二阶导数。一般规律是什么？</p>
+<p>——考察：凸函数的加法性质</p>
+</div>
+
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  });
+</script>
+</body>
+</html>

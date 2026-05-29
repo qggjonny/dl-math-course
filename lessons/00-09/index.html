@@ -1,141 +1,105 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>00-09 泰勒展开与数值微分 · 深度学习数学</title>
+<title>00-09 梯度与方向导数 · 深度学习数学</title>
 <link rel="stylesheet" href="../../css/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 </head><body>
-<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-09</span>
-<span><a href="../00-08/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-10/">下一课 →</a></span></nav>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-07</span>
+<span><a href="../00-06/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-08/">下一课 →</a></span></nav>
 <div class="container">
 
-<h1>00-09 泰勒展开与数值微分</h1>
+<h1>00-09 梯度与方向导数</h1>
 
 <hr>
 
-<h2>一、泰勒展开：用多项式"克隆"一条曲线</h2>
+<h2>一、梯度：最陡的方向</h2>
 
-<p><strong>画面：</strong> 你有一条弯弯曲曲的曲线 $f(x)$，太复杂了不好算。你想找一条<strong>简单的多项式</strong>来代替它——至少在某个点 $x=a$ 附近，让它和原曲线"长得很像"。</p>
+<p>把所有偏导数拼成一个向量——这就是梯度。</p>
 
-<p>怎么做到？一层一层地逼近：</p>
+<p>$$\nabla f = \left[\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n}\right]$$</p>
 
-<div class="callout callout-info">
-<h3>逐级逼近：从"经过同一点"到"弯曲程度都一样"</h3>
+<p><strong>核心直觉：梯度向量指向函数值上升<em>最快</em>的方向。</strong></p>
 
-<p><strong>第 0 级——常数近似：经过同一点。</strong> 最简单的近似就是一条水平线，让它和原曲线在 $x=a$ 处相交：</p>
+<p><strong>画面：</strong> 你站在山谷里，四周都是坡。你原地转一圈，总有一个方向是<strong>最陡的上坡</strong>——那就是梯度指的方向。梯度的大小 = 那个方向的坡度有多陡。梯度的反方向 = 最陡的下坡路。</p>
 
-$$f(x) \approx f(a)$$
-
-<p>这就保证了两条线<strong>经过同一点</strong>。但在那点附近，水平线很快就偏离了原曲线——因为原曲线有坡度，水平线没有。</p>
-
-<p><strong>第 1 级——线性近似：切线。</strong> 加上坡度修正：让近似曲线不仅经过同一点，而且在 $x=a$ 处的<strong>斜率也一样</strong>：</p>
-
-$$f(x) \approx f(a) + f'(a)(x-a)$$
-
-<p>这就是切线方程。两条线现在<strong>相切</strong>——既经过同一点，又有同样的坡度。在 $x=a$ 极近处，切线已经非常接近原曲线了。但稍微走远一点，切线是直的，原曲线却是弯的——两者还是会分开。</p>
-
-<p><strong>第 2 级——二次近似：加上弯曲。</strong> 再加一个"弯曲修正项"，让近似曲线在 $x=a$ 处的<strong>二阶导数（弯曲程度）也和原曲线一样</strong>：</p>
-
-$$f(x) \approx f(a) + f'(a)(x-a) + \frac{f''(a)}{2}(x-a)^2$$
-
-<p>二次项 $(x-a)^2$ 是一条抛物线——它天然有弯曲。现在两条线在 $x=a$ 处：经过同一点 ✓、坡度相同 ✓、弯曲程度相同 ✓。附近的一小段几乎完全重合。</p>
-
-<p><strong>第 n 级——无限逼近。</strong> 继续加三阶、四阶……每一项让更高阶的导数也匹配：</p>
-
-$$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \frac{f'''(a)}{3!}(x-a)^3 + \cdots$$
-
-<p>$n!$ 出现在分母是因为每次求导会带下来一个因子（$(x-a)^n$ 的 $n$ 阶导数是 $n!$），系数里除以 $n!$ 正好消掉。</p>
-</div>
-
-<p><strong>泰勒展开的威力：</strong> 如果 $f$ 无限可导，这个无穷级数<strong>精确等于</strong>原函数（在收敛半径内）。实践中，我们通常只取前几项就够用了——比如中央差分只用到二阶展开，已经足够让 $\epsilon^2$ 项抵消。</p>
-
-<figure><img src="assets/taylor_approx.png" alt="泰勒展开逐阶逼近"><figcaption>$\sin x$ 在 $x=0$ 处的泰勒展开。1 阶（红线）只是切线；3 阶（绿线）已经能追上一段曲线；5 阶（橙线）几乎重合。阶数越高，在展开点附近越精确。</figcaption></figure>
-
-<hr>
-
-<h2>🖥️ 代码</h2>
-<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-
-<span class="hl-comment"># ===== 数值微分：用代码算坡度 =====</span>
-<span class="hl-keyword">def</span> <span class="hl-func">num_grad</span>(f, x, eps=<span class="hl-number">1e-5</span>):
-    <span class="hl-string">"""中央差分：往前走一丁点，往后退一丁点，算平均坡度
-    (f(x+eps)-f(x-eps)) / (2*eps) 
-    精度比单边高：单边只看"往前"，中央看了"前后"然后取平均，误差抵消了一部分
-    """</span>
-    <span class="hl-keyword">return</span> (f(x + eps) - f(x - eps)) / (<span class="hl-number">2</span> * eps)
-
-<span class="hl-comment"># 测试 f(x)=x²，理论导数 = 2x</span>
-<span class="hl-keyword">def</span> <span class="hl-func">sq</span>(x):
-    <span class="hl-keyword">return</span> x ** <span class="hl-number">2</span>
-
-<span class="hl-keyword">for</span> x <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>]:
-    n = num_grad(sq, x)           <span class="hl-comment"># 数值近似</span>
-    t = <span class="hl-number">2</span> * x                      <span class="hl-comment"># 理论：f'(x)=2x</span>
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"f'({x}) 数值={n:.6f}  理论={t}"</span>)
-
-<span class="hl-comment"># ===== 梯度下降：从山顶走到山谷 =====</span>
-<span class="hl-comment"># f(x)=x²-4x+4 的最小值在 x=2（f'(x)=2x-4=0 → x=2）</span>
-x = <span class="hl-number">0.0</span>                    <span class="hl-comment"># 站在 x=0 的位置</span>
-lr = <span class="hl-number">0.1</span>                   <span class="hl-comment"># 学习率：每步走 0.1 倍的坡度</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\n从 x=0 出发，目标 x=2"</span>)
-<span class="hl-keyword">for</span> step <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">30</span>):
-    grad = <span class="hl-number">2</span>*x - <span class="hl-number">4</span>          <span class="hl-comment"># 当前位置的坡度</span>
-    x = x - lr * grad       <span class="hl-comment"># 沿着坡度反方向走一步</span>
-    <span class="hl-keyword">if</span> step % <span class="hl-number">5</span> == <span class="hl-number">0</span>:
-        <span class="hl-builtin">print</span>(<span class="hl-string">f"  第{step:2d}步: x={x:.4f}  坡度={grad:+.4f}"</span>)
-        <span class="hl-comment"># 坡度从 -4 逐渐变成 0，x 从 0 逐渐滑到 2</span></code></pre>
-<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
+<figure><img src="assets/gradient_contour.png" alt="梯度方向垂直于等高线"><figcaption>等高线越密坡越陡。梯度方向（红色箭头）始终<strong>垂直于等高线</strong>——这就是最陡上坡方向。沿等高线走（蓝色箭头）高度不变。</figcaption></figure>
 
 <div class="callout callout-info">
-<h3>为什么中央差分比单边更精确？——泰勒展开揭密</h3>
+<h3>为什么梯度方向最快？——方向导数完整推导</h3>
 
-<p>代码注释说「误差抵消了一部分」——到底怎么抵消的？用泰勒展开来算。</p>
+<p><strong>第一步：方向导数的定义。</strong></p>
 
-<p><strong>单边差分（只看往前）：</strong></p>
+<p>你站在 $(x, y)$ 点，选一个方向 $\mathbf{u} = (u_x, u_y)$（单位向量，模=1）。往前走 $\epsilon$ 步——也就是 $x$ 变到 $x + \epsilon u_x$，$y$ 变到 $y + \epsilon u_y$。函数值变了多少？</p>
 
-$$f(x+\epsilon) = f(x) + \epsilon f'(x) + \frac{\epsilon^2}{2} f''(x) + \frac{\epsilon^3}{6} f'''(x) + O(\epsilon^4)$$
+$$D_{\mathbf{u}} f = \lim_{\epsilon \to 0} \frac{f(x + \epsilon u_x,\; y + \epsilon u_y) - f(x, y)}{\epsilon}$$
 
-<p>移项：</p>
+<p>这就是方向导数的<strong>定义</strong>。注意：如果你选的方向是 $(1, 0)$（沿 $x$ 轴走），方向导数就退化成普通偏导数 $\partial f / \partial x$。</p>
 
-$$\frac{f(x+\epsilon)-f(x)}{\epsilon} = f'(x) + \underbrace{\frac{\epsilon}{2}f''(x) + O(\epsilon^2)}_{\text{误差项：首项是 } O(\epsilon)}$$
+<p><strong>第二步：把方向导数拆成偏导数的组合，推出公式。</strong></p>
 
-<p>误差的主导项是 $\frac{\epsilon}{2}f''(x)$——和 $\epsilon$ 成正比。$\epsilon$ 缩小 10 倍，误差大约缩小 10 倍。</p>
-
-<p><strong>中央差分（看前后）：</strong>写出 $f(x+\epsilon)$ 和 $f(x-\epsilon)$ 两个泰勒展开：</p>
+<p>关键技巧——把「沿斜线走一步」拆成「先沿 $x$ 走一步，再沿 $y$ 走一步」：</p>
 
 $$
 \begin{aligned}
-f(x+\epsilon) &= f(x) + \epsilon f'(x) + \frac{\epsilon^2}{2} f''(x) + \frac{\epsilon^3}{6} f'''(x) + \frac{\epsilon^4}{24} f''''(x) + \cdots \\[4pt]
-f(x-\epsilon) &= f(x) - \epsilon f'(x) + \frac{\epsilon^2}{2} f''(x) - \frac{\epsilon^3}{6} f'''(x) + \frac{\epsilon^4}{24} f''''(x) - \cdots
+f(x + \epsilon u_x, y + \epsilon u_y) - f(x, y)
+&= \underbrace{[f(x + \epsilon u_x, y + \epsilon u_y) - f(x, y + \epsilon u_y)]}_{\text{纯 x-变化量}}
+ + \underbrace{[f(x, y + \epsilon u_y) - f(x, y)]}_{\text{纯 y-变化量}}
 \end{aligned}
 $$
 
-<p><strong>相减：</strong>$f(x+\epsilon) - f(x-\epsilon)$：</p>
-
+<p>当 $\epsilon \to 0$ 时：</p>
 <ul>
-  <li>$f(x)$ 消掉（都有，相减得 0）</li>
-  <li>$\epsilon f'(x) - (-\epsilon f'(x)) = 2\epsilon f'(x)$ ← 保留</li>
-  <li>$\frac{\epsilon^2}{2}f''(x) - \frac{\epsilon^2}{2}f''(x) = 0$ ← <strong>抵！消！了！</strong></li>
-  <li>$\frac{\epsilon^3}{6}f'''(x) - (-\frac{\epsilon^3}{6}f'''(x)) = \frac{\epsilon^3}{3}f'''(x)$</li>
+  <li>纯 x-变化量 $\approx \epsilon u_x \cdot \frac{\partial f}{\partial x}$（走了 $\epsilon u_x$ 这么多，乘上 $x$ 方向的坡度）</li>
+  <li>纯 y-变化量 $\approx \epsilon u_y \cdot \frac{\partial f}{\partial y}$（同理）</li>
 </ul>
 
-$$\frac{f(x+\epsilon)-f(x-\epsilon)}{2\epsilon} = f'(x) + \underbrace{\frac{\epsilon^2}{6}f'''(x) + O(\epsilon^4)}_{\text{误差项：首项是 } O(\epsilon^2)}$$
+<p>全部代入方向导数的定义：</p>
 
-<p><strong>关键：</strong>相减时 $\epsilon^2$ 项<strong>同号抵消</strong>了！剩余误差主导项是 $\frac{\epsilon^2}{6}f'''(x)$——和 $\epsilon^2$ 成正比。$\epsilon$ 缩小 10 倍，误差缩小 100 倍。这就是为什么中央差分比单边差分高一个精度量级。</p>
+$$D_{\mathbf{u}} f = \lim_{\epsilon \to 0} \frac{\epsilon u_x \frac{\partial f}{\partial x} + \epsilon u_y \frac{\partial f}{\partial y}}{\epsilon}
+= u_x \frac{\partial f}{\partial x} + u_y \frac{\partial f}{\partial y}
+= \nabla f \cdot \mathbf{u}$$
 
-<p><strong>直观理解：</strong>单边差分就像只看了看你前方一毫米的地形，就猜整条路的坡度——局部信息有限。中央差分同时看了前方和后方，左右信息对称，把「地形弯曲」带来的偏差对消掉了。</p>
+<p><strong>结论：方向导数 = 梯度 · 方向向量。</strong>这不是直接甩公式——是从定义出发，拆成偏导数组合，一步步推出来的。到这里还没有用到任何「最快」的说法，只是推导出了一个<strong>计算任意方向变化率的公式</strong>。</p>
+
+<p><strong>第三步：用点乘的几何意义回答「哪个方向最快」。</strong></p>
+
+<p>有了 $D_{\mathbf{u}}f = \nabla f \cdot \mathbf{u}$ 之后，看它的几何含义：</p>
+
+$$\nabla f \cdot \mathbf{u} = \|\nabla f\| \cdot \|\mathbf{u}\| \cdot \cos\theta = \|\nabla f\| \cdot \cos\theta$$
+
+<p>（$\|\mathbf{u}\|=1$ 因为 $\mathbf{u}$ 是单位向量。$\theta$ 是梯度和你的方向 $\mathbf{u}$ 之间的夹角。）</p>
+
+<ul>
+  <li>$\theta = 0°$（和梯度<strong>同向</strong>）→ $\cos 0° = 1$ → $D_{\mathbf{u}}f = \|\nabla f\|$ → <strong>最大</strong></li>
+  <li>$\theta = 90°$（和梯度<strong>垂直</strong>）→ $\cos 90° = 0$ → $D_{\mathbf{u}}f = 0$ → 高度不变（沿等高线走）</li>
+  <li>$\theta = 180°$（和梯度<strong>反向</strong>）→ $\cos 180° = -1$ → $D_{\mathbf{u}}f = -\|\nabla f\|$ → <strong>下降最快</strong>（这就是梯度下降！）</li>
+</ul>
+
+<p><strong>推导链完整：</strong>定义 → 拆成偏导数组合 → 推出 $\nabla f \cdot \mathbf{u}$ → 点乘在 $\theta=0°$ 最大 → 所以梯度方向最快。每一步都有出处，没有循环。</p>
+</div>
+
+<div class="callout callout-tip">
+<strong>梯度下降 = 闭着眼睛，每一步都往最陡的下坡方向踩一脚。</strong>
+$$\theta_{t+1} = \theta_t - \eta \cdot \nabla f(\theta_t)$$
+<ul>
+  <li>$\theta_t$：你现在站的位置</li>
+  <li>$\nabla f(\theta_t)$：这个位置的最陡上坡方向</li>
+  <li><strong>负号</strong>：因为我们想<strong>下降</strong>，所以反着走</li>
+  <li>$\eta$（学习率）：走多大步。太大→可能跨过山谷冲到对面山上去了；太小→半天走不到底</li>
+</ul>
 </div>
 
 <hr>
 
 <h2>💭 概念题</h2>
 <ol>
-<li>中央差分为什么比单边差分更精确？中央用 $(x+\epsilon)$ 和 $(x-\epsilon)$ 两边的信息取平均，单边只用一边。在你心里过一遍：x² 的中央差分计算结果比单边差分更接近 2x 吗？——考察：对称差分抵消误差</li>
+<li>梯度指向上升最快方向。为什么是"最快"？用方向导数 = 梯度与方向向量的点乘来解释。提示：$\cos\theta$ 在 $\theta=0°$（同向）时最大。——考察：方向导数的几何直觉</li>
 </ol>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-08/">← 00-08</a><a href="../../">📖 目录</a><a href="../00-10/">下一课 →</a></nav>
+<a href="../00-06/">← 00-06</a><a href="../../">📖 目录</a><a href="../00-08/">下一课 →</a></nav>
 </div></body></html>

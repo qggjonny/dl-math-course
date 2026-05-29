@@ -1,227 +1,169 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>00-12 连续分布 · 深度学习数学</title>
+<title>00-12 链式法则 · 深度学习数学</title>
 <link rel="stylesheet" href="../../css/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 </head><body>
-<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-12</span>
-<span><a href="../00-11/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-13/">下一课 →</a></span></nav>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-10</span>
+<span><a href="../00-09/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-11/">下一课 →</a></span></nav>
 <div class="container">
 
-<h1>00-12 连续分布</h1>
+<h1>00-12 链式法则</h1>
 
-<p>上节课的 PMF 用柱子高度表示概率。但这招对「气温 25.317°C」完全没用——它有无限精度，你没法给每一个可能的气温画一根柱子。连续分布需要换一种思考方式。</p>
+<p>如果说梯度是"往哪走"，那链式法则就是"在多层的机器里，最里面那颗螺丝钉拧一下，最终输出会变多少"。这条规则单独看简单，但它是后面所有复杂求导的基础。</p>
 
-<hr>
-
-<h2>一、单点概率 = 0：一根针尖戳不到一个点</h2>
-
-<blockquote><strong>连续随机变量取任意一个确定值的概率 = 0。</strong></blockquote>
-
-<p><strong>画面：</strong> 闭着眼睛往一张纸上扔一根针。针尖恰好戳中坐标 (3.1415926535..., 2.7182818284...) 的概率是多少？零。因为纸上无穷多个点，针尖恰好戳中<em>某特定一个点</em>在数学上是零概率事件。</p>
-
-<p>但针尖戳中一个<strong>区域</strong>——比如戳中左边三分之一——概率就是 1/3。因为区域有面积，而点没有面积。</p>
-
-<div class="callout callout-info">
-<strong>📐 推导：为什么单点概率严格为 0？</strong><br>
-积分就是求面积。对于任意单点 $x=a$：
-$$P(X=a) = \int_a^a f(x)\,dx = 0$$
-积分上下限相同 → 区间宽度为零 → 面积必为零。无论 $f(a)$ 有多高，乘上宽度 0，结果就是 0。<br><br>
-<strong>类比：</strong> 一根线段有长度，但线段上的一个「点」长度为零。连续分布的概率由<em>区间长度</em>承载，单点不贡献任何概率。
-</div>
-
-<p>所以连续分布的概率不看「柱子的高度」，而是看 <strong>PDF 曲线下方的面积</strong>：</p>
-
-<figure>
-<img src="assets/uniform_area.png" alt="概率 = 面积">
-<figcaption>均匀分布 U(1,4)：面积 = 宽 × 高 = 1。子区间 [c,d] 的概率 = (d−c)/(b−a)</figcaption>
-</figure>
-
-<p>$$P(a \le X \le b) = \int_a^b f(x)\,dx$$</p>
-
-<p>翻译：$X$ 落在 $[a,b]$ 的概率 = 曲线下方、$x=a$ 到 $x=b$ 夹出来的<strong>面积</strong>。</p>
-
-<div class="callout callout-info">
-<strong>PDF 两条铁律：</strong><br>
-① $f(x) \ge 0$ — 密度不能是负数<br>
-② $\int_{-\infty}^{\infty} f(x)\,dx = 1$ — 总面积恰好 = 1（所有情况概率之和）
-</div>
+<figure><img src="assets/gear_chain.png" alt="齿轮链"><figcaption>三级齿轮咬合：拧第一个齿轮 → 带动第二个 → 带动第三个。总传动比 = 各级传动比相乘</figcaption></figure>
 
 <hr>
 
-<h2>二、均匀分布：诚实的「没有偏好」</h2>
-<p>$[a,b]$ 内每个点的密度一样。PDF 是一段水平线。没有任何偏好——如果你完全不知道气温可能是多少，均匀分布是最诚实的假设。</p>
+<h2>一、咬合的齿轮：链式法则的直觉</h2>
+
+<p><strong>画面：</strong> 你面前有三个咬合在一起的齿轮。你转动第一个齿轮（输入 $x$），它带动第二个齿轮（中间结果 $g(x)$），第二个带动第三个（最终输出 $f(g(x))$）。</p>
+
+<p>现在问：<strong>你拧第一个齿轮 1 圈，最后一个齿轮转几圈？</strong></p>
+
+<p>答案 = <strong>第一个齿轮到第二个齿轮的传动比</strong> × <strong>第二个齿轮到第三个齿轮的传动比</strong>。</p>
+
+<p>这就是链式法则：</p>
+
+$$h(x) = f(g(x)) \quad\Rightarrow\quad h'(x) = f'(g(x)) \cdot g'(x)$$
 
 <div class="callout callout-info">
-<strong>📐 推导：PDF 的高度从哪来？</strong><br>
-设 PDF 在 $[a,b]$ 内为常数 $c$，区间外为 0。由总面积 = 1：
-$$\int_a^b c\,dx = c \cdot (b-a) = 1 \quad\Rightarrow\quad c = \frac{1}{b-a}$$
-直观：宽 $(b-a)$ 的矩形面积要等于 1，高度自然就是 $\frac{1}{b-a}$。区间越宽，密度越矮；区间越窄，密度越高。这就是「均匀」的数学含义——每个子区间的概率正比于它的长度，和位置无关。
+<h3>推导：为什么是乘法？为什么是 f'(g(x)) 而不是 f'(x)？</h3>
+
+<p><strong>从定义出发：</strong></p>
+
+$$h'(x) = \lim_{\Delta x \to 0} \frac{f(g(x+\Delta x)) - f(g(x))}{\Delta x}$$
+
+<p>令 $\Delta u = g(x+\Delta x) - g(x)$（中间变量因为 $x$ 变而变的量）。则 $g(x+\Delta x) = g(x) + \Delta u$，代入：</p>
+
+$$h'(x) = \lim_{\Delta x \to 0} \frac{f(g(x)+\Delta u) - f(g(x))}{\Delta x}$$
+
+<p><strong>关键技巧——凑出两个差商的乘积：</strong></p>
+
+$$= \lim_{\Delta x \to 0} \underbrace{\frac{f(g(x)+\Delta u) - f(g(x))}{\Delta u}}_{\text{外层 f 在 g(x) 处的导数}} \cdot \underbrace{\frac{\Delta u}{\Delta x}}_{\text{内层 g 的差商}}$$
+
+<p>当 $\Delta x \to 0$ 时，$\Delta u \to 0$（因为 $g$ 可导则连续），所以：</p>
+
+$$h'(x) = f'(g(x)) \cdot g'(x)$$
+
+<p><strong>推导同时回答了三个问题：</strong></p>
+<ol>
+  <li><strong>为什么是乘法？</strong> 因为我们凑出了两个差商的乘积——外层的 $\frac{\Delta f}{\Delta u}$ 和内层的 $\frac{\Delta u}{\Delta x}$。</li>
+  <li><strong>为什么是 $f'(g(x))$ 而不是 $f'(x)$？</strong> 外层的差商是 $\frac{f(g(x)+\Delta u)-f(g(x))}{\Delta u}$——外层 $f$ 是在 <strong>$u=g(x)$ 处</strong>取值，不是在 $x$ 处取值。</li>
+  <li><strong>从几何上看：</strong> $x$ 变一点 → $u$ 变 $g'(x)$ 倍 → $y$ 变 $f'(u)$ 倍。两步放大倍数相乘 = 总放大倍数。函数图像上：复合函数在 $x$ 处的切线斜率 = 外层在 $u=g(x)$ 处的切线斜率 × 内层在 $x$ 处的切线斜率。</li>
+</ol>
 </div>
 
-<hr>
-
-<h2>三、正态分布：最常用的钟形曲线</h2>
-
-<p>两个数字决定一切：</p>
-
-<figure>
-<img src="assets/normal_mu.png" alt="μ 控制中心">
-<figcaption>μ 控制中心。σ 相同 → 形状不变，只是左右平移</figcaption>
-</figure>
-
-<figure>
-<img src="assets/normal_sigma.png" alt="σ 控制胖瘦">
-<figcaption>σ 控制胖瘦。σ 越大越矮越胖。总面积恒为 1，胖了就得矮</figcaption>
-</figure>
-
-<h3>公式拆零件：</h3>
-
-$$f(x) = \frac{1}{\sigma\sqrt{2\pi}} \exp\!\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)$$
-
-<table>
-<tr><th>零件</th><th>在干什么</th></tr>
-<tr><td>$(x-\mu)^2$</td><td>离中心多远。远处→平方很大→exp 里很负→密度≈0</td></tr>
-<tr><td>$2\sigma^2$（分母）</td><td>σ 越大，同样距离被大分母稀释→衰减变慢→钟变胖</td></tr>
-<tr><td>$\frac{1}{\sigma\sqrt{2\pi}}$</td><td>归一化。σ 翻倍→系数减半，把胖钟拉矮保持面积=1</td></tr>
-</table>
-
-<p><strong>验证直觉：</strong> σ=1 → f(0)≈0.399。σ=2 → f(0)≈0.199。恰好减半！因为钟宽了一倍，高度必须减半来保持总面积。</p>
-
-<div class="callout callout-info">
-<strong>📐 推导：$\pi$ 从哪冒出来的？</strong><br>
-你可能好奇：明明是概率分布，为什么杀出来一个圆周率 $\pi$？它来自<strong>高斯积分</strong>的归一化：
-$$\int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}$$
-推导技巧：把平方积分转到极坐标——
-$$\left(\int_{-\infty}^{\infty} e^{-x^2}dx\right)^2 = \int_{-\infty}^{\infty}\int_{-\infty}^{\infty} e^{-(x^2+y^2)}dx\,dy = \int_0^{2\pi}\int_0^{\infty} e^{-r^2}r\,dr\,d\theta = \pi$$
-角度积分一圈 $\int_0^{2\pi}d\theta = 2\pi$，$r$ 的积分贡献 $\frac{1}{2}$，合起来就是 $\pi$。正态分布的系数 $\frac{1}{\sigma\sqrt{2\pi}}$ 就是把这个 $\sqrt{\pi}$ 摊平成总面积 = 1 的结果。
-</div>
-
-<hr>
-
-<h2>四、CDF：一把刷子从左扫到右</h2>
-
-<p><strong>画面：</strong> 一把刷子从最左边往右刷，每刷过一段曲线，就把下面的颜料扫进桶里。桶从空的（F(-∞)=0）慢慢涨，到最右边刚好满（F(+∞)=1）。</p>
-
-<div class="callout callout-info">
-<strong>📐 推导：PDF 与 CDF 的微积分关系</strong><br>
-CDF $F(x)$ 是 PDF $f(t)$ 从 $-\infty$ 到 $x$ 的累积：
-$$F(x) = \int_{-\infty}^x f(t)\,dt$$
-反过来，PDF 是 CDF 的导数——CDF 的瞬时变化率就是该点的密度：
-$$f(x) = F'(x)$$
-<strong>直觉：</strong> 刷子扫过某一点时桶里进颜料的「速度」就是那一点的密度值。密度高处进得快（CDF 陡），密度低处进得慢（CDF 平）。所以 CDF 永远单调不减——颜料只进不出。
-</div>
-
-<figure>
-<img src="assets/normal_cdf.png" alt="CDF">
-<figcaption>CDF 从 0 单调升到 1，永不下降。F(μ)=0.5</figcaption>
-</figure>
-
-<hr>
-
-<h2>五、68-95-99.7 法则</h2>
-
-<figure>
-<img src="assets/normal_68_95_99.png" alt="68-95-99.7">
-<figcaption>±1σ→68.3% &emsp; ±2σ→95.5% &emsp; ±3σ→99.7%</figcaption>
-</figure>
-
-<p>σ 是天然尺子。1σ=正常，2σ=少见，3σ=极端。<strong>不是线性增长</strong>——钟的尾巴指数衰减，3σ 之外概率微乎其微。</p>
-
-<div class="callout callout-info">
-<strong>📐 推导：为什么 68 → 95 → 99.7 不是线性？用密度值说话</strong><br>
-标准正态 $\mathcal{N}(0,1)$ 在各点的密度：
-<table>
-<tr><th>$x$（离中心几 σ）</th><th>$f(x)$（该点密度）</th><th>相对中心的比例</th></tr>
-<tr><td>0</td><td>0.3989</td><td>100% — 最高</td></tr>
-<tr><td>1</td><td>0.2420</td><td>60.7% — 降了近四成</td></tr>
-<tr><td>2</td><td>0.0540</td><td>13.5% — 只剩一成多</td></tr>
-<tr><td>3</td><td>0.0044</td><td>1.1% — 几乎没了</td></tr>
-</table>
-每往外走 1σ，密度以 $e^{-x^2/2}$ 的速度指数暴跌。±3σ 处的密度只有中心的约 1%，所以再往外面积几乎不增长。<br><br>
-<strong>结论：</strong> 从 ±1σ 到 ±2σ，概率增加了 27.2%（因为密度还不太低），但从 ±2σ 到 ±3σ 只增加了 4.2%（因为密度已经微乎其微）。不是线性比例——这是指数衰减的直接后果。
-</div>
-
-<hr>
-
-<h2>六、正态分布为什么无处不在：中心极限定理导引</h2>
-
-<p><strong>画面：米粒堆山丘。</strong> 往桌上倒一堆米，米粒会堆成一座山丘——中间高、四周低，轮廓像钟形曲线。为什么？</p>
-
-<p>每粒米落下时是随机的（可能偏左、可能偏右），但成千上万粒米叠加后，「偏左」和「偏右」互相抵消，最终大多数米稳定在中心附近。每次多倒一粒，山丘就更接近完美的钟形。</p>
-
-<div class="callout callout-info">
-<strong>中心极限定理（CLT）的直觉表述：</strong><br>
-大量<strong>独立</strong>随机变量的<strong>和</strong>，无论各自原本是什么分布（均匀、指数、甚至离散），加起来后的分布趋向于<strong>正态分布</strong>。<br><br>
-$$\frac{X_1 + X_2 + \cdots + X_n - n\mu}{\sigma\sqrt{n}} \;\xrightarrow{d}\; \mathcal{N}(0,1)$$
-<strong>关键条件：</strong> 每个变量方差有限、互相独立。现实中绝大多数「总量」型变量都满足——身高 = 基因 + 营养 + 环境 + 测量误差，每一项都是独立的小因素，叠加后就变成正态。
-</div>
-
-<p><strong>深度学习的应用：</strong></p>
 <ul>
-<li><strong>权重初始化：</strong> Xavier/He 初始化从正态分布采样，确保信号在前向传播中不爆炸不消失</li>
-<li><strong>Batch Normalization：</strong> 把每层输出强行拉回均值 0 方差 1，利用正态的稳定性质</li>
-<li><strong>VAE 潜在空间：</strong> 编码器输出 $\mu$ 和 $\sigma$，解码器从 $\mathcal{N}(\mu,\sigma^2)$ 采样——假设潜在变量天然服从正态</li>
-<li><strong>扩散模型：</strong> 每一步加高斯噪声、每一步去高斯噪声，整个生成过程围绕正态分布构建</li>
+  <li>$g'(x)$：拧输入 $x$，中间结果 $g(x)$ 怎么变（第一个传动比）</li>
+  <li>$f'(g(x))$：中间结果 $g(x)$ 变一点，最终输出怎么变（第二个传动比）</li>
+  <li>乘起来：输入→输出的<strong>总传动比</strong></li>
 </ul>
 
-<p>正态分布之所以是「默认分布」，不是因为数学家偏爱它——而是<strong>大量微小随机因素叠加后，数学上必然如此</strong>。米粒堆山丘，数据堆正态。</p>
+<p>来一个具体例子：$h(x) = \sin(x^2)$</p>
+<ul>
+  <li>内层齿轮 $g(x) = x^2$，传动比 $g'(x) = 2x$</li>
+  <li>外层齿轮 $f(u) = \sin(u)$，传动比 $f'(u) = \cos(u)$</li>
+  <li>注意：外层传动比要<strong>在 $u=x^2$ 那个位置算</strong>，不是在 $x$ 处算</li>
+  <li>总传动比：$h'(x) = \cos(x^2) \cdot 2x$</li>
+</ul>
 
 <hr>
 
-<h2>🖥️ 代码</h2>
+<h2>二、多列齿轮：多条路径求和</h2>
+
+<p>如果一个输入变量通过<strong>多条路径</strong>影响最终输出——就像一台机器同时驱动两条传送带——那总传动比 = 各条路径的传动比<strong>之和</strong>：</p>
+
+$$\frac{dz}{dx} = \frac{\partial z}{\partial y_1} \cdot \frac{dy_1}{dx} + \frac{\partial z}{\partial y_2} \cdot \frac{dy_2}{dx} + \cdots$$
+
+<div class="callout callout-info">
+<h3>推导：为什么是求和？</h3>
+
+<p>设 $z = f(y_1(x), y_2(x))$——最终输出 $z$ 通过两个中间变量 $y_1, y_2$ 依赖于 $x$。</p>
+
+<p><strong>全微分：</strong> $x$ 变 $\Delta x$，导致 $y_1$ 变 $\Delta y_1 \approx \frac{dy_1}{dx}\Delta x$，$y_2$ 变 $\Delta y_2 \approx \frac{dy_2}{dx}\Delta x$。</p>
+
+<p>$y_1$ 和 $y_2$ 各自的变化都会影响 $z$——总变化 = 各路径贡献之和：</p>
+
+$$\Delta z \approx \frac{\partial z}{\partial y_1} \cdot \Delta y_1 + \frac{\partial z}{\partial y_2} \cdot \Delta y_2$$
+
+<p>代入 $\Delta y_1$ 和 $\Delta y_2$ 的表达式：</p>
+
+$$\Delta z \approx \frac{\partial z}{\partial y_1} \cdot \frac{dy_1}{dx}\Delta x + \frac{\partial z}{\partial y_2} \cdot \frac{dy_2}{dx}\Delta x$$
+
+<p>两边除以 $\Delta x$，取极限 $\Delta x \to 0$：</p>
+
+$$\frac{dz}{dx} = \frac{\partial z}{\partial y_1} \cdot \frac{dy_1}{dx} + \frac{\partial z}{\partial y_2} \cdot \frac{dy_2}{dx}$$
+
+<p><strong>直觉：</strong> 就像两条水渠汇入一个水库——上游放水，两条渠各自带走一部分水，水库水位变化 = 两条渠的贡献加起来。链式法则的加法来自<strong>各路径独立贡献的叠加</strong>。</p>
+</div>
+
+<p><strong>画面：</strong> 发动机驱动两条传送带，两条传送带都汇到一个包装箱。发动机加速 → 两条传送带都加速 → 包装箱加速。总效应 = 两条路径的效应相加。</p>
+
+<div class="callout callout-info">
+<h3>多级齿轮的启示：连乘导致极度敏感</h3>
+<p>100 级齿轮咬合在一起。如果每级传动比都 &lt; 1（比如 0.25），100 次连乘后 → $0.25^{100} \approx 0$——第一个齿轮拧 10000 圈，最后一个纹丝不动。如果每级都 &gt; 1，最后一个会疯狂加速。</p>
+
+<p><strong>这和深度学习有什么关系？</strong> 神经网络的反向传播就是在用链式法则求梯度——每一层的局部导数连乘起来。100 层网络 → 100 个因子连乘。大多数因子 &lt; 1 → 梯度指数衰减（<strong>梯度消失</strong>，浅层学不到东西）；大多数因子 &gt; 1 → 梯度指数爆炸（<strong>梯度爆炸</strong>，更新一步跨太远）。深层网络训练困难的根源就在这里——不是网络不聪明，是链式法则的乘法性质让深层梯度对每一层的缩放极其敏感。</p>
+</div>
+
+<hr>
+
+<h2>三、手算一个例子：$(wx-y)^2$ 的导数</h2>
+
+<p>$L = (wx - y)^2$。假设 $y$ 是常数（一个目标值），我们想知道 $w$ 变一点，$L$ 变多少。</p>
+
+<ul>
+  <li>内层：$u(w) = wx - y$，$\frac{du}{dw} = x$</li>
+  <li>外层：$L(u) = u^2$，$\frac{dL}{du} = 2u$</li>
+  <li>链式：$\frac{dL}{dw} = 2(wx-y) \cdot x$</li>
+</ul>
+
 <pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
-<span class="hl-comment"># ===== 均匀分布 U(0,1) =====</span>
-a, b = <span class="hl-number">0.0</span>, <span class="hl-number">1.0</span>
-h = <span class="hl-number">1.0</span> / (b - a)                <span class="hl-comment"># PDF 高度 = 1/宽</span>
-c, d = <span class="hl-number">0.2</span>, <span class="hl-number">0.5</span>
-prob = (d-c) / (b-a)            <span class="hl-comment"># 概率 = 长度占比</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"P({c}≤X≤{d}) = {prob}"</span>)
+<span class="hl-comment"># ===== sin(x²) 验证链式法则 =====</span>
+<span class="hl-keyword">def</span> <span class="hl-func">h</span>(x):
+    <span class="hl-keyword">return</span> np.sin(x ** <span class="hl-number">2</span>)       <span class="hl-comment"># 复合函数</span>
 
-<span class="hl-comment"># 模拟验证</span>
-np.random.seed(<span class="hl-number">42</span>)
-samples = np.random.uniform(a, b, <span class="hl-number">100000</span>)
-in_int = np.<span class="hl-builtin">sum</span>((samples>=c) & (samples<=d))
-<span class="hl-builtin">print</span>(<span class="hl-string">f"模拟 P = {in_int/100000:.4f}"</span>)
+<span class="hl-keyword">def</span> <span class="hl-func">h_grad</span>(x):
+    <span class="hl-keyword">return</span> np.cos(x ** <span class="hl-number">2</span>) * <span class="hl-number">2</span> * x  <span class="hl-comment"># 链式：cos(x²)·2x</span>
 
-<span class="hl-comment"># ===== 正态 PDF（手工实现） =====</span>
-<span class="hl-keyword">def</span> <span class="hl-func">normal_pdf</span>(x, mu, sigma):
-    c = <span class="hl-number">1.0</span>/(sigma*np.sqrt(<span class="hl-number">2</span>*np.pi))
-    e = -<span class="hl-number">0.5</span>*((x-mu)/sigma)**<span class="hl-number">2</span>
-    <span class="hl-keyword">return</span> c * np.exp(e)
+<span class="hl-comment"># 数值验证（中央差分）</span>
+<span class="hl-keyword">def</span> <span class="hl-func">num_grad</span>(f, x, eps=<span class="hl-number">1e-5</span>):
+    <span class="hl-keyword">return</span> (f(x+eps) - f(x-eps)) / (<span class="hl-number">2</span>*eps)
 
-<span class="hl-comment"># 验证 σ 减半效应</span>
-<span class="hl-keyword">for</span> s <span class="hl-keyword">in</span> [<span class="hl-number">0.5</span>,<span class="hl-number">1.0</span>,<span class="hl-number">2.0</span>]:
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"σ={s:.1f}: f(0)={normal_pdf(0,0,s):.4f}"</span>)
+x = <span class="hl-number">1.5</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"h'(1.5) 数值={num_grad(h,x):.6f}  解析={h_grad(x):.6f}"</span>)
+<span class="hl-comment"># 两个值应该几乎相同</span>
 
-<span class="hl-comment"># ===== 模拟 68-95-99.7 =====</span>
-sn = np.random.normal(<span class="hl-number">0</span>,<span class="hl-number">1</span>,<span class="hl-number">100000</span>)
-<span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>,<span class="hl-number">2</span>,<span class="hl-number">3</span>]:
-    r = np.mean((sn>=-k)&(sn<=k))
-    t = {<span class="hl-number">1</span>:<span class="hl-number">0.6827</span>,<span class="hl-number">2</span>:<span class="hl-number">0.9545</span>,<span class="hl-number">3</span>:<span class="hl-number">0.9973</span>}[k]
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"±{k}σ: sim={r:.4f} theory={t:.4f}"</span>)
+<span class="hl-comment"># ===== 线性回归：一步梯度下降 =====</span>
+w, x_val, y = <span class="hl-number">0.5</span>, <span class="hl-number">2.0</span>, <span class="hl-number">1.0</span>
 
-<span class="hl-comment"># CDF 数值积分</span>
-xg = np.linspace(-<span class="hl-number">4</span>,<span class="hl-number">4</span>,<span class="hl-number">501</span>)
-cdf = np.cumsum(normal_pdf(xg,<span class="hl-number">0</span>,<span class="hl-number">1</span>)) * (xg[<span class="hl-number">1</span>]-xg[<span class="hl-number">0</span>])
-<span class="hl-builtin">print</span>(<span class="hl-string">f"F(-2)≈{cdf[125]:.4f} F(0)≈{cdf[250]:.4f} F(2)≈{cdf[375]:.4f}"</span>)</code></pre>
-<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
+<span class="hl-comment"># 前向：输入 → 预测 → 差值</span>
+pred = w * x_val               <span class="hl-comment"># 预测 = 0.5×2.0 = 1.0</span>
+L = (pred - y) ** <span class="hl-number">2</span>           <span class="hl-comment"># 差值的平方 = (1.0-1.0)² = 0.0</span>
+
+<span class="hl-comment"># 从外层往内层，用链式法则求 ∂L/∂w</span>
+dloss_dpred = <span class="hl-number">2</span> * (pred - y)  <span class="hl-comment"># 外层：∂L/∂pred</span>
+dpred_dw = x_val               <span class="hl-comment"># 内层：∂pred/∂w = x</span>
+dloss_dw = dloss_dpred * dpred_dw  <span class="hl-comment"># 链式！∂L/∂w</span>
+
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\nL={L:.3f}  ∂L/∂w={dloss_dw:.3f}"</span>)</code></pre>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
 
 <hr>
 <h2>💭 概念题</h2>
 <ol>
-<li>"取一个确定值的概率 = 0"但现实中气温 25°C 完全可以发生。用「针尖戳纸」的比喻解释为什么不矛盾。——考察：数学理想化 vs 测量精度</li>
-<li>从总面积 = 1 的硬约束出发：如果 σ 从 1 翻到 2，钟变胖了。峰值 f(0) 应该是原来的几分之几？——考察：归一化系数 1/(σ√2π) 的直觉</li>
-<li>为什么 68-95-99.7 不是线性？±3σ 为什么不等于 3×68.3%？用"钟的尾巴指数衰减"来解释。——考察：正态分布的尾部衰减速度</li>
-<li>均匀分布的 PDF 高度 c=1/(b-a) 是怎么推导出来的？——考察：总面积=1 的约束</li>
-<li>米粒堆山丘的比喻体现了哪个定理？列举两个深度学习中的实际应用。——考察：中心极限定理的理解与迁移</li>
+<li>用齿轮比喻解释：如果每一级齿轮的传动比都是 0.25（减速），100 级串联后，拧第一个齿轮 10000 圈，最后一个转几圈？——考察：连乘的指数衰减效应</li>
+<li>为什么求 $h(x)=f(g(x))$ 的导数时必须先算出 $g(x)$ 的值？用齿轮比喻：你必须知道第二个齿轮现在卡在哪个齿上，才能算这一级的传动比。——考察：复合函数求导的计算顺序</li>
+<li>$h(x) = (2x+1)^3$，用链式法则手算 $h'(x)$。先分别写出外导和内导，再乘起来。——考察：链式法则的手算练习</li>
 </ol>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-11/">← 00-11</a><a href="../../">📖 目录</a><a href="../00-13/">下一课 →</a></nav>
+<a href="../00-09/">← 00-09</a><a href="../../">📖 目录</a><a href="../00-11/">下一课 →</a></nav>
 </div></body></html>

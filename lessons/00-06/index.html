@@ -1,171 +1,213 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>00-06 导数与偏导数 · 深度学习数学</title>
-<link rel="stylesheet" href="../../css/style.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
-</head><body>
-<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-06</span>
-<span><a href="../00-05/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-07/">下一课 →</a></span></nav>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>00-06 SVD（上）：旋转→拉伸→旋转</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <span class="title">🧠 深度学习数学</span>
+  <a href="../../index.html">目录</a>
+</nav>
+
 <div class="container">
 
-<h1>00-06 导数与偏导数</h1>
+<p style="color:var(--text-light);font-size:0.9em">🌱 阶段 0 · 第 6 课</p>
+<h1>SVD（上）：旋转→拉伸→旋转</h1>
 
-<hr>
+<h2>一、特征值为什么不够用</h2>
 
-<h2>一、导数：山路的坡度</h2>
+<p>前面 00-05 学了特征值分解：</p>
 
-<p><strong>画面：</strong> 你开车走盘山公路。仪表盘上的坡度计指着 15°。如果你继续往前开 1 公里，高度大约会上升 $\tan(15°)\times 1\text{km} \approx 270\text{m}$。</p>
+$$A\mathbf{v} = \lambda \mathbf{v}$$
 
-<p>导数就是这个「坡度」——<strong>在某一点，你往前走一点点，高度变化的速率。</strong></p>
+<p><strong>方阵</strong> $A$ 对一个向量 $\mathbf{v}$ 变换后，方向不变，只拉伸 $\lambda$ 倍。很直观——但有个致命限制：<strong>$A$ 必须是方阵</strong>（正方形矩阵）。</p>
 
-$$f'(x) = \lim_{\epsilon \to 0} \frac{f(x+\epsilon) - f(x)}{\epsilon}$$
+<p>现实中的矩阵大多是<strong>长方形的</strong>：</p>
 
-<p><strong>逐符号拆开：</strong></p>
 <ul>
-  <li>$f(x+\epsilon)$：你现在在 $x$ 位置，往前走一丁点 $\epsilon$ 后到达的新位置上的函数值</li>
-  <li>$f(x+\epsilon) - f(x)$：往前走 $\epsilon$ 后，函数值变化了多少（上升、下降、或不变）</li>
-  <li>除以 $\epsilon$：归一化——不管走了多远，算出"每走 1 单位"的变化率</li>
-  <li>$\lim_{\epsilon \to 0}$：$\epsilon$ 无限趋近 0——我要的是<strong>这一点的瞬时坡度</strong>，不是一段路的平均坡度</li>
+  <li>数据矩阵：1000 个样本 × 50 个特征 → $1000 \times 50$，不是方阵</li>
+  <li>神经网络的权重：输入 784 维 → 隐藏层 256 维 → $256 \times 784$</li>
+  <li>词嵌入矩阵：50000 个词 × 300 维 → $50000 \times 300$</li>
 </ul>
 
-<p>回到开车的比喻：导数 &gt; 0 = 正在上坡（往前走高度会增加），导数 &lt; 0 = 正在下坡，导数 = 0 = 到了山顶或山谷（坡度为零）。</p>
+<p><strong>特征值分解对长方形矩阵直接失效。</strong>我们需要一个对所有形状矩阵都有效的"特征值"——这就是 SVD。</p>
 
-<figure><img src="assets/tangent_line.png" alt="导数=切线斜率"><figcaption>$f(x)$ 曲线上某一点的切线斜率就是该点的导数。切线越陡→导数越大。导数为 0 时切线水平→山顶或谷底。</figcaption></figure>
+<h2>二、SVD 的直觉：圆变椭圆</h2>
 
-<h3>从定义推导求导规则</h3>
+<p><strong>画面：</strong> 手里有一个橡皮圆。用矩阵 $A$ 变换它——圆被<strong>拉成椭圆</strong>。</p>
 
-<p>定义是好，但每次都用极限算太慢了。从定义出发，推几个最常用的规则。</p>
+<p>椭圆的<strong>长轴和短轴</strong>就是 SVD 的核心：</p>
 
-<p><strong>$f(x) = x^2$ 的导数。</strong> 代入定义：</p>
+<ul>
+  <li><strong>长轴方向</strong> = 变换后空间里的「最容易被拉伸的方向」</li>
+  <li><strong>短轴方向</strong> = 变换后空间里的「最不容易被拉伸的方向」</li>
+  <li><strong>拉伸倍数</strong> = 长轴的长度 ÷ 原来圆的半径</li>
+</ul>
 
-$$\begin{aligned}
-f'(x) &= \lim_{\epsilon \to 0} \frac{(x+\epsilon)^2 - x^2}{\epsilon} \\[4pt]
-&= \lim_{\epsilon \to 0} \frac{x^2 + 2x\epsilon + \epsilon^2 - x^2}{\epsilon} \\[4pt]
-&= \lim_{\epsilon \to 0} \frac{2x\epsilon + \epsilon^2}{\epsilon} = \lim_{\epsilon \to 0} (2x + \epsilon) = 2x
-\end{aligned}$$
+<p>这些信息合起来就是 SVD。对任意 $m \times n$ 矩阵 $A$：</p>
 
-<p>所以 $(x^2)' = 2x$。每步做了什么：① 展开平方 ② 消掉 $x^2$ ③ 提出 $\epsilon$ 消掉 ④ $\epsilon \to 0$ 时 $\epsilon$ 项消失。</p>
+$$A = U \Sigma V^T$$
 
-<p><strong>$f(x) = x^n$ 的通式（幂函数求导）：</strong> 同样的套路，展开 $(x+\epsilon)^n$ 用二项式定理，第一项 $x^n$ 消掉，$\epsilon$ 提出后剩下 $nx^{n-1}$。结果是：</p>
+<p>三个矩阵的职责：</p>
 
-$$\boxed{(x^n)' = n \cdot x^{n-1}}$$
+<table>
+  <tr><th>矩阵</th><th>形状</th><th>职责</th><th>画面</th></tr>
+  <tr>
+    <td>$V^T$</td><td>$n \times n$</td>
+    <td><strong>旋转输入空间</strong></td>
+    <td>把坐标轴转到"椭圆将要被拉伸的方向"</td>
+  </tr>
+  <tr>
+    <td>$\Sigma$</td><td>$m \times n$</td>
+    <td><strong>沿轴拉伸</strong></td>
+    <td>对角线上的 $\sigma_1, \sigma_2, \ldots$ 就是各方向的拉伸倍数</td>
+  </tr>
+  <tr>
+    <td>$U$</td><td>$m \times m$</td>
+    <td><strong>旋转输出空间</strong></td>
+    <td>把拉伸后的轴转到椭圆的实际方位</td>
+  </tr>
+</table>
 
-<p>例子：$(x^3)' = 3x^2$，$(x)' = 1 \cdot x^0 = 1$，$(5)' = 0$（常数斜率永远是 0——一条水平线没有坡度）。</p>
+<p><strong>三步走：</strong> ① 旋转（$V^T$）→ ② 拉伸（$\Sigma$）→ ③ 旋转（$U$）。</p>
+
+<p>这就是 SVD 的"旋转→拉伸→旋转"画面。任何线性变换都可以拆成这三步。</p>
+
+<h2>三、一个具体例子</h2>
+
+<p>取 $2 \times 2$ 矩阵（虽然 SVD 对长方形矩阵也有效，但正方形看图更直观）：</p>
+
+$$A = \begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix}$$
+
+<p>这个矩阵的 SVD 是：</p>
+
+$$U = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 & -1 \\ 1 & 1 \end{bmatrix}, \quad
+  \Sigma = \begin{bmatrix} 4 & 0 \\ 0 & 2 \end{bmatrix}, \quad
+  V^T = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 & 1 \\ -1 & 1 \end{bmatrix}$$
+
+<p>验证：$U \Sigma V^T = A$ 吗？</p>
+
+<pre><code><span class="hl-comment"># 00-06 SVD 验证 — 三步走：旋转→拉伸→旋转</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 原始矩阵 A</span>
+A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],
+              [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])
+
+<span class="hl-comment"># U: 左奇异向量矩阵（旋转输出空间，2×2）</span>
+<span class="hl-comment"># 每一列是 A 变换后空间里椭圆的长轴/短轴方向</span>
+U = np.array([[<span class="hl-number">1</span>, -<span class="hl-number">1</span>],
+              [<span class="hl-number">1</span>,  <span class="hl-number">1</span>]]) / np.sqrt(<span class="hl-number">2</span>)
+
+<span class="hl-comment"># Σ: 奇异值对角矩阵（拉伸倍数，2×2）</span>
+<span class="hl-comment"># σ₁=4 表示长轴方向拉伸 4 倍，σ₂=2 表示短轴方向拉伸 2 倍</span>
+Sigma = np.array([[<span class="hl-number">4</span>, <span class="hl-number">0</span>],
+                  [<span class="hl-number">0</span>, <span class="hl-number">2</span>]])
+
+<span class="hl-comment"># V^T: 右奇异向量矩阵的转置（旋转输入空间，2×2）</span>
+<span class="hl-comment"># 把原始坐标轴转到"即将被拉伸的方向"</span>
+VT = np.array([[<span class="hl-number">1</span>,  <span class="hl-number">1</span>],
+               [-<span class="hl-number">1</span>, <span class="hl-number">1</span>]]) / np.sqrt(<span class="hl-number">2</span>)
+
+<span class="hl-comment"># 三步合成：旋转(V^T) → 拉伸(Σ) → 旋转(U)</span>
+A_reconstructed = U @ Sigma @ VT   <span class="hl-comment"># @ 是矩阵乘法</span>
+
+<span class="hl-builtin">print</span>(<span class="hl-string">"原始 A =\n"</span>, A)
+<span class="hl-builtin">print</span>(<span class="hl-string">"\nU Σ V^T =\n"</span>, A_reconstructed)
+<span class="hl-builtin">print</span>(<span class="hl-string">"\n相等?"</span>, np.allclose(A, A_reconstructed))  <span class="hl-comment"># 比较浮点数</span>
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 
 <div class="callout callout-info">
-<strong>🔗 求和与常数倍的规则：</strong> 求导是线性运算。
-<ul>
-  <li>$(f+g)' = f' + g'$ —— 和的导数 = 导数之和</li>
-  <li>$(c \cdot f)' = c \cdot f'$ —— 常数可以提到外面</li>
-</ul>
-<p>这意味着 $(3x^2 + 2x + 5)' = 3 \cdot 2x + 2 \cdot 1 + 0 = 6x + 2$。逐项求导再拼起来就行。</p>
+<strong>U 和 V^T 是正交矩阵。</strong>正交矩阵的列（或行）互相垂直且长度都是 1。说白了就是<strong>纯旋转</strong>（或镜像），不改变向量的长度——只改变方向。$V^T$ 也是正交的，因为 $V^T V = I$。
 </div>
 
-<h3>代码验证：数值微分</h3>
+<h2>四、Σ 对角线上的数字——奇异值</h2>
 
-<p>定义里的 $\lim_{\epsilon \to 0}$ 在计算机上没法真正做到——但取一个很小的 $\epsilon$（比如 $10^{-5}$），差商 $\frac{f(x+\epsilon)-f(x)}{\epsilon}$ 会非常接近真实导数。这叫<strong>数值微分</strong>。</p>
+<p>$\Sigma$ 对角线上是<strong>奇异值</strong> $\sigma_1 \ge \sigma_2 \ge \ldots \ge \sigma_r > 0$：</p>
 
-<pre><code>import numpy as np
+$$\Sigma = \begin{bmatrix}
+\sigma_1 & 0 & \cdots & 0 \\
+0 & \sigma_2 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & \sigma_r
+\end{bmatrix}_{m \times n}$$
 
-def f(x):
-    """f(x) = x²"""
-    return x ** 2
+<p><strong>奇异值和特征值的关系：</strong> 对 $A^T A$（这一定是个对称方阵）做特征值分解，特征值的<strong>平方根</strong>就是奇异值：</p>
 
-def numerical_derivative(f, x, eps=1e-5):
-    """用定义算 f'(x)：取一个很小的 eps，算差商"""
-    return (f(x + eps) - f(x)) / eps  # (f(x+ε) - f(x)) / ε
+<pre><code><span class="hl-comment"># 验证：奇异值是 A^T A 特征值的平方根</span>
+ATA = A.T @ A                              <span class="hl-comment"># A^T A，对称方阵</span>
+eigenvalues, _ = np.linalg.eig(ATA)        <span class="hl-comment"># 特征值分解</span>
+singular_from_eig = np.sqrt(eigenvalues)   <span class="hl-comment"># 奇异值 = sqrt(特征值)</span>
+singular_from_eig = np.sort(singular_from_eig)[::-<span class="hl-number">1</span>] <span class="hl-comment"># 从大到小排序</span>
 
-# 在 x=1, 2, 3 处验证
-# 理论值：f'(x) = 2x
-for x in [1, 2, 3]:
-    num = numerical_derivative(f, x)   # 数值近似
-    exact = 2 * x                       # 理论值
-    print(f"f'({x})  数值={num:.6f}  理论={exact}  误差={abs(num-exact):.2e}")
+<span class="hl-comment"># numpy 直接算 SVD</span>
+U2, s2, VT2 = np.linalg.svd(A)             <span class="hl-comment"># np.linalg.svd 返回 U, s, V^T</span>
+                                            <span class="hl-comment"># s 是 1D 数组，不是对角矩阵</span>
 
-# 输出：
-# f'(1)  数值=2.000010  理论=2  误差=1.00e-05
-# f'(2)  数值=4.000010  理论=4  误差=1.00e-05
-# f'(3)  数值=6.000010  理论=6  误差=1.00e-05</code></pre>
+<span class="hl-builtin">print</span>(<span class="hl-string">"A^T A 特征值:"</span>, eigenvalues)
+<span class="hl-builtin">print</span>(<span class="hl-string">"sqrt(特征值) ="</span>, singular_from_eig)
+<span class="hl-builtin">print</span>(<span class="hl-string">"np.linalg.svd:"</span>, s2)
+<span class="hl-builtin">print</span>(<span class="hl-string">"一致?"</span>, np.allclose(singular_from_eig, s2))
+</code></pre>
 
-<p>误差约 $10^{-5}$——和 $\epsilon$ 同一量级。定义不是空洞的，是能在计算机上跑通的。</p>
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 
-<hr>
+<h2>五、奇异值的含义：各方向的"重要性"</h2>
 
-<h2>二、偏导数：只看一个踏板</h2>
+<p><strong>画面：</strong> 还是圆变椭圆。$\sigma_1=4$ 意味着长轴方向拉伸了 4 倍——这是矩阵 $A$「最敏感」的方向。$\sigma_2=2$ 拉伸 2 倍——次敏感方向。</p>
 
-<p>如果函数有两个输入 $f(x,y)$——就像开车同时有<strong>油门</strong>和<strong>方向盘</strong>。偏导数就是问：「我只踩油门（$x$ 变），方向盘不动（$y$ 不变），高度变化多快？」</p>
+<p>如果 $\sigma_3$ 很小（比如 0.01），那在第三个方向上几乎不拉伸——输入的微小变化在这个方向上被"压扁"了。这种方向在数据压缩时可以<strong>丢掉</strong>，对整体影响微乎其微。</p>
 
-<p>$$\frac{\partial f}{\partial x} = \lim_{\epsilon \to 0} \frac{f(x+\epsilon, y) - f(x, y)}{\epsilon}$$</p>
+<p>这就是 SVD 的威力：<strong>用奇异值的大小判断哪些方向重要、哪些可以忽略。</strong></p>
 
-<p>$\partial$（读作 "round d"）这个符号只是提醒你：不止一个变量，但我现在只看这一个。</p>
-
-<p><strong>偏导数的计算规则——简单到离谱：</strong> 对 $x$ 求偏导时，把 $y$ 当成常数就行（就像把 $y$ 当成数字 5）。</p>
-
-<p>例子：$f(x,y) = x^2 + 3xy + y^3$。</p>
-
+<div class="callout callout-tip">
+<strong>深度学习中的 SVD：</strong>
 <ul>
-  <li>对 $x$ 求偏导：$\frac{\partial f}{\partial x} = 2x + 3y + 0$。$y^3$ 看成常数 → 导数 = 0</li>
-  <li>对 $y$ 求偏导：$\frac{\partial f}{\partial y} = 0 + 3x + 3y^2$。$x^2$ 看成常数 → 导数 = 0</li>
+  <li><strong>PCA 降维</strong>：对数据中心化矩阵做 SVD，取前 k 个最大奇异值对应的方向 = 保留最重要的 k 个维度</li>
+  <li><strong>LoRA 微调</strong>：把权重更新 $\Delta W$ 分解为 $AB$，其中 $A$ 和 $B$ 是低秩矩阵——本质是只保留最大的几个奇异值对应的方向</li>
+  <li><strong>矩阵近似</strong>：只取前 k 个奇异值，就能得到原始矩阵的「最佳 k 秩近似」——下节课细讲</li>
 </ul>
-
-<h3>代码验证：偏导数数值计算</h3>
-
-<pre><code>import numpy as np
-
-def g(x, y):
-    """f(x,y) = x² + 3xy + y³"""
-    return x**2 + 3*x*y + y**3
-
-def partial_x(f, x, y, eps=1e-5):
-    """对 x 的偏导：只动 x，y 不动"""
-    return (f(x + eps, y) - f(x, y)) / eps
-
-def partial_y(f, x, y, eps=1e-5):
-    """对 y 的偏导：只动 y，x 不动"""
-    return (f(x, y + eps) - f(x, y)) / eps
-
-# 在点 (2, 3) 验证
-x0, y0 = 2.0, 3.0
-
-# 理论：∂f/∂x = 2x + 3y = 4 + 9 = 13
-# 理论：∂f/∂y = 3x + 3y² = 6 + 27 = 33
-px_num = partial_x(g, x0, y0)
-py_num = partial_y(g, x0, y0)
-print(f"∂f/∂x  数值={px_num:.6f}  理论=13")
-print(f"∂f/∂y  数值={py_num:.6f}  理论=33")</code></pre>
-
-<p>把 $y$ 当成常数——这个规则不是死记的，是「只动 $x$，$y$ 不动」这个定义的直接结果。</p>
-
-<hr>
-
-<h2>三、梯度：把所有偏导数打包</h2>
-
-<p>偏导数一个个算完之后，把它们装进一个向量里——这就是<strong>梯度</strong>：</p>
-
-$$\nabla f = \begin{bmatrix} \frac{\partial f}{\partial x} \\[4pt] \frac{\partial f}{\partial y} \end{bmatrix}$$
-
-<p>对 $f(x,y) = x^2 + 3xy + y^3$，梯度 = $\begin{bmatrix} 2x+3y \\ 3x+3y^2 \end{bmatrix}$。</p>
-
-<p>在点 $(2,3)$ 处，梯度 = $\begin{bmatrix} 13 \\ 33 \end{bmatrix}$。</p>
-
-<p>梯度的几何含义是下一课（00-07）的主题——这里先知道它就是把所有偏导打包成一个向量。</p>
-
-<hr>
+</div>
 
 <h2>💭 概念题</h2>
 
-<ol>
-<li>导数 $f'(3) = -2$ 意味着什么？在 $x=3$ 附近，$x$ 增大一点，$f(x)$ 会怎样变化？——考察：导数的符号含义</li>
-<li>$f(x) = 7$（常数函数）的导数是多少？从「坡度」的角度解释——考察：常数的导数为零的直觉</li>
-<li>对 $f(x,y) = x^2y + \sin(x)$，分别求 $\frac{\partial f}{\partial x}$ 和 $\frac{\partial f}{\partial y}$——考察：偏导数把另一变量当常数</li>
-</ol>
+<div class="exercise">
+<h3>1. SVD vs 特征值</h3>
+<p>特征值分解 $A = Q\Lambda Q^{-1}$ 和 SVD $A = U\Sigma V^T$ 最大的区别是什么？为什么 SVD 适用范围更广？</p>
+<p>——考察：SVD 对任意形状矩阵有效的原因</p>
+</div>
 
-<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
+<div class="exercise">
+<h3>2. 奇异值的意义</h3>
+<p>如果矩阵 $A$ 的奇异值分别是 100、3、0.002，用 A 去乘一个随机单位向量。结果向量的长度大概在什么范围？哪个方向上的输入对输出影响最大？</p>
+<p>——考察：奇异值=拉伸倍数、长短轴方向</p>
+</div>
 
-<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-05/">← 00-05</a><a href="../../">📖 目录</a><a href="../00-07/">下一课 →</a></nav>
-</div></body></html>
+<div class="exercise">
+<h3>3. 正交矩阵核查</h3>
+<p>上面例子中 $U$ 和 $V^T$ 都是正交矩阵。怎么验证它们真的是正交的？跑代码确认 $U^T U = I$ 和 $V^T V = I$。</p>
+<p>——考察：正交矩阵的定义</p>
+</div>
+
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  });
+</script>
+</body>
+</html>
