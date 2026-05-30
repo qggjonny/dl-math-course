@@ -86,22 +86,86 @@ $$\det(A) = a_{11}\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}
 <td>$\mathbf{v}_1$ 的 z 分量</td>
 <td>$\mathbf{v}_2,\mathbf{v}_3$ 的 xy 子块</td>
 <td>xy 平面的投影面积 × z 方向的高度</td>
-</tr>
+|</tr>
 </table>
-<p><strong>一句话：</strong> 三维体积 = 在三个坐标平面上各算一个底面积 × 对应方向的高度，带正负号加起来。每个 2×2 行列式 $ad-bc$ 你已经会算了——三维只是<strong>三个二维的组合</strong>。</p>
-<h3>降阶展开（拉普拉斯展开）——任意 n×n</h3>
-<div class="callout callout-info">
-<strong>🔑 核心洞察：</strong> 行列式有三个基本性质，这<strong>完全决定了</strong>它必须用降阶展开来计算：
+<p>但等等——<strong>为什么这样加起来就等于总体积？</strong> 这不是巧合，而是行列式三条基本性质的必然结果。下面一步步推出来。</p>
+
+<h3>推导：从"体积放大镜"到降阶展开</h3>
+
+<p>行列式有三个基本性质，它们<strong>完全决定了</strong>降阶展开的公式：</p>
+
 <ol>
-<li><strong>单位矩阵的行列式 = 1：</strong> $\det(I) = 1$，空间没被扭——体积不变。</li>
-<li><strong>交换两列，行列式变号：</strong> $\det([\mathbf{v}_1,\mathbf{v}_2]) = -\det([\mathbf{v}_2,\mathbf{v}_1])$——因为平行四边形被"翻了面"。</li>
-<li><strong>对每一列是线性的：</strong> 如果把 $\mathbf{v}_1$ 放大 $k$ 倍，体积也放大 $k$ 倍。如果把 $\mathbf{v}_1$ 拆成两个向量的和，体积等于分别算再相加。</li>
+<li><strong>$\det(I) = 1$：</strong> 单位矩阵的行列式 = 1，空间没被扭——体积不变。</li>
+<li><strong>交换两列，行列式变号：</strong> $\det([\mathbf{v}_1,\mathbf{v}_2,\mathbf{v}_3]) = -\det([\mathbf{v}_2,\mathbf{v}_1,\mathbf{v}_3])$——翻面了。</li>
+<li><strong>对每一列是线性的：</strong> $\mathbf{v}_1$ 放大 $k$ 倍，体积放大 $k$ 倍；$\mathbf{v}_1$ 拆成两个向量之和，体积等于分别算再加。</li>
 </ol>
-<p>从这三条出发，<strong>可以推出降阶展开不是"定义"，而是必然结论：</strong></p>
-<p>把第一列 $\mathbf{v}_1$ 写成三个标准基向量的组合：$\mathbf{v}_1 = a_{11}\mathbf{e}_1 + a_{21}\mathbf{e}_2 + a_{31}\mathbf{e}_3$。由线性性质（性质 3），行列式可以拆开：</p>
-$$\det(A) = a_{11}\det(\mathbf{e}_1, \mathbf{v}_2, \mathbf{v}_3) + a_{21}\det(\mathbf{e}_2, \mathbf{v}_2, \mathbf{v}_3) + a_{31}\det(\mathbf{e}_3, \mathbf{v}_2, \mathbf{v}_3)$$
-<p>每一项 $\det(\mathbf{e}_i, \mathbf{v}_2, \mathbf{v}_3)$（第一个向量是基向量，后两个照常）可以通过不断交换列（性质 2）整理成 $\pm$ 一个低阶行列式的形式。整理后第一列变成 $[1,0,0]^T$，去掉第一行第一列——<strong>自然就降阶了</strong>。</p>
-<p><strong>这个推导不靠死记——它从"行列式 = 体积放大镜"的几何直觉出发，借助三条基本性质，逐层降阶到你已经会算的 2×2。</strong></p>
+
+<p><strong>第 1 步——利用线性性质拆开第一列：</strong></p>
+
+<p>$\mathbf{v}_1$ 可以写成三个标准基向量的组合：</p>
+
+$$\mathbf{v}_1 = \begin{bmatrix} a_{11} \\ a_{21} \\ a_{31} \end{bmatrix}
+          = a_{11}\begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix}
+          + a_{21}\begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix}
+          + a_{31}\begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix}
+          = a_{11}\mathbf{e}_1 + a_{21}\mathbf{e}_2 + a_{31}\mathbf{e}_3$$
+
+<p>由线性性质（性质 3），行列式可以按第一列拆开：</p>
+
+$$\det(A) = \det(\mathbf{v}_1, \mathbf{v}_2, \mathbf{v}_3)
+          = a_{11}\det(\mathbf{e}_1, \mathbf{v}_2, \mathbf{v}_3)
+          + a_{21}\det(\mathbf{e}_2, \mathbf{v}_2, \mathbf{v}_3)
+          + a_{31}\det(\mathbf{e}_3, \mathbf{v}_2, \mathbf{v}_3)$$
+
+<p>三项分别是 $\mathbf{v}_1$ 的<strong>x、y、z 分量各自贡献的体积</strong>。这回答了"为什么三部分加起来就是总体积"——这就是线性性质的直接推论。</p>
+
+<p><strong>第 2 步——处理每一小项（以中间项为例，看负号从哪来）：</strong></p>
+
+<p>看 $a_{21}\det(\mathbf{e}_2, \mathbf{v}_2, \mathbf{v}_3)$。$\mathbf{e}_2 = [0,1,0]^T$，它在三列中排<strong>第一</strong>：</p>
+
+$$\det\left(\begin{bmatrix}0\\1\\0\end{bmatrix},
+            \begin{bmatrix}a_{12}\\a_{22}\\a_{32}\end{bmatrix},
+            \begin{bmatrix}a_{13}\\a_{23}\\a_{33}\end{bmatrix}\right)$$
+
+<p>我们要把这个整理成 $1\times($ 一个 2×2 行列式 $)$ 的形式。怎么做？<strong>交换列，把 $\mathbf{e}_2$ 挪到原本它该在的位置。</strong></p>
+
+<p>在第一项（$a_{11}$ 那项），$\mathbf{e}_1=[1,0,0]^T$ 排第一——它本来就是第一基向量，不需要交换。直接把第一行第一列去掉就行。</p>
+
+<p>但 $\mathbf{e}_2$ 是<strong>第二</strong>基向量！如果三列的顺序是 $(\mathbf{e}_2, \mathbf{v}_2, \mathbf{v}_3)$，中间那个 $\mathbf{v}_2$ 的"第二列"身份被 $\mathbf{e}_2$ 占着。还原到标准顺序需要<strong>一次交换</strong>：</p>
+
+$$\det(\mathbf{e}_2, \mathbf{v}_2, \mathbf{v}_3)
+  \;=\; -\det(\mathbf{v}_2, \mathbf{e}_2, \mathbf{v}_3)$$
+
+<p><strong>看！</strong> 交换一次，前面冒出一个负号——这就是表格里 $a_{12}$ 前面那个「$-$」的<strong>出处</strong>。它不是硬记的规则，而是 $\mathbf{e}_2$ 需要跨过 $\mathbf{v}_2$ 回到第二列的位置，跨一次 = 变一次号。</p>
+
+<p>现在 $\mathbf{e}_2$ 排第二了。把第二行第二列（只有 $[1]$）去掉，剩下：</p>
+
+$$-\det(\mathbf{v}_2^{\text{去第2行}}, \mathbf{v}_3^{\text{去第2行}})
+  = -\begin{vmatrix} a_{11} & a_{13} \\ a_{31} & a_{33} \end{vmatrix}$$
+
+<p>注意：$a_{21}\det(\mathbf{e}_2, \mathbf{v}_2, \mathbf{v}_3)$ 里前面的 $a_{21}$ 是 $\mathbf{v}_1$ 的 y 分量，但乘的 2×2 子式来自 $\mathbf{v}_2,\mathbf{v}_3$ 去掉第二行。对 $\mathbf{v}_2$ 去掉第二行 $a_{22}$ 后，剩 $a_{12}, a_{32}$；对 $\mathbf{v}_3$ 去掉第二行 $a_{23}$ 后，剩 $a_{13}, a_{33}$。</p>
+
+<p><strong>这就是表格里第二项的全部来历：$a_{21}$ ×（去掉第二行后的 2×2 行列式）×（交换一次导致的负号）。</strong> 负号不是额外加的，是走"列交换 → 符号翻转"这条规则自然冒出来的。</p>
+
+<p><strong>第 3 步——第一项和第三项同理：</strong></p>
+
+<ul>
+<li>$\det(\mathbf{e}_1, \mathbf{v}_2, \mathbf{v}_3)$：$\mathbf{e}_1$ 已在第一列，不需要交换 → 正号。去掉第一行第一列 → $\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}$</li>
+<li>$\det(\mathbf{e}_3, \mathbf{v}_2, \mathbf{v}_3)$：$\mathbf{e}_3$ 要跨过两列到第三位 → <strong>两次交换</strong>，$(-1)\times(-1)=+1$ → 正号。去掉第三行第三列 → $\begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}$</li>
+</ul>
+
+<p><strong>汇总——三个分量拼回总体积：</strong></p>
+
+$$\begin{aligned}
+\det(A) &= a_{11} \cdot (+\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix})  \quad \text{← x 分量，yz 平面投影面积} \\
+        &+ a_{21} \cdot (-\begin{vmatrix}a_{12}&a_{13}\\a_{32}&a_{33}\end{vmatrix})  \quad \text{← y 分量，xz 平面投影面积（交换一次得负）} \\
+        &+ a_{31} \cdot (+\begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix})  \quad \text{← z 分量，xy 平面投影面积}
+\end{aligned}$$
+
+<p><strong>总结：</strong> 降阶展开 = 把 $\mathbf{v}_1$ 拆成三个分量 × 各自方向上 $\mathbf{v}_2,\mathbf{v}_3$ 的投影面积，再根据"$\mathbf{e}_i$ 需要跨几列才能回到自己该待的位置"决定正负号。不是硬背公式——每一步都在做"体积 = 底面积 × 高度"，只是换了一个坐标系来量。</p>
+
+<div class="callout callout-info">
+<strong>📐 n×n 推广：</strong> 替换 $\mathbf{e}_1, \mathbf{e}_2, \mathbf{e}_3$ 的思路对任意 n 维适用。展开第 i 行第 j 列时，把第一列拆成 n 个基向量 → 每项交换列让基向量归位 → 符号 = $(-1)^{i+j}$（棋盘格，i+j 为偶数正、奇数负）→ 去掉第 i 行第 j 列 → 剩下 (n-1)×(n-1) 子式。一路递归到底层 2×2 的 $ad-bc$。
 </div>
 <p><strong>走一个例子：</strong></p>
 $$A = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix}$$
