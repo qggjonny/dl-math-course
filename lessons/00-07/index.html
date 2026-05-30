@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>00-07 SVD（下）：低秩近似与伪逆</title>
+  <title>00-07 SVD（下）：用奇异值压缩信息</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
@@ -19,166 +19,184 @@
 <div class="container">
 
 <p style="color:var(--text-light);font-size:0.9em">🌱 阶段 0 · 第 7 课</p>
-<h1>SVD（下）：低秩近似与伪逆</h1>
+<h1>SVD（下）：用奇异值压缩信息</h1>
 
-<h2>一、截断 SVD：扔掉不重要的部分</h2>
+<h2>一、回忆：SVD 把矩阵拆成"图层"</h2>
 
-<p><strong>画面：</strong> 上节课讲的圆变椭圆。如果椭圆某个轴的方向拉伸倍数极小（$\sigma \approx 0$），那个方向上的信息几乎被压扁了——<strong>扔掉它对整体影响微乎其微</strong>。</p>
+<p>上节课得到的 SVD 公式：</p>
 
-<p>把 SVD 展开写：</p>
+$$A = U \Sigma V^T$$
 
-$$A = U\Sigma V^T = \sum_{i=1}^r \sigma_i \,\mathbf{u}_i \mathbf{v}_i^T$$
+<p>如果我们把 $U$ 的列记作 $\mathbf{u}_1, \mathbf{u}_2$，$V^T$ 的行记作 $\mathbf{v}_1^T, \mathbf{v}_2^T$，$\Sigma$ 对角线上的奇异值记作 $\sigma_1, \sigma_2$，那么 SVD 可以<strong>逐项展开</strong>写：</p>
 
-<p>其中 $r$ 是非零奇异值的个数（矩阵的<strong>秩</strong>）。每一项 $\sigma_i \mathbf{u}_i \mathbf{v}_i^T$ 是一个<strong>秩为 1 的矩阵</strong>——可以理解为一张"图层"。</p>
+$$A = \sigma_1 \cdot \mathbf{u}_1 \mathbf{v}_1^T \;+\; \sigma_2 \cdot \mathbf{u}_2 \mathbf{v}_2^T$$
 
-<p>如果只保留前 $k$ 个最大的奇异值：</p>
+<p>每一项 $\sigma_i \mathbf{u}_i \mathbf{v}_i^T$ 是一个 $2\times 2$ 矩阵（$\mathbf{u}_i$ 是 $2\times 1$ 列向量，$\mathbf{v}_i^T$ 是 $1\times 2$ 行向量，外积得到 $2\times 2$）。可以理解为一张<strong>"图层"</strong>——$\sigma_i$ 越大，这层贡献越大。</p>
 
-$$A_k = \sum_{i=1}^k \sigma_i \,\mathbf{u}_i \mathbf{v}_i^T$$
-
-<p>$A_k$ 是 $A$ 的<strong>最佳 $k$ 秩近似</strong>——在所有秩 ≤ $k$ 的矩阵中，$A_k$ 和原矩阵的误差最小。（这就是 Eckart–Young 定理）</p>
-
-<div class="callout callout-info">
-<strong>类比：</strong> 就像用三原色画一幅画。相比 256 色调色板，只用红黄蓝三种颜料损失了很多细节——但画面的大致色调还在。奇异值最大的那几个方向就是"最重要的颜料"。
-</div>
-
-<h2>二、图像压缩：眼见为实</h2>
-
-<p>用一张灰度图来展示截断 SVD 的效果。灰度图就是一个矩阵——每个元素是像素灰度值（0~255）。</p>
-
-<pre><code><span class="hl-comment"># 00-07 图像 SVD 压缩 — 只用前 k 个奇异值重建图像</span>
+<pre><code><span class="hl-comment"># 00-07 第一步：把 SVD 展开，看每一项（每一层）长什么样</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
-<span class="hl-comment"># 生成一个"玩具图像"：10×10 的十字图案</span>
-<span class="hl-comment"># 实际应用中可以用 plt.imread 读真实图像</span>
-img = np.zeros((<span class="hl-number">10</span>, <span class="hl-number">10</span>))            <span class="hl-comment"># 10×10 全零矩阵（黑色）</span>
-img[<span class="hl-number">4</span>:<span class="hl-number">6</span>, :] = <span class="hl-number">1.0</span>                   <span class="hl-comment"># 中间两行设为白色（水平线）</span>
-img[:, <span class="hl-number">4</span>:<span class="hl-number">6</span>] = <span class="hl-number">1.0</span>                   <span class="hl-comment"># 中间两列设为白色（竖直线）</span>
-                                       <span class="hl-comment"># 结果：一个白色十字架图案</span>
+A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],
+              [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])
 
-<span class="hl-comment"># SVD 分解</span>
-U, s, VT = np.linalg.svd(img)          <span class="hl-comment"># s 是 1D 奇异值数组，从大到小排列</span>
+U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># U(2×2), s=[σ₁,σ₂], VT(2×2)</span>
 
-<span class="hl-builtin">print</span>(<span class="hl-string">"奇异值:"</span>, np.round(s, <span class="hl-number">2</span>))
-<span class="hl-builtin">print</span>(<span class="hl-string">"非零奇异值个数 ="</span>, np.sum(s > <span class="hl-number">1e-10</span>))
+<span class="hl-builtin">print</span>(<span class="hl-string">"原始矩阵 A:"</span>)
+<span class="hl-builtin">print</span>(A)
 
-<span class="hl-comment"># 只用前 k 个奇异值重建</span>
-<span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>, <span class="hl-number">5</span>]:
-    <span class="hl-comment"># A_k = sum_{i=0}^{k-1} σᵢ · uᵢ · vᵢ^T</span>
-    <span class="hl-comment"># np.outer(a, b) 计算 a 和 b 的外积 a b^T</span>
-    A_k = <span class="hl-builtin">sum</span>(s[i] * np.outer(U[:, i], VT[i, :])
-               <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(k))
-    
-    <span class="hl-comment"># 计算重建误差（Frobenius 范数）</span>
-    error = np.linalg.norm(img - A_k)   <span class="hl-comment"># 默认就是 Frobenius 范数</span>
-    
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"\nk={k}:"</span>)
-    <span class="hl-builtin">print</span>(np.round(A_k, <span class="hl-number">1</span>))
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"误差: {error:.3f}"</span>)
+<span class="hl-comment"># 逐层拆开</span>
+<span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-builtin">len</span>(s)):
+    <span class="hl-comment"># 第 i 层: σᵢ · uᵢ · vᵢ^T</span>
+    <span class="hl-comment"># np.outer(a, b) = a @ b^T → 外积 得到矩阵</span>
+    layer = s[i] * np.outer(U[:, i], VT[i, :])
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"\n第 {i+1} 层 (σ={s[i]:.1f}):"</span>)
+    <span class="hl-builtin">print</span>(layer)
+
+<span class="hl-comment"># 验证：两层加起来 = A</span>
+reconstructed = s[<span class="hl-number">0</span>]*np.outer(U[:,<span class="hl-number">0</span>], VT[<span class="hl-number">0</span>,:]) + \
+               s[<span class="hl-number">1</span>]*np.outer(U[:,<span class="hl-number">1</span>], VT[<span class="hl-number">1</span>,:])
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n两层之和:\n{reconstructed}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"等于 A？ {np.allclose(A, reconstructed)}"</span>)
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 
-<p>运行就能看到：只用 2 个奇异值，十字架的大致轮廓就恢复了；用 3 个，几乎完美。而原图有 9 个非零奇异值——<strong>前 3 个就携带了绝大部分信息。</strong></p>
+<h2>二、扔掉小奇异值——只用一层</h2>
 
-<h2>三、伪逆：长方形矩阵怎么"求逆"</h2>
+<p>$\sigma_1 = 4$，$\sigma_2 = 2$。第一层贡献大，第二层贡献小。如果<strong>只用第一层</strong>（扔掉第二层），结果差多少？</p>
 
-<p><strong>问题：</strong> 只有方阵才有逆矩阵。长方形的 $A$（比如 $3 \times 2$）不能直接求逆。但很多时候我们需要解 $A\mathbf{x} = \mathbf{b}$——比如线性回归里找最小二乘解。</p>
+<pre><code><span class="hl-comment"># 00-07 第二步：只用最大的奇异值重建——看看误差多大</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
-<p><strong>答案：伪逆</strong> $A^+$（读作"A dagger"），通过 SVD 定义：</p>
+A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],
+              [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])
+U, s, VT = np.linalg.svd(A)
+
+<span class="hl-comment"># 只用 k=1 个最大奇异值</span>
+k = <span class="hl-number">1</span>
+A_1 = <span class="hl-builtin">sum</span>(s[i] * np.outer(U[:, i], VT[i, :])
+          <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(k))
+
+error = np.linalg.norm(A - A_1, <span class="hl-string">'fro'</span>)      <span class="hl-comment"># Frobenius 范数 = 所有元素平方和的根</span>
+                                            <span class="hl-comment"># 用来衡量两个矩阵之间的"距离"</span>
+
+<span class="hl-builtin">print</span>(<span class="hl-string">f"只用 {k} 个奇异值重建:"</span>)
+<span class="hl-builtin">print</span>(A_1)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n原始 A:"</span>)
+<span class="hl-builtin">print</span>(A)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n误差 = {error:.3f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"相对误差 = {error / np.linalg.norm(A, 'fro') * 100:.1f}%"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<p>只用 1 个奇异值（丢掉了一半信息），误差约 40%。不算小——但这个思路在<strong>更大的矩阵</strong>上威力巨大。如果一个矩阵有 100 个奇异值、只有前 5 个比较大，丢掉后 95 个可能只损失 1%。</p>
+
+<h2>三、更大的例子：5×3 矩阵</h2>
+
+<pre><code><span class="hl-comment"># 00-07 第三步：5×3 矩阵，用前 k 个奇异值重建</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+np.random.seed(<span class="hl-number">42</span>)
+<span class="hl-comment"># 生成一个"接近低秩"的 5×3 矩阵：前两列相关</span>
+A = np.random.randn(<span class="hl-number">5</span>, <span class="hl-number">3</span>)             <span class="hl-comment"># 5×3 随机矩阵</span>
+A[:, <span class="hl-number">2</span>] = A[:, <span class="hl-number">0</span>] * <span class="hl-number">0.5</span> + A[:, <span class="hl-number">1</span>] * <span class="hl-number">0.3</span>  <span class="hl-comment"># 第3列 ≈ 前两列的线性组合</span>
+                                       <span class="hl-comment"># 这样第3个奇异值会很小</span>
+
+U, s, VT = np.linalg.svd(A)
+
+<span class="hl-builtin">print</span>(<span class="hl-string">f"A 形状: {A.shape}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"奇异值: σ₁={s[0]:.3f}, σ₂={s[1]:.3f}, σ₃={s[2]:.3f}"</span>)
+<span class="hl-builtin">print</span>()
+<span class="hl-builtin">print</span>(<span class="hl-string">"原始 A:"</span>)
+<span class="hl-builtin">print</span>(np.round(A, <span class="hl-number">3</span>))
+
+<span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>]:
+    <span class="hl-comment"># A_k = Σ_{i=0}^{k-1} σᵢ uᵢ vᵢ^T</span>
+    A_k = <span class="hl-builtin">sum</span>(s[i] * np.outer(U[:, i], VT[i, :])
+              <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(k))
+    error = np.linalg.norm(A - A_k, <span class="hl-string">'fro'</span>)
+    rel_err = error / np.linalg.norm(A, <span class="hl-string">'fro'</span>) * <span class="hl-number">100</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"\nk={k}: 误差={error:.3f}, 相对={rel_err:.1f}%"</span>)
+    <span class="hl-builtin">print</span>(np.round(A_k, <span class="hl-number">3</span>))
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<p>第三个奇异值很小（因为我们故意让第三列 ≈ 前两列的线性组合）。只用前 2 个奇异值重建，误差可能不到 1%——<strong>15 个数字的矩阵，用 10 个数字的"压缩版"几乎无损恢复。</strong></p>
+
+<h2>四、伪逆——长方形矩阵的"逆"</h2>
+
+<p>$A$ 是 $m \times n$ 长方形矩阵时，不能求 $A^{-1}$（只有方阵才有逆）。但 SVD 可以构造一个<strong>"最接近逆的东西"</strong>——伪逆 $A^+$：</p>
 
 $$A^+ = V \Sigma^+ U^T$$
 
-<p>其中 $\Sigma^+$ 是把 $\Sigma$ 的所有<strong>非零奇异值取倒数</strong>，然后转置：</p>
+<p>其中 $\Sigma^+$ 是<strong>把非零奇异值取倒数然后转置</strong>。</p>
 
-$$\Sigma = \begin{bmatrix} \sigma_1 & 0 \\ 0 & \sigma_2 \\ 0 & 0 \end{bmatrix}_{3\times2}
-\quad\Longrightarrow\quad
-\Sigma^+ = \begin{bmatrix} 1/\sigma_1 & 0 & 0 \\ 0 & 1/\sigma_2 & 0 \end{bmatrix}_{2\times3}$$
+<p>举个例子立即就清楚了：</p>
 
-<pre><code><span class="hl-comment"># 00-07 伪逆 — 长方形矩阵的"逆"</span>
+<pre><code><span class="hl-comment"># 00-07 第四步：伪逆 — 手搓 vs 内置</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
-<span class="hl-comment"># 3×2 长方形矩阵，列数 > 行数时方程可能无解</span>
-<span class="hl-comment"># 但伪逆给出最小二乘解：min ||Ax - b||</span>
-A = np.array([[<span class="hl-number">1</span>, <span class="hl-number">2</span>],
+A = np.array([[<span class="hl-number">1</span>, <span class="hl-number">2</span>],             <span class="hl-comment"># 3×2 长方形矩阵</span>
               [<span class="hl-number">3</span>, <span class="hl-number">4</span>],
               [<span class="hl-number">5</span>, <span class="hl-number">6</span>]])
 
-b = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>])         <span class="hl-comment"># 目标向量</span>
+<span class="hl-comment"># 方法1: numpy 内置</span>
+A_plus_np = np.linalg.pinv(A)              <span class="hl-comment"># 伪逆，返回 2×3</span>
 
-<span class="hl-comment"># 方法1：numpy 内置</span>
-x_pinv = np.linalg.pinv(A) @ b         <span class="hl-comment"># pinv 返回伪逆 A^+</span>
+<span class="hl-comment"># 方法2: 用 SVD 手搓</span>
+U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># U:3×3, s:[σ₁,σ₂], VT:2×2</span>
 
-<span class="hl-comment"># 方法2：手搓 SVD 伪逆</span>
-U, s, VT = np.linalg.svd(A)             <span class="hl-comment"># U:3×3, s:[σ₁,σ₂], VT:2×2</span>
-r = np.<span class="hl-builtin">sum</span>(s > <span class="hl-number">1e-10</span>)                    <span class="hl-comment"># 非零奇异值个数</span>
-S_inv = np.diag(<span class="hl-number">1.0</span> / s[:r])            <span class="hl-comment"># Σ⁺ 的核心：非零奇异值取倒数</span>
-                                        <span class="hl-comment"># diag 把 1D 数组变成对角矩阵</span>
-S_inv_full = np.zeros((<span class="hl-number">2</span>, <span class="hl-number">3</span>))          <span class="hl-comment"># Σ⁺ 是 2×3（Σ 是 3×2）</span>
-S_inv_full[:r, :r] = S_inv              <span class="hl-comment"># 非零部分填入</span>
-A_plus = VT.T @ S_inv_full @ U.T        <span class="hl-comment"># A⁺ = V Σ⁺ U^T</span>
-                                       <span class="hl-comment"># VT.T = V, U.T = U^T</span>
+<span class="hl-comment"># 构造 Σ⁺：先取倒数，再转置</span>
+sigma_inv = np.diag(<span class="hl-number">1.0</span> / s)              <span class="hl-comment"># 2×2 对角矩阵 [[1/σ₁, 0], [0, 1/σ₂]]</span>
+sigma_plus = np.zeros((<span class="hl-number">2</span>, <span class="hl-number">3</span>))           <span class="hl-comment"># Σ⁺ 是 2×3（Σ 原来是 3×2）</span>
+sigma_plus[:<span class="hl-number">2</span>, :<span class="hl-number">2</span>] = sigma_inv            <span class="hl-comment"># 填入 1/σᵢ</span>
 
-x_manual = A_plus @ b                   <span class="hl-comment"># 解 A⁺ b</span>
+A_plus_manual = VT.T @ sigma_plus @ U.T   <span class="hl-comment"># V Σ⁺ U^T = A⁺</span>
 
-<span class="hl-builtin">print</span>(<span class="hl-string">"numpy pinv:"</span>, x_pinv)
-<span class="hl-builtin">print</span>(<span class="hl-string">"手搓 SVD:"</span>, x_manual)
-<span class="hl-builtin">print</span>(<span class="hl-string">"一致?"</span>, np.allclose(x_pinv, x_manual))
+<span class="hl-builtin">print</span>(<span class="hl-string">"numpy pinv:\n"</span>, np.round(A_plus_np, <span class="hl-number">4</span>))
+<span class="hl-builtin">print</span>(<span class="hl-string">"\n手搓:\n"</span>, np.round(A_plus_manual, <span class="hl-number">4</span>))
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n一致？ {np.allclose(A_plus_np, A_plus_manual)}"</span>)
 
-<span class="hl-comment"># 验证：Ax 应该尽量接近 b（最小二乘意义下）</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">"\nAx ="</span>, A @ x_pinv)
-<span class="hl-builtin">print</span>(<span class="hl-string">"b  ="</span>, b)
-<span class="hl-builtin">print</span>(<span class="hl-string">"||Ax-b|| ="</span>, np.linalg.norm(A @ x_pinv - b))
+<span class="hl-comment"># 伪逆有什么用？解 Ax = b：</span>
+b = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>])
+x = A_plus_np @ b                          <span class="hl-comment"># x = A⁺ b，这是最小二乘解</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n解 Ax ≈ b: x = {np.round(x, 4)}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"验证 Ax = {np.round(A @ x, 4)}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"目标 b = {b}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"||Ax-b|| = {np.linalg.norm(A @ x - b):.4f}"</span>)
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 
-<h2>四、伪逆和最小二乘</h2>
+<p>伪逆的本质是：<strong>把非零奇异值取倒数</strong>——因为 SVD 告诉我们 $A$ 在这些方向上拉伸了 $\sigma$ 倍，要"撤销"这个拉伸，就除以 $\sigma$。</p>
 
-<p>对 $A\mathbf{x} = \mathbf{b}$（$A$ 是 $m \times n$），分两种情况：</p>
-
-<table>
-  <tr><th>情况</th><th>方程数</th><th>解的性质</th></tr>
-  <tr>
-    <td>$m > n$（高瘦矩阵）</td>
-    <td>方程多于未知数</td>
-    <td>一般无精确解。伪逆给出<strong>最小二乘解</strong>：$\min \|A\mathbf{x} - \mathbf{b}\|$</td>
-  </tr>
-  <tr>
-    <td>$m < n$（矮胖矩阵）</td>
-    <td>未知数多于方程</td>
-    <td>无穷多解。伪逆给出<strong>最小范数解</strong>：所有解中 $\|\mathbf{x}\|$ 最小的那个</td>
-  </tr>
-</table>
-
-<p>线性回归就是第一种情况：样本数 >> 特征数，用伪逆找最小二乘拟合。</p>
-
-<div class="callout callout-tip">
-<strong>截断 SVD 在深度学习中的应用：</strong>
-<ul>
-  <li><strong>LoRA</strong>：不更新整个权重矩阵 $W$，而是加一个低秩增量 $\Delta W = BA$，只训练 $A$ 和 $B$。本质：假设更新只在最大的几个奇异值方向上</li>
-  <li><strong>模型压缩</strong>：对全连接层的权重做 SVD，只保留前 k 个奇异值——压缩 10 倍但精度损失 < 1%</li>
-  <li><strong>权重初始化</strong>：一些方法用 SVD 初始化权重，确保初始时各方向拉伸均匀</li>
-</ul>
+<div class="callout callout-info">
+<strong>伪逆和最小二乘：</strong><br>
+方程 $A\mathbf{x} = \mathbf{b}$（$A$ 是 $3\times 2$，3 个方程 2 个未知数）一般无解。<br>
+$\mathbf{x} = A^+ \mathbf{b}$ 给出的是<strong>最接近的近似解</strong>——让 $\|A\mathbf{x} - \mathbf{b}\|$ 最小。<br>
+这就是<strong>最小二乘</strong>。线性回归本质上就是在做这件事。
 </div>
 
 <h2>💭 概念题</h2>
 
 <div class="exercise">
 <h3>1. 截断的直觉</h3>
-<p>一张 1000×1000 的灰度图像，SVD 后有 500 个非零奇异值。只保留前 20 个重建，图像看起来模糊但轮廓清晰。为什么前 20 个奇异值能保留主要的视觉信息？后面 480 个奇异值携带了什么？</p>
-<p>——考察：奇异值大小 = 信息重要性、截断 = 丢弃细节保留结构</p>
+<p>一个 100×100 的矩阵有 80 个非零奇异值。只保留前 5 个重建，误差 0.3%。这说明什么？后 75 个奇异值大概多小？</p>
+<p>——考察：奇异值衰减速度 = 矩阵"低秩程度"</p>
 </div>
 
 <div class="exercise">
 <h3>2. 伪逆 vs 普通逆</h3>
-<p>如果 $A$ 是 $n \times n$ 可逆方阵，$A^+$ 和 $A^{-1}$ 是什么关系？用 SVD 验证：当所有奇异值都非零且 $A$ 是方阵时，$A^+ = A^{-1}$。</p>
+<p>$A$ 是 $2\times 2$ 可逆方阵。用 SVD 证明 $A^+ = A^{-1}$。（提示：$A = U\Sigma V^T$，所以 $A^{-1} = V\Sigma^{-1} U^T$）</p>
 <p>——考察：伪逆是普通逆的推广</p>
 </div>
 
 <div class="exercise">
-<h3>3. 秩和奇异值</h3>
-<p>一个 $5 \times 5$ 矩阵只有 3 个非零奇异值。这个矩阵的秩是多少？用 numpy 生成一个秩为 3 的矩阵，验证 `np.linalg.matrix_rank(A)` 和非零奇异值个数一致。</p>
-<p>——考察：秩 = 非零奇异值个数</p>
+<h3>3. 秩和零奇异值</h3>
+<p>如果 $A$ 是 $5 \times 5$ 矩阵，`np.linalg.svd` 返回的奇异值中有一个是 0（或极接近 0）。$A$ 的秩是多少？`np.linalg.matrix_rank(A)` 会返回什么？验证代码。</p>
+<p>——考察：秩 = 非零奇异值的个数</p>
 </div>
 
 </div>
