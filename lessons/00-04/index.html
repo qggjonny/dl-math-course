@@ -6,158 +6,141 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 </head><body>
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-04</span>
 <span><a href="../00-03/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-05/">下一课 →</a></span></nav>
 <div class="container">
-
 <h1>00-04 行列式</h1>
-
 <hr>
-
 <h2>矩阵对空间做了什么</h2>
-
 <p>00-01 学过：矩阵是一本"操作手册"——把一个向量扭成另一个向量。现在把这个想法放大：<strong>矩阵不只是扭一个箭头，它扭的是整个空间。</strong></p>
-
 <p><strong>画面：</strong> 想象桌面上铺了一张方格坐标纸。矩阵 $A$ 就是一只无形的手——它把整张纸抓住，<strong>扯一扯、扭一扭</strong>。纸上的每个点都被拉到了新位置。</p>
-
 <p>我们来看矩阵 $A = \begin{bmatrix} 2 & 1 \\ 0 & 1 \end{bmatrix}$ 对空间做了什么。取四个特殊点——单位正方形的四个角：</p>
-
 $$
 (0,0) \rightarrow (0,0) \qquad
 (1,0) \rightarrow (2,0) \qquad
 (0,1) \rightarrow (1,1) \qquad
 (1,1) \rightarrow (3,1)
 $$
-
 <p>正方形被<strong>推歪了</strong>，变成了一个平行四边形。原来的面积是 1，现在的面积是多少？这就是<strong>行列式</strong>要回答的问题。</p>
-
 <h3>行列式：面积放大镜</h3>
-
 <p><strong>画面：</strong> 矩阵把单位正方形（面积=1）扭成了平行四边形。行列式 $\det(A)$ 就是这个平行四边形的面积——也就是<strong>面积放大了几倍</strong>。</p>
-
 <p>对 2×2 矩阵 $\begin{bmatrix} a & b \\ c & d \end{bmatrix}$：</p>
-
 $$\det(A) = ad - bc$$
-
 <h4>🧮 推导：为什么是 ad−bc？——纯几何证明</h4>
-
 <p>把矩阵的两列看作两个向量：</p>
-
 $$\mathbf{v}_1 = \begin{bmatrix} a \\ c \end{bmatrix}, \quad
-  \mathbf{v}_2 = \begin{bmatrix} b \\ d \end{bmatrix}$$
-
+\mathbf{v}_2 = \begin{bmatrix} b \\ d \end{bmatrix}$$
 <p>矩阵作用在单位正方形上：第一列 $\mathbf{v}_1$ 就是原来 $(1,0)$ 被扭到的新位置，第二列 $\mathbf{v}_2$ 就是原来 $(0,1)$ 被扭到的新位置。所以变换后的平行四边形 <strong>就是 $\mathbf{v}_1$ 和 $\mathbf{v}_2$ 张成的平行四边形</strong>。</p>
-
 <p>怎么求这个平行四边形的面积？<strong>底 × 高。</strong></p>
-
 <p><strong>第 1 步——底：</strong> 以 $\mathbf{v}_1$ 为底。$\mathbf{v}_1 = (a, c)$，底长 = $\sqrt{a^2 + c^2}$（勾股定理）。</p>
-
 <p><strong>第 2 步——高：</strong> $\mathbf{v}_1$ 所在直线过原点，法向量 $(c, -a)$，直线方程 $cx - ay = 0$。$\mathbf{v}_2$ 的终点 $(b, d)$ 到这条直线的距离（点到直线距离公式）：</p>
-
 $$\text{高} = \frac{|c \cdot b - a \cdot d|}{\sqrt{a^2 + c^2}} = \frac{|ad - bc|}{\sqrt{a^2 + c^2}}$$
-
 <p>（分子取绝对值因为距离非负，分母 $\sqrt{a^2 + c^2}$ 是法向量的长度。）</p>
-
 <p><strong>第 3 步——底 × 高：</strong></p>
-
 $$\text{面积} = \cancel{\sqrt{a^2 + c^2}} \cdot \frac{|ad - bc|}{\cancel{\sqrt{a^2 + c^2}}} = |ad - bc|$$
-
 <p><strong>两个根号恰好消掉！</strong> $ad-bc$ 自然出现，不是硬凑的公式。</p>
-
 <figure><img src="assets/det_parallelogram.png" alt="平行四边形面积 = 底×高"><figcaption>$\mathbf{v}_1$ 做底，$\mathbf{v}_2$ 的终点到 $\mathbf{v}_1$ 所在直线的垂直距离为高。底×高 = $|ad-bc|$</figcaption></figure>
-
 <p><strong>符号的含义：</strong> 去掉绝对值，$ad - bc$ 的正负号表示 $\mathbf{v}_1$ 到 $\mathbf{v}_2$ 的<strong>旋转方向</strong>——逆时针为正（$ad-bc > 0$），顺时针为负（$ad-bc < 0$）。所以行列式是<strong>有向面积</strong>。</p>
-
 <div class="callout callout-info">
 <strong>🔲 直观证明——矩形减法：</strong> 不用点到直线距离，也可以用纯几何来验证。把平行四边形框在一个大矩形里（宽 $a+b$，高 $c+d$），面积 = $(a+b)(c+d) = ac + ad + bc + bd$。多余的部分由<strong>两个小矩形 + 四个小三角形</strong>组成（像剪纸一样，沿着平行四边形的边剪掉多余部分）：
-
 <ul>
-  <li>2 个三角形 $\frac{1}{2}ac$（上下各一个）→ 合计 $ac$</li>
-  <li>2 个<strong>矩形</strong> $bc$（左右各一个）→ 合计 $2bc$</li>
-  <li>2 个三角形 $\frac{1}{2}bd$（左右各一个）→ 合计 $bd$</li>
+<li>2 个三角形 $\frac{1}{2}ac$（上下各一个）→ 合计 $ac$</li>
+<li>2 个<strong>矩形</strong> $bc$（左右各一个）→ 合计 $2bc$</li>
+<li>2 个三角形 $\frac{1}{2}bd$（左右各一个）→ 合计 $bd$</li>
 </ul>
-
 <p>减掉：$(ac + ad + bc + bd) - (ac + 2bc + bd) = ad - bc$。多余部分恰好消掉，剩下 $ad-bc$。两种方法殊途同归：底×高最快，矩形减法最直观。</p>
 </div>
-
 <p>刚才那个矩阵：$\det = 2\times1 - 1\times0 = 2$。面积放大了 2 倍。</p>
-
 <p>行列式 <strong>= 0</strong> 意味着什么？正方形成了<strong>一条线</strong>——面积=0，信息丢了一维。行列式 <strong>= 负数</strong> 意味着空间被<strong>翻转</strong>了（像把纸翻到背面）。</p>
-
-<h3>3×3 行列式的定义——降阶展开</h3>
-
-<p>行列式是一个<strong>从方阵到数字的函数</strong>：喂给它一个 n×n 方阵，吐出一个数。2×2 的定义你已经会了：$ad-bc$。</p>
-
-<p><strong>3×3 怎么定义？</strong> 方法是<strong>降阶展开</strong>（拉普拉斯展开）：把 3×3 拆成几个 2×2 来算——3×3 的定义建立在 2×2 之上。</p>
-
-<p>沿第一行展开：每个元素 × 删掉它所在行和列后剩下的 2×2 行列式，再带上交替的正负号（位置 $(i,j)$ 的符号 = $(-1)^{i+j}$，棋盘格）：</p>
-
-$$
-\det\begin{bmatrix} a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \\ a_{31} & a_{32} & a_{33} \end{bmatrix}
-= a_{11}\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}
+<h3>3×3 行列式——体积放大镜（三维版）</h3>
+<p>2×2 矩阵两列是两个向量，张成一个平行四边形——行列式 = 面积。3×3 矩阵三列是<strong>三个向量</strong>：</p>
+$$\mathbf{v}_1 = \begin{bmatrix} a_{11} \\ a_{21} \\ a_{31} \end{bmatrix},\quad
+\mathbf{v}_2 = \begin{bmatrix} a_{12} \\ a_{22} \\ a_{32} \end{bmatrix},\quad
+\mathbf{v}_3 = \begin{bmatrix} a_{13} \\ a_{23} \\ a_{33} \end{bmatrix}$$
+<p>这三个向量张成一个<strong>平行六面体</strong>（一个被"推歪了"的立方体）。行列式 = 这个平行六面体的<strong>有向体积</strong>——空间被放大了几倍。</p>
+<p><strong>怎么算这个体积？</strong> 把三维体积拆成二维面积的组合。</p>
+<p><strong>画面：</strong> 把 $\mathbf{v}_2$ 和 $\mathbf{v}_3$ 先投影到某个坐标平面上（比如 yz 平面），算它们在那张平面上的投影面积的 2D 行列式。然后用 $\mathbf{v}_1$ 在这个平面垂直方向上的分量做"高度"。三张坐标平面各贡献一部分，加起来就是总体积。</p>
+<p>具体来说——沿第一行展开：</p>
+$$\det(A) = a_{11}\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}
 - a_{12}\begin{vmatrix}a_{21}&a_{23}\\a_{31}&a_{33}\end{vmatrix}
-+ a_{13}\begin{vmatrix}a_{21}&a_{22}\\a_{31}&a_{32}\end{vmatrix}
-$$
-
-<p><strong>竖线</strong> $\begin{vmatrix}\cdot\end{vmatrix}$ 就是行列式的简写——比写「$\det($矩阵$)$」省地方。</p>
-
++ a_{13}\begin{vmatrix}a_{21}&a_{22}\\a_{31}&a_{32}\end{vmatrix}$$
+<p>每一项的含义：</p>
+<table>
+<tr><th>项</th><th>$\mathbf{v}_1$ 的分量</th><th>2×2 子式</th><th>含义</th></tr>
+<tr>
+<td>$a_{11} \cdot \begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}$</td>
+<td>$\mathbf{v}_1$ 的 x 分量</td>
+<td>$\mathbf{v}_2,\mathbf{v}_3$ 的 yz 子块</td>
+<td>yz 平面的投影面积 × x 方向的高度</td>
+</tr>
+<tr>
+<td>$-a_{12} \cdot \begin{vmatrix}a_{21}&a_{23}\\a_{31}&a_{33}\end{vmatrix}$</td>
+<td>$\mathbf{v}_1$ 的 y 分量</td>
+<td>$\mathbf{v}_2,\mathbf{v}_3$ 的 xz 子块</td>
+<td>xz 平面的投影面积 × y 方向的高度<br>（前面有个负号——因为行列式对列的顺序敏感）</td>
+</tr>
+<tr>
+<td>$+a_{13} \cdot \begin{vmatrix}a_{21}&a_{22}\\a_{31}&a_{32}\end{vmatrix}$</td>
+<td>$\mathbf{v}_1$ 的 z 分量</td>
+<td>$\mathbf{v}_2,\mathbf{v}_3$ 的 xy 子块</td>
+<td>xy 平面的投影面积 × z 方向的高度</td>
+</tr>
+</table>
+<p><strong>一句话：</strong> 三维体积 = 在三个坐标平面上各算一个底面积 × 对应方向的高度，带正负号加起来。每个 2×2 行列式 $ad-bc$ 你已经会算了——三维只是<strong>三个二维的组合</strong>。</p>
+<h3>降阶展开（拉普拉斯展开）——任意 n×n</h3>
+<div class="callout callout-info">
+<strong>🔑 核心洞察：</strong> 行列式有三个基本性质，这<strong>完全决定了</strong>它必须用降阶展开来计算：
+<ol>
+<li><strong>单位矩阵的行列式 = 1：</strong> $\det(I) = 1$，空间没被扭——体积不变。</li>
+<li><strong>交换两列，行列式变号：</strong> $\det([\mathbf{v}_1,\mathbf{v}_2]) = -\det([\mathbf{v}_2,\mathbf{v}_1])$——因为平行四边形被"翻了面"。</li>
+<li><strong>对每一列是线性的：</strong> 如果把 $\mathbf{v}_1$ 放大 $k$ 倍，体积也放大 $k$ 倍。如果把 $\mathbf{v}_1$ 拆成两个向量的和，体积等于分别算再相加。</li>
+</ol>
+<p>从这三条出发，<strong>可以推出降阶展开不是"定义"，而是必然结论：</strong></p>
+<p>把第一列 $\mathbf{v}_1$ 写成三个标准基向量的组合：$\mathbf{v}_1 = a_{11}\mathbf{e}_1 + a_{21}\mathbf{e}_2 + a_{31}\mathbf{e}_3$。由线性性质（性质 3），行列式可以拆开：</p>
+$$\det(A) = a_{11}\det(\mathbf{e}_1, \mathbf{v}_2, \mathbf{v}_3) + a_{21}\det(\mathbf{e}_2, \mathbf{v}_2, \mathbf{v}_3) + a_{31}\det(\mathbf{e}_3, \mathbf{v}_2, \mathbf{v}_3)$$
+<p>每一项 $\det(\mathbf{e}_i, \mathbf{v}_2, \mathbf{v}_3)$（第一个向量是基向量，后两个照常）可以通过不断交换列（性质 2）整理成 $\pm$ 一个低阶行列式的形式。整理后第一列变成 $[1,0,0]^T$，去掉第一行第一列——<strong>自然就降阶了</strong>。</p>
+<p><strong>这个推导不靠死记——它从"行列式 = 体积放大镜"的几何直觉出发，借助三条基本性质，逐层降阶到你已经会算的 2×2。</strong></p>
+</div>
 <p><strong>走一个例子：</strong></p>
-
 $$A = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix}$$
-
 <p>沿第一行展开：</p>
-
 $$\begin{aligned}
 \det(A) &= 1 \cdot \begin{vmatrix}5&6\\8&9\end{vmatrix}
-        - 2 \cdot \begin{vmatrix}4&6\\7&9\end{vmatrix}
-        + 3 \cdot \begin{vmatrix}4&5\\7&8\end{vmatrix} \\[8pt]
-        &= 1 \cdot (5\cdot9 - 6\cdot8)
-         - 2 \cdot (4\cdot9 - 6\cdot7)
-         + 3 \cdot (4\cdot8 - 5\cdot7) \\[8pt]
-        &= 1 \cdot (-3) - 2 \cdot (-6) + 3 \cdot (-3) \\[8pt]
-        &= -3 + 12 - 9 = 0
+- 2 \cdot \begin{vmatrix}4&6\\7&9\end{vmatrix}
++ 3 \cdot \begin{vmatrix}4&5\\7&8\end{vmatrix} \\[8pt]
+&= 1 \cdot (5\cdot9 - 6\cdot8)
+- 2 \cdot (4\cdot9 - 6\cdot7)
++ 3 \cdot (4\cdot8 - 5\cdot7) \\[8pt]
+&= 1 \cdot (-3) - 2 \cdot (-6) + 3 \cdot (-3) \\[8pt]
+&= -3 + 12 - 9 = 0
 \end{aligned}$$
-
-<p>行列式 = 0！这意味着这个矩阵把三维空间压扁了——实际上它的第三行 = 第二行 × 2 − 第一行，三行不独立，体积被压没了。</p>
-
-<div class="callout callout-info">
-<strong>💡 降阶展开可以沿任意一行或一列。</strong> 沿第一列展开的话：
+<p>行列式 = 0！这意味着矩阵把三维空间<strong>压扁了</strong>——三个向量躺在同一张平面上，体积 = 0。实际上第三行 = 第二行 × 2 − 第一行，三行不独立。</p>
+<div class="callout callout-tip">
+<strong>💡 可以沿任意一行或一列展开。</strong> 沿第一列展开的话：
 $$\det(A) = a_{11}\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}
-          - a_{21}\begin{vmatrix}a_{12}&a_{13}\\a_{32}&a_{33}\end{vmatrix}
-          + a_{31}\begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}$$
-结果一样。通常选含 0 最多的行或列，省计算。
+- a_{21}\begin{vmatrix}a_{12}&a_{13}\\a_{32}&a_{33}\end{vmatrix}
++ a_{31}\begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}$$
+结果一样。展开时符号规律是棋盘格：$(-1)^{i+j}$。通常选含 0 最多的行或列，省计算。
 </div>
-
 <h3>n×n 行列式——套路不变</h3>
-
-<p>4×4 降成 3×3（四个 3×3 行列式），每个 3×3 再降成 2×2……一层层拆下去，<strong>最终全是 $ad-bc$ 的组合</strong>。</p>
-
-<div class="callout callout-info">
-<strong>📐 行列式的递归定义：</strong> n×n 行列式 = 沿任一行展开的 n 个 (n−1)×(n−1) 行列式的带符号和。一路递归到 2×2 的 $ad-bc$ 为止。
-</div>
-
+<p>4×4 降成 3×3（四个 3×3 行列式），每个 3×3 再降成 2×2……一层层拆下去，<strong>最终全是 $ad-bc$ 的组合</strong>。降阶展开是行列式三条基本性质的直接推论——不是凭空定义的算法。</p>
+<p><strong>递归总结：</strong> n×n 行列式 = 沿任一行展开的 n 个 (n−1)×(n−1) 行列式的带符号和。一路递归到 2×2 的 $ad-bc$ 为止。每一步都是在做"体积 = 底面积 × 高度"的推广。</p>
 <pre><code>import numpy as np
-
 A = np.array([[1, 2, 3],
-              [4, 5, 6],
-              [7, 8, 9]])
-
+[4, 5, 6],
+[7, 8, 9]])
 # 手算：1·(45-48) - 2·(36-42) + 3·(32-35) = -3+12-9 = 0
 det_manual = 1*(5*9 - 6*8) - 2*(4*9 - 6*7) + 3*(4*8 - 5*7)
 print(f"手算行列式: {det_manual}")
 print(f"np.linalg.det: {np.linalg.det(A):.0f}")</code></pre>
-
 <hr>
-
 <h2>💭 概念题</h2>
-
 <ol>
 <li>矩阵把单位正方形扭成平行四边形。行列式为 0 时，平行四边形变成了什么？——考察：行列式=0 的几何含义</li>
 <li>用降阶展开手算 $\begin{bmatrix}2&0&1\\0&3&0\\1&0&2\end{bmatrix}$ 的行列式。提示：中间那列有两个 0，沿第二行或第二列展开最省事。——考察：3×3 降阶展开</li>
 </ol>
-
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-03/">← 00-03</a><a href="../../">📖 目录</a><a href="../00-05/">下一课 →</a></nav>
+<a href="../00-03/">← 00-03</a><a href="../../">📖 目录</a><a href="../00-05/">00-05 →</a></nav>
 </div></body></html>

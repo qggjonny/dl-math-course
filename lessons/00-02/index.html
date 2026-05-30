@@ -6,41 +6,26 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 </head><body>
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-02</span>
 <span><a href="../00-01/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-03/">下一课 →</a></span></nav>
 <div class="container">
-
 <h1>00-02 矩阵运算</h1>
-
 <hr>
-
 <h2>一、点乘 — 一个人的影子有多长</h2>
-
 <p><strong>画面：</strong> 正午大太阳。你站在操场上，太阳在你头顶正上方。你的影子有多长？取决于你站得多直：笔直站 → 影子为一团（最短），斜躺 → 影子拉得老长。</p>
-
 <figure><img src="assets/dot_product_angle.png" alt="点乘夹角"><figcaption>$\mathbf{a}\cdot\mathbf{b}=\|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$。$\theta=0°$→最大，$\theta=90°$→0，$\theta=180°$→最小</figcaption></figure>
-
 <p>这就是点乘的几何含义：<strong>两个向量各自有多长，乘起来，再按夹角打一个折。</strong></p>
-
 <p>也可以这样看：把 a "投"到 b 的方向上。<strong>投影怎么算？</strong> a、投影、垂线构成直角三角形——a 是斜边，投影是邻边。直角三角形中，邻边 = 斜边 × cosθ，所以投影长度 = ‖a‖cosθ，<strong>再乘以 b 的长度</strong>。反过来也行——把 b 投到 a 上，再乘以 a 的长度。两种看法结果一样。</p>
-
 <p><strong>注意：</strong> 当 θ > 90° 时 cosθ &lt; 0，「投影」落在 b 的<strong>反方向</strong>上，点乘为负——这说明两个向量总体上在「互相背离」。当 θ &lt; 90° 时 cosθ > 0，投影在 b 的方向上，点乘为正——两个向量总体上在「互相帮助」。当 θ = 90° 时 cosθ = 0，投影长度为 0——两个向量垂直，谁也不影响谁。</p>
-
 $$\mathbf{a} \cdot \mathbf{b} = a_1b_1 + a_2b_2 + \cdots + a_nb_n = \|\mathbf{a}\|\,\|\mathbf{b}\|\,\cos\theta$$
-
 <div class="callout callout-info">
 <h3>为什么「分量乘完求和」=「长度×长度×cos」？</h3>
-
 <p><strong>三步推导，只需要余弦定理：</strong></p>
-
 <p><strong>第 1 步——画出三角形。</strong> 向量 $\mathbf{a}$ 和 $\mathbf{b}$ 的差 $\mathbf{a}-\mathbf{b}$ 构成三角形第三条边。余弦定理告诉我们第三条边的长度平方：</p>
-
 $$\|\mathbf{a} - \mathbf{b}\|^2 = \|\mathbf{a}\|^2 + \|\mathbf{b}\|^2 - 2\|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$$
-
 <p><strong>第 2 步——用代数定义展开左边。</strong> 注意：为什么 $\|\mathbf{v}\|^2 = \mathbf{v}\cdot\mathbf{v}$？靠的是<strong>勾股定理</strong>——向量 $\mathbf{v}=(v_1, v_2)$ 是两个直角边，它的长度（斜边）$\|\mathbf{v}\| = \sqrt{v_1^2 + v_2^2}$，所以 $\|\mathbf{v}\|^2 = v_1^2 + v_2^2$。而点乘的代数定义是各分量相乘求和：$\mathbf{v}\cdot\mathbf{v} = v_1\times v_1 + v_2\times v_2 = v_1^2 + v_2^2$。两者相等——勾股定理把几何长度和代数分量串在了一起：</p>
-
 $$
 \begin{aligned}
 \|\mathbf{a} - \mathbf{b}\|^2 &= (\mathbf{a}-\mathbf{b})\cdot(\mathbf{a}-\mathbf{b}) \\
@@ -48,92 +33,57 @@ $$
 &= \|\mathbf{a}\|^2 + \|\mathbf{b}\|^2 - 2(\mathbf{a}\cdot\mathbf{b})
 \end{aligned}
 $$
-
 <p><strong>第 3 步——对比左右两边。</strong> 第 1 步和第 2 步都等于 $\|\mathbf{a}-\mathbf{b}\|^2$，所以它们相等：</p>
-
 $$\cancel{\|\mathbf{a}\|^2 + \|\mathbf{b}\|^2} - 2(\mathbf{a}\cdot\mathbf{b}) = \cancel{\|\mathbf{a}\|^2 + \|\mathbf{b}\|^2} - 2\|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$$
-
 <p>消去相同项：</p>
-
 $$\mathbf{a}\cdot\mathbf{b} = \|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$$
-
 <p><strong>所以「对应分量乘完求和」和「长度×长度×夹角余弦」是同一个东西——不是分别定义，是余弦定理推导出来的等价关系。</strong></p>
 </div>
-
 <p>拆开看：</p>
 <ul>
-  <li>$\|\mathbf{a}\|$：向量 $\mathbf{a}$ 的长度（从原点到箭头尖的距离）</li>
-  <li>$\|\mathbf{b}\|$：向量 $\mathbf{b}$ 的长度</li>
-  <li>$\cos\theta$：夹角的余弦。$\cos 0°=1$（同向），$\cos 90°=0$（垂直），$\cos 180°=-1$（反向）</li>
+<li>$\|\mathbf{a}\|$：向量 $\mathbf{a}$ 的长度（从原点到箭头尖的距离）</li>
+<li>$\|\mathbf{b}\|$：向量 $\mathbf{b}$ 的长度</li>
+<li>$\cos\theta$：夹角的余弦。$\cos 0°=1$（同向），$\cos 90°=0$（垂直），$\cos 180°=-1$（反向）</li>
 </ul>
-
 <p><strong>三个情况一目了然：</strong> 同向 → 点乘最大（影子拉最长）；垂直 → 点乘 = 0（没有投影）；反向 → 点乘为负（影子"反方向"了）。</p>
-
 <pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-
 a = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>])
 b = np.array([<span class="hl-number">4</span>, <span class="hl-number">5</span>, <span class="hl-number">6</span>])
-
 <span class="hl-comment"># np.dot(a,b)：对应位置相乘再求和 → 1×4+2×5+3×6=32</span>
 dot = np.dot(a, b)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"点乘 = {dot}"</span>)
-
 <span class="hl-comment"># 验证几何公式：cosθ = (a·b) / (|a|×|b|)</span>
 <span class="hl-comment"># np.linalg.norm 默认算 L2（欧几里得长度）</span>
 cos_theta = dot / (np.linalg.norm(a) * np.linalg.norm(b))
 <span class="hl-builtin">print</span>(<span class="hl-string">f"cosθ = {cos_theta:.3f}"</span>)  <span class="hl-comment"># 接近 1 → 几乎同向</span></code></pre>
-
 <hr>
-
 <h2>二、矩阵×向量 — 变换机器</h2>
-
 <p><strong>画面：</strong> 一台数控机床。你把一块钢板（向量 $\mathbf{x}$）放进去，机器按照操作手册（矩阵 $A$）上的指令——每一行告诉机器「输出的这个分量，等于原料的各分量按这些系数组合」——输出一个加工好的零件（向量 $\mathbf{y}$）。矩阵就是这张操作手册。不同的矩阵 = 不同的加工方式：有的拉伸，有的旋转，有的剪切。</p>
-
 <p>这就是矩阵最核心的功能：<strong>把一个向量变成另一个向量。</strong> 深度学习里每一层神经网络都在干这件事——只不过矩阵特别大、叠了很多层而已。</p>
-
 <h3>怎么算？——每一行和输入做点乘</h3>
-
 <p>矩阵 $A$ 有 $m$ 行 $n$ 列，向量 $\mathbf{x}$ 有 $n$ 个分量。输出 $\mathbf{y} = A\mathbf{x}$ 有 $m$ 个分量，<strong>第 $i$ 个分量 = $A$ 的第 $i$ 行 与 $\mathbf{x}$ 做点乘</strong>：</p>
-
 $$y_i = A\text{ 第 }i\text{ 行} \;\cdot\; \mathbf{x}$$
-
 <p>这个规则不是新东西——<strong>它就是把刚才学的点乘用在了矩阵的每一行上。</strong> 矩阵有 $m$ 行，就做 $m$ 次点乘，得到 $m$ 个输出分量。</p>
-
 <p>拿具体例子算：</p>
-
 $$A = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}, \quad
-  \mathbf{x} = \begin{bmatrix} 5 \\ 6 \end{bmatrix}$$
-
+\mathbf{x} = \begin{bmatrix} 5 \\ 6 \end{bmatrix}$$
 <p><strong>第 1 个输出分量</strong> = 第 1 行 · $\mathbf{x}$：</p>
-
 $$y_1 = \begin{bmatrix}2 & 1\end{bmatrix} \cdot \begin{bmatrix}5 \\ 6\end{bmatrix}
-      = 2\times5 + 1\times6 = 16$$
-
+= 2\times5 + 1\times6 = 16$$
 <p><strong>第 2 个输出分量</strong> = 第 2 行 · $\mathbf{x}$：</p>
-
 $$y_2 = \begin{bmatrix}0 & 3\end{bmatrix} \cdot \begin{bmatrix}5 \\ 6\end{bmatrix}
-      = 0\times5 + 3\times6 = 18$$
-
+= 0\times5 + 3\times6 = 18$$
 <p>拼起来：</p>
-
 $$A\mathbf{x} = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}
-                \begin{bmatrix} 5 \\ 6 \end{bmatrix}
-              = \begin{bmatrix} 16 \\ 18 \end{bmatrix}$$
-
+\begin{bmatrix} 5 \\ 6 \end{bmatrix}
+= \begin{bmatrix} 16 \\ 18 \end{bmatrix}$$
 <p><strong>等号左边的写法要记住：</strong> $A\mathbf{x}$ 不写点乘符号（不是 $A\cdot\mathbf{x}$），矩阵和向量并排写就表示乘法。$\mathbf{x}$ 默认是列向量——竖着写。输入 (5,6) 变成了输出 (16,18)。</p>
-
 <h3>形状规则</h3>
-
 <p>$(m \times n)$ 的矩阵 × $(n \times 1)$ 的向量 → $(m \times 1)$ 的向量。</p>
-
 <p>直观理解：$A$ 的列数（$n$）= 输入向量的分量数，对不上就没法做点乘。$A$ 的行数（$m$）= 输出向量的分量数——有多少行，就输出多少个分量。</p>
-
 <h3>几何含义：矩阵把向量"扭"到新位置</h3>
-
 <p>$A = \begin{bmatrix}2&1\\0&3\end{bmatrix}$ 把输入 (5,6) 扭到了 (16,18)。整个平面都被这张"操作手册"重新安排了——有些方向被拉伸，有些方向被旋转。</p>
-
 <p>不同的矩阵做不同的事：</p>
-
 $$
 \begin{aligned}
 \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}
@@ -147,145 +97,100 @@ $$
 &&\text{——旋转矩阵：逆时针转 90°}
 \end{aligned}
 $$
-
 <p>以后学到特征值和特征向量时，会深入讲不同矩阵把平面"怎样扭"——哪里是拉伸方向，哪里是压缩方向。</p>
-
 <pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-
 A = np.array([[<span class="hl-number">2</span>, <span class="hl-number">1</span>],
-              [<span class="hl-number">0</span>, <span class="hl-number">3</span>]])     <span class="hl-comment"># (2,2) 矩阵——操作手册</span>
+[<span class="hl-number">0</span>, <span class="hl-number">3</span>]])     <span class="hl-comment"># (2,2) 矩阵——操作手册</span>
 x = np.array([<span class="hl-number">5</span>, <span class="hl-number">6</span>])           <span class="hl-comment"># (2,) 向量——原料</span>
-
 y = A @ x  <span class="hl-comment"># @ 是 Python 3.5+ 的矩阵乘法运算符</span>
-          <span class="hl-comment"># 等价于 np.dot(A, x)</span>
+<span class="hl-comment"># 等价于 np.dot(A, x)</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"A·x = {y}"</span>)
 <span class="hl-comment"># 输出: A·x = [16 18]</span>
-
 <span class="hl-comment"># 单位矩阵：什么也不做</span>
 I = np.eye(<span class="hl-number">2</span>)            <span class="hl-comment"># 2×2 单位矩阵 [[1,0],[0,1]]</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"I·x = {I @ x}"</span>)
 <span class="hl-comment"># 输出: I·x = [5 6]  ← 原封不动</span>
-
 <span class="hl-comment"># 旋转 90°：逆时针转</span>
 R = np.array([[<span class="hl-number">0</span>, -<span class="hl-number">1</span>],
-              [<span class="hl-number">1</span>,  <span class="hl-number">0</span>]])    <span class="hl-comment"># 2×2 旋转矩阵</span>
+[<span class="hl-number">1</span>,  <span class="hl-number">0</span>]])    <span class="hl-comment"># 2×2 旋转矩阵</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"R·x = {R @ x}"</span>)
 <span class="hl-comment"># 输出: R·x = [-6  5]  ← (5,6) 转到了 (-6,5)</span></code></pre>
-
 <hr>
-
 <h2>三、矩阵乘法 — 流水生产线</h2>
-
 <p><strong>画面：</strong> 工厂里一条生产线。第一台机器把原材料处理成半成品（$A$ 的变换），第二台机器把半成品加工成成品（$B$ 的变换）。两台机器首尾相连——这就是 $C = BA$。矩阵乘就是两张"操作手册"的接力。</p>
-
 <h3>怎么算？——行 × 列做点乘</h3>
-
 <p>两个矩阵相乘：</p>
-
 $$A = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}, \quad
-  B = \begin{bmatrix} 1 & 0 \\ 4 & 2 \end{bmatrix}$$
-
+B = \begin{bmatrix} 1 & 0 \\ 4 & 2 \end{bmatrix}$$
 <p>算 $C = BA$。$C$ 的第 $i$ 行第 $j$ 列 = <strong>$B$ 的第 $i$ 行</strong> 与 <strong>$A$ 的第 $j$ 列</strong> 做点乘：</p>
-
 $$c_{ij} = B \text{ 第 } i \text{ 行} \;\cdot\; A \text{ 第 } j \text{ 列}$$
-
 <p><strong>逐个算：</strong></p>
-
 $$\begin{aligned}
 c_{11} &= B\text{ 第1行} \cdot A\text{ 第1列}
-       = \begin{bmatrix}1 & 0\end{bmatrix} \cdot \begin{bmatrix}2 \\ 0\end{bmatrix}
-       = 1\times2 + 0\times0 = 2 \\[8pt]
+= \begin{bmatrix}1 & 0\end{bmatrix} \cdot \begin{bmatrix}2 \\ 0\end{bmatrix}
+= 1\times2 + 0\times0 = 2 \\[8pt]
 c_{12} &= B\text{ 第1行} \cdot A\text{ 第2列}
-       = \begin{bmatrix}1 & 0\end{bmatrix} \cdot \begin{bmatrix}1 \\ 3\end{bmatrix}
-       = 1\times1 + 0\times3 = 1 \\[8pt]
+= \begin{bmatrix}1 & 0\end{bmatrix} \cdot \begin{bmatrix}1 \\ 3\end{bmatrix}
+= 1\times1 + 0\times3 = 1 \\[8pt]
 c_{21} &= B\text{ 第2行} \cdot A\text{ 第1列}
-       = \begin{bmatrix}4 & 2\end{bmatrix} \cdot \begin{bmatrix}2 \\ 0\end{bmatrix}
-       = 4\times2 + 2\times0 = 8 \\[8pt]
+= \begin{bmatrix}4 & 2\end{bmatrix} \cdot \begin{bmatrix}2 \\ 0\end{bmatrix}
+= 4\times2 + 2\times0 = 8 \\[8pt]
 c_{22} &= B\text{ 第2行} \cdot A\text{ 第2列}
-       = \begin{bmatrix}4 & 2\end{bmatrix} \cdot \begin{bmatrix}1 \\ 3\end{bmatrix}
-       = 4\times1 + 2\times3 = 10
+= \begin{bmatrix}4 & 2\end{bmatrix} \cdot \begin{bmatrix}1 \\ 3\end{bmatrix}
+= 4\times1 + 2\times3 = 10
 \end{aligned}$$
-
 <p>拼起来：</p>
-
 $$C = BA = \begin{bmatrix} 1&0 \\ 4&2 \end{bmatrix}
-                  \begin{bmatrix} 2&1 \\ 0&3 \end{bmatrix}
-        = \begin{bmatrix} 2 & 1 \\ 8 & 10 \end{bmatrix}$$
-
+\begin{bmatrix} 2&1 \\ 0&3 \end{bmatrix}
+= \begin{bmatrix} 2 & 1 \\ 8 & 10 \end{bmatrix}$$
 <h3>为什么是行 × 列？——变换复合（用上一节的知识验证）</h3>
-
 <p>算完之后回头看<strong>为什么</strong>是这个规则——<strong>答案就在上一节的「矩阵×向量」里。</strong></p>
-
 <p>上一节讲了：$A\mathbf{x}$ 是把向量 $\mathbf{x}$ 扭一次。现在有两台机器——先用 $A$ 扭，再用 $B$ 扭。拿一个具体向量验证：</p>
-
 <p><strong>两步走：</strong> 先算 $A\mathbf{x}$（第一台机器，矩阵×向量），再把结果交给 $B$（第二台机器）：</p>
-
 $$A\mathbf{x} = \begin{bmatrix}2&1\\0&3\end{bmatrix}\begin{bmatrix}5\\6\end{bmatrix}
-            = \begin{bmatrix}16\\18\end{bmatrix}$$
-
+= \begin{bmatrix}16\\18\end{bmatrix}$$
 $$B(A\mathbf{x}) = \begin{bmatrix}1&0\\4&2\end{bmatrix}\begin{bmatrix}16\\18\end{bmatrix}
-                = \begin{bmatrix}16\\100\end{bmatrix}$$
-
+= \begin{bmatrix}16\\100\end{bmatrix}$$
 <p><strong>一步走：</strong> 用 $C = BA$ 直接把 $\mathbf{x}$ 扭到位：</p>
-
 $$C\mathbf{x} = \begin{bmatrix}2&1\\8&10\end{bmatrix}\begin{bmatrix}5\\6\end{bmatrix}
-             = \begin{bmatrix}2\times5+1\times6\\8\times5+10\times6\end{bmatrix}
-             = \begin{bmatrix}16\\100\end{bmatrix} \;\checkmark$$
-
+= \begin{bmatrix}2\times5+1\times6\\8\times5+10\times6\end{bmatrix}
+= \begin{bmatrix}16\\100\end{bmatrix} \;\checkmark$$
 <p>两步走和一步走结果一样。所以「行×列」不是硬记的公式——它是 $B$ 和 $A$ 作为变换<strong>接力</strong>时自然出现的计算方式。$B$ 的第 $i$ 行决定「中间结果（$A\mathbf{x}$）的各分量怎样组合成第 $i$ 个输出」，$A$ 的第 $j$ 列决定「输入的第 $j$ 个分量如何分配到各中间结果」，两者的点乘恰好就是 $c_{ij}$——也就是「不做中间产物、直接一步到位」的规则。</p>
-
 <p><strong>铁律：内维咬合。</strong> $(m, \cancel{n}) \times (\cancel{n}, p) = (m, p)$。$A$ 的列数 = $B$ 的行数，否则接口对不上。</p>
-
 <pre><code>A = np.array([[<span class="hl-number">1</span>,<span class="hl-number">2</span>,<span class="hl-number">3</span>], [<span class="hl-number">4</span>,<span class="hl-number">5</span>,<span class="hl-number">6</span>]])  <span class="hl-comment"># (2,3)</span>
 B = np.array([[<span class="hl-number">7</span>,<span class="hl-number">8</span>], [<span class="hl-number">9</span>,<span class="hl-number">10</span>], [<span class="hl-number">11</span>,<span class="hl-number">12</span>]])  <span class="hl-comment"># (3,2)：行数 3 = A 的列数 3 ✓</span>
-
 C = A @ B  <span class="hl-comment"># (2,3)×(3,2) → (2,2)</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"C = A@B:\n{C}"</span>)
 <span class="hl-comment"># C[0,0]=1×7+2×9+3×11=58  C[0,1]=1×8+2×10+3×12=64</span>
 <span class="hl-comment"># C[1,0]=4×7+5×9+6×11=139 C[1,1]=4×8+5×10+6×12=154</span></code></pre>
-
 <hr>
-
 <h2>四、广播 — 自动"复印"</h2>
-
 <p><strong>画面：</strong> 老师发卷子。讲台上只有一份卷子，但老师把它"复印"了 40 份，每人一份——每一份的内容一模一样。广播就是 numpy 帮你自动"复印"小数组去匹配大数组的形状。</p>
-
 <p><strong>注意：</strong>"复印"只是比喻——numpy 不是真的在内存里复制 40 份数据，它只是<strong>假装</strong>有那么多份。实际内存里只有一份。所以广播不浪费内存。</p>
-
 <h3>规则：三步判断法</h3>
-
 <p>两个数组能不能广播，走这三步：</p>
-
 <ol>
-  <li><strong>从右向左对齐</strong>两个 shape</li>
-  <li><strong>短的补 1</strong>：哪个数组维度少，在左边补 1，补到一样多</li>
-  <li><strong>逐维比较</strong>：每一维必须<strong>相等</strong>或其中一个是 <strong>1</strong></li>
+<li><strong>从右向左对齐</strong>两个 shape</li>
+<li><strong>短的补 1</strong>：哪个数组维度少，在左边补 1，补到一样多</li>
+<li><strong>逐维比较</strong>：每一维必须<strong>相等</strong>或其中一个是 <strong>1</strong></li>
 </ol>
-
 <h3>示例 1：成功 (3,1) + (1,4) → (3,4)</h3>
-
 <pre><code>x = np.array([[1], [2], [3]])           # (3,1) — 3 行 1 列
 y = np.array([[10, 20, 30, 40]])         # (1,4) — 1 行 4 列
-
 # 对齐：      (3, 1)
 #             (1, 4)
 # 第1维: 1 vs 4 → 1 可以复印成 4 ✓
 # 第0维: 3 vs 1 → 1 可以复印成 3 ✓
 # 结果: (3,4)
-
 z = x + y
 print(z)
 # [[11 21 31 41]
 #  [12 22 32 42]
 #  [13 23 33 43]]</code></pre>
-
 <h3>示例 2：成功 — 不同 rank (3,2) + (2,) → (3,2)</h3>
-
 <p>一个矩阵加一个向量，能不能广播？</p>
-
 <pre><code>A = np.array([[1,2],[3,4],[5,6]])      # (3,2) — 2 维
 v = np.array([10, 20])                   # (2,)  — 1 维，rank 不同
-
 # 步骤1-2: 短的补 1
 #   (3, 2)     ← A
 #   (2,) → (1, 2)  ← v 左边补 1
@@ -294,19 +199,14 @@ v = np.array([10, 20])                   # (2,)  — 1 维，rank 不同
 #   第1维: 2 vs 2 → 相等 ✓
 #   第0维: 3 vs 1 → 1 可以复印成 3 ✓
 # 结果: (3,2)
-
 print(A + v)
 # [[11 22]
 #  [13 24]
 #  [15 26]]</code></pre>
-
 <h3>示例 3：失败 — (3,2) + (3,) ❌</h3>
-
 <p>为什么这个会报错？过一遍三步：</p>
-
 <pre><code>A = np.array([[1,2],[3,4],[5,6]])      # (3,2)
 w = np.array([10, 20, 30])               # (3,)
-
 # 步骤1-2: 短的补 1
 #   (3, 2)
 #   (3,) → (1, 3)   ← w 左边补 1
@@ -314,24 +214,17 @@ w = np.array([10, 20, 30])               # (3,)
 # 步骤3: 逐维比较
 #   第1维: 2 vs 3 → 2≠3，而且都不是 1 ❌ 炸了！
 #   不用再看第0维了
-
 # ValueError: operands could not be broadcast together
 </code></pre>
-
 <p><strong>关键教训：</strong> 广播看的是<strong>每一维的数值</strong>，不是看数组里一共有几个数。(3,) 虽然长度和 (3,2) 的行数一样，但广播对齐后它变成了 (1,3)——第 1 维是 3，和对方的 2 对不上，所以炸了。</p>
-
 <h3>示例 4：失败 — (3,2) + (2,3) ❌</h3>
-
 <p>同样的 rank，但每一维都对不上：</p>
-
 <pre><code># (3, 2)
 # (2, 3)
 # 第1维: 2 vs 3 → 都不等于 1 ❌
 # 第0维: 3 vs 2 → 都不等于 1 ❌
 # 两维都不行，彻底炸</code></pre>
-
 <h3>速查表</h3>
-
 <table>
 <tr><th>左边</th><th>右边</th><th>对齐后</th><th>通过？</th><th>原因</th></tr>
 <tr><td>(3,1)</td><td>(1,4)</td><td>1→4,3→3</td><td>✅</td><td>各有 1 维可复印</td></tr>
@@ -341,20 +234,15 @@ w = np.array([10, 20, 30])               # (3,)
 <tr><td>(4,3)</td><td>(3,)</td><td>(4,3)vs(1,3)</td><td>✅</td><td>3=3, 1→4</td></tr>
 <tr><td>(3,2)</td><td>(2,3)</td><td>—</td><td>❌</td><td>两维都不行</td></tr>
 </table>
-
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ 全部代码到 online-python.com 运行</a></p>
-
 <hr>
-
 <h2>💭 概念题</h2>
-
 <ol>
 <li>点乘为 0 意味着两个向量在几何上是什么关系？如果点乘为正呢？如果为负呢？——考察：点乘公式 $\|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$ 的直观含义</li>
 <li>矩阵 $A$ 是 (3,4) 的形状，向量 $\mathbf{x}$ 有 5 个分量。$A\mathbf{x}$ 能算吗？为什么？——考察：矩阵×向量的内维匹配规则</li>
 <li>$A$ 是 (3,4) 的矩阵，$B$ 是 (5,3) 的矩阵。$AB$ 和 $BA$ 分别能算吗？——考察：矩阵乘法内维匹配的铁律</li>
 <li>为什么 (3,2) + (3,) 会报错，但 (3,2) + (1,2) 不会？用广播规则解释。——考察：广播对齐规则</li>
 </ol>
-
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-01/">← 00-01</a><a href="../../">📖 目录</a><a href="../00-03/">下一课 →</a></nav>
+<a href="../00-01/">← 00-01</a><a href="../../">📖 目录</a><a href="../00-03/">00-03 →</a></nav>
 </div></body></html>

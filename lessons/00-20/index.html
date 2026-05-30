@@ -6,156 +6,104 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 </head><body>
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-15</span>
 <span><a href="../00-14/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../01-01/">下一课 →</a></span></nav>
 <div class="container">
-
 <h1>00-20 信息论：熵、交叉熵、KL 散度</h1>
-
 <hr>
-
 <h2>一、信息量：越不可能的事，信息越大</h2>
-
 <p><strong>画面：</strong> 有人告诉你两件事——</p>
-
 <blockquote>
 「明天太阳会升起来。」→ 你心想：废话。<br>
 「明天会下雪。」（你在三亚）→ 你震惊：怎么可能！
 </blockquote>
-
 <p>第一条信息量几乎为零——你早就知道。第二条信息量巨大——概率极低的事件真的发生了。</p>
-
 <p><strong>信息量与概率成反比。</strong> 数学上定义为：</p>
-
 $$I(x) = -\log P(x)$$
-
 <p>概率越小 → $-\log P$ 越大 → 信息量越大。对数底取 2 时单位是<strong>比特</strong>（bit），取 $e$ 时单位是<strong>奈特</strong>（nat）。深度学习里通常用 $e$。</p>
-
 <p>例子：公平硬币正面概率 $P=0.5$，信息量 $-\ln(0.5) = 0.693$ nat。如果 $P=0.99$（几乎确定），信息量 $-\ln(0.99) \approx 0.01$ nat——几乎没信息。</p>
-
 <hr>
-
 <h2>二、熵：平均来看，有多不确定？</h2>
-
 <p>信息量是一件事的。如果你想描述<strong>整个概率分布</strong>的不确定性——把所有可能结果的信息量按概率加权平均：</p>
-
 $$\boxed{H(P) = -\sum_x P(x) \ln P(x)}$$
-
 <p>这就是<strong>熵</strong>。它衡量的是：从这个分布里随机抽一个结果，<strong>平均会得到多少 surprise</strong>。</p>
-
 <p><strong>极值情况：</strong></p>
 <ul>
-  <li>确定性分布 $P=[1, 0, 0]$（只有一个选项，概率 100%）：$H = -1\ln1 - 0 - 0 = 0$。零不确定性。</li>
-  <li>均匀分布 $P=[\frac13, \frac13, \frac13]$：$H = -3 \times \frac13 \ln\frac13 = \ln 3 \approx 1.099$。最大化——你完全不知道会抽到哪个。</li>
+<li>确定性分布 $P=[1, 0, 0]$（只有一个选项，概率 100%）：$H = -1\ln1 - 0 - 0 = 0$。零不确定性。</li>
+<li>均匀分布 $P=[\frac13, \frac13, \frac13]$：$H = -3 \times \frac13 \ln\frac13 = \ln 3 \approx 1.099$。最大化——你完全不知道会抽到哪个。</li>
 </ul>
-
 <p>在分类问题里：如果模型的预测分布熵很高（接近均匀）→ 模型很不确定。熵很低（接近 one-hot）→ 模型很自信。</p>
-
 <pre><code>import numpy as np
-
 def entropy(probs):
-    """H(P) = -Σ p_i ln(p_i)"""
-    # 只算 p > 0 的项（ln(0) 无定义）
-    return -np.sum(probs[probs > 0] * np.log(probs[probs > 0]))
-
+"""H(P) = -Σ p_i ln(p_i)"""
+# 只算 p > 0 的项（ln(0) 无定义）
+return -np.sum(probs[probs > 0] * np.log(probs[probs > 0]))
 # 三个猫狗鸟分类
 confident = np.array([0.95, 0.03, 0.02])  # 模型：95% 确定是猫
 uncertain = np.array([0.40, 0.35, 0.25])  # 模型：不太确定
 uniform   = np.array([1/3, 1/3, 1/3])      # 完全不确定
-
 print(f"熵(确定)  = {entropy(confident):.4f}")   # ~0.2
 print(f"熵(不确定)= {entropy(uncertain):.4f}")   # ~1.1
 print(f"熵(均匀)  = {entropy(uniform):.4f}")     # ~1.099 = ln(3)</code></pre>
-
 <hr>
-
 <h2>三、交叉熵：我的模型和真相差多远？</h2>
-
 <p>真实分布是 $P$（比如图片的真标签：100% 是猫）。模型的预测是 $Q$（输出 [0.7, 0.2, 0.1]）。怎么量化模型错得有多离谱？</p>
-
 <p>用<strong>交叉熵</strong>：</p>
-
 $$\boxed{H(P, Q) = -\sum_x P(x) \ln Q(x)}$$
-
 <p>和熵公式对比——唯一的区别：<strong>对数里是 $Q$ 而不是 $P$</strong>。也就是：真实的分布 $P$ 来决定「哪个结果重要」，但用模型预测的概率 $Q$ 来算信息量。</p>
-
 <p><strong>画面：</strong> 真实标签说「这就是猫」（$P = [1, 0, 0]$）。如果模型也输出 $Q = [0.99, 0.01, 0]$，交叉熵 = $-\ln(0.99) \approx 0.01$——很小，模型几乎没错。如果模型瞎猜 $Q = [0.01, 0.5, 0.49]$，交叉熵 = $-\ln(0.01) \approx 4.6$——巨大，模型被狠狠打脸。</p>
-
 <p><strong>分类任务里交叉熵为什么当损失函数？</strong> 交叉熵最小 = 模型的预测分布 $Q$ 最接近真实分布 $P$。梯度下降让交叉熵越来越小 → 模型的预测越来越准。</p>
-
 <pre><code>def cross_entropy(p_true, q_pred):
-    """H(P,Q) = -Σ p_i ln(q_i)"""
-    # 只算 p > 0 的项
-    mask = p_true > 0
-    return -np.sum(p_true[mask] * np.log(q_pred[mask]))
-
+"""H(P,Q) = -Σ p_i ln(q_i)"""
+# 只算 p > 0 的项
+mask = p_true > 0
+return -np.sum(p_true[mask] * np.log(q_pred[mask]))
 # 真标签：猫（one-hot）
 y_true = np.array([1.0, 0.0, 0.0])
-
 # 三个模型的预测
 good  = np.array([0.90, 0.05, 0.05])   # 好：90% 确定是猫
 ok    = np.array([0.50, 0.30, 0.20])   # 一般：一半一半
 bad   = np.array([0.10, 0.60, 0.30])   # 差：认为是狗
-
 print(f"交叉熵(好) = {cross_entropy(y_true, good):.4f}")   # ~0.105
 print(f"交叉熵(一般)= {cross_entropy(y_true, ok):.4f}")    # ~0.693
 print(f"交叉熵(差) = {cross_entropy(y_true, bad):.4f}")    # ~2.303</code></pre>
-
 <p>模型越好 → 交叉熵越小。这就是训练分类模型时最小化的那个数。</p>
-
 <hr>
-
 <h2>四、KL 散度：两个分布"形状"差多少？</h2>
-
 <p>交叉熵 = 熵 + <strong>KL 散度</strong>：</p>
-
 $$H(P, Q) = H(P) + D_{\mathrm{KL}}(P \parallel Q)$$
-
 <p>移项：</p>
-
 $$\boxed{D_{\mathrm{KL}}(P \parallel Q) = \sum_x P(x) \ln\frac{P(x)}{Q(x)}}$$
-
 <p><strong>KL 散度衡量的是：</strong> 用 $Q$ 来近似 $P$，比直接用 $P$ 多浪费了多少信息。熵 $H(P)$ 是「最低消费」——数据本身的不确定性。KL 散度是「超额消费」——模型不好带来的额外成本。</p>
-
 <p><strong>关键性质：</strong></p>
 <ul>
-  <li>$D_{\mathrm{KL}}(P \parallel Q) \ge 0$，当且仅当 $P=Q$ 时等于 0（两个分布完全一样）</li>
-  <li>不对称：$D_{\mathrm{KL}}(P \parallel Q) \neq D_{\mathrm{KL}}(Q \parallel P)$。不是真正的「距离」</li>
+<li>$D_{\mathrm{KL}}(P \parallel Q) \ge 0$，当且仅当 $P=Q$ 时等于 0（两个分布完全一样）</li>
+<li>不对称：$D_{\mathrm{KL}}(P \parallel Q) \neq D_{\mathrm{KL}}(Q \parallel P)$。不是真正的「距离」</li>
 </ul>
-
 <p><strong>为什么训练时用交叉熵而不是 KL 散度？</strong> 因为 $H(P)$（真实标签的熵）是常数——训练数据固定了就不变。最小化交叉熵 = 最小化 KL 散度，所以交叉熵就够了。</p>
-
 <pre><code>def kl_divergence(p, q):
-    """D_KL(P||Q) = Σ p_i ln(p_i/q_i)"""
-    mask = p > 0
-    return np.sum(p[mask] * np.log(p[mask] / q[mask]))
-
+"""D_KL(P||Q) = Σ p_i ln(p_i/q_i)"""
+mask = p > 0
+return np.sum(p[mask] * np.log(p[mask] / q[mask]))
 y_true = np.array([1.0, 0.0, 0.0])
 pred   = np.array([0.90, 0.05, 0.05])
-
 H_P = entropy(y_true)
 H_PQ = cross_entropy(y_true, pred)
 D_KL = kl_divergence(y_true, pred)
-
 print(f"H(P)    = {H_P:.4f}")        # 0（one-hot 的熵恒为 0）
 print(f"H(P,Q)  = {H_PQ:.4f}")       # 0.105
 print(f"D_KL    = {D_KL:.4f}")       # 0.105
 print(f"H(P,Q) = H(P) + D_KL? {abs(H_PQ - (H_P + D_KL)) < 1e-10}")</code></pre>
-
 <hr>
-
 <h2>💭 概念题</h2>
-
 <ol>
 <li>抛一枚公平硬币，熵是多少？抛一枚永远出正面的硬币，熵是多少？哪个更大，为什么？——考察：熵与确定性的关系</li>
 <li>真标签是 $P=[1,0,0]$，模型预测 $Q=[0.3,0.4,0.3]$。交叉熵是多少？如果 $Q$ 变成 $[0.6,0.2,0.2]$，交叉熵变大还是变小？——考察：交叉熵反映预测准确度</li>
 <li>$H(P,Q) \ge H(P)$ 这个不等式为什么恒成立？从 KL 散度的非负性解释。——考察：交叉熵、熵、KL 散度三者的关系</li>
 </ol>
-
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
-
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-14/">← 00-14</a><a href="../../">📖 目录</a><a href="../01-01/">下一课 →</a></nav>
+<a href="../00-19/">← 00-19</a><a href="../../">📖 目录</a><a href="../01-01/">01-01 →</a></nav>
 </div></body></html>

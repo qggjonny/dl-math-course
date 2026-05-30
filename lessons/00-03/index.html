@@ -6,80 +6,50 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 </head><body>
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-03</span>
 <span><a href="../00-02/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-04/">下一课 →</a></span></nav>
 <div class="container">
-
 <h1>00-03 范数</h1>
-
 <hr>
-
 <h2>范数：箭有多长，看你怎么量</h2>
-
 <p>向量 $\mathbf{v} = [3, -4]$ 有多"大"？取决于你是<strong>开车</strong>还是<strong>坐直升机</strong>。</p>
-
 <h3>L1 范数：曼哈顿的出租车</h3>
-
 <p><strong>画面：</strong> 你在纽约曼哈顿。街道全是横平竖直的网格，不能斜穿街区。从 $(0,0)$ 到 $(3,-4)$，只能先往东开 3 条街，再往南开 4 条街。一共走了 7 个街区。这就是 L1：把每个分量的绝对值加起来。</p>
-
 $$\|\mathbf{v}\|_1 = |3| + |-4| = 7$$
-
 <p><strong>为什么用绝对值？</strong> 因为往南走了 4 条街——走的距离是 4，不是 -4。绝对值吃掉正负号，只留"走了多远"。</p>
-
 <h3>L2 范数：坐直升机</h3>
-
 <p><strong>画面：</strong> 这次你不管什么街道了，直接坐直升机从起点飞到终点。这就是你脑子里那个"两点之间最短"的距离——初中就学过的勾股定理。</p>
-
 $$\|\mathbf{v}\|_2 = \sqrt{3^2 + (-4)^2} = \sqrt{9 + 16} = 5$$
-
 <p>L2 就是直线距离。负号在平方里自动消失（$(-4)^2 = 16$），所以不用额外取绝对值。</p>
-
 <pre><code>import numpy as np
-
 v = np.array([3, -4])
-
 # L1：绝对值求和（出租车走过的街区数）
 l1 = np.sum(np.abs(v))       # np.abs(v) → [3, 4] → 求和 = 7
 print(f"L1 = {l1}")           # 7
-
 # L2：直线距离（直升机飞的）
 l2 = np.linalg.norm(v)        # np.linalg.norm 默认算 L2
 print(f"L2 = {l2}")           # 5.0</code></pre>
-
 <h3>L1 和 L2 的形状有什么不同？</h3>
-
 <p>把所有长度为 1 的向量画出来：L1 画出来是一个<strong>菱形</strong>，L2 画出来是一个<strong>圆</strong>。</p>
-
 <figure><img src="assets/l1_l2_balls.png" alt="L1 vs L2 单位圆"><figcaption>L2 是光滑的圆，L1 是带尖角的菱形。菱形尖角就坐落在坐标轴上</figcaption></figure>
-
 <p>为什么这个形状重要？菱形有四个<strong>尖角</strong>，恰好戳在坐标轴上——这个性质意味着 L1 天然"喜欢"让某些分量精确为 0。圆没有尖角，L2 只会让分量变小但不会精确到 0。</p>
-
 <div class="callout callout-info">
 <strong>💡 为什么尖角意味着零分量？</strong> 用两个例子来感受。
-
 <p>向量 $(3, 5)$ — 两个分量都不为零，<strong>不稀疏</strong>。<br>
 向量 $(3, 0)$ — 有一个分量精确为 0，<strong>稀疏</strong>。<br>
 向量 $(0, 0, 7, 0, 0)$ — 5 个分量里 4 个是零，<strong>非常稀疏</strong>。</p>
-
 <p>「稀疏」就是<strong>分量里有很多精确的零</strong>。</p>
-
 <p>那么 L1 为什么天然产生稀疏向量？看图：菱形的四个尖角恰好戳在坐标轴上——在尖角上，总有一个分量为 0。而圆的边缘光滑，没有尖角，碰不到坐标轴。</p>
-
 <p>打个比方：你有一根棍子（一条直线），想在上面找一个"最短"的点（按某种量法）。如果用圆形"尺子"量——圆形膨胀到碰到棍子时，接触点通常是光滑弧面上的一个点，两个分量都不为零。但用菱形"尺子"量——菱形膨胀到碰到棍子时，尖角先戳到棍子，接触点的某个分量恰好是 0。</p>
-
 <p><strong>这就是 L1 比 L2 更容易产生零分量的几何原因。</strong> 菱形有尖角，圆没有。以后当你需要「挑出最重要的几个分量，把不重要的清零」时，就会想起 L1 这个特性。</p>
 </div>
-
 <hr>
-
 <h2>💭 概念题</h2>
-
 <ol>
 <li>L1 和 L2 都用 v=[3,-4] 算过了。如果换成 v=[5,0]，L1 和 L2 各是多少？它们相等吗？什么时候 L1 和 L2 相等？——考察：L1/L2 的区别与特殊情况</li>
 </ol>
-
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-02/">← 00-02</a><a href="../../">📖 目录</a><a href="../00-04/">下一课 →</a></nav>
+<a href="../00-02/">← 00-02</a><a href="../../">📖 目录</a><a href="../00-04/">00-04 →</a></nav>
 </div></body></html>

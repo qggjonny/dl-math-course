@@ -6,34 +6,22 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 </head><body>
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-05</span>
 <span><a href="../00-04/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-06/">下一课 →</a></span></nav>
 <div class="container">
-
 <h1>00-05 特征值与特征向量</h1>
-
 <hr>
-
 <h2>特征值与特征向量：不扭的方向</h2>
-
 <p>矩阵把整个空间扭了。但空间里有一些<strong>特殊的方向</strong>——扭完之后，它还在自己的方向上，只是被拉长（或压短、或翻转）了。</p>
-
 <p><strong>画面：</strong> 回到橡胶皮。你扯住对角往外拉。皮上画了一个箭头，如果这个箭头恰好沿着对角线——拉完之后它还在对角线上，只是变长了。如果这个箭头斜着画——拉完之后方向就偏了。</p>
-
 <p>那个<strong>不偏</strong>的方向，就是特征向量 $\mathbf{v}$。被拉长（或压短）的倍数，就是特征值 $\lambda$。</p>
-
 <figure><img src="assets/eigenvectors.png" alt="特征向量不偏方向"><figcaption>矩阵把正方形扭成平行四边形。沿 $\mathbf{v}_1$、$\mathbf{v}_2$ 方向的箭头方向不变、只被拉长——这两个就是特征向量。斜方向的箭头偏了——它不是特征向量。</figcaption></figure>
-
 $$A\mathbf{v} = \lambda \mathbf{v}$$
-
 <p>读作：矩阵 $A$ 作用在 $\mathbf{v}$ 上，效果只是把 $\mathbf{v}$ 缩放 $\lambda$ 倍。方向不变，长度变。</p>
-
 <h3>特征值的含义</h3>
-
 <p>回到空间变换的画面。一个 2×2 矩阵有两个特征值 $\lambda_1$ 和 $\lambda_2$——对应两个不扭的方向。</p>
-
 <table>
 <tr><th>特征值</th><th>几何含义</th><th>例子</th></tr>
 <tr><td>$\lambda = 2$</td><td>这个方向被拉长到 2 倍</td><td>扯橡胶皮</td></tr>
@@ -41,91 +29,52 @@ $$A\mathbf{v} = \lambda \mathbf{v}$$
 <tr><td>$\lambda = 0$</td><td><strong>这个方向被压成零</strong>——信息消失了</td><td>整张纸被压成一条线！</td></tr>
 <tr><td>$\lambda < 0$</td><td>不仅拉长，还<strong>翻转</strong>方向</td><td>箭头倒过来了</td></tr>
 </table>
-
 <h3>怎么算？——特征方程</h3>
-
 <p><code>np.linalg.eig</code> 帮我们算了，但它背后做了什么？我们来手动推导。</p>
-
 <p>出发点是定义：</p>
-
 $$A\mathbf{v} = \lambda \mathbf{v}$$
-
 <p>这行式子说：矩阵 $A$ 作用在向量 $\mathbf{v}$ 上（$A\mathbf{v}$，用 <code>@</code> 算），结果等于这个向量单纯被拉长 $\lambda$ 倍（$\lambda\mathbf{v}$，用 <code>*</code> 算）。$\lambda$ 是一个普通数字（标量），$\mathbf{v}$ 是一个向量——$\lambda\mathbf{v}$ 就是把 $\mathbf{v}$ 的每个分量都乘 $\lambda$。</p>
-
 <p><strong>第一步：全移到左边。</strong> 和普通方程一样，把右边的东西搬到左边：</p>
-
 $$A\mathbf{v} - \lambda\mathbf{v} = \mathbf{0}$$
-
 <p>$\mathbf{0}$ 是全零向量 $[0,0]$。左边两项都是向量（$A\mathbf{v}$ 是向量，$\lambda\mathbf{v}$ 也是向量），所以能相减。</p>
-
 <p><strong>第二步：引入单位矩阵 $I$。</strong> 现在想把 $\mathbf{v}$ 提出来，写成「某个矩阵 × $\mathbf{v} = \mathbf{0}$」的形式。但这里有个问题：$A$ 是矩阵，$\lambda$ 是标量——它们不是同类，不能直接写 $A - \lambda$（矩阵减数字没有意义，就像「苹果减橙子」）。</p>
-
 <p>解决办法：把标量 $\lambda$ 变成矩阵。怎么变？乘上<strong>单位矩阵</strong> $I$：</p>
-
 $$I = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}$$
-
 <p>$I$ 的作用是「什么都不变」——对任何向量 $\mathbf{v}$，$I\mathbf{v} = \mathbf{v}$。就像数字 1：$1 \times 5 = 5$。那么 $\lambda I$ 就是一个矩阵：对角线上全是 $\lambda$，其余是 0。</p>
-
 <p>现在可以把 $\lambda\mathbf{v}$ 改写成 $\lambda I \mathbf{v}$（因为 $I\mathbf{v} = \mathbf{v}$，所以 $\lambda I \mathbf{v} = \lambda \mathbf{v}$）：</p>
-
 $$A\mathbf{v} - \lambda I \mathbf{v} = \mathbf{0}$$
-
 <p>现在两项都是「矩阵 × 向量」的形式了！把 $\mathbf{v}$ 提出来：</p>
-
 $$(A - \lambda I)\mathbf{v} = \mathbf{0}$$
-
 <p><strong>第三步：行列式为 0。</strong> 我们想要一个<strong>非零</strong>的 $\mathbf{v}$（全零向量 $[0,0]$ 永远满足方程，但那是废话，不是我们要找的特征向量）。</p>
-
 <p>什么时候 $(A - \lambda I)\mathbf{v} = \mathbf{0}$ 有非零解？回看前面学的：行列式为 0 意味着矩阵把空间压扁了——有一整个方向被压成了零向量。所以：</p>
-
 $$\det(A - \lambda I) = 0$$
-
 <div class="callout callout-info">
 <strong>🔗 等价链：</strong> $\det(M) = 0 \iff M$ 不可逆 $\iff$ 存在非零向量 $\mathbf{v}$ 使得 $M\mathbf{v} = \mathbf{0}$。这三个说法是同一个意思：矩阵把某个方向"压扁"了，所以回不去了（不可逆），也意味着被压扁的那个方向上的向量满足 $M\mathbf{v} = \mathbf{0}$。特征方程的巧妙之处在于：我们主动要求 $\det(A-\lambda I)=0$，目的就是<strong>找到那个被压扁的方向</strong>——那个方向上的向量就是特征向量。
 </div>
-
 <p>这个方程叫<strong>特征方程</strong>。解出来的 $\lambda$ 就是特征值。</p>
-
 <p><strong>第四步：展开。</strong> 对 2×2 矩阵 $A = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$：</p>
-
 $$A - \lambda I = \begin{bmatrix} a & b \\ c & d \end{bmatrix} - \begin{bmatrix} \lambda & 0 \\ 0 & \lambda \end{bmatrix} = \begin{bmatrix} a-\lambda & b \\ c & d-\lambda \end{bmatrix}$$
-
 <p>行列式展开（用前面的 $ad-bc$ 公式，只是把对角线的 $a,d$ 换成 $a-\lambda, d-\lambda$）：</p>
-
 $$\det(A - \lambda I) = (a-\lambda)(d-\lambda) - bc$$
-
 $$= ad - a\lambda - d\lambda + \lambda^2 - bc$$
-
 $$= \lambda^2 - \underbrace{(a+d)}_{\text{迹}}\lambda + \underbrace{(ad-bc)}_{\text{行列式}} = 0$$
-
 <p>这就是关于 $\lambda$ 的二次方程！$a+d$（对角线之和）叫<strong>迹</strong>（trace，记作 $\text{tr}(A)$），$ad-bc$ 就是行列式 $\det(A)$。</p>
-
 <p><strong>用二次方程求根公式解出 λ 的通解：</strong></p>
-
 $$\lambda = \frac{\text{tr}(A) \pm \sqrt{\text{tr}(A)^2 - 4 \cdot \det(A)}}{2}$$
-
 <p>代入 $\text{tr}(A) = 7$，$\det(A) = 10$：</p>
-
 $$\lambda = \frac{7 \pm \sqrt{7^2 - 4 \times 10}}{2} = \frac{7 \pm \sqrt{49 - 40}}{2} = \frac{7 \pm 3}{2}$$
-
 $$\lambda_1 = \frac{7 + 3}{2} = 5, \quad \lambda_2 = \frac{7 - 3}{2} = 2$$
-
 <p>对任意 2×2 矩阵，特征值就是两个数：$\frac{\text{tr} \pm \sqrt{\text{tr}^2 - 4\det}}{2}$。判别式 $\text{tr}^2 - 4\det$ 决定：正 → 两个实根，零 → 重根，负 → 复根。</p>
-
 <div class="callout callout-info">
 <strong>🔍 迹的直观比喻：</strong> 迹 = 对角线之和 = <strong>各方向拉伸率之和</strong>。回忆对角矩阵 $\begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}$——x 方向拉长 2 倍，y 方向拉长 3 倍，迹 = 2+3 = 5。而特征值之积 = 行列式（面积放大倍数），特征值之和 = 迹（拉伸率总和）。一个管<strong>乘法</strong>（体积怎么变），一个管<strong>加法</strong>（各方向拉了多少）。
 </div>
-
 <pre><code>A = np.array([[4, 1], [2, 3]])
-
 # 迹 = 对角线之和
 trace = np.trace(A)         # = 4 + 3 = 7
 print(f"迹 = {trace}")
-
 # 行列式 = ad - bc
 det_A = np.linalg.det(A)    # = 4×3 - 1×2 = 10
 print(f"行列式 = {det_A:.0f}")
-
 # 特征方程: λ² - 7λ + 10 = 0
 # 二次方程求根: λ = (7 ± √(49-40)) / 2 = (7 ± 3) / 2
 import math
@@ -133,35 +82,22 @@ discriminant = math.sqrt(7**2 - 4*10)  # √(b²-4ac) = √(49-40) = 3
 lambda1 = (7 + discriminant) / 2       # = 5
 lambda2 = (7 - discriminant) / 2       # = 2
 print(f"λ₁ = {lambda1}, λ₂ = {lambda2}")</code></pre>
-
 <h4>两个恒等式是怎么来的？</h4>
-
 <p>特征方程展开后是 $\lambda^2 - \text{tr}(A)\lambda + \det(A) = 0$。这是标准二次方程 $x^2 + bx + c = 0$ 的形式（这里 $b = -\text{tr}(A)$，$c = \det(A)$）。</p>
-
 <p>二次方程有一个定理（韦达定理）：<strong>所有根之和 = $-b$，所有根之积 = $c$</strong>。拿 $x^2 - 7x + 10 = 0$ 来说：两根 2 和 5，和是 7（= $-(-7)$），积是 10。为什么？因为二次方程可以写成 $(x - r_1)(x - r_2) = 0$，展开后 $x^2 - (r_1+r_2)x + r_1 r_2 = 0$，对应系数就得到关系。</p>
-
 <p>应用到特征方程 $\lambda^2 - \text{tr}(A)\lambda + \det(A) = 0$：</p>
-
 <div class="callout callout-info">
 <strong>恒等式 ①：$\lambda_1 + \lambda_2 = \text{tr}(A)$</strong> — 特征值之和 = 迹（对角线之和）<br>
 <strong>恒等式 ②：$\lambda_1 \times \lambda_2 = \det(A)$</strong> — 特征值之积 = 行列式
 </div>
-
 <p><strong>走一遍例子验证：</strong> $A = \begin{bmatrix} 4 & 1 \\ 2 & 3 \end{bmatrix}$，迹 = 7，行列式 = 10。解出 $\lambda_1=5, \lambda_2=2$。5+2=7 ✓，5×2=10 ✓。</p>
-
 <h3>特征值与行列式的关系</h3>
-
 <p>行列式 = <strong>所有特征值相乘</strong>：</p>
-
 $$\det(A) = \lambda_1 \times \lambda_2 \times \cdots \times \lambda_n$$
-
 <div class="callout callout-info">
 <strong>📐 从 2×2 → n×n：</strong>
-
 <p><strong>① 2×2 回顾。</strong> 特征方程 $\lambda^2 - \text{tr}(A)\lambda + \det(A) = 0$，常数项 = $\det(A)$。同时因式分解 $(\lambda_1 - \lambda)(\lambda_2 - \lambda)$ 展开后常数项 = $\lambda_1\lambda_2$。同一多项式两种写法 → $\det(A) = \lambda_1\lambda_2$。</p>
-
 <p><strong>② 3×3 验证。</strong> 用 00-04 学的降阶展开，算一个具体例子——矩阵 $A = \begin{bmatrix} 3 & 1 & 0 \\ 1 & 2 & 1 \\ 0 & 1 & 3 \end{bmatrix}$ 的特征多项式：</p>
-
 $$\begin{aligned}
 \det(A-\lambda I) &= \begin{vmatrix} 3-\lambda & 1 & 0 \\ 1 & 2-\lambda & 1 \\ 0 & 1 & 3-\lambda \end{vmatrix} \\[4pt]
 &= (3-\lambda)\!\begin{vmatrix}2-\lambda&1\\1&3-\lambda\end{vmatrix} - 1\!\begin{vmatrix}1&1\\0&3-\lambda\end{vmatrix} + 0 \\[4pt]
@@ -169,85 +105,52 @@ $$\begin{aligned}
 &= (3-\lambda)(\lambda^2 - 5\lambda + 4) \\[4pt]
 &= (3-\lambda)(\lambda-1)(\lambda-4)
 \end{aligned}$$
-
 <p>令 $\lambda=0$，常数项 = $\det(A) = 3 \times (-1) \times (-4) = 12$。因式分解给出的特征值 $1,3,4$，乘积也是 12 ✓。</p>
-
 <p><strong>③ n×n——同样的逻辑。</strong> 降阶展开把 $\det(A-\lambda I)$ 拆成 $ad-bc$ 的组合。令 $\lambda=0$，所有含 $\lambda$ 的项消失，<strong>常数项恰好等于 $\det(A)$</strong>。同时特征多项式因式分解为 $(\lambda_1-\lambda)\cdots(\lambda_n-\lambda)$，令 $\lambda=0$，常数项 = $\lambda_1\cdots\lambda_n$。</p>
-
 <p><strong>同一個多项式，两种写法，常数项必须相等 → $\det(A) = \prod_{i=1}^n \lambda_i$。</strong></p>
-
 </div>
-
 <p>如果有一个特征值 = 0，行列式就是 0——空间被压扁了。面积放大倍数 = 每个方向放大倍数的乘积。多直观！</p>
-
 <h3>求出 λ 之后，怎么求特征向量 v？</h3>
-
 <p>有了特征值，把每个 λ 代回 $(A - \lambda I)\mathbf{v} = \mathbf{0}$，解出 v。</p>
-
 <p><strong>对 λ₁ = 5：</strong></p>
-
 $$A - 5I = \begin{bmatrix} 4-5 & 1 \\ 2 & 3-5 \end{bmatrix} = \begin{bmatrix} -1 & 1 \\ 2 & -2 \end{bmatrix}$$
-
 <p>解 $\begin{bmatrix} -1 & 1 \\ 2 & -2 \end{bmatrix} \begin{bmatrix} v_x \\ v_y \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$。第一行：$-v_x + v_y = 0$，所以 $v_y = v_x$。第二行 $2v_x - 2v_y = 0$ 是同一回事（第一行 × (-2)）。也就是说，只要 $v_y = v_x$ 就行——有无穷多解，取最简单的一个：</p>
-
 $$\mathbf{v}_1 = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$$
-
 <p><strong>对 λ₂ = 2：</strong></p>
-
 $$A - 2I = \begin{bmatrix} 4-2 & 1 \\ 2 & 3-2 \end{bmatrix} = \begin{bmatrix} 2 & 1 \\ 2 & 1 \end{bmatrix}$$
-
 <p>第一行：$2v_x + v_y = 0$，所以 $v_y = -2v_x$。取 $v_x = 1$：</p>
-
 $$\mathbf{v}_2 = \begin{bmatrix} 1 \\ -2 \end{bmatrix}$$
-
 <p><strong>验证：</strong> $A\mathbf{v}_1 = \begin{bmatrix} 4&1\\2&3 \end{bmatrix} \begin{bmatrix} 1\\1 \end{bmatrix} = \begin{bmatrix} 5\\5 \end{bmatrix} = 5 \cdot \begin{bmatrix} 1\\1 \end{bmatrix}$ ✓。$A\mathbf{v}_2 = \begin{bmatrix} 4&1\\2&3 \end{bmatrix} \begin{bmatrix} 1\\-2 \end{bmatrix} = \begin{bmatrix} 2\\-4 \end{bmatrix} = 2 \cdot \begin{bmatrix} 1\\-2 \end{bmatrix}$ ✓。</p>
-
 <p><strong>推导链完整：</strong> 特征方程 → 二次方程求 λ → 代入 $(A-\lambda I)\mathbf{v}=0$ → 解线性方程组 → 得到 v。下面用代码验证全过程：</p>
-
 <pre><code>A = np.array([[4, 1], [2, 3]])
-
 # np.linalg.eig 返回两样：
 #   eigvals → 特征值数组
 #   eigvecs → 特征向量（每列是一个特征向量）
 eigvals, eigvecs = np.linalg.eig(A)
-
 print(f"特征值: {eigvals}")         # [5. 2.]
 # 解释：一个方向被拉长 5 倍，另一个被拉长 2 倍
-
 print(f"行列式 = {np.linalg.det(A):.0f}")  # 10 = 5×2 ✓
-
 # 验证：A@v 应该 = λ×v
 v1 = eigvecs[:, 0]              # 第一个特征向量（第0列）
 l1 = eigvals[0]                  # 第一个特征值
 print(f"A@v1 = {A @ v1}")       # 扭一下
 print(f"λ×v1 = {l1 * v1}")      # 单纯缩放
 print(f"相等? {np.allclose(A @ v1, l1 * v1)}")  # True</code></pre>
-
 <h3>特例：对角矩阵</h3>
-
 <p>如果矩阵只有对角线上有数，其余全是 0：</p>
-
 $$A = \begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}$$
-
 <p>这个矩阵把 x 方向拉长 2 倍，y 方向拉长 3 倍——<strong>没有任何扭转</strong>。所以：</p>
-
 <ul>
-  <li>特征值 = 2 和 3（就是对角线上的数）</li>
-  <li>特征向量 = $[1,0]$ 和 $[0,1]$（就是坐标轴方向）</li>
+<li>特征值 = 2 和 3（就是对角线上的数）</li>
+<li>特征向量 = $[1,0]$ 和 $[0,1]$（就是坐标轴方向）</li>
 </ul>
-
 <p>看到对角矩阵 → 特征值就在对角线上，不用算。</p>
-
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
-
 <hr>
-
 <h2>💭 概念题</h2>
-
 <ol>
 <li>用特征方程手算 $A = \begin{bmatrix} 3 & 0 \\ 0 & 5 \end{bmatrix}$ 的特征值和特征向量。行列式是多少？验证 $\lambda_1+\lambda_2=$ 迹 和 $\lambda_1\lambda_2=$ 行列式。——考察：对角矩阵特征值 + 迹/行列式恒等式</li>
 </ol>
-
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-04/">← 00-04</a><a href="../../">📖 目录</a><a href="../00-06/">下一课 →</a></nav>
+<a href="../00-04/">← 00-04</a><a href="../../">📖 目录</a><a href="../00-06/">00-06 →</a></nav>
 </div></body></html>

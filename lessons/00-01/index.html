@@ -6,143 +6,95 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 </head><body>
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-01</span>
 <span><a href="../../">目录</a> &nbsp; <a href="../00-02/">下一课 →</a></span></nav>
 <div class="container">
-
 <h1>00-01 标量、向量、矩阵、张量</h1>
-
 <p>数学和编程里每一片数据都有"形状"——就像积木有不同大小。这节课认识四种最基本的形状。每种形状我们先在脑子里建一个画面，再用代码看一眼。</p>
-
 <div style="text-align:center;margin:1.5rem 0">
-  <img src="assets/staircase.png" alt="四级台阶：标量(点)→向量(箭)→矩阵(网格)→张量(一摞网格)"
-       style="max-width:100%;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
-  <p style="font-size:.85rem;color:#888;margin-top:.4rem">▲ 四级台阶：每升一级，多一个维度</p>
+<img src="assets/staircase.png" alt="四级台阶：标量(点)→向量(箭)→矩阵(网格)→张量(一摞网格)"
+style="max-width:100%;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+<p style="font-size:.85rem;color:#888;margin-top:.4rem">▲ 四级台阶：每升一级，多一个维度</p>
 </div>
-
 <hr>
-
 <h2>一、标量 Scalar — 一个单独的数</h2>
-
 <p>温度 25°C、考试分数 92、银行余额 384.50——这些都是标量：<strong>一个数，没有方向，没有形状。</strong></p>
-
 <p>在 Python 里怎么写？</p>
-
 <pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np  <span class="hl-comment"># numpy: Python 做数学运算的核心库，先把它加载进来</span>
-
 s = np.array(<span class="hl-number">3.14</span>)    <span class="hl-comment"># np.array() 把 Python 的普通数字包成 numpy 的"数组"格式</span>
-                       <span class="hl-comment"># 3.14 是个 Python float，包一层后变成 numpy 标量</span>
+<span class="hl-comment"># 3.14 是个 Python float，包一层后变成 numpy 标量</span>
 <span class="hl-builtin">print</span>(s)               <span class="hl-comment"># 输出: 3.14 ——就是那个数本身</span>
 <span class="hl-builtin">print</span>(s.shape)          <span class="hl-comment"># 输出: () ——空括号 = 零维，没有行也没有列</span>
-                       <span class="hl-comment"># .shape 是 numpy 数组自带的属性，告诉你"这个数组长什么样"</span></code></pre>
-
+<span class="hl-comment"># .shape 是 numpy 数组自带的属性，告诉你"这个数组长什么样"</span></code></pre>
 <p>标量虽然简单，但实际应用里很少单独用。你怎么同时管几千个数？答案在下面。</p>
-
 <hr>
-
 <h2>二、向量 Vector — 一排数，像一根箭</h2>
-
 <p><strong>画面：</strong> 想象你在黑板上画了一根从原点出发的箭，箭头落在 $(x, y)$ 的位置。这根箭就是向量 $[x, y]$。</p>
-
 <p>如果箭头落在 $(3, 4)$：</p>
 <ul>
-  <li>箭的<strong>长度</strong> = $\sqrt{3^2 + 4^2} = 5$<br><em>为什么是平方和开根号？勾股定理——从原点走到 (3,4)：先往右走 3，再往上走 4，这两段和斜线构成直角三角形。斜边² = 直角边²之和 = 3² + 4² = 25，所以斜边 = √25 = 5。</em></li>
-  <li>箭的<strong>方向</strong> = 箭头指的那个朝向</li>
+<li>箭的<strong>长度</strong> = $\sqrt{3^2 + 4^2} = 5$<br><em>为什么是平方和开根号？勾股定理——从原点走到 (3,4)：先往右走 3，再往上走 4，这两段和斜线构成直角三角形。斜边² = 直角边²之和 = 3² + 4² = 25，所以斜边 = √25 = 5。</em></li>
+<li>箭的<strong>方向</strong> = 箭头指的那个朝向</li>
 </ul>
-
 <p>向量就是一排数——但<strong>不能只当一排数看</strong>。它背后是一根有长度、有方向的箭，这种直觉是后面所有线性代数的基础。</p>
-
 <pre><code>v = np.array([<span class="hl-number">85</span>, <span class="hl-number">92</span>, <span class="hl-number">78</span>])  <span class="hl-comment"># 方括号 [] 把三个数包起来，这就是一个向量</span>
-                              <span class="hl-comment"># numpy 自动识别：一维数组 = 向量</span>
+<span class="hl-comment"># numpy 自动识别：一维数组 = 向量</span>
 <span class="hl-builtin">print</span>(v)                      <span class="hl-comment"># 输出: [85 92 78]</span>
 <span class="hl-builtin">print</span>(v.shape)                 <span class="hl-comment"># 输出: (3,) ——逗号表示"这是一维"</span>
-                              <span class="hl-comment"># (3,) 和 (1,3) 不同：(3,) 是一维向量，(1,3) 是只有一行的二维矩阵</span>
+<span class="hl-comment"># (3,) 和 (1,3) 不同：(3,) 是一维向量，(1,3) 是只有一行的二维矩阵</span>
 <span class="hl-builtin">print</span>(v[<span class="hl-number">1</span>])                   <span class="hl-comment"># 输出: 92 ——索引从 0 开始：v[0]=85, v[1]=92, v[2]=78</span></code></pre>
-
 <p>向量就是"一张表"——你有一个学生三门课的成绩表，装在这个向量里。每个位置固定代表一门课：第 0 位是语文，第 1 位是数学，第 2 位是英语。</p>
-
 <div class="callout callout-important">
 <h3>同一个箭头，两种容器：rank-1 vs rank-2</h3>
-
 <p><code>[85, 92, 78]</code> 这根箭可以装在两种容器里：</p>
-
 <table>
 <tr><th></th><th>rank-1 向量</th><th>rank-2 列矩阵</th></tr>
 <tr><td>代码</td><td><code>np.array([85,92,78])</code></td><td><code>np.array([[85],[92],[78]])</code></td></tr>
 <tr><td>shape</td><td><code>(3,)</code> — 一个数</td><td><code>(3,1)</code> — 两个数</td></tr>
 <tr><td>画面</td><td>一根 3D 空间的箭</td><td>同一根箭，但装在表格里</td></tr>
 </table>
-
 <p><strong>rank = shape 里有几个数。</strong> <code>()</code> 是 rank-0（标量），<code>(3,)</code> 是 rank-1（向量），<code>(3,1)</code> 是 rank-2（矩阵）。</p>
-
 <p><strong>关键区别：</strong> rank-1 向量的 <code>.T</code>（转置）<strong>不生效</strong>——它没有"行"和"列"的概念，转置还是自己。<strong>为什么？</strong> <code>.T</code> 的本质是「交换轴 0 和轴 1」——但 rank-1 只有轴 0，没有轴 1。没东西可交换，所以 <code>.T</code> 什么都不做。rank-2 列矩阵有两个轴（行和列），转置会交换它们：<code>(3,1)</code> → <code>(1,3)</code>。</p>
-
 <pre><code>a = np.array([1, 2, 3])       # rank-1: (3,)
 b = np.array([[1],[2],[3]])   # rank-2: (3,1)
-
 print(a.T)   # 输出: [1 2 3] ——没变！rank-1 没有转置概念
 print(b.T)   # 输出: [[1 2 3]] ——从 (3,1) 变成了 (1,3)</code></pre>
-
 <p>箭的分量一样（都是 1,2,3），但<strong>容器的 rank 不同，numpy 对待它们的方式就不一样。</strong>这个概念后面学广播和矩阵乘法时会反复出现。</p>
 </div>
-
 <hr>
-
 <h2>三、矩阵 Matrix — 不是数据，是"操作手册"</h2>
-
 <p><strong>画面：</strong> 你有一块橡皮泥，捏成箭头的样子。你想把它<strong>扭一下、拉一下</strong>，变成另一个形状。你需要一个"操作手册"告诉机器：旧箭头的每个分量怎么搅和到一起产生新箭头的分量。</p>
-
 <p><strong>矩阵就是这本操作手册。</strong> <em>（注意：矩阵不总是操作手册——比如协方差矩阵就是数据关系表，不是操作。但在深度学习中，权重矩阵、投影矩阵确实都是对数据做变换的，用「操作手册」来理解它们特别合适。）</em></p>
-
 <p>比如你想把箭头 $[1, 2]$ 变成 $[4, 6]$，用这个矩阵：</p>
-
 $$\mathbf{W} = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}$$
-
 <p>把它"作用"到箭头上——矩阵乘向量：</p>
-
 $$\mathbf{y} = \mathbf{W}\mathbf{x} = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix} \begin{bmatrix} 1 \\ 2 \end{bmatrix} = \begin{bmatrix} 2\times 1 + 1\times 2 \\ 0\times 1 + 3\times 2 \end{bmatrix} = \begin{bmatrix} 4 \\ 6 \end{bmatrix}$$
-
 <p><em>怎么算的？第 1 个分量 = W 第 1 行 [2,1] 和 x [1,2]「对应位置相乘再求和」→ 2×1+1×2=4。第 2 个分量同理。这个操作叫<strong>点乘</strong>（下一课详讲），这里先记住「行 × 列 = 一个数」就行。</em></p>
-
 <p><strong>箭头被扭了。</strong> 原来指 $(1,2)$，现在指 $(4,6)$。</p>
-
 <p><strong>形状的铁律：</strong></p>
 <ul>
-  <li>$W$ 是 $(2, 2)$，$x$ 是 $(2,)$，$y$ 是 $(2,)$</li>
-  <li>$W$ 的<strong>列数</strong> = $x$ 的<strong>长度</strong>（都是 2）——不然没法做点乘</li>
-  <li>$y$ 的长度 = $W$ 的<strong>行数</strong></li>
+<li>$W$ 是 $(2, 2)$，$x$ 是 $(2,)$，$y$ 是 $(2,)$</li>
+<li>$W$ 的<strong>列数</strong> = $x$ 的<strong>长度</strong>（都是 2）——不然没法做点乘</li>
+<li>$y$ 的长度 = $W$ 的<strong>行数</strong></li>
 </ul>
-
 <pre><code>W = np.array([[<span class="hl-number">2</span>, <span class="hl-number">1</span>],     <span class="hl-comment"># 两层方括号：外层包住所有行，内层各包一行</span>
-              [<span class="hl-number">0</span>, <span class="hl-number">3</span>]])    <span class="hl-comment"># 形状 (2, 2)：2 行 2 列</span>
-
+[<span class="hl-number">0</span>, <span class="hl-number">3</span>]])    <span class="hl-comment"># 形状 (2, 2)：2 行 2 列</span>
 x = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>])     <span class="hl-comment"># 向量，形状 (2,)</span>
-
 <span class="hl-comment"># @ 是 Python 里的矩阵乘法运算符（Python 3.5+）</span>
 y = W @ x               <span class="hl-comment"># 矩阵乘向量：W(2,2) 把 x(2,) 扭成 y(2,)</span>
 <span class="hl-builtin">print</span>(y)                 <span class="hl-comment"># 输出: [4 6] ——箭头从 (1,2) 扭到了 (4,6)</span></code></pre>
-
 <hr>
-
 <h2>四、张量 Tensor — 三维及以上的"积木块"</h2>
-
 <p><strong>画面：</strong> 标量是一个点、向量是一根棍、矩阵是一张纸。那比纸更厚的呢？一<strong>摞</strong>纸——这就是三维张量。</p>
-
 <p>一张 224×224 像素的<strong>彩色照片</strong>怎么存？它不是一张纸——它是三张纸摞在一起：一张红色通道、一张绿色通道、一张蓝色通道。每一张都是 224×224。合在一起，形状是 <code>(3, 224, 224)</code>。</p>
-
 <p>如果你一次处理 32 张照片（这是常见做法，一次处理一批比一张张处理快得多），那就是四维：<code>(32, 3, 224, 224)</code>。第 0 维 = 一批有几张，第 1 维 = 颜色通道，第 2、3 维 = 图片的高和宽。</p>
-
 <pre><code><span class="hl-comment"># np.ones(形状) 创建全 1 数组</span>
 T = np.ones((<span class="hl-number">2</span>, <span class="hl-number">3</span>, <span class="hl-number">4</span>))     <span class="hl-comment"># (2摞, 每摞3行, 每行4列)</span>
 <span class="hl-builtin">print</span>(T.shape)              <span class="hl-comment"># 输出: (2, 3, 4) ——三维</span>
 <span class="hl-builtin">print</span>(T.size)               <span class="hl-comment"># 输出: 24 ——总共有 2×3×4=24 个数字在里面</span></code></pre>
-
 <hr>
-
 <h2>📌 四级台阶速查</h2>
-
 <table>
 <tr><th>名字</th><th>画面</th><th>shape</th><th>例子</th></tr>
 <tr><td>标量</td><td>一个点</td><td><code>()</code></td><td>温度 25°C</td></tr>
@@ -150,17 +102,13 @@ T = np.ones((<span class="hl-number">2</span>, <span class="hl-number">3</span>,
 <tr><td>矩阵</td><td>一张纸（操作手册）</td><td><code>(m, n)</code></td><td>扭箭头的规则</td></tr>
 <tr><td>张量</td><td>一摞纸</td><td><code>(b,c,h,w)</code></td><td>一批彩色照片</td></tr>
 </table>
-
 <hr>
-
 <h2>💭 概念题</h2>
-
 <ol>
 <li>一个矩阵 $W$ 形状是 (2, 3)。如果它要乘一个向量 $x$，$x$ 的长度必须是多少？结果向量的长度又是多少？——考察：矩阵乘向量的形状匹配规则</li>
 <li><code>np.array([1,2,3])</code> 的 shape 是 <code>(3,)</code>，而 <code>np.array([[1],[2],[3]])</code> 的 shape 是 <code>(3,1)</code>。用箭头画面解释：这两种形状在几何上有什么区别？——考察：一维向量 vs 二维单列矩阵</li>
 <li>把 10 张 64×64 的彩色照片存成张量，它的形状是什么？第 0 维代表什么？——考察：张量维度含义</li>
 </ol>
-
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../../">📖 目录</a><a href="../00-02/">下一课 →</a></nav>
+<span></span><a href="../../">📖 目录</a><a href="../00-02/">00-02 →</a></nav>
 </div></body></html>
