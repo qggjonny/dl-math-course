@@ -35,7 +35,17 @@ f'(x) &= \lim_{\epsilon \to 0} \frac{(x+\epsilon)^2 - x^2}{\epsilon} \\[4pt]
 &= \lim_{\epsilon \to 0} \frac{2x\epsilon + \epsilon^2}{\epsilon} = \lim_{\epsilon \to 0} (2x + \epsilon) = 2x
 \end{aligned}$$
 <p>所以 $(x^2)' = 2x$。每步做了什么：① 展开平方 ② 消掉 $x^2$ ③ 提出 $\epsilon$ 消掉 ④ $\epsilon \to 0$ 时 $\epsilon$ 项消失。</p>
-<p><strong>$f(x) = x^n$ 的通式（幂函数求导）：</strong> 同样的套路，展开 $(x+\epsilon)^n$ 用二项式定理，第一项 $x^n$ 消掉，$\epsilon$ 提出后剩下 $nx^{n-1}$。结果是：</p>
+<p><strong>$f(x) = x^n$ 的通式（幂函数求导）：</strong> 还是走定义，三步拆开：</p>
+
+<p><strong>① 二项式展开：</strong></p>
+$$(x+\epsilon)^n = x^n + n x^{n-1}\epsilon + \binom{n}{2} x^{n-2}\epsilon^2 + \dots + \epsilon^n$$
+<p>第一项是 $x^n$，后面每一项都带着 $\epsilon$ 或更高次幂。</p>
+
+<p><strong>② 代入差商：</strong></p>
+$$\frac{f(x+\epsilon) - f(x)}{\epsilon} = \frac{(x^n + n x^{n-1}\epsilon + \epsilon^2\cdot(\cdots)) - x^n}{\epsilon} = n x^{n-1} + \epsilon \cdot (\cdots)$$
+<p>$x^n$ 被减掉消了；剩下的每一项都除以 $\epsilon$，$n x^{n-1}\epsilon / \epsilon = n x^{n-1}$，其余项除完后还有 $\epsilon$ 因子。</p>
+
+<p><strong>③ 取极限 $\epsilon \to 0$：</strong> 带 $\epsilon$ 的项全部归零——只留下 $n x^{n-1}$。结果是：</p>
 $$\boxed{(x^n)' = n \cdot x^{n-1}}$$
 <p>例子：$(x^3)' = 3x^2$，$(x)' = 1 \cdot x^0 = 1$，$(5)' = 0$（常数斜率永远是 0——一条水平线没有坡度）。</p>
 <div class="callout callout-info">

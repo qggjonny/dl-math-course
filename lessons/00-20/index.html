@@ -72,9 +72,18 @@ print(f"交叉熵(差) = {cross_entropy(y_true, bad):.4f}")    # ~2.303</code></
 <p>模型越好 → 交叉熵越小。这就是训练分类模型时最小化的那个数。</p>
 <hr>
 <h2>四、KL 散度：两个分布"形状"差多少？</h2>
-<p>交叉熵 = 熵 + <strong>KL 散度</strong>：</p>
-$$H(P, Q) = H(P) + D_{\mathrm{KL}}(P \parallel Q)$$
-<p>移项：</p>
+<p>交叉熵 = 熵 + <strong>KL 散度</strong>。推导只差一行——把 $D_{KL}$ 的定义展开再拆分：</p>
+
+$$\begin{aligned}
+D_{\mathrm{KL}}(P \parallel Q) &= \sum_x P(x) \ln\frac{P(x)}{Q(x)} \\
+&= \sum_x P(x) \big[\ln P(x) - \ln Q(x)\big] \\
+&= \underbrace{\sum_x P(x) \ln P(x)}_{-H(P)} \;-\; \underbrace{\sum_x P(x) \ln Q(x)}_{-H(P,Q)} \\
+&= -H(P) + H(P, Q)
+\end{aligned}$$
+
+<p>移项即得：$H(P,Q) = H(P) + D_{\mathrm{KL}}(P \parallel Q)$。</p>
+
+<p><strong>KL 散度的定义公式：</strong></p>
 $$\boxed{D_{\mathrm{KL}}(P \parallel Q) = \sum_x P(x) \ln\frac{P(x)}{Q(x)}}$$
 <p><strong>KL 散度衡量的是：</strong> 用 $Q$ 来近似 $P$，比直接用 $P$ 多浪费了多少信息。熵 $H(P)$ 是「最低消费」——数据本身的不确定性。KL 散度是「超额消费」——模型不好带来的额外成本。</p>
 <p><strong>关键性质：</strong></p>

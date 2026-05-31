@@ -99,9 +99,17 @@ $$P(y \mid \hat{y}) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y - \hat{y
 
 $$L = \prod_{i=1}^N \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right)$$
 
-<p>取对数（忽略常数项）：</p>
+<p>取对数——把连乘变成连加：</p>
 
-$$\ell = -\sum_{i=1}^N \frac{(y_i - \hat{y}_i)^2}{2\sigma^2}$$
+$$\begin{aligned}
+\ell &= \ln L = \ln\prod_{i=1}^N \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right) \\[4pt]
+&= \sum_{i=1}^N \ln\left[\frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right)\right] \\[4pt]
+&= \underbrace{N \ln\frac{1}{\sqrt{2\pi\sigma^2}}}_{\text{常数，不依赖 }\hat{y}_i} \;+\; \sum_{i=1}^N \left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right)
+\end{aligned}$$
+
+<p>常数项 $N\ln(1/\sqrt{2\pi\sigma^2})$ 不含模型参数 $\hat{y}_i$，不影响优化——最大化 $\ell$ 时可以丢掉。因子 $1/(2\sigma^2) > 0$ 是正常数，最小化时也可省略。所以：</p>
+
+$$\text{最大化 }\ell \;\Longleftrightarrow\; \text{最小化 } \sum_{i=1}^N (y_i - \hat{y}_i)^2$$
 
 <p><strong>最大化 $\ell$ = 最小化 $\sum (y_i - \hat{y}_i)^2$ → MSE！</strong></p>
 
