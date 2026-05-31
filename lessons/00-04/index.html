@@ -62,10 +62,10 @@ $$\mathbf{v}_1 = \begin{bmatrix} a_{11} \\ a_{21} \\ a_{31} \end{bmatrix},\quad
 <p>这三个向量张成一个<strong>平行六面体</strong>（一个被"推歪了"的立方体）。行列式 = 这个平行六面体的<strong>有向体积</strong>——空间被放大了几倍。</p>
 <p><strong>怎么算这个体积？</strong> 把三维体积拆成二维面积的组合。</p>
 <p><strong>画面：</strong> 把 $\mathbf{v}_2$ 和 $\mathbf{v}_3$ 先投影到某个坐标平面上（比如 yz 平面），算它们在那张平面上的投影面积的 2D 行列式。然后用 $\mathbf{v}_1$ 在这个平面垂直方向上的分量做"高度"。三张坐标平面各贡献一部分，加起来就是总体积。</p>
-<p>具体来说——沿第一行展开：</p>
+<p>具体来说——沿第一列展开（把 $\mathbf{v}_1$ 按分量拆开）：</p>
 $$\det(A) = a_{11}\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}
-- a_{12}\begin{vmatrix}a_{21}&a_{23}\\a_{31}&a_{33}\end{vmatrix}
-+ a_{13}\begin{vmatrix}a_{21}&a_{22}\\a_{31}&a_{32}\end{vmatrix}$$
+- a_{21}\begin{vmatrix}a_{12}&a_{13}\\a_{32}&a_{33}\end{vmatrix}
++ a_{31}\begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}$$
 <p>每一项的含义：</p>
 <table>
 <tr><th>项</th><th>$\mathbf{v}_1$ 的分量</th><th>2×2 子式</th><th>含义</th></tr>
@@ -76,19 +76,19 @@ $$\det(A) = a_{11}\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}
 <td>yz 平面的投影面积 × x 方向的高度</td>
 </tr>
 <tr>
-<td>$-a_{12} \cdot \begin{vmatrix}a_{21}&a_{23}\\a_{31}&a_{33}\end{vmatrix}$</td>
+<td>$-a_{21} \cdot \begin{vmatrix}a_{12}&a_{13}\\a_{32}&a_{33}\end{vmatrix}$</td>
 <td>$\mathbf{v}_1$ 的 y 分量</td>
 <td>$\mathbf{v}_2,\mathbf{v}_3$ 的 xz 子块</td>
-<td>xz 平面的投影面积 × y 方向的高度<br>（前面有个负号——因为行列式对列的顺序敏感）</td>
+<td>xz 平面的投影面积 × y 方向的高度<br>（前面有个负号——$\mathbf{e}_2$ 跨到第二列需换一次，符号翻转）</td>
 </tr>
 <tr>
-<td>$+a_{13} \cdot \begin{vmatrix}a_{21}&a_{22}\\a_{31}&a_{32}\end{vmatrix}$</td>
+<td>$+a_{31} \cdot \begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}$</td>
 <td>$\mathbf{v}_1$ 的 z 分量</td>
 <td>$\mathbf{v}_2,\mathbf{v}_3$ 的 xy 子块</td>
-<td>xy 平面的投影面积 × z 方向的高度</td>
+<td>xy 平面的投影面积 × z 方向的高度<br>（$\mathbf{e}_3$ 跨两次，负负得正）</td>
 |</tr>
 </table>
-<p>但等等——<strong>为什么这样加起来就等于总体积？</strong> 这不是巧合，而是行列式三条基本性质的必然结果。下面一步步推出来。</p>
+<p><strong>注意这个公式里用的是 $a_{11}, a_{21}, a_{31}$——都是第一列的元素。</strong> 下面就用行列式的三条基本性质，一步步证明为什么这个公式成立（而不是死记）。</p>
 
 <h3>推导：从"体积放大镜"到降阶展开</h3>
 
@@ -176,7 +176,7 @@ $$\begin{aligned}
 <div class="callout callout-info">
 <strong>📐 n×n 推广：</strong> 替换 $\mathbf{e}_1, \mathbf{e}_2, \mathbf{e}_3$ 的思路对任意 n 维适用。展开第 i 行第 j 列时，把第一列拆成 n 个基向量 → 每项交换列让基向量归位 → 符号 = $(-1)^{i+j}$（棋盘格，i+j 为偶数正、奇数负）→ 去掉第 i 行第 j 列 → 剩下 (n-1)×(n-1) 子式。一路递归到底层 2×2 的 $ad-bc$。
 </div>
-<p><strong>走一个例子：</strong></p>
+<p><strong>走一个例子——换沿第一行展开试试（推导证明的是第一列，但任意行/列结果一样）：</strong></p>
 $$A = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix}$$
 <p>沿第一行展开：</p>
 $$\begin{aligned}
@@ -191,11 +191,11 @@ $$\begin{aligned}
 \end{aligned}$$
 <p>行列式 = 0！这意味着矩阵把三维空间<strong>压扁了</strong>——三个向量躺在同一张平面上，体积 = 0。实际上第三行 = 第二行 × 2 − 第一行，三行不独立。</p>
 <div class="callout callout-tip">
-<strong>💡 可以沿任意一行或一列展开。</strong> 沿第一列展开的话：
+<strong>💡 可以沿任意一行或一列展开。</strong> 上面走的是第一列，沿第一行展开结果也一样：
 $$\det(A) = a_{11}\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}
-- a_{21}\begin{vmatrix}a_{12}&a_{13}\\a_{32}&a_{33}\end{vmatrix}
-+ a_{31}\begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}$$
-结果一样。展开时符号规律是棋盘格：$(-1)^{i+j}$。通常选含 0 最多的行或列，省计算。
+- a_{12}\begin{vmatrix}a_{21}&a_{23}\\a_{31}&a_{33}\end{vmatrix}
++ a_{13}\begin{vmatrix}a_{21}&a_{22}\\a_{31}&a_{32}\end{vmatrix}$$
+展开时符号规律是棋盘格：$(-1)^{i+j}$。通常选含 0 最多的行或列，省计算。
 </div>
 <h3>n×n 行列式——套路不变</h3>
 <p>4×4 降成 3×3（四个 3×3 行列式），每个 3×3 再降成 2×2……一层层拆下去，<strong>最终全是 $ad-bc$ 的组合</strong>。降阶展开是行列式三条基本性质的直接推论——不是凭空定义的算法。</p>
