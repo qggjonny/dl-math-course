@@ -153,19 +153,19 @@ $$= -\begin{vmatrix}a_{12}&a_{13}\\a_{32}&a_{33}\end{vmatrix}$$
 
 $$\det\begin{pmatrix}0&a_{12}&a_{13}\\0&a_{22}&a_{23}\\1&a_{32}&a_{33}\end{pmatrix}$$
 
-<p><strong>交换第 1 行和第 3 行</strong>（行列式变号）：</p>
+<p>要把第 3 行的 $1$ 挪到第 1 行，并且保持 $\mathbf{v}_2, \mathbf{v}_3$ 的顺序不变——<strong>换两次行</strong>：先换 2↔3，再换 1↔2。</p>
 
-$$-\;\det\begin{pmatrix}1&a_{32}&a_{33}\\0&a_{22}&a_{23}\\0&a_{12}&a_{13}\end{pmatrix}$$
+$$\det\begin{pmatrix}0&a_{12}&a_{13}\\0&a_{22}&a_{23}\\1&a_{32}&a_{33}\end{pmatrix}
+\;\xrightarrow{\text{换 2↔3，变号}}\;
+-\det\begin{pmatrix}0&a_{12}&a_{13}\\1&a_{32}&a_{33}\\0&a_{22}&a_{23}\end{pmatrix}
+\;\xrightarrow{\text{换 1↔2，再变号}}\;
+(-1)\cdot(-1)\det\begin{pmatrix}1&a_{32}&a_{33}\\0&a_{12}&a_{13}\\0&a_{22}&a_{23}\end{pmatrix}$$
 
-<p>第一列又变成 $[1,0,0]^T$ 了！展开，去掉第 1 行第 1 列：</p>
+<p>两次交换 → 负负得正。第一列变成 $[1,0,0]^T$，和 $\mathbf{e}_1$ 的情况完全一样！</p>
 
-$$= -\begin{vmatrix}a_{22}&a_{23}\\a_{12}&a_{13}\end{vmatrix}$$
+$$= +\begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}$$
 
-<p>这个 2×2 行列式的行顺序和我们想要的 $M_{31} = \begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}$ 正好<strong>反了</strong>。交换这两行，2×2 行列式再变一次号：</p>
-
-$$-\begin{vmatrix}a_{22}&a_{23}\\a_{12}&a_{13}\end{vmatrix} = -\bigl(-\begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}\bigr) = +\begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}$$
-
-<p>两次交换（一次 3×3 行交换 + 一次 2×2 行交换调顺序）→ 负负得正。</p>
+<p>干净利落——两次行交换，直接得到 $+M_{31}$。</p>
 
 <p><strong>三项全部用 $\mathbf{e}_1$ 的套路解决了。</strong></p>
 
