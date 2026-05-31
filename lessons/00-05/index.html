@@ -97,7 +97,7 @@ $$\det(A) = \lambda_1 \times \lambda_2 \times \cdots \times \lambda_n$$
 <div class="callout callout-info">
 <strong>📐 从 2×2 → n×n：</strong>
 <p><strong>① 2×2 回顾。</strong> 特征方程 $\lambda^2 - \text{tr}(A)\lambda + \det(A) = 0$，常数项 = $\det(A)$。同时因式分解 $(\lambda_1 - \lambda)(\lambda_2 - \lambda)$ 展开后常数项 = $\lambda_1\lambda_2$。同一多项式两种写法 → $\det(A) = \lambda_1\lambda_2$。</p>
-<p><strong>② 3×3 验证。</strong> 用 00-04 学的降阶展开，算一个具体例子——矩阵 $A = \begin{bmatrix} 3 & 1 & 0 \\ 1 & 2 & 1 \\ 0 & 1 & 3 \end{bmatrix}$ 的特征多项式：</p>
+<p><strong>② 3×3 验证。</strong> 用 00-04 学的降阶展开（沿第一行，符号 + - + 来自行交换次数：第 1 列 0 次→正，第 2 列 1 次→负，第 3 列 2 次→正），算一个具体例子——矩阵 $A = \begin{bmatrix} 3 & 1 & 0 \\ 1 & 2 & 1 \\ 0 & 1 & 3 \end{bmatrix}$ 的特征多项式：</p>
 $$\begin{aligned}
 \det(A-\lambda I) &= \begin{vmatrix} 3-\lambda & 1 & 0 \\ 1 & 2-\lambda & 1 \\ 0 & 1 & 3-\lambda \end{vmatrix} \\[4pt]
 &= (3-\lambda)\!\begin{vmatrix}2-\lambda&1\\1&3-\lambda\end{vmatrix} - 1\!\begin{vmatrix}1&1\\0&3-\lambda\end{vmatrix} + 0 \\[4pt]
