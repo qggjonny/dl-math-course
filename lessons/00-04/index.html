@@ -110,12 +110,20 @@ $$\mathbf{v}_1 = \begin{bmatrix} a_{11} \\ a_{21} \\ a_{31} \end{bmatrix}
           + a_{31}\begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix}
           = a_{11}\mathbf{e}_1 + a_{21}\mathbf{e}_2 + a_{31}\mathbf{e}_3$$
 
-<p>由线性性质（性质 3），行列式可以按第一列拆开：</p>
+<p>性质 3 说：<strong>行列式对每一列都是线性的</strong>——有两层意思：</p>
+<ul>
+<li><strong>拆加法：</strong> 第一列如果是两个向量之和，行列式可以拆成两个行列式之和。$\det(\mathbf{u}+\mathbf{w}, \mathbf{v}_2, \mathbf{v}_3) = \det(\mathbf{u}, \mathbf{v}_2, \mathbf{v}_3) + \det(\mathbf{w}, \mathbf{v}_2, \mathbf{v}_3)$</li>
+<li><strong>提倍数：</strong> 第一列如果乘了一个倍数，倍数可以提到行列式外面。$\det(c\,\mathbf{u}, \mathbf{v}_2, \mathbf{v}_3) = c \cdot \det(\mathbf{u}, \mathbf{v}_2, \mathbf{v}_3)$</li>
+</ul>
+<p>现在把 $\mathbf{v}_1 = a_{11}\mathbf{e}_1 + a_{21}\mathbf{e}_2 + a_{31}\mathbf{e}_3$ 代入行列式的第一列，<strong>先拆加法、再提倍数</strong>：</p>
 
-$$\det(A) = \det(\mathbf{v}_1, \mathbf{v}_2, \mathbf{v}_3)
-          = a_{11}\det(\mathbf{e}_1, \mathbf{v}_2, \mathbf{v}_3)
-          + a_{21}\det(\mathbf{e}_2, \mathbf{v}_2, \mathbf{v}_3)
-          + a_{31}\det(\mathbf{e}_3, \mathbf{v}_2, \mathbf{v}_3)$$
+$$\begin{aligned}
+\det(A) &= \det(a_{11}\mathbf{e}_1 + a_{21}\mathbf{e}_2 + a_{31}\mathbf{e}_3,\; \mathbf{v}_2,\; \mathbf{v}_3) \\
+&= \det(a_{11}\mathbf{e}_1, \mathbf{v}_2, \mathbf{v}_3) + \det(a_{21}\mathbf{e}_2, \mathbf{v}_2, \mathbf{v}_3) + \det(a_{31}\mathbf{e}_3, \mathbf{v}_2, \mathbf{v}_3) \quad \text{← 拆加法：三项之和拆成三个行列式} \\
+&= a_{11}\det(\mathbf{e}_1, \mathbf{v}_2, \mathbf{v}_3) + a_{21}\det(\mathbf{e}_2, \mathbf{v}_2, \mathbf{v}_3) + a_{31}\det(\mathbf{e}_3, \mathbf{v}_2, \mathbf{v}_3) \quad \text{← 提倍数：系数提到外面}
+\end{aligned}$$
+
+<p><strong>三项都在，一个不少。</strong> 现在每项里面是一个基向量 + $\mathbf{v}_2$ + $\mathbf{v}_3$ 的行列式，比原来简单了。</p>
 
 <p>三项分别是 $\mathbf{v}_1$ 的<strong>x、y、z 分量各自贡献的体积</strong>。每一项目己就是一个体积：比如 $a_{21}\det(\mathbf{e}_2, \mathbf{v}_2, \mathbf{v}_3)$ = 以 $\mathbf{v}_2,\mathbf{v}_3$ 在 xz 平面的投影面积（2×2 行列式）为<strong>底</strong>、$a_{21}$（$\mathbf{v}_1$ 的 y 分量）为<strong>高</strong>的一个斜方体。三个底 × 高拼起来 = 总体积。这回答了"为什么三部分加起来就是总体积"——线性性质把总体积拆成了三个独立的小体积，像把一块积木切成三片。</p>
 
