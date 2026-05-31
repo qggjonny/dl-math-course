@@ -127,37 +127,48 @@ $$\begin{aligned}
 
 <p>三项分别是 $\mathbf{v}_1$ 的<strong>x、y、z 分量各自贡献的体积</strong>。每一项目己就是一个体积：比如 $a_{21}\det(\mathbf{e}_2, \mathbf{v}_2, \mathbf{v}_3)$ = 以 $\mathbf{v}_2,\mathbf{v}_3$ 在 xz 平面的投影面积（2×2 行列式）为<strong>底</strong>、$a_{21}$（$\mathbf{v}_1$ 的 y 分量）为<strong>高</strong>的一个斜方体。三个底 × 高拼起来 = 总体积。这回答了"为什么三部分加起来就是总体积"——线性性质把总体积拆成了三个独立的小体积，像把一块积木切成三片。</p>
 
-<div class="callout callout-info">
-<strong>🔍 中间层——每一项 $\det(\mathbf{e}_i, \mathbf{v}_2, \mathbf{v}_3)$ 怎么化简成 2×2 子式？</strong><br><br>
-上面三项还都带着三列。怎么把三列缩成两列？<strong>沿第一列做 cofactor 展开。</strong><br><br>
-<strong>几何直觉：</strong> cofactor 展开的每一项 =（第一列第 i 个分量）×（去掉第 i 行和第一列后，剩下 $\mathbf{v}_2,\mathbf{v}_3$ 在垂直于 $\mathbf{e}_i$ 方向的那个平面上的投影面积）。<br>
-——如果第一列某个分量是 $0$，说明 $\mathbf{v}_1$ 在那个方向上<strong>没有分量</strong>，自然没有"高度"，该方向贡献的体积就是 $0$。<br>
-——只有分量非零的方向，才贡献体积。<br><br>
-<strong>对 $\det(\mathbf{e}_1, \mathbf{v}_2, \mathbf{v}_3)$：</strong> $\mathbf{e}_1 = [1,0,0]^T$。<br>
-第一列是 $[1,0,0]^T$——只有 x 方向有分量 $1$，y 和 z 方向分量都是 $0$：<br><br>
-$$\det\begin{pmatrix}1&a_{12}&a_{13}\\0&a_{22}&a_{23}\\0&a_{32}&a_{33}\end{pmatrix}
-= \underbrace{1}_{\text{x 分量}} \cdot \underbrace{\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}}_{\text{yz 平面投影面积}}
-\;-\; \underbrace{0}_{\text{y 分量=0，贡献为 0}} \cdot (\cdots)
-\;+\; \underbrace{0}_{\text{z 分量=0，贡献为 0}} \cdot (\cdots)$$
-只剩 $\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}$。<br><br>
-<strong>对 $\det(\mathbf{e}_2, \mathbf{v}_2, \mathbf{v}_3)$：</strong> $\mathbf{e}_2 = [0,1,0]^T$，但它在<strong>第一列</strong>。<br>
-第一列是 $[0,1,0]^T$——x 分量 $0$，y 分量 $1$，z 分量 $0$。<br>
-x 和 z 两个 $0$ 同样会把对应的 cofactor 杀掉，只有中间那个 $1$ 存活——但它在第 2 行，对应的是"去掉第 2 行和第一列"的子式。<br><br>
-$$\det\begin{pmatrix}0&a_{12}&a_{13}\\1&a_{22}&a_{23}\\0&a_{32}&a_{33}\end{pmatrix}
-= \underbrace{0}_{\text{x=0}} \cdot (\cdots)
-\;-\; \underbrace{1}_{\text{y=1}} \cdot \underbrace{\begin{vmatrix}a_{12}&a_{13}\\a_{32}&a_{33}\end{vmatrix}}_{\text{去第2行第1列}}
-\;+\; \underbrace{0}_{\text{z=0}} \cdot (\cdots)
-= -\begin{vmatrix}a_{12}&a_{13}\\a_{32}&a_{33}\end{vmatrix}$$
-注意中间项前面有个负号——cofactor 展开的符号是棋盘格 $(-1)^{i+j}$，第 2 行第 1 列 → $(-1)^{2+1} = -1$。<br><br>
-<strong>对 $\det(\mathbf{e}_3, \mathbf{v}_2, \mathbf{v}_3)$：</strong> $\mathbf{e}_3 = [0,0,1]^T$ 在第一列。<br>
-x、y 分量都是 $0$ → 前两个 cofactor 被杀，只剩第三个：<br><br>
-$$\det\begin{pmatrix}0&a_{12}&a_{13}\\0&a_{22}&a_{23}\\1&a_{32}&a_{33}\end{pmatrix}
-= \underbrace{0}_{\text{x=0}} \cdot (\cdots)
-\;-\; \underbrace{0}_{\text{y=0}} \cdot (\cdots)
-\;+\; \underbrace{1}_{\text{z=1}} \cdot \underbrace{\begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}}_{\text{去第3行第1列}}
-= +\begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}$$
-$(-1)^{3+1} = +1$，正号。<br><br>
-<strong>三项目前都在，每项 = 系数 $a_{i1}$ × 符号 × 一个 2×2 子式。</strong> 符号是 cofactor 展开自带的棋盘格，不是额外加的规则。下面走第二步：把这三个子式整理成最终公式。
+<p><strong>第 2 步——行交换：把每一项变成 $\mathbf{e}_1$ 的形式</strong></p>
+
+<p>上面三项里，第一项 $\det(\mathbf{e}_1, \mathbf{v}_2, \mathbf{v}_3)$ 最简单——$\mathbf{e}_1 = [1,0,0]^T$ 已经在第一列，沿第一列展开时下面两个 $0$ 杀掉多余 cofactor，直接得：</p>
+
+$$\det(\mathbf{e}_1, \mathbf{v}_2, \mathbf{v}_3) = \begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}$$
+
+<p>对另外两项，<strong>技巧是交换行，把第一列也变成 $[1,0,0]^T$</strong>——这样就回到了 $\mathbf{e}_1$ 的情况，只是多一个行交换的符号。</p>
+
+<p><strong>对 $\det(\mathbf{e}_2, \mathbf{v}_2, \mathbf{v}_3)$：</strong> $\mathbf{e}_2 = [0,1,0]^T$ 在第一列，它的 "$1$" 在<strong>第 2 行</strong>。</p>
+
+$$\det\begin{pmatrix}0&a_{12}&a_{13}\\1&a_{22}&a_{23}\\0&a_{32}&a_{33}\end{pmatrix}$$
+
+<p><strong>交换第 1 行和第 2 行</strong>（行列式变号，性质 2）：</p>
+
+$$-\;\det\begin{pmatrix}1&a_{22}&a_{23}\\0&a_{12}&a_{13}\\0&a_{32}&a_{33}\end{pmatrix}$$
+
+<p><strong>看！</strong> 交换后第一列变成了 $[1,0,0]^T$——和 $\mathbf{e}_1$ 的情况<strong>完全一样</strong>。沿第一列展开，$0$ 杀掉多余项：</p>
+
+$$= -\begin{vmatrix}a_{12}&a_{13}\\a_{32}&a_{33}\end{vmatrix}$$
+
+<p>行交换一次 → 一个负号。干净利落。</p>
+
+<p><strong>对 $\det(\mathbf{e}_3, \mathbf{v}_2, \mathbf{v}_3)$：</strong> $\mathbf{e}_3 = [0,0,1]^T$，它的 "$1$" 在<strong>第 3 行</strong>。</p>
+
+$$\det\begin{pmatrix}0&a_{12}&a_{13}\\0&a_{22}&a_{23}\\1&a_{32}&a_{33}\end{pmatrix}$$
+
+<p><strong>交换第 1 行和第 3 行</strong>（行列式变号）：</p>
+
+$$-\;\det\begin{pmatrix}1&a_{32}&a_{33}\\0&a_{22}&a_{23}\\0&a_{12}&a_{13}\end{pmatrix}$$
+
+<p>第一列又变成 $[1,0,0]^T$ 了！展开，去掉第 1 行第 1 列：</p>
+
+$$= -\begin{vmatrix}a_{22}&a_{23}\\a_{12}&a_{13}\end{vmatrix}$$
+
+<p>这个 2×2 行列式的行顺序和我们想要的 $M_{31} = \begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}$ 正好<strong>反了</strong>。交换这两行，2×2 行列式再变一次号：</p>
+
+$$-\begin{vmatrix}a_{22}&a_{23}\\a_{12}&a_{13}\end{vmatrix} = -\bigl(-\begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}\bigr) = +\begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}$$
+
+<p>两次交换（一次 3×3 行交换 + 一次 2×2 行交换调顺序）→ 负负得正。</p>
+
+<p><strong>三项全部用 $\mathbf{e}_1$ 的套路解决了。</strong></p>
+
 </div>
 
 <p><strong>汇总——三项拼回总体积：</strong></p>
@@ -168,13 +179,13 @@ $$\begin{aligned}
         &+ a_{31} \cdot (+\begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix})  \quad \text{← z 分量，xy 平面投影面积（棋盘格符号：}(-1)^{3+1}=+1\text{）}
 \end{aligned}$$
 
-<p><strong>这就是沿第一列展开的公式。</strong> 整个推导没有引入任何新规则——只是把 $\mathbf{v}_1$ 拆成三个分量，每个分量 × 对应方向的投影面积，符号由棋盘格 $(-1)^{i+j}$ 决定。每一步都在做"体积 = 底面积 × 高度"，只是换了一个坐标系来量。</p>
+<p><strong>这就是沿第一列展开的公式。</strong> 整个推导没有引入任何新规则——只是把 $\mathbf{v}_1$ 拆成三个分量，每项通过<strong>行交换变成 $\mathbf{e}_1$ 的形式</strong>，符号由交换次数决定（换一次变号，两次负负得正）。每一步都在做"体积 = 底面积 × 高度"，只是换了一个坐标系来量。</p>
 
 <div class="callout callout-info">
-<strong>📐 n×n 推广：</strong> 上面走的是 3×3 沿第一列展开，思路对任意 n 维适用：<br><br>
+<strong>📐 n×n 推广：</strong> 上面走的是 3×3，思路对任意 n 维适用：<br><br>
 ① 把第一列 $\mathbf{v}_1$ 拆成 n 个基向量（多线性）→ 得 n 个 $\det(\mathbf{e}_i, \mathbf{v}_2, \dots, \mathbf{v}_n)$<br>
-② 每项沿第一列做 cofactor 展开 —— $\mathbf{e}_i$ 只有第 i 行是 1，其余是 0，$0$ 杀掉多余 cofactor<br>
-③ 符号 = $(-1)^{i+1}$（棋盘格，i 为奇数正、偶数负）→ 去掉第 i 行第 1 列 → 剩下 (n-1)×(n-1) 子式<br>
+② 每项交换第 1 行和第 i 行，把第一列变成 $[1,0,\dots,0]^T$ → 符号 = $(-1)^{i-1}$（换 $i-1$ 次以上也行，关键看交换次数的奇偶）<br>
+③ 回到 $\mathbf{e}_1$ 的情况 → 去掉第 1 行第 1 列 → 剩下 (n-1)×(n-1) 子式<br>
 ④ 一路递归到底层 2×2 的 $ad-bc$。
 </div>
 <p><strong>走一个例子——换沿第一行展开试试（推导证明的是第一列，但任意行/列结果一样）：</strong></p>
