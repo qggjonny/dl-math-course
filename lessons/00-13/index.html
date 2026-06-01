@@ -65,8 +65,10 @@ $$f(tx_1 + (1-t)x_2) \le t f(x_1) + (1-t) f(x_2)$$
     <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(n):
         <span class="hl-keyword">for</span> j <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(i+<span class="hl-number">1</span>, n):
             <span class="hl-keyword">for</span> t <span class="hl-keyword">in</span> [<span class="hl-number">0.25</span>, <span class="hl-number">0.5</span>, <span class="hl-number">0.75</span>]:
-                xi, xj = xs[i], xs[j]        <span class="hl-comment"># 选两个端点</span>
-                x_mid = t*xi + (<span class="hl-number">1</span>-t)*xj      <span class="hl-comment"># 弦上的一点</span>
+                <span class="hl-comment"># 选两个端点</span>
+                xi, xj = xs[i], xs[j]
+                <span class="hl-comment"># 弦上的一点</span>
+                x_mid = t*xi + (<span class="hl-number">1</span>-t)*xj
                 <span class="hl-comment"># 凸函数条件：f(中间点) ≤ t*f(xi) + (1-t)*f(xj)</span>
                 <span class="hl-keyword">if</span> f(x_mid) > t*f(xi) + (<span class="hl-number">1</span>-t)*f(xj) + <span class="hl-number">1e-10</span>:
                     <span class="hl-keyword">return</span> <span class="hl-builtin">False</span>
@@ -74,10 +76,14 @@ $$f(tx_1 + (1-t)x_2) \le t f(x_1) + (1-t) f(x_2)$$
 
 xs = np.linspace(-<span class="hl-number">3</span>, <span class="hl-number">3</span>, <span class="hl-number">30</span>)
 
-<span class="hl-builtin">print</span>(<span class="hl-string">"x² 凸?"</span>, is_convex_1d(<span class="hl-keyword">lambda</span> x: x**<span class="hl-number">2</span>, xs))             <span class="hl-comment"># True</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">"x³ 凸?"</span>, is_convex_1d(<span class="hl-keyword">lambda</span> x: x**<span class="hl-number">3</span>, xs))             <span class="hl-comment"># False</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">"sin(x) 凸?"</span>, is_convex_1d(np.sin, xs))              <span class="hl-comment"># False</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">"eˣ 凸?"</span>, is_convex_1d(np.exp, xs))                 <span class="hl-comment"># True</span>
+<span class="hl-comment"># True</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"x² 凸?"</span>, is_convex_1d(<span class="hl-keyword">lambda</span> x: x**<span class="hl-number">2</span>, xs))
+<span class="hl-comment"># False</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"x³ 凸?"</span>, is_convex_1d(<span class="hl-keyword">lambda</span> x: x**<span class="hl-number">3</span>, xs))
+<span class="hl-comment"># False</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"sin(x) 凸?"</span>, is_convex_1d(np.sin, xs))
+<span class="hl-comment"># True</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"eˣ 凸?"</span>, is_convex_1d(np.exp, xs))
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
@@ -100,8 +106,10 @@ $$f''(x) < 0 \quad\Longrightarrow\quad \text{上凸，凹的（像倒扣的碗�
 <span class="hl-comment">    xs: 检查点</span>
 <span class="hl-comment">    """</span>
     <span class="hl-keyword">for</span> x <span class="hl-keyword">in</span> xs:
-        dd = f_dd(x)                     <span class="hl-comment"># 二阶导数值</span>
-        <span class="hl-keyword">if</span> dd < -<span class="hl-number">1e-10</span>:                     <span class="hl-comment"># 如果有个点的二阶导 < 0</span>
+        <span class="hl-comment"># 二阶导数值</span>
+        dd = f_dd(x)
+        <span class="hl-comment"># 如果有个点的二阶导 < 0</span>
+        <span class="hl-keyword">if</span> dd < -<span class="hl-number">1e-10</span>:
             <span class="hl-builtin">print</span>(<span class="hl-string">f"  x={x:.1f}: f''={dd:.2f} < 0 → 非凸"</span>)
             <span class="hl-keyword">return</span> <span class="hl-builtin">False</span>
     <span class="hl-keyword">return</span> <span class="hl-builtin">True</span>
@@ -151,12 +159,15 @@ $$H_{ij} = \frac{\partial^2 f}{\partial x_i \partial x_j}$$
 <span class="hl-comment"># 用有限差分近似 Hessian</span>
 eps = <span class="hl-number">1e-5</span>
 <span class="hl-keyword">for</span> name, func <span class="hl-keyword">in</span> [(<span class="hl-string">"x²+y²"</span>, f), (<span class="hl-string">"x²−y²"</span>, f2)]:
-    x0 = np.array([<span class="hl-number">1.0</span>, <span class="hl-number">1.0</span>])             <span class="hl-comment"># 在 (1, 1) 处算 Hessian</span>
+    <span class="hl-comment"># 在 (1, 1) 处算 Hessian</span>
+    x0 = np.array([<span class="hl-number">1.0</span>, <span class="hl-number">1.0</span>])
     <span class="hl-comment"># 手动计算 2×2 Hessian 矩阵的每个元素</span>
     <span class="hl-comment"># H[0,0] = ∂²f/∂x²: 对 x 做两次差分</span>
     f0 = func(x0)
-    x1 = x0 + np.array([eps, <span class="hl-number">0</span>])        <span class="hl-comment"># x+eps, y 不变</span>
-    x2 = x0 - np.array([eps, <span class="hl-number">0</span>])        <span class="hl-comment"># x-eps, y 不变</span>
+    <span class="hl-comment"># x+eps, y 不变</span>
+    x1 = x0 + np.array([eps, <span class="hl-number">0</span>])
+    <span class="hl-comment"># x-eps, y 不变</span>
+    x2 = x0 - np.array([eps, <span class="hl-number">0</span>])
     H00 = (func(x1) - <span class="hl-number">2</span>*f0 + func(x2)) / eps**<span class="hl-number">2</span>
     <span class="hl-comment"># 同理 H[1,1] = ∂²f/∂y²</span>
     y1 = x0 + np.array([<span class="hl-number">0</span>, eps])
@@ -164,7 +175,8 @@ eps = <span class="hl-number">1e-5</span>
     H11 = (func(y1) - <span class="hl-number">2</span>*f0 + func(y2)) / eps**<span class="hl-number">2</span>
     <span class="hl-comment"># 交叉项用中心差分近似</span>
     H = np.array([[H00, <span class="hl-number">0</span>], [<span class="hl-number">0</span>, H11]])
-    eigs = np.linalg.eigvals(H)          <span class="hl-comment"># Hessian 特征值</span>
+    <span class="hl-comment"># Hessian 特征值</span>
+    eigs = np.linalg.eigvals(H)
     <span class="hl-builtin">print</span>(<span class="hl-string">f"{name}: Hessian 特征值 = {np.round(eigs,2)}, 凸? {np.all(eigs >= 0)}"</span>)
 </code></pre>
 

@@ -147,8 +147,10 @@ np.random.seed(<span class="hl-number">42</span>)
 <span class="hl-comment"># 从 N(μ=5, σ=2) 抽 100000 个样本</span>
 <span class="hl-comment"># loc=μ(均值), scale=σ(标准差), size=样本数</span>
 samples = np.random.normal(loc=<span class="hl-number">5</span>, scale=<span class="hl-number">2</span>, size=<span class="hl-number">100000</span>)
-mu = np.mean(samples)          <span class="hl-comment"># 样本均值 ≈ 期望</span>
-var = np.var(samples, ddof=<span class="hl-number">0</span>)  <span class="hl-comment"># ddof=0: 除以 n（总体方差）</span>
+<span class="hl-comment"># 样本均值 ≈ 期望</span>
+mu = np.mean(samples)
+<span class="hl-comment"># ddof=0: 除以 n（总体方差）</span>
+var = np.var(samples, ddof=<span class="hl-number">0</span>)
 <span class="hl-comment"># ddof=1: 除以 n-1（样本无偏估计）</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"μ≈{mu:.3f} σ²≈{var:.3f} σ≈{np.std(samples,ddof=0):.3f}"</span>)
 <span class="hl-comment"># 验证 E[aX+b] = aE[X]+b</span>

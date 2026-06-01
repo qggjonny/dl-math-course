@@ -46,19 +46,26 @@ $$\mathbf{a}\cdot\mathbf{b} = \|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$$
 <li>$\cos\theta$：夹角的余弦。$\cos 0°=1$（同向），$\cos 90°=0$（垂直），$\cos 180°=-1$（反向）</li>
 </ul>
 <p><strong>三个情况一目了然：</strong> 同向 → 点乘最大（影子拉最长）；垂直 → 点乘 = 0（没有投影）；反向 → 点乘为负（影子"反方向"了）。</p>
-<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy科学计算库，别名np</span>
-a = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>])                    <span class="hl-comment"># np.array(列表) → 创建一维向量a，shape=(3,)</span>
-b = np.array([<span class="hl-number">4</span>, <span class="hl-number">5</span>, <span class="hl-number">6</span>])                    <span class="hl-comment"># 同理创建向量b，shape=(3,)</span>
+<pre><code><span class="hl-comment"># 导入numpy科学计算库，别名np</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-comment"># np.array(列表) → 创建一维向量a，shape=(3,)</span>
+a = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>])
+<span class="hl-comment"># 同理创建向量b，shape=(3,)</span>
+b = np.array([<span class="hl-number">4</span>, <span class="hl-number">5</span>, <span class="hl-number">6</span>])
 <span class="hl-comment"># np.dot(a, b)：对应位置相乘再求和 → 1×4 + 2×5 + 3×6 = 32</span>
 <span class="hl-comment"># np.dot是点乘函数，也可用 a @ b（Python 3.5+）</span>
-dot = np.dot(a, b)                         <span class="hl-comment"># 返回标量32——两个向量的点乘结果是一个数</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"点乘 = {dot}"</span>)                     <span class="hl-comment"># f-string：花括号{}内是Python表达式，直接嵌入字符串</span>
+<span class="hl-comment"># 返回标量32——两个向量的点乘结果是一个数</span>
+dot = np.dot(a, b)
+<span class="hl-comment"># f-string：花括号{}内是Python表达式，直接嵌入字符串</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"点乘 = {dot}"</span>)
 <span class="hl-comment"># 验证几何公式：cosθ = (a·b) / (‖a‖ × ‖b‖)</span>
 <span class="hl-comment"># np.linalg.norm(v)：默认计算L2范数（欧几里得长度）√(v₁²+v₂²+...+vₙ²)</span>
 <span class="hl-comment"># 这里 norm(a) = √(1²+2²+3²) = √14 ≈ 3.742</span>
 <span class="hl-comment"># 这里 norm(b) = √(4²+5²+6²) = √77 ≈ 8.775</span>
-cos_theta = dot / (np.linalg.norm(a) * np.linalg.norm(b))  <span class="hl-comment"># 余弦=点乘/(长度乘积)</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"cosθ = {cos_theta:.3f}"</span>)           <span class="hl-comment"># :.3f = 保留3位小数 → cosθ ≈ 0.975 接近1=几乎同向</span></code></pre>
+<span class="hl-comment"># 余弦=点乘/(长度乘积)</span>
+cos_theta = dot / (np.linalg.norm(a) * np.linalg.norm(b))
+<span class="hl-comment"># :.3f = 保留3位小数 → cosθ ≈ 0.975 接近1=几乎同向</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"cosθ = {cos_theta:.3f}"</span>)</code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <hr>
@@ -103,23 +110,34 @@ $$
 \end{aligned}
 $$
 <p>以后学到特征值和特征向量时，会深入讲不同矩阵把平面"怎样扭"——哪里是拉伸方向，哪里是压缩方向。</p>
-<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy科学计算库，别名np</span>
-A = np.array([[<span class="hl-number">2</span>, <span class="hl-number">1</span>],                      <span class="hl-comment"># np.array(嵌套列表) → 创建2×2矩阵——操作手册</span>
-[<span class="hl-number">0</span>, <span class="hl-number">3</span>]])                     <span class="hl-comment"># A[0,:]=[2,1]为第0行，A[1,:]=[0,3]为第1行</span>
-x = np.array([<span class="hl-number">5</span>, <span class="hl-number">6</span>])                      <span class="hl-comment"># 一维向量，shape=(2,) —— 输入的"原料"</span>
-y = A @ x                                  <span class="hl-comment"># @ 是 Python 3.5+ 的矩阵乘法运算符（等价于 np.dot(A, x)）</span>
+<pre><code><span class="hl-comment"># 导入numpy科学计算库，别名np</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-comment"># np.array(嵌套列表) → 创建2×2矩阵——操作手册</span>
+A = np.array([[<span class="hl-number">2</span>, <span class="hl-number">1</span>],
+<span class="hl-comment"># A[0,:]=[2,1]为第0行，A[1,:]=[0,3]为第1行</span>
+[<span class="hl-number">0</span>, <span class="hl-number">3</span>]])
+<span class="hl-comment"># 一维向量，shape=(2,) —— 输入的"原料"</span>
+x = np.array([<span class="hl-number">5</span>, <span class="hl-number">6</span>])
+<span class="hl-comment"># @ 是 Python 3.5+ 的矩阵乘法运算符（等价于 np.dot(A, x)）</span>
+y = A @ x
 <span class="hl-comment">                                        # A(2,2) @ x(2,) → y(2,)</span>
 <span class="hl-comment">                                        # y[0] = A第0行·x = 2×5+1×6 = 16</span>
 <span class="hl-comment">                                        # y[1] = A第1行·x = 0×5+3×6 = 18</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"A·x = {y}"</span>)                         <span class="hl-comment"># 输出: A·x = [16 18] —— 向量(5,6)被扭成(16,18)</span>
+<span class="hl-comment"># 输出: A·x = [16 18] —— 向量(5,6)被扭成(16,18)</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"A·x = {y}"</span>)
 <span class="hl-comment"># 单位矩阵：对角线上全是1，其余位置全是0 —— 乘任何向量都不变</span>
-I = np.eye(<span class="hl-number">2</span>)                                <span class="hl-comment"># np.eye(n)：创建n×n单位矩阵 [[1,0],[0,1]]</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"I·x = {I @ x}"</span>)                     <span class="hl-comment"># 输出: I·x = [5 6] ← 原封不动，单位矩阵"什么也不做"</span>
+<span class="hl-comment"># np.eye(n)：创建n×n单位矩阵 [[1,0],[0,1]]</span>
+I = np.eye(<span class="hl-number">2</span>)
+<span class="hl-comment"># 输出: I·x = [5 6] ← 原封不动，单位矩阵"什么也不做"</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"I·x = {I @ x}"</span>)
 <span class="hl-comment"># 旋转90°矩阵：逆时针转 —— 把坐标系旋转π/2弧度</span>
-R = np.array([[<span class="hl-number">0</span>, -<span class="hl-number">1</span>],                      <span class="hl-comment"># 旋转矩阵：(x,y) → (-y,x)，逆时针90°</span>
-[<span class="hl-number">1</span>,  <span class="hl-number">0</span>]])                     <span class="hl-comment"># 第0行 [0,-1]：输出x分量 = -输入y</span>
+<span class="hl-comment"># 旋转矩阵：(x,y) → (-y,x)，逆时针90°</span>
+R = np.array([[<span class="hl-number">0</span>, -<span class="hl-number">1</span>],
+<span class="hl-comment"># 第0行 [0,-1]：输出x分量 = -输入y</span>
+[<span class="hl-number">1</span>,  <span class="hl-number">0</span>]])
 <span class="hl-comment">                                        # 第1行 [1, 0]：输出y分量 = +输入x</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"R·x = {R @ x}"</span>)                     <span class="hl-comment"># 输出: R·x = [-6 5] ← (5,6)逆时针转了90°到(-6,5)</span></code></pre>
+<span class="hl-comment"># 输出: R·x = [-6 5] ← (5,6)逆时针转了90°到(-6,5)</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"R·x = {R @ x}"</span>)</code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <hr>
@@ -164,11 +182,15 @@ $$C\mathbf{x} = \begin{bmatrix}2&1\\8&10\end{bmatrix}\begin{bmatrix}5\\6\end{bma
 = \begin{bmatrix}16\\100\end{bmatrix} \;\checkmark$$
 <p>两步走和一步走结果一样。所以「行×列」不是硬记的公式——它是 $B$ 和 $A$ 作为变换<strong>接力</strong>时自然出现的计算方式。$B$ 的第 $i$ 行决定「中间结果（$A\mathbf{x}$）的各分量怎样组合成第 $i$ 个输出」，$A$ 的第 $j$ 列决定「输入的第 $j$ 个分量如何分配到各中间结果」，两者的点乘恰好就是 $c_{ij}$——也就是「不做中间产物、直接一步到位」的规则。</p>
 <p><strong>铁律：内维咬合。</strong> $(m, \cancel{n}) \times (\cancel{n}, p) = (m, p)$。$A$ 的列数 = $B$ 的行数，否则接口对不上。</p>
-<pre><code>A = np.array([[<span class="hl-number">1</span>,<span class="hl-number">2</span>,<span class="hl-number">3</span>], [<span class="hl-number">4</span>,<span class="hl-number">5</span>,<span class="hl-number">6</span>]])  <span class="hl-comment"># np.array(嵌套列表) → 创建2×3矩阵，2行3列</span>
-B = np.array([[<span class="hl-number">7</span>,<span class="hl-number">8</span>], [<span class="hl-number">9</span>,<span class="hl-number">10</span>], [<span class="hl-number">11</span>,<span class="hl-number">12</span>]])  <span class="hl-comment"># 创建3×2矩阵——B的行数3 = A的列数3 ✓ 内维咬合</span>
-C = A @ B                                    <span class="hl-comment"># 矩阵乘法：(2,3) @ (3,2) → (2,2)</span>
+<pre><code><span class="hl-comment"># np.array(嵌套列表) → 创建2×3矩阵，2行3列</span>
+A = np.array([[<span class="hl-number">1</span>,<span class="hl-number">2</span>,<span class="hl-number">3</span>], [<span class="hl-number">4</span>,<span class="hl-number">5</span>,<span class="hl-number">6</span>]])
+<span class="hl-comment"># 创建3×2矩阵——B的行数3 = A的列数3 ✓ 内维咬合</span>
+B = np.array([[<span class="hl-number">7</span>,<span class="hl-number">8</span>], [<span class="hl-number">9</span>,<span class="hl-number">10</span>], [<span class="hl-number">11</span>,<span class="hl-number">12</span>]])
+<span class="hl-comment"># 矩阵乘法：(2,3) @ (3,2) → (2,2)</span>
+C = A @ B
 <span class="hl-comment">                                          # 内维3被"吃掉"，外维(2,2)为结果形状</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"C = A@B:\n{C}"</span>)                       <span class="hl-comment"># \n = 换行符，C打印为2×2矩阵</span>
+<span class="hl-comment"># \n = 换行符，C打印为2×2矩阵</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"C = A@B:\n{C}"</span>)
 <span class="hl-comment"># C[0,0] = 1×7 + 2×9 + 3×11 = 7+18+33 = 58  —— A第0行 · B第0列</span>
 <span class="hl-comment"># C[0,1] = 1×8 + 2×10 + 3×12 = 8+20+36 = 64  —— A第0行 · B第1列</span>
 <span class="hl-comment"># C[1,0] = 4×7 + 5×9 + 6×11 = 28+45+66=139  —— A第1行 · B第0列</span>
@@ -187,9 +209,11 @@ C = A @ B                                    <span class="hl-comment"># 矩阵�
 <li><strong>逐维比较</strong>：每一维必须<strong>相等</strong>或其中一个是 <strong>1</strong></li>
 </ol>
 <h3>示例 1：成功 (3,1) + (1,4) → (3,4)</h3>
-<pre><code>x = np.array([[1], [2], [3]])           <span class="hl-comment"># np.array(嵌套列表) → shape=(3,1)，3行1列的列向量</span>
+<pre><code><span class="hl-comment"># np.array(嵌套列表) → shape=(3,1)，3行1列的列向量</span>
+x = np.array([[1], [2], [3]])
 <span class="hl-comment">                                      # 每一行是一个独立子列表，如 [1] → 一列</span>
-y = np.array([[10, 20, 30, 40]])         <span class="hl-comment"># np.array([[...]]) → shape=(1,4)，1行4列的行向量</span>
+<span class="hl-comment"># np.array([[...]]) → shape=(1,4)，1行4列的行向量</span>
+y = np.array([[10, 20, 30, 40]])
 <span class="hl-comment">                                      # 单层外层列表 + 内层一个列表放4个数</span>
 <span class="hl-comment"># 广播三步法：</span>
 <span class="hl-comment">#   步骤1: 从右向左对齐 → (3, 1) 和 (1, 4)</span>
@@ -197,24 +221,29 @@ y = np.array([[10, 20, 30, 40]])         <span class="hl-comment"># np.array([[.
 <span class="hl-comment">#   步骤3: 逐维比较 → 第1维: 1 vs 4 → 1可复印成4 ✓</span>
 <span class="hl-comment">#                     第0维: 3 vs 1 → 1可复印成3 ✓</span>
 <span class="hl-comment">#   结果shape: (3, 4)</span>
-z = x + y                                  <span class="hl-comment"># 广播加法：x(3,1)沿列方向复制4份 + y(1,4)沿行方向复制3份</span>
+<span class="hl-comment"># 广播加法：x(3,1)沿列方向复制4份 + y(1,4)沿行方向复制3份</span>
+z = x + y
 <span class="hl-comment">                                      # 相当于把x的每列重复4次，y的每行重复3次，然后逐元素加</span>
-<span class="hl-builtin">print</span>(z)                                   <span class="hl-comment"># 输出(3,4)矩阵：x的第1行+[10,20,30,40]=[11,21,31,41]</span>
+<span class="hl-comment"># 输出(3,4)矩阵：x的第1行+[10,20,30,40]=[11,21,31,41]</span>
+<span class="hl-builtin">print</span>(z)
 <span class="hl-comment">                                      #              x的第2行+[10,20,30,40]=[12,22,32,42]</span>
 <span class="hl-comment">                                      #              x的第3行+[10,20,30,40]=[13,23,33,43]</span></code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <h3>示例 2：成功 — 不同 rank (3,2) + (2,) → (3,2)</h3>
 <p>一个矩阵加一个向量，能不能广播？</p>
-<pre><code>A = np.array([[1,2],[3,4],[5,6]])      <span class="hl-comment"># np.array(嵌套列表) → shape=(3,2)，3行2列矩阵</span>
-v = np.array([10, 20])                   <span class="hl-comment"># np.array(列表) → shape=(2,)，一维向量，rank=1</span>
+<pre><code><span class="hl-comment"># np.array(嵌套列表) → shape=(3,2)，3行2列矩阵</span>
+A = np.array([[1,2],[3,4],[5,6]])
+<span class="hl-comment"># np.array(列表) → shape=(2,)，一维向量，rank=1</span>
+v = np.array([10, 20])
 <span class="hl-comment"># 广播三步法：</span>
 <span class="hl-comment">#   步骤1-2: 短的补1 → A: (3,2),  v: (2,) → 左边补1得 (1,2)</span>
 <span class="hl-comment">#   步骤3: 逐维比较 → 第1维: 2 vs 2 → 相等 ✓</span>
 <span class="hl-comment">#                     第0维: 3 vs 1 → 1可复印成3 ✓</span>
 <span class="hl-comment">#   结果shape: (3,2)</span>
 <span class="hl-comment">#   含义：v沿第0维（行方向）复制3行，然后和A逐元素相加</span>
-<span class="hl-builtin">print</span>(A + v)                               <span class="hl-comment"># A(3,2) + v广播后(3,2) → 输出:</span>
+<span class="hl-comment"># A(3,2) + v广播后(3,2) → 输出:</span>
+<span class="hl-builtin">print</span>(A + v)
 <span class="hl-comment"># [[11 22]   # A[0,:]=[1,2] + v=[10,20]</span>
 <span class="hl-comment">#  [13 24]   # A[1,:]=[3,4] + v=[10,20]</span>
 <span class="hl-comment">#  [15 26]]  # A[2,:]=[5,6] + v=[10,20]</span></code></pre>
@@ -222,8 +251,10 @@ v = np.array([10, 20])                   <span class="hl-comment"># np.array(列
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <h3>示例 3：失败 — (3,2) + (3,) ❌</h3>
 <p>为什么这个会报错？过一遍三步：</p>
-<pre><code>A = np.array([[1,2],[3,4],[5,6]])      <span class="hl-comment"># np.array(嵌套列表) → shape=(3,2)，3行2列矩阵</span>
-w = np.array([10, 20, 30])               <span class="hl-comment"># np.array(列表) → shape=(3,)，一维向量，长度=3</span>
+<pre><code><span class="hl-comment"># np.array(嵌套列表) → shape=(3,2)，3行2列矩阵</span>
+A = np.array([[1,2],[3,4],[5,6]])
+<span class="hl-comment"># np.array(列表) → shape=(3,)，一维向量，长度=3</span>
+w = np.array([10, 20, 30])
 <span class="hl-comment"># 广播三步法：</span>
 <span class="hl-comment">#   步骤1-2: 短的补1 → A: (3,2),  w: (3,) → 左边补1得 (1,3)</span>
 <span class="hl-comment">#   步骤3: 逐维比较 → 第1维: 2 vs 3 → 2≠3 且都不是1 ❌ 炸了！</span>

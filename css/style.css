@@ -107,7 +107,7 @@ blockquote {
 .copy-btn {
   position: absolute;
   top: 4px;
-  right: 10px;
+  left: 1.2em;             /* 对齐代码内边距 */
   z-index: 1;
   background: var(--bg);
   border: 1px solid var(--border);

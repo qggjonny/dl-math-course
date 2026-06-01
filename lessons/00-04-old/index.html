@@ -209,18 +209,24 @@ $$f(x) = f(a) + f'(a)(x-a) + \\frac{f''(a)}{2!}(x-a)^2 + \\frac{f'''(a)}{3!}(x-a
     <span class="hl-keyword">return</span> x ** <span class="hl-number">2</span>
 
 <span class="hl-keyword">for</span> x <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>]:
-    n = num_grad(sq, x)           <span class="hl-comment"># 数值近似</span>
-    t = <span class="hl-number">2</span> * x                      <span class="hl-comment"># 理论：f'(x)=2x</span>
+    <span class="hl-comment"># 数值近似</span>
+    n = num_grad(sq, x)
+    <span class="hl-comment"># 理论：f'(x)=2x</span>
+    t = <span class="hl-number">2</span> * x
     <span class="hl-builtin">print</span>(<span class="hl-string">f"f'({x}) 数值={n:.6f}  理论={t}"</span>)
 
 <span class="hl-comment"># ===== 梯度下降：从山顶走到山谷 =====</span>
 <span class="hl-comment"># f(x)=x²-4x+4 的最小值在 x=2（f'(x)=2x-4=0 → x=2）</span>
-x = <span class="hl-number">0.0</span>                    <span class="hl-comment"># 站在 x=0 的位置</span>
-lr = <span class="hl-number">0.1</span>                   <span class="hl-comment"># 学习率：每步走 0.1 倍的坡度</span>
+<span class="hl-comment"># 站在 x=0 的位置</span>
+x = <span class="hl-number">0.0</span>
+<span class="hl-comment"># 学习率：每步走 0.1 倍的坡度</span>
+lr = <span class="hl-number">0.1</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"\n从 x=0 出发，目标 x=2"</span>)
 <span class="hl-keyword">for</span> step <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">30</span>):
-    grad = <span class="hl-number">2</span>*x - <span class="hl-number">4</span>          <span class="hl-comment"># 当前位置的坡度</span>
-    x = x - lr * grad       <span class="hl-comment"># 沿着坡度反方向走一步</span>
+    <span class="hl-comment"># 当前位置的坡度</span>
+    grad = <span class="hl-number">2</span>*x - <span class="hl-number">4</span>
+    <span class="hl-comment"># 沿着坡度反方向走一步</span>
+    x = x - lr * grad
     <span class="hl-keyword">if</span> step % <span class="hl-number">5</span> == <span class="hl-number">0</span>:
         <span class="hl-builtin">print</span>(<span class="hl-string">f"  第{step:2d}步: x={x:.4f}  坡度={grad:+.4f}"</span>)
         <span class="hl-comment"># 坡度从 -4 逐渐变成 0，x 从 0 逐渐滑到 2</span></code></pre>

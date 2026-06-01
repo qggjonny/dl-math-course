@@ -83,9 +83,11 @@ $$\frac{dz}{dx} = \frac{\partial z}{\partial y_1} \cdot \frac{dy_1}{dx} + \frac{
 <pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 <span class="hl-comment"># ===== sin(x²) 验证链式法则 =====</span>
 <span class="hl-keyword">def</span> <span class="hl-func">h</span>(x):
-<span class="hl-keyword">return</span> np.sin(x ** <span class="hl-number">2</span>)       <span class="hl-comment"># 复合函数</span>
+<span class="hl-comment"># 复合函数</span>
+<span class="hl-keyword">return</span> np.sin(x ** <span class="hl-number">2</span>)
 <span class="hl-keyword">def</span> <span class="hl-func">h_grad</span>(x):
-<span class="hl-keyword">return</span> np.cos(x ** <span class="hl-number">2</span>) * <span class="hl-number">2</span> * x  <span class="hl-comment"># 链式：cos(x²)·2x</span>
+<span class="hl-comment"># 链式：cos(x²)·2x</span>
+<span class="hl-keyword">return</span> np.cos(x ** <span class="hl-number">2</span>) * <span class="hl-number">2</span> * x
 <span class="hl-comment"># 数值验证（中央差分）</span>
 <span class="hl-keyword">def</span> <span class="hl-func">num_grad</span>(f, x, eps=<span class="hl-number">1e-5</span>):
 <span class="hl-keyword">return</span> (f(x+eps) - f(x-eps)) / (<span class="hl-number">2</span>*eps)
@@ -95,12 +97,17 @@ x = <span class="hl-number">1.5</span>
 <span class="hl-comment"># ===== 线性回归：一步梯度下降 =====</span>
 w, x_val, y = <span class="hl-number">0.5</span>, <span class="hl-number">2.0</span>, <span class="hl-number">1.0</span>
 <span class="hl-comment"># 前向：输入 → 预测 → 差值</span>
-pred = w * x_val               <span class="hl-comment"># 预测 = 0.5×2.0 = 1.0</span>
-L = (pred - y) ** <span class="hl-number">2</span>           <span class="hl-comment"># 差值的平方 = (1.0-1.0)² = 0.0</span>
+<span class="hl-comment"># 预测 = 0.5×2.0 = 1.0</span>
+pred = w * x_val
+<span class="hl-comment"># 差值的平方 = (1.0-1.0)² = 0.0</span>
+L = (pred - y) ** <span class="hl-number">2</span>
 <span class="hl-comment"># 从外层往内层，用链式法则求 ∂L/∂w</span>
-dloss_dpred = <span class="hl-number">2</span> * (pred - y)  <span class="hl-comment"># 外层：∂L/∂pred</span>
-dpred_dw = x_val               <span class="hl-comment"># 内层：∂pred/∂w = x</span>
-dloss_dw = dloss_dpred * dpred_dw  <span class="hl-comment"># 链式！∂L/∂w</span>
+<span class="hl-comment"># 外层：∂L/∂pred</span>
+dloss_dpred = <span class="hl-number">2</span> * (pred - y)
+<span class="hl-comment"># 内层：∂pred/∂w = x</span>
+dpred_dw = x_val
+<span class="hl-comment"># 链式！∂L/∂w</span>
+dloss_dw = dloss_dpred * dpred_dw
 <span class="hl-builtin">print</span>(<span class="hl-string">f"\nL={L:.3f}  ∂L/∂w={dloss_dw:.3f}"</span>)</code></pre>
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
 <hr>

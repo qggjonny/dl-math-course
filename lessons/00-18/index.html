@@ -58,9 +58,12 @@ $$\theta^7 (1-\theta)^3$$
 <pre><code><span class="hl-comment"># 00-18 似然函数 — 抛硬币 10 次 7 正，猜 θ</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
-thetas = np.linspace(<span class="hl-number">0.01</span>, <span class="hl-number">0.99</span>, <span class="hl-number">100</span>)  <span class="hl-comment"># 100 个候选 θ 值</span>
-likelihood = thetas**<span class="hl-number">7</span> * (<span class="hl-number">1</span> - thetas)**<span class="hl-number">3</span>      <span class="hl-comment"># L(θ) = θ⁷(1-θ)³</span>
-best_idx = np.argmax(likelihood)              <span class="hl-comment"># 似然最大的 θ 的下标</span>
+<span class="hl-comment"># 100 个候选 θ 值</span>
+thetas = np.linspace(<span class="hl-number">0.01</span>, <span class="hl-number">0.99</span>, <span class="hl-number">100</span>)
+<span class="hl-comment"># L(θ) = θ⁷(1-θ)³</span>
+likelihood = thetas**<span class="hl-number">7</span> * (<span class="hl-number">1</span> - thetas)**<span class="hl-number">3</span>
+<span class="hl-comment"># 似然最大的 θ 的下标</span>
+best_idx = np.argmax(likelihood)
 
 <span class="hl-builtin">print</span>(<span class="hl-string">f"最大似然估计 θ̂ = {thetas[best_idx]:.3f}"</span>)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"直觉：7/10 = {7/10}"</span>)
@@ -134,8 +137,10 @@ true_mu, true_sigma = <span class="hl-number">5.0</span>, <span class="hl-number
 data = np.random.normal(true_mu, true_sigma, <span class="hl-number">1000</span>)
 
 <span class="hl-comment"># MLE 估计：高斯分布的 MLE 就是样本均值和样本标准差</span>
-mu_hat = np.mean(data)                       <span class="hl-comment"># μ̂ = (1/N) Σ xᵢ</span>
-sigma_hat = np.std(data)                     <span class="hl-comment"># σ̂ = sqrt((1/N) Σ (xᵢ-μ)²)</span>
+<span class="hl-comment"># μ̂ = (1/N) Σ xᵢ</span>
+mu_hat = np.mean(data)
+<span class="hl-comment"># σ̂ = sqrt((1/N) Σ (xᵢ-μ)²)</span>
+sigma_hat = np.std(data)
 
 <span class="hl-builtin">print</span>(<span class="hl-string">f"真实参数: μ={true_mu}, σ={true_sigma}"</span>)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"MLE 估计: μ̂={mu_hat:.3f}, σ̂={sigma_hat:.3f}"</span>)
@@ -152,7 +157,8 @@ sigma_hat = np.std(data)                     <span class="hl-comment"># σ̂ = s
     <span class="hl-keyword">return</span> -n/<span class="hl-number">2</span>*np.log(<span class="hl-number">2</span>*np.pi*sigma**<span class="hl-number">2</span>) - np.<span class="hl-builtin">sum</span>((data-mu)**<span class="hl-number">2</span>)/(<span class="hl-number">2</span>*sigma**<span class="hl-number">2</span>)
 
 ll_mle = log_likelihood(mu_hat, sigma_hat, data)
-ll_off = log_likelihood(<span class="hl-number">4.0</span>, <span class="hl-number">2.5</span>, data)     <span class="hl-comment"># 故意用错误参数</span>
+<span class="hl-comment"># 故意用错误参数</span>
+ll_off = log_likelihood(<span class="hl-number">4.0</span>, <span class="hl-number">2.5</span>, data)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"\nMLE 对数似然: {ll_mle:.1f}"</span>)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"错误参数对数似然: {ll_off:.1f}"</span>)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"MLE 更高 ✓"</span>)

@@ -59,20 +59,30 @@ $$\boxed{(x^n)' = n \cdot x^{n-1}}$$
 <h3>代码验证：数值微分</h3>
 <p>定义里的 $\lim_{\epsilon \to 0}$ 在计算机上没法真正做到——但取一个很小的 $\epsilon$（比如 $10^{-5}$），差商 $\frac{f(x+\epsilon)-f(x)}{\epsilon}$ 会非常接近真实导数。这叫<strong>数值微分</strong>。</p>
 <pre><code><span class="hl-comment"># 00-08 第一步：数值微分——用定义验证 f(x)=x² 的导数 f'(x)=2x</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy，别名np（本例主要用于规范，实际未用numpy功能）</span>
+<span class="hl-comment"># 导入numpy，别名np（本例主要用于规范，实际未用numpy功能）</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
-<span class="hl-keyword">def</span> <span class="hl-funcdef">f</span>(x):                              <span class="hl-comment"># 定义函数 f(x) = x²</span>
-    <span class="hl-string">"""f(x) = x²"""</span>                      <span class="hl-comment"># docstring文档字符串：说明这个函数做什么</span>
-    <span class="hl-keyword">return</span> x ** <span class="hl-number">2</span>                        <span class="hl-comment"># **是幂运算：x**2 = x²，返回x的平方</span>
+<span class="hl-comment"># 定义函数 f(x) = x²</span>
+<span class="hl-keyword">def</span> <span class="hl-funcdef">f</span>(x):
+    <span class="hl-comment"># docstring文档字符串：说明这个函数做什么</span>
+    <span class="hl-string">"""f(x) = x²"""</span>
+    <span class="hl-comment"># **是幂运算：x**2 = x²，返回x的平方</span>
+    <span class="hl-keyword">return</span> x ** <span class="hl-number">2</span>
 
-<span class="hl-keyword">def</span> <span class="hl-funcdef">numerical_derivative</span>(f, x, eps=<span class="hl-number">1e-5</span>):  <span class="hl-comment"># 数值微分函数，参数：函数f、求导点x、微小步长ε（默认10⁻⁵）</span>
-    <span class="hl-string">"""用定义算 f'(x)：取一个很小的 eps，算差商"""</span>  <span class="hl-comment"># 用极限定义近似：f'(x) ≈ (f(x+ε)−f(x)) / ε</span>
-    <span class="hl-keyword">return</span> (f(x + eps) - f(x)) / eps     <span class="hl-comment"># 前向差商：(f(x+ε)−f(x))/ε，ε越小越精确</span>
+<span class="hl-comment"># 数值微分函数，参数：函数f、求导点x、微小步长ε（默认10⁻⁵）</span>
+<span class="hl-keyword">def</span> <span class="hl-funcdef">numerical_derivative</span>(f, x, eps=<span class="hl-number">1e-5</span>):
+    <span class="hl-comment"># 用极限定义近似：f'(x) ≈ (f(x+ε)−f(x)) / ε</span>
+    <span class="hl-string">"""用定义算 f'(x)：取一个很小的 eps，算差商"""</span>
+    <span class="hl-comment"># 前向差商：(f(x+ε)−f(x))/ε，ε越小越精确</span>
+    <span class="hl-keyword">return</span> (f(x + eps) - f(x)) / eps
 
 <span class="hl-comment"># 在 x=1, 2, 3 处验证——理论值：f'(x) = 2x</span>
-<span class="hl-keyword">for</span> x <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>]:                        <span class="hl-comment"># 循环测试3个点：x=1→导数值=2, x=2→4, x=3→6</span>
-    num = numerical_derivative(f, x)      <span class="hl-comment"># 调用数值微分，传入f和当前x → 数值近似导数</span>
-    exact = <span class="hl-number">2</span> * x                          <span class="hl-comment"># 理论值：幂函数求导法则 (x²)' = 2x</span>
+<span class="hl-comment"># 循环测试3个点：x=1→导数值=2, x=2→4, x=3→6</span>
+<span class="hl-keyword">for</span> x <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>]:
+    <span class="hl-comment"># 调用数值微分，传入f和当前x → 数值近似导数</span>
+    num = numerical_derivative(f, x)
+    <span class="hl-comment"># 理论值：幂函数求导法则 (x²)' = 2x</span>
+    exact = <span class="hl-number">2</span> * x
     <span class="hl-comment"># f-string: {x}=x值, {num:.6f}=数值结果保留6位, {exact}=理论值, {abs(...):.2e}=误差用科学记数法2位</span>
     <span class="hl-builtin">print</span>(<span class="hl-string">f"f'({x})  数值={num:.6f}  理论={exact}  误差={abs(num-exact):.2e}"</span>)
 </code></pre>
@@ -92,28 +102,43 @@ $$\boxed{(x^n)' = n \cdot x^{n-1}}$$
 </ul>
 <h3>代码验证：偏导数数值计算</h3>
 <pre><code><span class="hl-comment"># 00-08 第二步：偏导数数值计算——验证 ∂f/∂x 和 ∂f/∂y</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy，别名np</span>
+<span class="hl-comment"># 导入numpy，别名np</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
-<span class="hl-keyword">def</span> <span class="hl-funcdef">g</span>(x, y):                            <span class="hl-comment"># 定义二元函数 g(x,y) = x² + 3xy + y³</span>
-    <span class="hl-string">"""f(x,y) = x² + 3xy + y³"""</span>          <span class="hl-comment"># docstring：说明函数公式</span>
-    <span class="hl-keyword">return</span> x**<span class="hl-number">2</span> + <span class="hl-number">3</span>*x*y + y**<span class="hl-number">3</span>          <span class="hl-comment"># x**2=x², 3*x*y=3xy, y**3=y³</span>
+<span class="hl-comment"># 定义二元函数 g(x,y) = x² + 3xy + y³</span>
+<span class="hl-keyword">def</span> <span class="hl-funcdef">g</span>(x, y):
+    <span class="hl-comment"># docstring：说明函数公式</span>
+    <span class="hl-string">"""f(x,y) = x² + 3xy + y³"""</span>
+    <span class="hl-comment"># x**2=x², 3*x*y=3xy, y**3=y³</span>
+    <span class="hl-keyword">return</span> x**<span class="hl-number">2</span> + <span class="hl-number">3</span>*x*y + y**<span class="hl-number">3</span>
 
-<span class="hl-keyword">def</span> <span class="hl-funcdef">partial_x</span>(f, x, y, eps=<span class="hl-number">1e-5</span>):        <span class="hl-comment"># 对x的偏导数：f是原函数，x,y是求导点，eps=微小步长ε</span>
-    <span class="hl-string">"""对 x 的偏导：只动 x，y 不动"""</span>       <span class="hl-comment"># 偏导数定义：∂f/∂x = lim_{ε→0} (f(x+ε,y)−f(x,y))/ε</span>
-    <span class="hl-keyword">return</span> (f(x + eps, y) - f(x, y)) / eps  <span class="hl-comment"># 只改变x（加ε），y保持不变 → 数值近似偏导</span>
+<span class="hl-comment"># 对x的偏导数：f是原函数，x,y是求导点，eps=微小步长ε</span>
+<span class="hl-keyword">def</span> <span class="hl-funcdef">partial_x</span>(f, x, y, eps=<span class="hl-number">1e-5</span>):
+    <span class="hl-comment"># 偏导数定义：∂f/∂x = lim_{ε→0} (f(x+ε,y)−f(x,y))/ε</span>
+    <span class="hl-string">"""对 x 的偏导：只动 x，y 不动"""</span>
+    <span class="hl-comment"># 只改变x（加ε），y保持不变 → 数值近似偏导</span>
+    <span class="hl-keyword">return</span> (f(x + eps, y) - f(x, y)) / eps
 
-<span class="hl-keyword">def</span> <span class="hl-funcdef">partial_y</span>(f, x, y, eps=<span class="hl-number">1e-5</span>):        <span class="hl-comment"># 对y的偏导数</span>
-    <span class="hl-string">"""对 y 的偏导：只动 y，x 不动"""</span>       <span class="hl-comment"># 偏导数定义：∂f/∂y = lim_{ε→0} (f(x,y+ε)−f(x,y))/ε</span>
-    <span class="hl-keyword">return</span> (f(x, y + eps) - f(x, y)) / eps  <span class="hl-comment"># 只改变y（加ε），x保持不变 → 数值近似偏导</span>
+<span class="hl-comment"># 对y的偏导数</span>
+<span class="hl-keyword">def</span> <span class="hl-funcdef">partial_y</span>(f, x, y, eps=<span class="hl-number">1e-5</span>):
+    <span class="hl-comment"># 偏导数定义：∂f/∂y = lim_{ε→0} (f(x,y+ε)−f(x,y))/ε</span>
+    <span class="hl-string">"""对 y 的偏导：只动 y，x 不动"""</span>
+    <span class="hl-comment"># 只改变y（加ε），x保持不变 → 数值近似偏导</span>
+    <span class="hl-keyword">return</span> (f(x, y + eps) - f(x, y)) / eps
 
 <span class="hl-comment"># 在点 (2, 3) 验证——把x₀=2, y₀=3代入偏导公式</span>
-x0, y0 = <span class="hl-number">2.0</span>, <span class="hl-number">3.0</span>                        <span class="hl-comment"># 测试点：x₀=2.0, y₀=3.0（浮点数）</span>
+<span class="hl-comment"># 测试点：x₀=2.0, y₀=3.0（浮点数）</span>
+x0, y0 = <span class="hl-number">2.0</span>, <span class="hl-number">3.0</span>
 <span class="hl-comment"># 理论：∂f/∂x = 2x + 3y（对x求偏导，y当常数）→ 2*2 + 3*3 = 4+9 = 13</span>
 <span class="hl-comment"># 理论：∂f/∂y = 3x + 3y²（对y求偏导，x当常数）→ 3*2 + 3*9 = 6+27 = 33</span>
-px_num = partial_x(g, x0, y0)             <span class="hl-comment"># 数值计算 ∂g/∂x 在 (2,3) 的值 → 应≈13.0</span>
-py_num = partial_y(g, x0, y0)             <span class="hl-comment"># 数值计算 ∂g/∂y 在 (2,3) 的值 → 应≈33.0</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"∂f/∂x  数值={px_num:.6f}  理论=13"</span>)  <span class="hl-comment"># :.6f=保留6位小数，误差约10⁻⁵量级</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"∂f/∂y  数值={py_num:.6f}  理论=33"</span>)  <span class="hl-comment"># 数值结果和理论值非常接近</span>
+<span class="hl-comment"># 数值计算 ∂g/∂x 在 (2,3) 的值 → 应≈13.0</span>
+px_num = partial_x(g, x0, y0)
+<span class="hl-comment"># 数值计算 ∂g/∂y 在 (2,3) 的值 → 应≈33.0</span>
+py_num = partial_y(g, x0, y0)
+<span class="hl-comment"># :.6f=保留6位小数，误差约10⁻⁵量级</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"∂f/∂x  数值={px_num:.6f}  理论=13"</span>)
+<span class="hl-comment"># 数值结果和理论值非常接近</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"∂f/∂y  数值={py_num:.6f}  理论=33"</span>)
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>

@@ -130,41 +130,65 @@ $$\frac{X_1 + X_2 + \cdots + X_n - n\mu}{\sigma\sqrt{n}} \;\xrightarrow{d}\; \ma
 <hr>
 <h2>🖥️ 代码</h2>
 <pre><code><span class="hl-comment"># 00-15 连续分布：均匀分布 + 正态分布的 PDF/CDF/68-95-99.7 法则</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy，别名np</span>
+<span class="hl-comment"># 导入numpy，别名np</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 <span class="hl-comment"># ===== 均匀分布 U(0,1) =====</span>
-a, b = <span class="hl-number">0.0</span>, <span class="hl-number">1.0</span>                         <span class="hl-comment"># 区间[0,1]，浮点数类型</span>
-h = <span class="hl-number">1.0</span> / (b - a)                        <span class="hl-comment"># PDF高度 = 1/宽度，因为总面积必须=1</span>
-c, d = <span class="hl-number">0.2</span>, <span class="hl-number">0.5</span>                         <span class="hl-comment"># 子区间[0.2, 0.5]</span>
-prob = (d-c) / (b-a)                    <span class="hl-comment"># 概率 = 子区间宽度/总宽度（矩形面积之比）</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"P({c}≤X≤{d}) = {prob}"</span>)       <span class="hl-comment"># 理论概率：0.3/1.0 = 0.3</span>
+<span class="hl-comment"># 区间[0,1]，浮点数类型</span>
+a, b = <span class="hl-number">0.0</span>, <span class="hl-number">1.0</span>
+<span class="hl-comment"># PDF高度 = 1/宽度，因为总面积必须=1</span>
+h = <span class="hl-number">1.0</span> / (b - a)
+<span class="hl-comment"># 子区间[0.2, 0.5]</span>
+c, d = <span class="hl-number">0.2</span>, <span class="hl-number">0.5</span>
+<span class="hl-comment"># 概率 = 子区间宽度/总宽度（矩形面积之比）</span>
+prob = (d-c) / (b-a)
+<span class="hl-comment"># 理论概率：0.3/1.0 = 0.3</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"P({c}≤X≤{d}) = {prob}"</span>)
 <span class="hl-comment"># 用蒙特卡洛模拟验证理论值</span>
-np.random.seed(<span class="hl-number">42</span>)                     <span class="hl-comment"># seed()：固定随机种子，保证结果可复现</span>
-samples = np.random.uniform(a, b, <span class="hl-number">100000</span>)  <span class="hl-comment"># uniform(a,b,size)：生成10万个[0,1)均匀随机数</span>
-in_int = np.<span class="hl-builtin">sum</span>((samples>=c) & (samples<=d))  <span class="hl-comment"># 逻辑与(&)：统计落在子区间内的样本数</span>
+<span class="hl-comment"># seed()：固定随机种子，保证结果可复现</span>
+np.random.seed(<span class="hl-number">42</span>)
+<span class="hl-comment"># uniform(a,b,size)：生成10万个[0,1)均匀随机数</span>
+samples = np.random.uniform(a, b, <span class="hl-number">100000</span>)
+<span class="hl-comment"># 逻辑与(&)：统计落在子区间内的样本数</span>
+in_int = np.<span class="hl-builtin">sum</span>((samples>=c) & (samples<=d))
                                           <span class="hl-comment"># sum()对布尔数组：True=1，直接计数</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"模拟 P = {in_int/100000:.4f}"</span>)  <span class="hl-comment"># :.4f = 保留4位小数，应≈0.3000</span>
+<span class="hl-comment"># :.4f = 保留4位小数，应≈0.3000</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"模拟 P = {in_int/100000:.4f}"</span>)
 <span class="hl-comment"># ===== 正态 PDF（手工实现正态密度函数）=====</span>
-<span class="hl-keyword">def</span> <span class="hl-func">normal_pdf</span>(x, mu, sigma):             <span class="hl-comment"># x=输入值，mu=均值(中心)，sigma=标准差(胖瘦)</span>
-    c = <span class="hl-number">1.0</span>/(sigma*np.sqrt(<span class="hl-number">2</span>*np.pi))        <span class="hl-comment"># 归一化系数：1/(σ√(2π))，保证总面积为1</span>
+<span class="hl-comment"># x=输入值，mu=均值(中心)，sigma=标准差(胖瘦)</span>
+<span class="hl-keyword">def</span> <span class="hl-func">normal_pdf</span>(x, mu, sigma):
+    <span class="hl-comment"># 归一化系数：1/(σ√(2π))，保证总面积为1</span>
+    c = <span class="hl-number">1.0</span>/(sigma*np.sqrt(<span class="hl-number">2</span>*np.pi))
                                             <span class="hl-comment"># σ翻倍→系数减半，钟变胖变矮</span>
-    e = -<span class="hl-number">0.5</span>*((x-mu)/sigma)**<span class="hl-number">2</span>             <span class="hl-comment"># 指数部分：-(x-μ)²/(2σ²)，决定离中心多远</span>
+    <span class="hl-comment"># 指数部分：-(x-μ)²/(2σ²)，决定离中心多远</span>
+    e = -<span class="hl-number">0.5</span>*((x-mu)/sigma)**<span class="hl-number">2</span>
                                             <span class="hl-comment"># x离μ越远→指数越负→exp趋近0→密度趋近0</span>
-    <span class="hl-keyword">return</span> c * np.exp(e)                   <span class="hl-comment"># np.exp()：e的幂，支持数组运算（自动广播）</span>
+    <span class="hl-comment"># np.exp()：e的幂，支持数组运算（自动广播）</span>
+    <span class="hl-keyword">return</span> c * np.exp(e)
 <span class="hl-comment"># 验证 σ 减半效应：σ翻倍 → 中心密度减半（总面积守恒）</span>
-<span class="hl-keyword">for</span> s <span class="hl-keyword">in</span> [<span class="hl-number">0.5</span>,<span class="hl-number">1.0</span>,<span class="hl-number">2.0</span>]:                  <span class="hl-comment"># 遍历三个不同的σ值</span>
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"σ={s:.1f}: f(0)={normal_pdf(0,0,s):.4f}"</span>)  <span class="hl-comment"># 在μ=0处密度：σ=0.5→高，σ=2→矮</span>
+<span class="hl-comment"># 遍历三个不同的σ值</span>
+<span class="hl-keyword">for</span> s <span class="hl-keyword">in</span> [<span class="hl-number">0.5</span>,<span class="hl-number">1.0</span>,<span class="hl-number">2.0</span>]:
+    <span class="hl-comment"># 在μ=0处密度：σ=0.5→高，σ=2→矮</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"σ={s:.1f}: f(0)={normal_pdf(0,0,s):.4f}"</span>)
 <span class="hl-comment"># ===== 模拟验证 68-95-99.7 法则 =====</span>
-sn = np.random.normal(<span class="hl-number">0</span>,<span class="hl-number">1</span>,<span class="hl-number">100000</span>)       <span class="hl-comment"># normal(μ,σ,size)：生成10万个标准正态(均值0,标准差1)样本</span>
-<span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>,<span class="hl-number">2</span>,<span class="hl-number">3</span>]:                         <span class="hl-comment"># k=1,2,3 → ±1σ, ±2σ, ±3σ</span>
-    r = np.mean((sn>=-k)&(sn<=k))         <span class="hl-comment"># mean()：落在[-k,k]内的样本比例（频率≈概率）</span>
-    t = {<span class="hl-number">1</span>:<span class="hl-number">0.6827</span>,<span class="hl-number">2</span>:<span class="hl-number">0.9545</span>,<span class="hl-number">3</span>:<span class="hl-number">0.9973</span>}[k]   <span class="hl-comment"># 字典取理论值：±1σ→68.27%, ±2σ→95.45%, ±3σ→99.73%</span>
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"±{k}σ: sim={r:.4f} theory={t:.4f}"</span>)  <span class="hl-comment"># 模拟值 vs 理论值，高度吻合</span>
+<span class="hl-comment"># normal(μ,σ,size)：生成10万个标准正态(均值0,标准差1)样本</span>
+sn = np.random.normal(<span class="hl-number">0</span>,<span class="hl-number">1</span>,<span class="hl-number">100000</span>)
+<span class="hl-comment"># k=1,2,3 → ±1σ, ±2σ, ±3σ</span>
+<span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>,<span class="hl-number">2</span>,<span class="hl-number">3</span>]:
+    <span class="hl-comment"># mean()：落在[-k,k]内的样本比例（频率≈概率）</span>
+    r = np.mean((sn>=-k)&(sn<=k))
+    <span class="hl-comment"># 字典取理论值：±1σ→68.27%, ±2σ→95.45%, ±3σ→99.73%</span>
+    t = {<span class="hl-number">1</span>:<span class="hl-number">0.6827</span>,<span class="hl-number">2</span>:<span class="hl-number">0.9545</span>,<span class="hl-number">3</span>:<span class="hl-number">0.9973</span>}[k]
+    <span class="hl-comment"># 模拟值 vs 理论值，高度吻合</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"±{k}σ: sim={r:.4f} theory={t:.4f}"</span>)
 <span class="hl-comment"># ===== CDF 数值积分（用矩形法近似积分）=====</span>
-xg = np.linspace(-<span class="hl-number">4</span>,<span class="hl-number">4</span>,<span class="hl-number">501</span>)               <span class="hl-comment"># linspace(-4,4,501)：[-4,4]等间距取501个点，步长=8/500=0.016</span>
+<span class="hl-comment"># linspace(-4,4,501)：[-4,4]等间距取501个点，步长=8/500=0.016</span>
+xg = np.linspace(-<span class="hl-number">4</span>,<span class="hl-number">4</span>,<span class="hl-number">501</span>)
 <span class="hl-comment"># np.cumsum()：累积求和 → 每个位置=之前所有PDF值的累积</span>
 <span class="hl-comment"># 乘以Δx(dx=步长) → 矩形面积累加 → CDF的近似</span>
-cdf = np.cumsum(normal_pdf(xg,<span class="hl-number">0</span>,<span class="hl-number">1</span>)) * (xg[<span class="hl-number">1</span>]-xg[<span class="hl-number">0</span>])  <span class="hl-comment"># cumsum(501个密度值)×步长 → 近似CDF</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"F(-2)≈{cdf[125]:.4f} F(0)≈{cdf[250]:.4f} F(2)≈{cdf[375]:.4f}"</span>)  <span class="hl-comment"># 取x≈-2, 0, 2处的CDF值</span>
+<span class="hl-comment"># cumsum(501个密度值)×步长 → 近似CDF</span>
+cdf = np.cumsum(normal_pdf(xg,<span class="hl-number">0</span>,<span class="hl-number">1</span>)) * (xg[<span class="hl-number">1</span>]-xg[<span class="hl-number">0</span>])
+<span class="hl-comment"># 取x≈-2, 0, 2处的CDF值</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"F(-2)≈{cdf[125]:.4f} F(0)≈{cdf[250]:.4f} F(2)≈{cdf[375]:.4f}"</span>)
 <span class="hl-comment"># CDF(-2)≈0.023, CDF(0)=0.5, CDF(2)≈0.977 → 和正态表一致</span>
 </code></pre>
 
