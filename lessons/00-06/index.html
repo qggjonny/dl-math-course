@@ -216,6 +216,27 @@ $V^T$：$2 \times 2$（行是输入空间中「被拉伸的方向」）<br><br>
 一般情况：$A$ 是 $m \times n$，则 $U$ 是 $m \times m$，$\Sigma$ 是 $m \times n$，$V^T$ 是 $n \times n$。$\Sigma$ 的对角线上有 $\min(m,n)$ 个奇异值。
 </div>
 
+<div class="callout callout-info">
+<strong>实际数字走一遍（$A = \begin{bmatrix}3&1\\1&3\end{bmatrix}$）：</strong><br><br>
+numpy 跑出来：<br>
+$U = \begin{bmatrix} -0.707 & -0.707 \\ -0.707 & 0.707 \end{bmatrix}$（两列 = 两个单位向量，互相垂直）<br>
+$\Sigma = \begin{bmatrix} 4 & 0 \\ 0 & 2 \end{bmatrix}$（对角线 = 长轴 4、短轴 2）<br>
+$V^T = \begin{bmatrix} -0.707 & -0.707 \\ -0.707 & 0.707 \end{bmatrix}$（两行 = 被拉伸之前的两个方向）<br><br>
+现在乘回去验证：<br>
+$U\Sigma V^T = \begin{bmatrix}-0.707&-0.707\\-0.707&0.707\end{bmatrix} \begin{bmatrix}4&0\\0&2\end{bmatrix} \begin{bmatrix}-0.707&-0.707\\-0.707&0.707\end{bmatrix}$<br>
+$= \begin{bmatrix}-2.828&-1.414\\-2.828&1.414\end{bmatrix} \begin{bmatrix}-0.707&-0.707\\-0.707&0.707\end{bmatrix} = \begin{bmatrix}3&1\\1&3\end{bmatrix} = A$ ✓<br><br>
+这就是 SVD：<strong>三个矩阵乘起来，恰好等于原矩阵。</strong>不是近似，是精确相等。
+</div>
+
+<div class="callout callout-info">
+<strong>为什么右边没有矩阵？$V^T$ 是作用在什么东西上的？</strong><br><br>
+你观察得很敏锐。完整的写法其实是：<strong>$A = U \Sigma V^T \cdot I$</strong>，其中 $I$ 是单位矩阵。<br><br>
+单位矩阵 $I$ 代表「标准的坐标轴」——$I$ 的列是 $\begin{bmatrix}1\\0\end{bmatrix}$ 和 $\begin{bmatrix}0\\1\end{bmatrix}$，就是平常画图的 x 轴和 y 轴。<br><br>
+所以管道是（从右往左读）：<br>
+① $I$（标准坐标轴）→ ② $V^T$（把轴转到「最好拉的方向」）→ ③ $\Sigma$（沿新方向拉伸）→ ④ $U$（把拉伸后的轴转到最终方位）= $A$<br><br>
+因为 $I$ 乘任何矩阵都不变，所以<strong>省略不写</strong>。但理解的时候要知道：$V^T$ 作用在标准基上，不是凭空旋转。这和你之前学的特征值分解 $A = Q \Lambda Q^{-1}$ 结构类似——$Q^{-1}$ 把向量转到特征基、$\Lambda$ 缩放、$Q$ 转回来。
+</div>
+
 <p>用代码验证：</p>
 
 <pre><code><span class="hl-comment"># 00-06 第三步：用 numpy 的 SVD 函数，把 A 拆成 U Σ V^T 三步</span>
