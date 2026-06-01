@@ -74,26 +74,30 @@ P(病 \mid 阳性) &= \frac{P(阳性 \mid 病) \cdot P(病)}{P(阳性 \mid 病) 
 <p><strong>为什么只有 50%？</strong> 因为发病率太低了（1%）。10000 个人里，有 100 个真病人（99 个测出阳性）和 9900 个好人（99 个假阳性）。阳性总共 99+99=198 人，其中只有 99 个真有病——恰好一半。</p>
 <figure><img src="assets/bayes_area.png" alt="贝叶斯体检阳性树状图"><figcaption>10000 人：有病 100 人（99 阳性），没病 9900 人（99 假阳性）。阳性共 198 人，真阳性只有一半。</figcaption></figure>
 <p>假阳性虽然比例低（1%），但<strong>没病的人基数太大</strong>（9900），假阳性的绝对人数（99）和真阳性（99）一样多。这就是<strong>基础率忽略</strong>——直觉只盯住了 99% 的准确率，忘了发病率 1% 这个先验。</p>
-<pre><code>import numpy as np
-# 模拟 100000 人
-N = 100000
-rng = np.random.default_rng(42)
-# 1% 的人真有病
-has_disease = rng.random(N) < 0.01
-# 有病的人：99% 测出阳性
-# 没病的人：1% 假阳性
+<pre><code><span class="hl-comment"># 00-17 贝叶斯公式：模拟体检阳性问题（发病率1%，检测准确率99%）</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy，别名np</span>
+<span class="hl-comment"># 模拟 100000 人的体检数据</span>
+N = <span class="hl-number">100000</span>                                <span class="hl-comment"># 总模拟人数：10万</span>
+rng = np.random.default_rng(<span class="hl-number">42</span>)          <span class="hl-comment"># default_rng(seed)：新版随机数生成器，seed保证可复现</span>
+<span class="hl-comment"># 1% 的人真有病 → 生成10万个布尔值，True概率=0.01</span>
+has_disease = rng.random(N) &lt; <span class="hl-number">0.01</span>       <span class="hl-comment"># random(N)：生成N个[0,1)均匀随机数，<0.01→True(有病)</span>
+<span class="hl-comment"># np.where(条件, 真时取值, 假时取值)：按条件二选一</span>
+<span class="hl-comment"># 有病的人：99% 测出阳性（灵敏度）；没病的人：1% 假阳性</span>
 test_positive = np.where(
-has_disease,
-rng.random(N) < 0.99,    # 有病的：灵敏度 99%
-rng.random(N) < 0.01     # 没病的：假阳性率 1%
+    has_disease,                          <span class="hl-comment"># 条件：是否有病（布尔数组）</span>
+    rng.random(N) &lt; <span class="hl-number">0.99</span>,                <span class="hl-comment"># 真有病 → 99%概率测出阳性（灵敏度）</span>
+    rng.random(N) &lt; <span class="hl-number">0.01</span>                 <span class="hl-comment"># 没病的 → 1%概率假阳性</span>
 )
-# 在测出阳性的人里，有多少真有病？
-positives = test_positive.sum()
-true_positives = (test_positive & has_disease).sum()
-print(f"阳性总人数: {positives}")
-print(f"真阳性(真有病): {true_positives}")
-print(f"P(病|阳性) = {true_positives}/{positives} = {true_positives/positives:.3f}")
-# 大约 0.5——和贝叶斯公式算的一样</code></pre>
+<span class="hl-comment"># 在测出阳性的人里，有多少真有病？→ P(病|阳性)</span>
+positives = test_positive.sum()           <span class="hl-comment"># .sum()对布尔数组：True=1 → 阳性总人数</span>
+true_positives = (test_positive & has_disease).sum()  <span class="hl-comment"># & 逻辑与：阳性且真有病 → 真阳性人数</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"阳性总人数: {positives}"</span>)        <span class="hl-comment"># 阳性人数 ≈ 198人(99真阳性+99假阳性)</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"真阳性(真有病): {true_positives}"</span>)  <span class="hl-comment"># 真有病且阳性 ≈ 99人</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"P(病|阳性) = {true_positives}/{positives} = {true_positives/positives:.3f}"</span>)
+<span class="hl-comment"># :.3f = 保留3位小数，大约 0.500——和贝叶斯公式算的一样</span>
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <p>贝叶斯公式不是在玩符号——它纠正了一个真实的思维错误。</p>
 <hr>
 <h2>💭 概念题</h2>

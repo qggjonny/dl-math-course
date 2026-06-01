@@ -23,14 +23,20 @@ $$\|\mathbf{v}\|_1 = |3| + |-4| = 7$$
 <p><strong>画面：</strong> 这次你不管什么街道了，直接坐直升机从起点飞到终点。这就是你脑子里那个"两点之间最短"的距离——初中就学过的勾股定理。</p>
 $$\|\mathbf{v}\|_2 = \sqrt{3^2 + (-4)^2} = \sqrt{9 + 16} = 5$$
 <p>L2 就是直线距离。负号在平方里自动消失（$(-4)^2 = 16$），所以不用额外取绝对值。</p>
-<pre><code>import numpy as np
-v = np.array([3, -4])
-# L1：绝对值求和（出租车走过的街区数）
-l1 = np.sum(np.abs(v))       # np.abs(v) → [3, 4] → 求和 = 7
-print(f"L1 = {l1}")           # 7
-# L2：直线距离（直升机飞的）
-l2 = np.linalg.norm(v)        # np.linalg.norm 默认算 L2
-print(f"L2 = {l2}")           # 5.0</code></pre>
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy科学计算库，别名np</span>
+v = np.array([3, -4])                      <span class="hl-comment"># np.array(列表) → 创建一维向量v，shape=(2,)</span>
+<span class="hl-comment"># L1范数 = 各分量绝对值之和 —— 曼哈顿出租车走的街区数</span>
+<span class="hl-comment"># np.abs(v)：对数组每个元素取绝对值 → [3, 4]（吃掉负号）</span>
+<span class="hl-comment"># np.sum()：对数组所有元素求和 → 返回标量</span>
+l1 = np.sum(np.abs(v))                     <span class="hl-comment"># L1 = |3| + |-4| = 3 + 4 = 7</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"L1 = {l1}"</span>)                         <span class="hl-comment"># 输出: L1 = 7 —— 出租车计价器上的街区数</span>
+<span class="hl-comment"># L2范数 = 欧几里得距离 —— 直升机直线飞行的距离</span>
+<span class="hl-comment"># np.linalg.norm(v)：默认ord=None即L2范数，√(v₁² + v₂² + ...)</span>
+l2 = np.linalg.norm(v)                     <span class="hl-comment"># L2 = √(3² + (-4)²) = √(9+16) = √25 = 5.0</span>
+<span class="hl-comment">                                      # 平方让负号自动消失：(-4)² = 16，不需要额外取绝对值</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"L2 = {l2}"</span>)                         <span class="hl-comment"># 输出: L2 = 5.0 —— 直升机仪表盘上的直线距离</span></code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <h3>L1 和 L2 的形状有什么不同？</h3>
 <p>把所有长度为 1 的向量画出来：L1 画出来是一个<strong>菱形</strong>，L2 画出来是一个<strong>圆</strong>。</p>
 <figure><img src="assets/l1_l2_balls.png" alt="L1 vs L2 单位圆"><figcaption>L2 是光滑的圆，L1 是带尖角的菱形。菱形尖角就坐落在坐标轴上</figcaption></figure>

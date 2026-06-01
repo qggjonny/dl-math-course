@@ -30,14 +30,18 @@ onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',dis
 <p>只有两种结果：成功（1）和失败（0）。</p>
 <p>$$P(X=1) = p, \quad P(X=0) = 1-p$$</p>
 <p><strong>画面：</strong> 一枚偏心的硬币，正面概率 $p=0.7$。抛一次，不是正面就是反面——就这么简单。</p>
-<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-np.random.seed(<span class="hl-number">42</span>)           <span class="hl-comment"># 固定随机种子，保证每次运行结果一样</span>
-p = <span class="hl-number">0.7</span>
-<span class="hl-comment"># np.random.random(1000) 生成 1000 个 [0, 1) 的随机小数</span>
-<span class="hl-comment"># < p: 小于 0.7 的变成 True（正面），其余 False（反面）</span>
-flips = np.random.random(<span class="hl-number">1000</span>) &lt; p
-<span class="hl-comment"># .mean() 对布尔数组：True=1, False=0, 平均值=正面的比例</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"p=0.7, 抛1000次: 正面比例 {flips.mean():.3f}"</span>)</code></pre>
+<pre><code><span class="hl-comment"># 00-14 伯努利分布：模拟抛偏心硬币1000次</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy，别名np</span>
+np.random.seed(<span class="hl-number">42</span>)                     <span class="hl-comment"># seed()：固定随机种子，保证每次运行结果一样</span>
+p = <span class="hl-number">0.7</span>                                     <span class="hl-comment"># 正面概率 p=0.7（偏心硬币正面更重）</span>
+<span class="hl-comment"># np.random.random(1000) → 生成1000个[0,1)均匀分布的随机小数</span>
+<span class="hl-comment"># < p → 小于0.7的变成True（正面），≥0.7的变成False（反面）</span>
+flips = np.random.random(<span class="hl-number">1000</span>) &lt; p      <span class="hl-comment"># 结果：布尔数组，True=正面(约70%)</span>
+<span class="hl-comment"># .mean() 对布尔数组：True当作1、False当作0 → 平均值=正面比例</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"p=0.7, 抛1000次: 正面比例 {flips.mean():.3f}"</span>)  <span class="hl-comment"># :.3f = 保留3位小数</span>
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <hr>
 <h2>四、二项分布：抛 n 次硬币</h2>
 <h3>4.1 公式推导——先算一种排法，再乘排法数</h3>
@@ -61,13 +65,19 @@ flips = np.random.random(<span class="hl-number">1000</span>) &lt; p
 </table>
 <p>「正正反反反」只有 1 种排法；「2 正 3 反」却有 $\binom{5}{2}=10$ 种。排列方式越多，这件事就越容易发生。</p>
 <figure><img src="assets/binomial_hist.png" alt="二项分布"><figcaption>n=10, p=0.5。k=5 的柱子最高——$\binom{10}{5}=252$ 种排法，远多于两端的 $\binom{10}{0}=1$ 种</figcaption></figure>
-<pre><code>n, p = <span class="hl-number">10</span>, <span class="hl-number">0.5</span>
-<span class="hl-comment"># np.random.binomial(n, p, size) 模拟抛 size 轮，每轮抛 n 次</span>
-results = np.random.binomial(n, p, size=<span class="hl-number">10000</span>)
-<span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">3</span>, <span class="hl-number">5</span>, <span class="hl-number">7</span>]:
-freq = np.mean(results == k)   <span class="hl-comment"># == True/False, mean=比例</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"P(X={k}) ≈ {freq:.4f}"</span>)
-<span class="hl-comment"># P(X=5) 最大，P(X=3) 和 P(X=7) 对称</span></code></pre>
+<pre><code><span class="hl-comment"># 00-14 二项分布：模拟抛10次硬币，重复10000轮</span>
+n, p = <span class="hl-number">10</span>, <span class="hl-number">0.5</span>                                 <span class="hl-comment"># n=每轮抛10次，p=公平硬币(正面概率0.5)</span>
+<span class="hl-comment"># np.random.binomial(n, p, size)：模拟 size 轮，每轮抛 n 次</span>
+<span class="hl-comment"># 返回 size 个整数，每个 = 该轮正面出现的次数(0~n)</span>
+results = np.random.binomial(n, p, size=<span class="hl-number">10000</span>)  <span class="hl-comment"># 10000轮的正面次数数组</span>
+<span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">3</span>, <span class="hl-number">5</span>, <span class="hl-number">7</span>]:                        <span class="hl-comment"># 检验k=3,5,7这三个正面次数的概率</span>
+    freq = np.mean(results == k)              <span class="hl-comment"># results==k → 布尔数组，mean() → 频率≈概率</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"P(X={k}) ≈ {freq:.4f}"</span>)           <span class="hl-comment"># :.4f = 保留4位小数</span>
+<span class="hl-comment"># P(X=5) 最大 ← C(10,5)=252种排法最多（中间鼓）</span>
+<span class="hl-comment"># P(X=3) ≈ P(X=7) ← 对称分布（p=0.5公平硬币）</span>
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <hr>
 <h2>五、多项分布：不止两个盒子</h2>
 <h3>5.1 从二项到多项——思想的自然推广</h3>
@@ -88,11 +98,15 @@ freq = np.mean(results == k)   <span class="hl-comment"># == True/False, mean=�
 <p>其中 $\sum k_i = n$，$\sum p_i = 1$。</p>
 <h3>5.3 代码验证</h3>
 <p>掷六面骰子，每面概率都是 1/6——六个盒子，每个放一样多的筹码。</p>
-<pre><code><span class="hl-comment"># np.random.multinomial(总次数, 各面概率)</span>
-<span class="hl-comment"># 掷 1000 次骰子</span>
-dice = np.random.multinomial(<span class="hl-number">1000</span>, [<span class="hl-number">1</span>/<span class="hl-number">6</span>]*<span class="hl-number">6</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"掷骰1000次: {dice}"</span>)       <span class="hl-comment"># 六个面的出现次数</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"总和={dice.sum()}"</span>)        <span class="hl-comment"># 一定 = 1000</span></code></pre>
+<pre><code><span class="hl-comment"># 00-14 多项分布：掷六面骰子1000次</span>
+<span class="hl-comment"># np.random.multinomial(n, pvals)：掷骰子n次，每面概率pvals</span>
+<span class="hl-comment"># [1/6]*6 → [0.1667,0.1667,0.1667,0.1667,0.1667,0.1667] 公平骰子</span>
+dice = np.random.multinomial(<span class="hl-number">1000</span>, [<span class="hl-number">1</span>/<span class="hl-number">6</span>]*<span class="hl-number">6</span>)  <span class="hl-comment"># 返回长度为6的数组，分别是面1~6的出现次数</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"掷骰1000次: {dice}"</span>)       <span class="hl-comment"># 六个面各自的出现次数</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"总和={dice.sum()}"</span>)          <span class="hl-comment"># .sum()：所有面的次数之和 — 一定 = 1000</span>
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ 全部代码到 online-python.com 运行</a></p>
 <hr>
 <h2>💭 概念题</h2>

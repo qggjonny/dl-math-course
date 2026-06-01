@@ -22,12 +22,14 @@ style="max-width:100%;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
 <h2>一、标量 Scalar — 一个单独的数</h2>
 <p>温度 25°C、考试分数 92、银行余额 384.50——这些都是标量：<strong>一个数，没有方向，没有形状。</strong></p>
 <p>在 Python 里怎么写？</p>
-<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np  <span class="hl-comment"># numpy: Python 做数学运算的核心库，先把它加载进来</span>
-s = np.array(<span class="hl-number">3.14</span>)    <span class="hl-comment"># np.array() 把 Python 的普通数字包成 numpy 的"数组"格式</span>
-<span class="hl-comment"># 3.14 是个 Python float，包一层后变成 numpy 标量</span>
-<span class="hl-builtin">print</span>(s)               <span class="hl-comment"># 输出: 3.14 ——就是那个数本身</span>
-<span class="hl-builtin">print</span>(s.shape)          <span class="hl-comment"># 输出: () ——空括号 = 零维，没有行也没有列</span>
-<span class="hl-comment"># .shape 是 numpy 数组自带的属性，告诉你"这个数组长什么样"</span></code></pre>
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np  <span class="hl-comment"># 导入numpy科学计算库，别名np —— Python做数学运算的核心库</span>
+s = np.array(<span class="hl-number">3.14</span>)    <span class="hl-comment"># np.array(标量) → 把Python浮点数包装成0维numpy数组（标量）</span>
+<span class="hl-comment">                    # 3.14是个Python float，包一层后变成numpy的ndarray对象</span>
+<span class="hl-builtin">print</span>(s)               <span class="hl-comment"># 打印标量的值 → 输出: 3.14 —— 就是那个数本身</span>
+<span class="hl-builtin">print</span>(s.shape)          <span class="hl-comment"># .shape属性：返回元组表示数组各维大小 → () 空元组 = 零维</span>
+<span class="hl-comment">                    # 空括号意味着没有行也没有列——这就是"0维"的含义</span></code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <p>标量虽然简单，但实际应用里很少单独用。你怎么同时管几千个数？答案在下面。</p>
 <hr>
 <h2>二、向量 Vector — 一排数，像一根箭</h2>
@@ -38,12 +40,14 @@ s = np.array(<span class="hl-number">3.14</span>)    <span class="hl-comment"># 
 <li>箭的<strong>方向</strong> = 箭头指的那个朝向</li>
 </ul>
 <p>向量就是一排数——但<strong>不能只当一排数看</strong>。它背后是一根有长度、有方向的箭，这种直觉是后面所有线性代数的基础。</p>
-<pre><code>v = np.array([<span class="hl-number">85</span>, <span class="hl-number">92</span>, <span class="hl-number">78</span>])  <span class="hl-comment"># 方括号 [] 把三个数包起来，这就是一个向量</span>
-<span class="hl-comment"># numpy 自动识别：一维数组 = 向量</span>
-<span class="hl-builtin">print</span>(v)                      <span class="hl-comment"># 输出: [85 92 78]</span>
-<span class="hl-builtin">print</span>(v.shape)                 <span class="hl-comment"># 输出: (3,) ——逗号表示"这是一维"</span>
-<span class="hl-comment"># (3,) 和 (1,3) 不同：(3,) 是一维向量，(1,3) 是只有一行的二维矩阵</span>
-<span class="hl-builtin">print</span>(v[<span class="hl-number">1</span>])                   <span class="hl-comment"># 输出: 92 ——索引从 0 开始：v[0]=85, v[1]=92, v[2]=78</span></code></pre>
+<pre><code>v = np.array([<span class="hl-number">85</span>, <span class="hl-number">92</span>, <span class="hl-number">78</span>])  <span class="hl-comment"># np.array(列表) → 创建一维numpy数组（向量），形状(3,)</span>
+<span class="hl-comment">                        # 方括号[]把三个数包在一起——numpy自动识别为一维</span>
+<span class="hl-builtin">print</span>(v)                      <span class="hl-comment"># 打印向量 → 输出: [85 92 78]</span>
+<span class="hl-builtin">print</span>(v.shape)                 <span class="hl-comment"># .shape属性 → 输出: (3,) —— 逗号表示"这是一维数组"</span>
+<span class="hl-comment">                        # (3,) 和 (1,3) 不同：(3,)是一维向量，(1,3)是只有一行的二维矩阵</span>
+<span class="hl-builtin">print</span>(v[<span class="hl-number">1</span>])                   <span class="hl-comment"># 索引访问：v[1]=92 —— Python索引从0开始，v[0]=85, v[2]=78</span></code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <p>向量就是"一张表"——你有一个学生三门课的成绩表，装在这个向量里。每个位置固定代表一门课：第 0 位是语文，第 1 位是数学，第 2 位是英语。</p>
 <div class="callout callout-important">
 <h3>同一个箭头，两种容器：rank-1 vs rank-2</h3>
@@ -56,10 +60,16 @@ s = np.array(<span class="hl-number">3.14</span>)    <span class="hl-comment"># 
 </table>
 <p><strong>rank = shape 里有几个数。</strong> <code>()</code> 是 rank-0（标量），<code>(3,)</code> 是 rank-1（向量），<code>(3,1)</code> 是 rank-2（矩阵）。</p>
 <p><strong>关键区别：</strong> rank-1 向量的 <code>.T</code>（转置）<strong>不生效</strong>——它没有"行"和"列"的概念，转置还是自己。<strong>为什么？</strong> <code>.T</code> 的本质是「交换轴 0 和轴 1」——但 rank-1 只有轴 0，没有轴 1。没东西可交换，所以 <code>.T</code> 什么都不做。rank-2 列矩阵有两个轴（行和列），转置会交换它们：<code>(3,1)</code> → <code>(1,3)</code>。</p>
-<pre><code>a = np.array([1, 2, 3])       # rank-1: (3,)
-b = np.array([[1],[2],[3]])   # rank-2: (3,1)
-print(a.T)   # 输出: [1 2 3] ——没变！rank-1 没有转置概念
-print(b.T)   # 输出: [[1 2 3]] ——从 (3,1) 变成了 (1,3)</code></pre>
+<pre><code>a = np.array([1, 2, 3])       <span class="hl-comment"># rank-1向量：np.array(一维列表) → shape=(3,)，只有轴0</span>
+<span class="hl-comment">                            # 一根3D空间里的箭——有长度和方向，没有"行列"概念</span>
+b = np.array([[1],[2],[3]])   <span class="hl-comment"># rank-2列矩阵：嵌套列表 → shape=(3,1)，有行轴和列轴</span>
+<span class="hl-comment">                            # 同一根箭装在表格里——3行1列，每个分量独占一行</span>
+<span class="hl-builtin">print</span>(a.T)   <span class="hl-comment"># rank-1向量调用.T转置 → 输出: [1 2 3] ——没变！</span>
+             <span class="hl-comment"># 原因：.T的本质是交换轴0和轴1，但rank-1只有轴0，无轴可换</span>
+<span class="hl-builtin">print</span>(b.T)   <span class="hl-comment"># rank-2矩阵调用.T转置 → 输出: [[1 2 3]] —— 从(3,1)变成(1,3)</span>
+             <span class="hl-comment"># rank-2有行和列两个轴，.T交换它们：行变列、列变行</span></code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <p>箭的分量一样（都是 1,2,3），但<strong>容器的 rank 不同，numpy 对待它们的方式就不一样。</strong>这个概念后面学广播和矩阵乘法时会反复出现。</p>
 </div>
 <hr>
@@ -78,21 +88,30 @@ $$\mathbf{y} = \mathbf{W}\mathbf{x} = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatri
 <li>$W$ 的<strong>列数</strong> = $x$ 的<strong>长度</strong>（都是 2）——不然没法做点乘</li>
 <li>$y$ 的长度 = $W$ 的<strong>行数</strong></li>
 </ul>
-<pre><code>W = np.array([[<span class="hl-number">2</span>, <span class="hl-number">1</span>],     <span class="hl-comment"># 两层方括号：外层包住所有行，内层各包一行</span>
-[<span class="hl-number">0</span>, <span class="hl-number">3</span>]])    <span class="hl-comment"># 形状 (2, 2)：2 行 2 列</span>
-x = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>])     <span class="hl-comment"># 向量，形状 (2,)</span>
-<span class="hl-comment"># @ 是 Python 里的矩阵乘法运算符（Python 3.5+）</span>
-y = W @ x               <span class="hl-comment"># 矩阵乘向量：W(2,2) 把 x(2,) 扭成 y(2,)</span>
-<span class="hl-builtin">print</span>(y)                 <span class="hl-comment"># 输出: [4 6] ——箭头从 (1,2) 扭到了 (4,6)</span></code></pre>
+<pre><code>W = np.array([[<span class="hl-number">2</span>, <span class="hl-number">1</span>],     <span class="hl-comment"># np.array(嵌套列表) → 创建二维数组（矩阵），形状(2,2)</span>
+[<span class="hl-number">0</span>, <span class="hl-number">3</span>]])    <span class="hl-comment"># 两层方括号：外层包住所有行，内层各包一行</span>
+<span class="hl-comment">                # 第一行 [2,1] = 输出y₁ = 2×x₁ + 1×x₂</span>
+<span class="hl-comment">                # 第二行 [0,3] = 输出y₂ = 0×x₁ + 3×x₂</span>
+x = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>])     <span class="hl-comment"># 一维向量，形状(2,) —— 输入"箭头"</span>
+<span class="hl-comment"># @ 是 Python 3.5+ 引入的矩阵乘法运算符（等价于 np.dot()）</span>
+y = W @ x               <span class="hl-comment"># 矩阵乘向量：W(2,2) @ x(2,) → y(2,)</span>
+<span class="hl-comment">                        # 第1个分量 = 2×1+1×2 = 4</span>
+<span class="hl-comment">                        # 第2个分量 = 0×1+3×2 = 6</span>
+<span class="hl-builtin">print</span>(y)                 <span class="hl-comment"># 输出: [4 6] —— 箭头从(1,2)被矩阵"扭"到了(4,6)</span></code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <hr>
 <h2>四、张量 Tensor — 三维及以上的"积木块"</h2>
 <p><strong>画面：</strong> 标量是一个点、向量是一根棍、矩阵是一张纸。那比纸更厚的呢？一<strong>摞</strong>纸——这就是三维张量。</p>
 <p>一张 224×224 像素的<strong>彩色照片</strong>怎么存？它不是一张纸——它是三张纸摞在一起：一张红色通道、一张绿色通道、一张蓝色通道。每一张都是 224×224。合在一起，形状是 <code>(3, 224, 224)</code>。</p>
 <p>如果你一次处理 32 张照片（这是常见做法，一次处理一批比一张张处理快得多），那就是四维：<code>(32, 3, 224, 224)</code>。第 0 维 = 一批有几张，第 1 维 = 颜色通道，第 2、3 维 = 图片的高和宽。</p>
-<pre><code><span class="hl-comment"># np.ones(形状) 创建全 1 数组</span>
-T = np.ones((<span class="hl-number">2</span>, <span class="hl-number">3</span>, <span class="hl-number">4</span>))     <span class="hl-comment"># (2摞, 每摞3行, 每行4列)</span>
-<span class="hl-builtin">print</span>(T.shape)              <span class="hl-comment"># 输出: (2, 3, 4) ——三维</span>
-<span class="hl-builtin">print</span>(T.size)               <span class="hl-comment"># 输出: 24 ——总共有 2×3×4=24 个数字在里面</span></code></pre>
+<pre><code><span class="hl-comment"># np.ones(形状元组) → 创建全1数组，数据类型默认float64</span>
+<span class="hl-comment"># 三维数组 = 张量：(2摞纸, 每摞3行, 每行4列)</span>
+T = np.ones((<span class="hl-number">2</span>, <span class="hl-number">3</span>, <span class="hl-number">4</span>))     <span class="hl-comment"># np.ones((2,3,4)) → shape=(2,3,4)的三维全1张量</span>
+<span class="hl-builtin">print</span>(T.shape)              <span class="hl-comment"># .shape属性 → 输出: (2, 3, 4) —— 三维，第0维=2，第1维=3，第2维=4</span>
+<span class="hl-builtin">print</span>(T.size)               <span class="hl-comment"># .size属性 → 输出: 24 —— 元素总数=2×3×4=24</span></code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <hr>
 <h2>📌 四级台阶速查</h2>
 <table>

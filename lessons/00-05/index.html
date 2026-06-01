@@ -68,20 +68,31 @@ $$\lambda_1 = \frac{7 + 3}{2} = 5, \quad \lambda_2 = \frac{7 - 3}{2} = 2$$
 <div class="callout callout-info">
 <strong>🔍 迹的直观比喻：</strong> 迹 = 对角线之和 = <strong>各方向拉伸率之和</strong>。回忆对角矩阵 $\begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}$——x 方向拉长 2 倍，y 方向拉长 3 倍，迹 = 2+3 = 5。而特征值之积 = 行列式（面积放大倍数），特征值之和 = 迹（拉伸率总和）。一个管<strong>乘法</strong>（体积怎么变），一个管<strong>加法</strong>（各方向拉了多少）。
 </div>
-<pre><code>A = np.array([[4, 1], [2, 3]])
-# 迹 = 对角线之和
-trace = np.trace(A)         # = 4 + 3 = 7
-print(f"迹 = {trace}")
-# 行列式 = ad - bc
-det_A = np.linalg.det(A)    # = 4×3 - 1×2 = 10
-print(f"行列式 = {det_A:.0f}")
-# 特征方程: λ² - 7λ + 10 = 0
-# 二次方程求根: λ = (7 ± √(49-40)) / 2 = (7 ± 3) / 2
-import math
-discriminant = math.sqrt(7**2 - 4*10)  # √(b²-4ac) = √(49-40) = 3
-lambda1 = (7 + discriminant) / 2       # = 5
-lambda2 = (7 - discriminant) / 2       # = 2
-print(f"λ₁ = {lambda1}, λ₂ = {lambda2}")</code></pre>
+<pre><code><span class="hl-comment"># 00-05 第一步：手算特征值——用迹和行列式推出 λ₁ 和 λ₂</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                     <span class="hl-comment"># 导入numpy，别名np，提供矩阵运算</span>
+
+A = np.array([[<span class="hl-number">4</span>, <span class="hl-number">1</span>],                  <span class="hl-comment"># np.array(嵌套列表) → 创建2×2二维数组（矩阵）</span>
+              [<span class="hl-number">2</span>, <span class="hl-number">3</span>]])                 <span class="hl-comment"># 外层列表每元素一行：A = [[4,1],[2,3]]</span>
+
+<span class="hl-comment"># 迹 = 对角线元素之和 → a+d = 4+3 = 7</span>
+trace = np.trace(A)                       <span class="hl-comment"># trace()返回矩阵对角线之和，整数7</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"迹 = {trace}"</span>)              <span class="hl-comment"># f-string输出：迹 = 7</span>
+
+<span class="hl-comment"># 行列式 = ad−bc = 4×3 − 1×2 = 10</span>
+det_A = np.linalg.det(A)                  <span class="hl-comment"># linalg.det()计算行列式，浮点数10.0</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"行列式 = {det_A:.0f}"</span>)        <span class="hl-comment"># :.0f = 保留0位小数，输出整数形式 "10"</span>
+
+<span class="hl-comment"># 特征方程: λ² − tr(A)·λ + det(A) = 0</span>
+<span class="hl-comment"># 即 λ² − 7λ + 10 = 0</span>
+<span class="hl-comment"># 二次方程求根公式: λ = (tr ± √(tr²−4det)) / 2</span>
+<span class="hl-keyword">import</span> math                            <span class="hl-comment"># 导入math模块，使用sqrt开方函数</span>
+discriminant = math.sqrt(<span class="hl-number">7</span>**<span class="hl-number">2</span> - <span class="hl-number">4</span>*<span class="hl-number">10</span>)  <span class="hl-comment"># √(b²−4ac) = √(49−40) = √9 = 3.0</span>
+lambda1 = (<span class="hl-number">7</span> + discriminant) / <span class="hl-number">2</span>         <span class="hl-comment"># λ₁ = (7+3)/2 = 5.0，第一个特征值</span>
+lambda2 = (<span class="hl-number">7</span> - discriminant) / <span class="hl-number">2</span>         <span class="hl-comment"># λ₂ = (7−3)/2 = 2.0，第二个特征值</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"λ₁ = {lambda1}, λ₂ = {lambda2}"</span>)  <span class="hl-comment"># 输出：λ₁ = 5.0, λ₂ = 2.0</span>
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <h4>两个恒等式是怎么来的？</h4>
 <p>特征方程展开后是 $\lambda^2 - \text{tr}(A)\lambda + \det(A) = 0$。这是标准二次方程 $x^2 + bx + c = 0$ 的形式（这里 $b = -\text{tr}(A)$，$c = \det(A)$）。</p>
 <p>二次方程有一个定理（韦达定理）：<strong>所有根之和 = $-b$，所有根之积 = $c$</strong>。拿 $x^2 - 7x + 10 = 0$ 来说：两根 2 和 5，和是 7（= $-(-7)$），积是 10。为什么？因为二次方程可以写成 $(x - r_1)(x - r_2) = 0$，展开后 $x^2 - (r_1+r_2)x + r_1 r_2 = 0$，对应系数就得到关系。</p>
@@ -122,20 +133,32 @@ $$A - 2I = \begin{bmatrix} 4-2 & 1 \\ 2 & 3-2 \end{bmatrix} = \begin{bmatrix} 2 
 $$\mathbf{v}_2 = \begin{bmatrix} 1 \\ -2 \end{bmatrix}$$
 <p><strong>验证：</strong> $A\mathbf{v}_1 = \begin{bmatrix} 4&1\\2&3 \end{bmatrix} \begin{bmatrix} 1\\1 \end{bmatrix} = \begin{bmatrix} 5\\5 \end{bmatrix} = 5 \cdot \begin{bmatrix} 1\\1 \end{bmatrix}$ ✓。$A\mathbf{v}_2 = \begin{bmatrix} 4&1\\2&3 \end{bmatrix} \begin{bmatrix} 1\\-2 \end{bmatrix} = \begin{bmatrix} 2\\-4 \end{bmatrix} = 2 \cdot \begin{bmatrix} 1\\-2 \end{bmatrix}$ ✓。</p>
 <p><strong>推导链完整：</strong> 特征方程 → 二次方程求 λ → 代入 $(A-\lambda I)\mathbf{v}=0$ → 解线性方程组 → 得到 v。下面用代码验证全过程：</p>
-<pre><code>A = np.array([[4, 1], [2, 3]])
-# np.linalg.eig 返回两样：
-#   eigvals → 特征值数组
-#   eigvecs → 特征向量（每列是一个特征向量）
-eigvals, eigvecs = np.linalg.eig(A)
-print(f"特征值: {eigvals}")         # [5. 2.]
-# 解释：一个方向被拉长 5 倍，另一个被拉长 2 倍
-print(f"行列式 = {np.linalg.det(A):.0f}")  # 10 = 5×2 ✓
-# 验证：A@v 应该 = λ×v
-v1 = eigvecs[:, 0]              # 第一个特征向量（第0列）
-l1 = eigvals[0]                  # 第一个特征值
-print(f"A@v1 = {A @ v1}")       # 扭一下
-print(f"λ×v1 = {l1 * v1}")      # 单纯缩放
-print(f"相等? {np.allclose(A @ v1, l1 * v1)}")  # True</code></pre>
+<pre><code><span class="hl-comment"># 00-05 第二步：用 np.linalg.eig 验证——特征值就是"不扭方向"的拉伸倍数</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy，别名np</span>
+
+A = np.array([[<span class="hl-number">4</span>, <span class="hl-number">1</span>],                    <span class="hl-comment"># 同样的矩阵 A = [[4,1],[2,3]]</span>
+              [<span class="hl-number">2</span>, <span class="hl-number">3</span>]])                   <span class="hl-comment"># 外层列表每元素一行 → 2×2矩阵</span>
+
+<span class="hl-comment"># np.linalg.eig 返回两个值（元组解包）：</span>
+<span class="hl-comment">#   eigvals → 特征值一维数组（按降序排列）</span>
+<span class="hl-comment">#   eigvecs → 特征向量矩阵，每列是一个特征向量（按对应列归一化）</span>
+eigvals, eigvecs = np.linalg.eig(A)         <span class="hl-comment"># eigvals=[5., 2.]（浮点数）, eigvecs 2×2矩阵</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"特征值: {eigvals}"</span>)              <span class="hl-comment"># 输出 [5. 2.] — λ₁=5, λ₂=2</span>
+
+<span class="hl-comment"># 解释：λ₁=5 → 这个方向被拉长5倍；λ₂=2 → 这个方向被拉长2倍</span>
+
+<span class="hl-comment"># 特征值之积 = 行列式（面积放大倍数）</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"行列式 = {np.linalg.det(A):.0f}"</span>)  <span class="hl-comment"># .det()返回行列式 → 10 = 5×2 ✓</span>
+
+<span class="hl-comment"># 验证定义：对第一个特征向量 v1，A @ v1 应该 = λ₁ × v1</span>
+v1 = eigvecs[:, <span class="hl-number">0</span>]                       <span class="hl-comment"># 取第0列 → 第一个特征向量（2维向量）</span>
+l1 = eigvals[<span class="hl-number">0</span>]                           <span class="hl-comment"># 第一个特征值 → 5.0</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"A@v1 = {A @ v1}"</span>)               <span class="hl-comment"># A @ v1：矩阵乘法，矩阵把v1变换后的结果</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"λ×v1 = {l1 * v1}"</span>)              <span class="hl-comment"># l1 * v1：标量乘向量，单纯缩放v1的每个分量</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"相等? {np.allclose(A @ v1, l1 * v1)}"</span>) <span class="hl-comment"># allclose：容忍浮点误差的近似相等判断 → True</span>
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <h3>特例：对角矩阵</h3>
 <p>如果矩阵只有对角线上有数，其余全是 0：</p>
 $$A = \begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}$$

@@ -32,29 +32,36 @@ $$A = \sigma_1 \cdot \mathbf{u}_1 \mathbf{v}_1^T \;+\; \sigma_2 \cdot \mathbf{u}
 <p>每一项 $\sigma_i \mathbf{u}_i \mathbf{v}_i^T$ 是一个 $2\times 2$ 矩阵（$\mathbf{u}_i$ 是 $2\times 1$ 列向量，$\mathbf{v}_i^T$ 是 $1\times 2$ 行向量，外积得到 $2\times 2$）。可以理解为一张<strong>"图层"</strong>——$\sigma_i$ 越大，这层贡献越大。</p>
 
 <pre><code><span class="hl-comment"># 00-07 第一步：把 SVD 展开，看每一项（每一层）长什么样</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy，别名np，提供线性代数运算</span>
 
-A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],
-              [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])
+A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],                    <span class="hl-comment"># np.array(嵌套列表) → 创建2×2二维数组</span>
+              [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])                   <span class="hl-comment"># 外层列表每元素是一行：A = [[3,1],[1,3]]</span>
 
-U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># U(2×2), s=[σ₁,σ₂], VT(2×2)</span>
+<span class="hl-comment"># SVD分解：A = U Σ V^T，一次性拆成三部分</span>
+U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># U=左奇异向量(2×2), s=奇异值1D数组[σ₁,σ₂], VT=右奇异向量转置(2×2)</span>
 
-<span class="hl-builtin">print</span>(<span class="hl-string">"原始矩阵 A:"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">"原始矩阵 A:"</span>)                  <span class="hl-comment"># 打印原始矩阵，方便和后面的图层对比</span>
 <span class="hl-builtin">print</span>(A)
 
-<span class="hl-comment"># 逐层拆开</span>
-<span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-builtin">len</span>(s)):
+<span class="hl-comment"># 逐层拆开——SVD可以写成：A = σ₁·u₁·v₁^T + σ₂·u₂·v₂^T + ...</span>
+<span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-builtin">len</span>(s)):                <span class="hl-comment"># range(len(s))：遍历每个奇异值, i=0,1</span>
     <span class="hl-comment"># 第 i 层: σᵢ · uᵢ · vᵢ^T</span>
-    <span class="hl-comment"># np.outer(a, b) = a @ b^T → 外积 得到矩阵</span>
+    <span class="hl-comment"># np.outer(a, b)：外积，a是列向量(m×1)，b是行向量(1×n) → m×n矩阵</span>
+    <span class="hl-comment">#   U[:,i]：U的第i列（左奇异向量, 2维）</span>
+    <span class="hl-comment">#   VT[i,:]：VT的第i行（右奇异向量, 2维）</span>
+    <span class="hl-comment">#   s[i] * outer：奇异值σᵢ缩放这一层的贡献</span>
     layer = s[i] * np.outer(U[:, i], VT[i, :])
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"\n第 {i+1} 层 (σ={s[i]:.1f}):"</span>)
-    <span class="hl-builtin">print</span>(layer)
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"\n第 {i+1} 层 (σ={s[i]:.1f}):"</span>)  <span class="hl-comment"># f-string, :.1f=保留1位小数显示奇异值</span>
+    <span class="hl-builtin">print</span>(layer)                            <span class="hl-comment"># 打印这一层矩阵——σ越大贡献越大</span>
 
-<span class="hl-comment"># 验证：两层加起来 = A</span>
+<span class="hl-comment"># 验证：两层加起来应等于原矩阵 A</span>
+<span class="hl-comment"># s[0]*outer(U[:,0], VT[0,:])：第一层（σ₁,u₁,v₁）</span>
+<span class="hl-comment"># s[1]*outer(U[:,1], VT[1,:])：第二层（σ₂,u₂,v₂）</span>
+<span class="hl-comment"># \ 是Python行连接符，用于把长语句分成两行写</span>
 reconstructed = s[<span class="hl-number">0</span>]*np.outer(U[:,<span class="hl-number">0</span>], VT[<span class="hl-number">0</span>,:]) + \
                s[<span class="hl-number">1</span>]*np.outer(U[:,<span class="hl-number">1</span>], VT[<span class="hl-number">1</span>,:])
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\n两层之和:\n{reconstructed}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"等于 A？ {np.allclose(A, reconstructed)}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n两层之和:\n{reconstructed}"</span>)  <span class="hl-comment"># 验证重建结果，应和原始A一样</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"等于 A？ {np.allclose(A, reconstructed)}"</span>)  <span class="hl-comment"># allclose：容忍浮点误差的近似相等 → True</span>
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
@@ -64,26 +71,29 @@ reconstructed = s[<span class="hl-number">0</span>]*np.outer(U[:,<span class="hl
 <p>$\sigma_1 = 4$，$\sigma_2 = 2$。第一层贡献大，第二层贡献小。如果<strong>只用第一层</strong>（扔掉第二层），结果差多少？</p>
 
 <pre><code><span class="hl-comment"># 00-07 第二步：只用最大的奇异值重建——看看误差多大</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy，别名np</span>
 
-A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],
-              [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])
-U, s, VT = np.linalg.svd(A)
+A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],                    <span class="hl-comment"># 同一个矩阵 A = [[3,1],[1,3]]</span>
+              [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])                   <span class="hl-comment"># 2×2对称矩阵，奇异值σ₁=4, σ₂=2</span>
+U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># SVD分解：U(2×2), s=[4,2], VT(2×2)</span>
 
-<span class="hl-comment"># 只用 k=1 个最大奇异值</span>
-k = <span class="hl-number">1</span>
+<span class="hl-comment"># 只用 k=1 个最大奇异值重建——扔掉σ₂这一层</span>
+k = <span class="hl-number">1</span>                                     <span class="hl-comment"># k=1：只保留第一个（最大的）奇异值</span>
+<span class="hl-comment"># 生成器表达式 sum(... for i in range(k))：对前k个索引求和</span>
+<span class="hl-comment"># 每个i：s[i] * outer(U[:,i], VT[i,:]) = σᵢ · uᵢ · vᵢ^T</span>
 A_1 = <span class="hl-builtin">sum</span>(s[i] * np.outer(U[:, i], VT[i, :])
-          <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(k))
+          <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(k))              <span class="hl-comment"># range(k)=range(1)=[0]：只循环一次</span>
 
-error = np.linalg.norm(A - A_1, <span class="hl-string">'fro'</span>)      <span class="hl-comment"># Frobenius 范数 = 所有元素平方和的根</span>
-                                            <span class="hl-comment"># 用来衡量两个矩阵之间的"距离"</span>
+<span class="hl-comment"># 计算重建误差——用Frobenius范数衡量矩阵间"距离"</span>
+error = np.linalg.norm(A - A_1, <span class="hl-string">'fro'</span>)      <span class="hl-comment"># norm(..., 'fro')：Frobenius范数 = √(Σ所有元素平方)</span>
+                                            <span class="hl-comment"># 即把矩阵展平成一维，算欧几里得距离</span>
 
-<span class="hl-builtin">print</span>(<span class="hl-string">f"只用 {k} 个奇异值重建:"</span>)
-<span class="hl-builtin">print</span>(A_1)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\n原始 A:"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"只用 {k} 个奇异值重建:"</span>)       <span class="hl-comment"># 打印标题</span>
+<span class="hl-builtin">print</span>(A_1)                                  <span class="hl-comment"># 打印近似矩阵A₁——和原A对比</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n原始 A:"</span>)                        <span class="hl-comment"># 打印原始矩阵</span>
 <span class="hl-builtin">print</span>(A)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\n误差 = {error:.3f}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"相对误差 = {error / np.linalg.norm(A, 'fro') * 100:.1f}%"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n误差 = {error:.3f}"</span>)           <span class="hl-comment"># :.3f = 保留3位小数显示误差</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"相对误差 = {error / np.linalg.norm(A, 'fro') * 100:.1f}%"</span>)  <span class="hl-comment"># 误差÷原始范数×100%=相对误差百分比</span>
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
@@ -93,30 +103,35 @@ error = np.linalg.norm(A - A_1, <span class="hl-string">'fro'</span>)      <span
 <h2>三、更大的例子：5×3 矩阵</h2>
 
 <pre><code><span class="hl-comment"># 00-07 第三步：5×3 矩阵，用前 k 个奇异值重建</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy，别名np</span>
 
-np.random.seed(<span class="hl-number">42</span>)
-<span class="hl-comment"># 生成一个"接近低秩"的 5×3 矩阵：前两列相关</span>
-A = np.random.randn(<span class="hl-number">5</span>, <span class="hl-number">3</span>)             <span class="hl-comment"># 5×3 随机矩阵</span>
-A[:, <span class="hl-number">2</span>] = A[:, <span class="hl-number">0</span>] * <span class="hl-number">0.5</span> + A[:, <span class="hl-number">1</span>] * <span class="hl-number">0.3</span>  <span class="hl-comment"># 第3列 ≈ 前两列的线性组合</span>
-                                       <span class="hl-comment"># 这样第3个奇异值会很小</span>
+np.random.seed(<span class="hl-number">42</span>)                      <span class="hl-comment"># 固定随机种子=42，保证每次运行生成的"随机"数相同（可复现）</span>
 
-U, s, VT = np.linalg.svd(A)
+<span class="hl-comment"># 生成一个"接近低秩"的 5×3 矩阵：第3列是前两列的线性组合</span>
+A = np.random.randn(<span class="hl-number">5</span>, <span class="hl-number">3</span>)             <span class="hl-comment"># randn(5,3)：从标准正态分布N(0,1)中抽取 → 5行3列随机矩阵</span>
+<span class="hl-comment"># A[:,0]：取A的第0列（所有行）→ 5个元素的列向量</span>
+<span class="hl-comment"># A[:,1]：取A的第1列 → 5个元素的列向量</span>
+<span class="hl-comment"># A[:,2] = 0.5*A[:,0] + 0.3*A[:,1]：第3列由前两列线性组合而成</span>
+A[:, <span class="hl-number">2</span>] = A[:, <span class="hl-number">0</span>] * <span class="hl-number">0.5</span> + A[:, <span class="hl-number">1</span>] * <span class="hl-number">0.3</span>  <span class="hl-comment"># 广播：标量×列向量 = 每个元素乘标量，再加起来</span>
+                                       <span class="hl-comment"># 后果：第3个奇异值会非常小（列线性相关）</span>
 
-<span class="hl-builtin">print</span>(<span class="hl-string">f"A 形状: {A.shape}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"奇异值: σ₁={s[0]:.3f}, σ₂={s[1]:.3f}, σ₃={s[2]:.3f}"</span>)
-<span class="hl-builtin">print</span>()
+U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># SVD分解：U(5×5), s(3个奇异值), VT(3×3)</span>
+
+<span class="hl-builtin">print</span>(<span class="hl-string">f"A 形状: {A.shape}"</span>)             <span class="hl-comment"># A.shape → (5, 3)，即5行3列</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"奇异值: σ₁={s[0]:.3f}, σ₂={s[1]:.3f}, σ₃={s[2]:.3f}"</span>)  <span class="hl-comment"># :.3f=保留3位，σ₃应远小于前两个</span>
+<span class="hl-builtin">print</span>()                                    <span class="hl-comment"># 空行，让输出更好看</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">"原始 A:"</span>)
-<span class="hl-builtin">print</span>(np.round(A, <span class="hl-number">3</span>))
+<span class="hl-builtin">print</span>(np.round(A, <span class="hl-number">3</span>))                    <span class="hl-comment"># round(A, 3)：四舍五入到3位小数，让输出整洁</span>
 
-<span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>]:
-    <span class="hl-comment"># A_k = Σ_{i=0}^{k-1} σᵢ uᵢ vᵢ^T</span>
+<span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>]:                        <span class="hl-comment"># 分别试验：只用1个奇异值 vs 用前2个奇异值</span>
+    <span class="hl-comment"># A_k = Σ_{i=0}^{k-1} σᵢ uᵢ vᵢ^T —— 用前k个奇异值重建</span>
+    <span class="hl-comment"># 生成器表达式：for i in range(k) 依次取i=0,...,k-1</span>
     A_k = <span class="hl-builtin">sum</span>(s[i] * np.outer(U[:, i], VT[i, :])
-              <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(k))
-    error = np.linalg.norm(A - A_k, <span class="hl-string">'fro'</span>)
-    rel_err = error / np.linalg.norm(A, <span class="hl-string">'fro'</span>) * <span class="hl-number">100</span>
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"\nk={k}: 误差={error:.3f}, 相对={rel_err:.1f}%"</span>)
-    <span class="hl-builtin">print</span>(np.round(A_k, <span class="hl-number">3</span>))
+              <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(k))      <span class="hl-comment"># sum()对生成器产生的k个矩阵逐元素求和</span>
+    error = np.linalg.norm(A - A_k, <span class="hl-string">'fro'</span>)  <span class="hl-comment"># Frobenius范数 = √(Σ|Aᵢⱼ−A_kᵢⱼ|²)</span>
+    rel_err = error / np.linalg.norm(A, <span class="hl-string">'fro'</span>) * <span class="hl-number">100</span>  <span class="hl-comment"># 相对误差 = 绝对误差÷原矩阵大小×100%</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"\nk={k}: 误差={error:.3f}, 相对={rel_err:.1f}%"</span>)  <span class="hl-comment"># 显示k和对应的误差</span>
+    <span class="hl-builtin">print</span>(np.round(A_k, <span class="hl-number">3</span>))                <span class="hl-comment"># 打印近似矩阵（四舍五入便于阅读）</span>
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
@@ -133,37 +148,43 @@ $$A^+ = V \Sigma^+ U^T$$
 
 <p>举个例子立即就清楚了：</p>
 
-<pre><code><span class="hl-comment"># 00-07 第四步：伪逆 — 手搓 vs 内置</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<pre><code><span class="hl-comment"># 00-07 第四步：伪逆 — 手搓 vs 内置 —— 长方矩阵的"逆"</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy，别名np</span>
 
-A = np.array([[<span class="hl-number">1</span>, <span class="hl-number">2</span>],             <span class="hl-comment"># 3×2 长方形矩阵</span>
-              [<span class="hl-number">3</span>, <span class="hl-number">4</span>],
-              [<span class="hl-number">5</span>, <span class="hl-number">6</span>]])
+<span class="hl-comment"># 3×2 长方形矩阵——不是方阵，无法求普通逆</span>
+A = np.array([[<span class="hl-number">1</span>, <span class="hl-number">2</span>],                    <span class="hl-comment"># np.array创建3行2列矩阵：[[1,2],[3,4],[5,6]]</span>
+              [<span class="hl-number">3</span>, <span class="hl-number">4</span>],                     <span class="hl-comment"># 3个方程，2个未知数 → 超定方程组</span>
+              [<span class="hl-number">5</span>, <span class="hl-number">6</span>]])                    <span class="hl-comment"># 形状 (3, 2)</span>
 
-<span class="hl-comment"># 方法1: numpy 内置</span>
-A_plus_np = np.linalg.pinv(A)              <span class="hl-comment"># 伪逆，返回 2×3</span>
+<span class="hl-comment"># 方法1: numpy 内置伪逆函数——一行搞定</span>
+A_plus_np = np.linalg.pinv(A)              <span class="hl-comment"># pinv()返回Moore-Penrose伪逆，形状 (2,3)</span>
+                                            <span class="hl-comment"># 3×2矩阵的伪逆是2×3，和转置形状一样</span>
 
-<span class="hl-comment"># 方法2: 用 SVD 手搓</span>
-U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># U:3×3, s:[σ₁,σ₂], VT:2×2</span>
+<span class="hl-comment"># 方法2: 用 SVD 手搓伪逆——A⁺ = V Σ⁺ U^T</span>
+U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># SVD分解 A=UΣV^T：U(3×3), s=[σ₁,σ₂], VT(2×2)</span>
 
-<span class="hl-comment"># 构造 Σ⁺：先取倒数，再转置</span>
-sigma_inv = np.diag(<span class="hl-number">1.0</span> / s)              <span class="hl-comment"># 2×2 对角矩阵 [[1/σ₁, 0], [0, 1/σ₂]]</span>
-sigma_plus = np.zeros((<span class="hl-number">2</span>, <span class="hl-number">3</span>))           <span class="hl-comment"># Σ⁺ 是 2×3（Σ 原来是 3×2）</span>
-sigma_plus[:<span class="hl-number">2</span>, :<span class="hl-number">2</span>] = sigma_inv            <span class="hl-comment"># 填入 1/σᵢ</span>
+<span class="hl-comment"># 构造 Σ⁺（Sigma的伪逆）：先把非零奇异值取倒数，再转置</span>
+sigma_inv = np.diag(<span class="hl-number">1.0</span> / s)              <span class="hl-comment"># np.diag([1/σ₁, 1/σ₂]) → 2×2对角矩阵 [[1/σ₁,0],[0,1/σ₂]]</span>
+sigma_plus = np.zeros((<span class="hl-number">2</span>, <span class="hl-number">3</span>))           <span class="hl-comment"># 先创建2×3的全零矩阵——Σ⁺的容器</span>
+sigma_plus[:<span class="hl-number">2</span>, :<span class="hl-number">2</span>] = sigma_inv            <span class="hl-comment"># 左上角2×2子矩阵填入 1/σᵢ 对角线值</span>
+                                            <span class="hl-comment"># [:2,:2] = 前2行×前2列切片</span>
 
-A_plus_manual = VT.T @ sigma_plus @ U.T   <span class="hl-comment"># V Σ⁺ U^T = A⁺</span>
+<span class="hl-comment"># 组装伪逆：A⁺ = V Σ⁺ U^T</span>
+<span class="hl-comment"># VT.T = V（转置回来）, U.T = U^T（U的转置）</span>
+A_plus_manual = VT.T @ sigma_plus @ U.T   <span class="hl-comment"># (2×2) @ (2×3) @ (3×3) → (2×3) = 和pinv一样的形状</span>
 
-<span class="hl-builtin">print</span>(<span class="hl-string">"numpy pinv:\n"</span>, np.round(A_plus_np, <span class="hl-number">4</span>))
-<span class="hl-builtin">print</span>(<span class="hl-string">"\n手搓:\n"</span>, np.round(A_plus_manual, <span class="hl-number">4</span>))
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\n一致？ {np.allclose(A_plus_np, A_plus_manual)}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">"numpy pinv:\n"</span>, np.round(A_plus_np, <span class="hl-number">4</span>))    <span class="hl-comment"># round到4位，和手搓对比</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"\n手搓:\n"</span>, np.round(A_plus_manual, <span class="hl-number">4</span>))    <span class="hl-comment"># 手搓结果，两者应完全一致</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n一致？ {np.allclose(A_plus_np, A_plus_manual)}"</span>) <span class="hl-comment"># allclose容忍浮点误差 → True</span>
 
-<span class="hl-comment"># 伪逆有什么用？解 Ax = b：</span>
-b = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>])
-x = A_plus_np @ b                          <span class="hl-comment"># x = A⁺ b，这是最小二乘解</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\n解 Ax ≈ b: x = {np.round(x, 4)}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"验证 Ax = {np.round(A @ x, 4)}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"目标 b = {b}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"||Ax-b|| = {np.linalg.norm(A @ x - b):.4f}"</span>)
+<span class="hl-comment"># 伪逆有什么用？——解超定方程组 Ax = b（最小二乘解）</span>
+b = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>])                <span class="hl-comment"># 目标向量b，形状(3,)——3个方程的目标值</span>
+x = A_plus_np @ b                          <span class="hl-comment"># x = A⁺b，(2×3)@(3,)→(2,)，最小二乘最优解</span>
+                                            <span class="hl-comment"># 这个x让||Ax−b||（误差范数）达到最小</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n解 Ax ≈ b: x = {np.round(x, 4)}"</span>)  <span class="hl-comment"># 打印最小二乘解</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"验证 Ax = {np.round(A @ x, 4)}"</span>)    <span class="hl-comment"># A@x：(3×2)@(2,)→(3,) 验证近似结果</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"目标 b = {b}"</span>)                     <span class="hl-comment"># 原始目标b</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"||Ax-b|| = {np.linalg.norm(A @ x - b):.4f}"</span>)  <span class="hl-comment"># 残差范数——越小说明解越好</span>
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
