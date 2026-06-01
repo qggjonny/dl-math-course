@@ -99,14 +99,14 @@ blockquote {
 .code-block-wrapper {
   position: relative;
   margin: 1.2em 0;
+  padding-top: 2.5em;     /* 按钮独占区，在 pre 上方 */
 }
 .code-block-wrapper pre {
   margin: 0;
-  padding-top: 3em;      /* 按钮高度 ~24px，留足空间不遮代码 */
 }
 .copy-btn {
   position: absolute;
-  top: 7px;
+  top: 4px;
   right: 10px;
   z-index: 1;
   background: var(--bg);
