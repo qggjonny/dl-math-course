@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>00-22 最大似然估计 MLE · 深度学习数学</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../css/style.css?v=20260601">
+</head>
+<body>
+
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-22</span>
+<span><a href="../00-21/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-23/">下一课 →</a></span></nav>
+
+<div class="container">
+
+<p style="color:var(--text-light);font-size:0.9em">🌱 阶段 0 · 第 18 课</p>
+<h1>最大似然估计 MLE</h1>
+
+<h2>一、反问题：看到结果，猜原因</h2>
+
+<p><strong>画面：</strong> 你走进一间屋子，发现地上有几根头发、一杯没喝完的咖啡。你想知道：刚才在这里的人更喜欢喝咖啡还是喝茶？</p>
+
+<p>你没法直接知道，但可以<strong>反推</strong>：如果这个人喝咖啡，地上出现这些现象的概率有多大？如果喝茶呢？比较这两个概率——哪个更高，哪个解释更合理。</p>
+
+<p>这就是<strong>似然</strong>的直觉：</p>
+
+$$P(\text{观察到这些} \mid \text{假设这个参数})$$
+
+<p>数据是固定的，参数是变量。<strong>在所有可能的参数值中，选那个"让观测数据出现概率最大"的参数。</strong></p>
+
+<h2>二、抛硬币的例子</h2>
+
+<p>抛一枚硬币 10 次，7 次正面。硬币正面概率 $\theta$ 是多少？</p>
+
+<p>如果 $\theta = 0.5$（公平硬币），出现"10 次中 7 次正面"的概率：</p>
+
+$$P(7\text{正} \mid \theta=0.5) = \binom{10}{7} (0.5)^7 (0.5)^3 \approx 0.117$$
+
+<p>如果 $\theta = 0.7$：</p>
+
+$$P(7\text{正} \mid \theta=0.7) = \binom{10}{7} (0.7)^7 (0.3)^3 \approx 0.267$$
+
+<p>$0.267 > 0.117$——$\theta=0.7$ 比 $\theta=0.5$ 更有可能产生这个结果。<strong>那最可能的是哪个？</strong></p>
+
+<h2>三、似然函数</h2>
+
+<p>把概率写成 $\theta$ 的函数——这就是<strong>似然函数</strong>：</p>
+
+$$L(\theta) = P(\text{数据} \mid \theta) = \binom{10}{7} \theta^7 (1-\theta)^3$$
+
+<p>$\binom{10}{7}$ 是常数，不影响最大化。所以最大化 $L(\theta)$ 等价于最大化：</p>
+
+$$\theta^7 (1-\theta)^3$$
+
+<pre><code><span class="hl-comment"># 00-18 似然函数 — 抛硬币 10 次 7 正，猜 θ</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 100 个候选 θ 值</span>
+thetas = np.linspace(<span class="hl-number">0.01</span>, <span class="hl-number">0.99</span>, <span class="hl-number">100</span>)
+<span class="hl-comment"># L(θ) = θ⁷(1-θ)³</span>
+likelihood = thetas**<span class="hl-number">7</span> * (<span class="hl-number">1</span> - thetas)**<span class="hl-number">3</span>
+best_idx = np.argmax(likelihood)              <span class="hl-comment"># 似然最大的 θ 的下标</span>
+
+<span class="hl-builtin">print</span>(<span class="hl-string">f"最大似然估计 θ̂ = {thetas[best_idx]:.3f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"直觉：7/10 = {7/10}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"一致！MLE = 样本比例"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<p>结果 $\hat{\theta}_{\text{MLE}} = 0.7$。直觉正确：抛 10 次 7 正，正面率最可能是 0.7。</p>
+
+<h2>四、对数似然——把乘变加</h2>
+
+<p>实际问题中数据量很大，$\theta_1 \times \theta_2 \times \cdots \times \theta_N$ 会溢出或下溢。对策：<strong>取对数</strong>。</p>
+
+<p>$\ln$ 是单调增函数，所以最大化 $L(\theta)$ 和最大化 $\ln L(\theta)$ 等价：</p>
+
+$$\ell(\theta) = \ln L(\theta) = 7\ln\theta + 3\ln(1-\theta) + \text{常数}$$
+
+<p>乘法变成加法——好算了。然后对 $\theta$ 求导：</p>
+
+$$\frac{d\ell}{d\theta} = \frac{7}{\theta} - \frac{3}{1-\theta} = 0 \quad\Longrightarrow\quad \hat{\theta} = \frac{7}{10}$$
+
+<p>一般情况：$n$ 次试验 $k$ 次成功 → $\hat{\theta}_{\text{MLE}} = k/n$。</p>
+
+<h2>五、MLE 通向损失函数</h2>
+
+<p>这是 MLE 最核心的用途——<strong>它解释了为什么交叉熵是分类的损失函数、MSE 是回归的损失函数。</strong></p>
+
+<p><strong>回归：假设误差服从高斯分布。</strong></p>
+
+<p>模型预测 $\hat{y}$，真实值 $y$。假设 $y = \hat{y} + \varepsilon$，$\varepsilon \sim \mathcal{N}(0, \sigma^2)$：</p>
+
+$$P(y \mid \hat{y}) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y - \hat{y})^2}{2\sigma^2}\right)$$
+
+<p>$N$ 个独立样本的似然：</p>
+
+$$L = \prod_{i=1}^N \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right)$$
+
+<p>取对数——把连乘变成连加：</p>
+
+$$\begin{aligned}
+\ell &= \ln L = \ln\prod_{i=1}^N \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right) \\[4pt]
+&= \sum_{i=1}^N \ln\left[\frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right)\right] \\[4pt]
+&= \underbrace{N \ln\frac{1}{\sqrt{2\pi\sigma^2}}}_{\text{常数，不依赖 }\hat{y}_i} \;+\; \sum_{i=1}^N \left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right)
+\end{aligned}$$
+
+<p>常数项 $N\ln(1/\sqrt{2\pi\sigma^2})$ 不含模型参数 $\hat{y}_i$，不影响优化——最大化 $\ell$ 时可以丢掉。因子 $1/(2\sigma^2) > 0$ 是正常数，最小化时也可省略。所以：</p>
+
+$$\text{最大化 }\ell \;\Longleftrightarrow\; \text{最小化 } \sum_{i=1}^N (y_i - \hat{y}_i)^2$$
+
+<p><strong>最大化 $\ell$ = 最小化 $\sum (y_i - \hat{y}_i)^2$ → MSE！</strong></p>
+
+<p><strong>分类：假设标签服从伯努利/类别分布。</strong></p>
+
+<p>二分类，模型预测概率 $\hat{p}$，真实标签 $y \in \{0,1\}$：</p>
+
+$$P(y \mid \hat{p}) = \hat{p}^y (1-\hat{p})^{1-y}$$
+
+<p>取负对数：</p>
+
+$$-\ln L = -\sum_{i=1}^N \big[y_i \ln \hat{p}_i + (1-y_i) \ln(1-\hat{p}_i)\big]$$
+
+<p><strong>这就是交叉熵损失！</strong></p>
+
+<pre><code><span class="hl-comment"># 00-18 用 MLE 拟合高斯分布 — 从数据反推均值和方差</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 生成真实分布为 N(5, 2²) 的 1000 个样本</span>
+np.random.seed(<span class="hl-number">42</span>)
+true_mu, true_sigma = <span class="hl-number">5.0</span>, <span class="hl-number">2.0</span>
+data = np.random.normal(true_mu, true_sigma, <span class="hl-number">1000</span>)
+
+<span class="hl-comment"># MLE 估计：高斯分布的 MLE 就是样本均值和样本标准差</span>
+mu_hat = np.mean(data)                       <span class="hl-comment"># μ̂ = (1/N) Σ xᵢ</span>
+sigma_hat = np.std(data)                     <span class="hl-comment"># σ̂ = sqrt((1/N) Σ (xᵢ-μ)²)</span>
+
+<span class="hl-builtin">print</span>(<span class="hl-string">f"真实参数: μ={true_mu}, σ={true_sigma}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"MLE 估计: μ̂={mu_hat:.3f}, σ̂={sigma_hat:.3f}"</span>)
+
+<span class="hl-comment"># 验证：算对数似然</span>
+<span class="hl-keyword">def</span> <span class="hl-func">log_likelihood</span>(mu, sigma, data):
+<span class="hl-comment">"""高斯分布的对数似然</span>
+<span class="hl-comment">    mu: 均值</span>
+<span class="hl-comment">    sigma: 标准差</span>
+<span class="hl-comment">    data: 观测数据</span>
+<span class="hl-comment">    """</span>
+    n = <span class="hl-builtin">len</span>(data)
+<span class="hl-comment"># log L = -n/2·log(2πσ²) - 1/(2σ²)·Σ(xᵢ-μ)²</span>
+    <span class="hl-keyword">return</span> -n/<span class="hl-number">2</span>*np.log(<span class="hl-number">2</span>*np.pi*sigma**<span class="hl-number">2</span>) - np.<span class="hl-builtin">sum</span>((data-mu)**<span class="hl-number">2</span>)/(<span class="hl-number">2</span>*sigma**<span class="hl-number">2</span>)
+
+ll_mle = log_likelihood(mu_hat, sigma_hat, data)
+<span class="hl-comment"># 故意用错误参数</span>
+ll_off = log_likelihood(<span class="hl-number">4.0</span>, <span class="hl-number">2.5</span>, data)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\nMLE 对数似然: {ll_mle:.1f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"错误参数对数似然: {ll_off:.1f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"MLE 更高 ✓"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<h2>六、MLE 和贝叶斯的区别</h2>
+
+<p>00-17 学了贝叶斯定理：$P(\theta \mid \text{数据}) \propto P(\text{数据} \mid \theta) \cdot P(\theta)$。</p>
+
+<ul>
+  <li><strong>MLE：</strong>只看 $P(\text{数据} \mid \theta)$，最大化它——不管 $\theta$ 本身有多大概率出现</li>
+  <li><strong>贝叶斯：</strong>还要乘先验 $P(\theta)$——如果 $\theta=0.99$ 按理说很罕见，贝叶斯会惩罚它</li>
+  <li><strong>MAP（最大后验）：</strong>贝叶斯中最大化 $P(\theta \mid \text{数据})$ 而非 $P(\text{数据} \mid \theta)$</li>
+</ul>
+
+<div class="callout callout-tip">
+<strong>为什么深度学习都选 MLE：</strong> 数据量大的时候，似然主导，先验的影响很小。MLE 和 MAP 差别不大。所以等价于：做回归就最小化 MSE，做分类就最小化交叉熵——不需要显式计算先验。
+</div>
+
+<h2>💭 概念题</h2>
+
+<div class="exercise">
+<h3>1. MLE 为什么不总是对的</h3>
+<p>抛 3 次硬币，3 次全是正面。MLE 估计 $\hat{\theta} = 1.0$。这个估计合理吗？有什么问题？贝叶斯方法会怎么修正？</p>
+<p>——考察：小样本下 MLE 的过拟合、先验的修正作用</p>
+</div>
+
+<div class="exercise">
+<h3>2. MSE 和交叉熵的来源</h3>
+<p>为什么回归用 MSE 而不交叉熵？分类用交叉熵而不用 MSE？从"假设数据服从什么分布"的角度解释。</p>
+<p>——考察：MLE → 损失函数的推导链条</p>
+</div>
+
+<div class="exercise">
+<h3>3. 对数似然为什么方便</h3>
+<p>有 1000 个独立样本，似然是 1000 个小概率的乘积。直接用 $L = \prod p_i$ 会有什么问题？取对数解决了什么？</p>
+<p>——考察：数值稳定性和求导便利性</p>
+</div>
+
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-21/">← 00-17</a><a href="../../">📖 目录</a><a href="../00-23/">00-19 →</a></nav>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  });
+</script>
+
+<script>
+(function(){
+  document.querySelectorAll('pre code').forEach(function(block){
+    var wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 复制';
+    btn.onclick = function(){
+      var text = block.innerText;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = '✅ 已复制';
+        btn.classList.add('copied');
+        setTimeout(function(){
+          btn.textContent = '📋 复制';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    };
+    block.parentNode.insertBefore(wrapper, block);
+    wrapper.appendChild(btn);
+    wrapper.appendChild(block);
+  });
+})();
+</script>
+
+</body>
+</html>
+

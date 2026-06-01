@@ -198,7 +198,105 @@ C = A @ B
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <hr>
-<h2>四、广播 — 自动"复印"</h2>
+
+<h2>四、转置 — 行列互换</h2>
+
+<p><strong>定义：</strong> 把矩阵的行变成列，列变成行。记作 $A^T$（读作「A 转置」）。</p>
+
+$$A = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix}, \qquad
+A^T = \begin{bmatrix} 1 & 4 \\ 2 & 5 \\ 3 & 6 \end{bmatrix}$$
+
+<p>$A$ 是 2×3，$A^T$ 是 3×2。<strong>转置把形状 $(m,n)$ 变成 $(n,m)$。</strong> 换个角度看：$A$ 的第 1 列 $[1,4]$ 变成了 $A^T$ 的第 1 行——<strong>行和列互换了位置。</strong></p>
+
+<h3>对称矩阵</h3>
+
+<p>如果一个矩阵转置后等于自己——$A = A^T$——就叫<strong>对称矩阵</strong>。</p>
+
+$$A = \begin{bmatrix} 1 & 3 \\ 3 & 2 \end{bmatrix}, \qquad
+A^T = \begin{bmatrix} 1 & 3 \\ 3 & 2 \end{bmatrix} = A$$
+
+<p>对角线是镜子：$a_{12} = a_{21}$（对称位置上的数相等）。对称矩阵必须是方阵（行数=列数）。<strong>对称矩阵在深度学习里到处出现——协方差矩阵、Hessian 矩阵，全是它。</strong>后面第五课和第六课会反复用到。</p>
+
+<h3>转置的性质</h3>
+
+<ul>
+<li><strong>$(A^T)^T = A$</strong> — 转两次 = 没转</li>
+<li><strong>$(AB)^T = B^T A^T$</strong> — 乘积的转置 = 倒过来各自转置再乘（注意顺序颠倒）</li>
+</ul>
+
+<pre><code><span class="hl-comment"># 转置演示：用 .T 属性翻转矩阵的行列</span>
+<span class="hl-comment"># 导入numpy，别名np</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># np.array(嵌套列表) → 创建2×3二维数组</span>
+A = np.array([[<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>],
+<span class="hl-comment"># 第一行：1,2,3</span>
+              [<span class="hl-number">4</span>, <span class="hl-number">5</span>, <span class="hl-number">6</span>]])
+<span class="hl-comment"># 第二行：4,5,6</span>
+
+<span class="hl-comment"># .shape 返回元组 (行数, 列数) → (2, 3)</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"A 形状: {A.shape}"</span>)
+
+<span class="hl-comment"># .T 属性返回转置矩阵 → 行列互换，不修改原矩阵</span>
+AT = A.T
+<span class="hl-comment"># 转置后形状 → (3, 2)</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"A^T 形状: {AT.shape}"</span>)
+
+<span class="hl-comment"># 打印 A^T：第一列变第一行</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"A^T =\n{AT}"</span>)
+
+<span class="hl-comment"># 验证 (A^T)^T = A</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"(A^T)^T = A? {np.allclose(A.T.T, A)}"</span>)
+
+<span class="hl-comment"># 对称矩阵：转置等于自身</span>
+S = np.array([[<span class="hl-number">1</span>, <span class="hl-number">3</span>],
+              [<span class="hl-number">3</span>, <span class="hl-number">2</span>]])
+<span class="hl-builtin">print</span>(<span class="hl-string">f"S 对称? {np.allclose(S, S.T)}"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<hr>
+
+<h2>五、Σ 和 Π 符号</h2>
+
+<p>到了第六课 SVD 开始，公式里会出现这个符号：</p>
+
+$$\sum_{i=1}^{n} x_i = x_1 + x_2 + \cdots + x_n$$
+
+<p>读作「从 i=1 加到 i=n」。$\Sigma$（希腊字母 Sigma，大写）就是<strong>求和</strong>的意思。</p>
+
+<p><strong>拆开看：</strong></p>
+<ul>
+<li>$\Sigma$ — 求和号</li>
+<li>$i=1$ — 从第 1 项开始</li>
+<li>$n$（在上面）— 加到第 n 项</li>
+<li>$x_i$ — 每一项叫什么（i 是下标，表示第 i 个）</li>
+</ul>
+
+<p>举例：$\sum_{i=1}^{4} i^2 = 1^2 + 2^2 + 3^2 + 4^2 = 1+4+9+16 = 30$。</p>
+
+<p><strong>双下标求和</strong>（两个 $\Sigma$ 叠在一起）：</p>
+
+$$\sum_{i=1}^{m}\sum_{j=1}^{n} A_{ij}$$
+
+<p>意思是「把矩阵所有元素加一遍」——先固定 i=1，把 j 从 1 加到 n（第一行求和）；再 i=2，第二行求和……直到第 m 行。</p>
+
+<h3>Π 连乘符号</h3>
+
+<p>和 $\Sigma$ 对称——$\Pi$（希腊字母 Pi，大写）表示<strong>连乘</strong>：</p>
+
+$$\prod_{i=1}^{n} x_i = x_1 \times x_2 \times \cdots \times x_n$$
+
+<p>举例：$\prod_{i=1}^{4} i = 1\times2\times3\times4 = 24$（就是 4!，阶乘）。后面讲特征值之积 = 行列式（$\prod \lambda_i$）时会用到。</p>
+
+<div class="callout callout-info">
+<strong>$\Sigma$ 和 $\Pi$ 的关系：</strong> $\log(\prod x_i) = \sum \log x_i$。连乘取对数变成求和——这是最大似然估计（第 22 课）的核心技巧。<br><br>
+<strong>怎么读：</strong> $\sum_{i=1}^{n}$ =「sum over i from 1 to n」。先看变量名（i），再看范围（1 到 n），最后看表达式（x_i）。不要被符号吓到——它就是循环的缩写。
+</div>
+
+<hr>
+
+<h2>六、广播 — 自动"复印"</h2>
 <p><strong>画面：</strong> 老师发卷子。讲台上只有一份卷子，但老师把它"复印"了 40 份，每人一份——每一份的内容一模一样。广播就是 numpy 帮你自动"复印"小数组去匹配大数组的形状。</p>
 <p><strong>注意：</strong>"复印"只是比喻——numpy 不是真的在内存里复制 40 份数据，它只是<strong>假装</strong>有那么多份。实际内存里只有一份。所以广播不浪费内存。</p>
 <h3>规则：三步判断法</h3>

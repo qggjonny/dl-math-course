@@ -1,163 +1,299 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>00-08 导数与偏导数 · 深度学习数学</title>
-<link rel="stylesheet" href="../../css/style.css?v=20260601">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
-</head><body>
-<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-06</span>
-<span><a href="../00-05/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-07/">下一课 →</a></span></nav>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>00-08 SVD（下）：低秩近似与伪逆 · 深度学习数学</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../css/style.css?v=20260601">
+</head>
+<body>
+
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-08</span>
+<span><a href="../00-07/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-10/">下一课 →</a></span></nav>
+
 <div class="container">
-<h1>00-08 导数与偏导数</h1>
-<hr>
-<h2>一、导数：山路的坡度</h2>
-<p><strong>画面：</strong> 你开车走盘山公路。仪表盘上的坡度计指着 15°。如果你继续往前开 1 公里，高度大约会上升 $\tan(15°)\times 1\text{km} \approx 270\text{m}$。</p>
-<p>导数就是这个「坡度」——<strong>在某一点，你往前走一点点，高度变化的速率。</strong></p>
-$$f'(x) = \lim_{\epsilon \to 0} \frac{f(x+\epsilon) - f(x)}{\epsilon}$$
-<p><strong>逐符号拆开：</strong></p>
-<ul>
-<li>$f(x+\epsilon)$：你现在在 $x$ 位置，往前走一丁点 $\epsilon$ 后到达的新位置上的函数值</li>
-<li>$f(x+\epsilon) - f(x)$：往前走 $\epsilon$ 后，函数值变化了多少（上升、下降、或不变）</li>
-<li>除以 $\epsilon$：归一化——不管走了多远，算出"每走 1 单位"的变化率</li>
-<li>$\lim_{\epsilon \to 0}$：$\epsilon$ 无限趋近 0——我要的是<strong>这一点的瞬时坡度</strong>，不是一段路的平均坡度</li>
-</ul>
-<p>回到开车的比喻：导数 &gt; 0 = 正在上坡（往前走高度会增加），导数 &lt; 0 = 正在下坡，导数 = 0 = 到了山顶或山谷（坡度为零）。</p>
-<figure><img src="assets/tangent_line.png" alt="导数=切线斜率"><figcaption>$f(x)$ 曲线上某一点的切线斜率就是该点的导数。切线越陡→导数越大。导数为 0 时切线水平→山顶或谷底。</figcaption></figure>
-<h3>从定义推导求导规则</h3>
-<p>定义是好，但每次都用极限算太慢了。从定义出发，推几个最常用的规则。</p>
-<p><strong>$f(x) = x^2$ 的导数。</strong> 代入定义：</p>
-$$\begin{aligned}
-f'(x) &= \lim_{\epsilon \to 0} \frac{(x+\epsilon)^2 - x^2}{\epsilon} \\[4pt]
-&= \lim_{\epsilon \to 0} \frac{x^2 + 2x\epsilon + \epsilon^2 - x^2}{\epsilon} \\[4pt]
-&= \lim_{\epsilon \to 0} \frac{2x\epsilon + \epsilon^2}{\epsilon} = \lim_{\epsilon \to 0} (2x + \epsilon) = 2x
-\end{aligned}$$
-<p>所以 $(x^2)' = 2x$。每步做了什么：① 展开平方 ② 消掉 $x^2$ ③ 提出 $\epsilon$ 消掉 ④ $\epsilon \to 0$ 时 $\epsilon$ 项消失。</p>
-<p><strong>$f(x) = x^n$ 的通式（幂函数求导）：</strong> 还是走定义，三步拆开：</p>
 
-<p><strong>① 二项式展开：</strong></p>
-$$(x+\epsilon)^n = x^n + n x^{n-1}\epsilon + \binom{n}{2} x^{n-2}\epsilon^2 + \dots + \epsilon^n$$
-<p>第一项是 $x^n$，后面每一项都带着 $\epsilon$ 或更高次幂。</p>
+<p style="color:var(--text-light);font-size:0.9em">🌱 阶段 0 · 第 7 课</p>
+<h1>SVD（下）：用奇异值压缩信息</h1>
 
-<p><strong>② 代入差商：</strong></p>
-$$\frac{f(x+\epsilon) - f(x)}{\epsilon} = \frac{(x^n + n x^{n-1}\epsilon + \epsilon^2\cdot(\cdots)) - x^n}{\epsilon} = n x^{n-1} + \epsilon \cdot (\cdots)$$
-<p>$x^n$ 被减掉消了；剩下的每一项都除以 $\epsilon$，$n x^{n-1}\epsilon / \epsilon = n x^{n-1}$，其余项除完后还有 $\epsilon$ 因子。</p>
+<h2>一、回忆：SVD 把矩阵拆成"图层"</h2>
 
-<p><strong>③ 取极限 $\epsilon \to 0$：</strong> 带 $\epsilon$ 的项全部归零——只留下 $n x^{n-1}$。结果是：</p>
-$$\boxed{(x^n)' = n \cdot x^{n-1}}$$
-<p>例子：$(x^3)' = 3x^2$，$(x)' = 1 \cdot x^0 = 1$，$(5)' = 0$（常数斜率永远是 0——一条水平线没有坡度）。</p>
-<div class="callout callout-info">
-<strong>🔗 求和与常数倍的规则：</strong> 求导是线性运算。
-<ul>
-<li>$(f+g)' = f' + g'$ —— 和的导数 = 导数之和</li>
-<li>$(c \cdot f)' = c \cdot f'$ —— 常数可以提到外面</li>
-</ul>
-<p>这意味着 $(3x^2 + 2x + 5)' = 3 \cdot 2x + 2 \cdot 1 + 0 = 6x + 2$。逐项求导再拼起来就行。</p>
-</div>
-<h3>代码验证：数值微分</h3>
-<p>定义里的 $\lim_{\epsilon \to 0}$ 在计算机上没法真正做到——但取一个很小的 $\epsilon$（比如 $10^{-5}$），差商 $\frac{f(x+\epsilon)-f(x)}{\epsilon}$ 会非常接近真实导数。这叫<strong>数值微分</strong>。</p>
-<pre><code><span class="hl-comment"># 00-08 第一步：数值微分——用定义验证 f(x)=x² 的导数 f'(x)=2x</span>
-<span class="hl-comment"># 导入numpy，别名np（本例主要用于规范，实际未用numpy功能）</span>
+<p>上节课得到的 SVD 公式：</p>
+
+$$A = U \Sigma V^T$$
+
+<p>如果我们把 $U$ 的列记作 $\mathbf{u}_1, \mathbf{u}_2$，$V^T$ 的行记作 $\mathbf{v}_1^T, \mathbf{v}_2^T$，$\Sigma$ 对角线上的奇异值记作 $\sigma_1, \sigma_2$，那么 SVD 可以<strong>逐项展开</strong>写：</p>
+
+$$A = \sigma_1 \cdot \mathbf{u}_1 \mathbf{v}_1^T \;+\; \sigma_2 \cdot \mathbf{u}_2 \mathbf{v}_2^T$$
+
+<p>每一项 $\sigma_i \mathbf{u}_i \mathbf{v}_i^T$ 是一个 $2\times 2$ 矩阵（$\mathbf{u}_i$ 是 $2\times 1$ 列向量，$\mathbf{v}_i^T$ 是 $1\times 2$ 行向量，外积得到 $2\times 2$）。可以理解为一张<strong>"图层"</strong>——$\sigma_i$ 越大，这层贡献越大。</p>
+
+<pre><code><span class="hl-comment"># 00-07 第一步：把 SVD 展开，看每一项（每一层）长什么样</span>
+<span class="hl-comment"># 导入numpy，别名np，提供线性代数运算</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
-<span class="hl-comment"># 定义函数 f(x) = x²</span>
-<span class="hl-keyword">def</span> <span class="hl-funcdef">f</span>(x):
-    <span class="hl-comment"># docstring文档字符串：说明这个函数做什么</span>
-    <span class="hl-string">"""f(x) = x²"""</span>
-    <span class="hl-comment"># **是幂运算：x**2 = x²，返回x的平方</span>
-    <span class="hl-keyword">return</span> x ** <span class="hl-number">2</span>
+<span class="hl-comment"># np.array(嵌套列表) → 创建2×2二维数组</span>
+A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],
+<span class="hl-comment"># 外层列表每元素是一行：A = [[3,1],[1,3]]</span>
+              [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])
 
-<span class="hl-comment"># 数值微分函数，参数：函数f、求导点x、微小步长ε（默认10⁻⁵）</span>
-<span class="hl-keyword">def</span> <span class="hl-funcdef">numerical_derivative</span>(f, x, eps=<span class="hl-number">1e-5</span>):
-    <span class="hl-comment"># 用极限定义近似：f'(x) ≈ (f(x+ε)−f(x)) / ε</span>
-    <span class="hl-string">"""用定义算 f'(x)：取一个很小的 eps，算差商"""</span>
-    <span class="hl-comment"># 前向差商：(f(x+ε)−f(x))/ε，ε越小越精确</span>
-    <span class="hl-keyword">return</span> (f(x + eps) - f(x)) / eps
+<span class="hl-comment"># SVD分解：A = U Σ V^T，一次性拆成三部分</span>
+<span class="hl-comment"># U=左奇异向量(2×2), s=奇异值1D数组[σ₁,σ₂], VT=右奇异向量转置(2×2)</span>
+U, s, VT = np.linalg.svd(A)
 
-<span class="hl-comment"># 在 x=1, 2, 3 处验证——理论值：f'(x) = 2x</span>
-<span class="hl-comment"># 循环测试3个点：x=1→导数值=2, x=2→4, x=3→6</span>
-<span class="hl-keyword">for</span> x <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>]:
-    num = numerical_derivative(f, x)      <span class="hl-comment"># 调用数值微分，传入f和当前x → 数值近似导数</span>
-    <span class="hl-comment"># 理论值：幂函数求导法则 (x²)' = 2x</span>
-    exact = <span class="hl-number">2</span> * x
-<span class="hl-comment"># f-string: {x}=x值, {num:.6f}=数值结果保留6位, {exact}=理论值, {abs(...):.2e}=误差用科学记数法2位</span>
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"f'({x})  数值={num:.6f}  理论={exact}  误差={abs(num-exact):.2e}"</span>)
+<span class="hl-comment"># 打印原始矩阵，方便和后面的图层对比</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"原始矩阵 A:"</span>)
+<span class="hl-comment"># 打印原始矩阵，方便对照</span>
+<span class="hl-builtin">print</span>(A)
+
+<span class="hl-comment"># 逐层拆开——SVD可以写成：A = σ₁·u₁·v₁^T + σ₂·u₂·v₂^T + ...</span>
+<span class="hl-comment"># range(len(s))：遍历每个奇异值, i=0,1</span>
+<span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-builtin">len</span>(s)):
+<span class="hl-comment"># 第 i 层: σᵢ · uᵢ · vᵢ^T</span>
+<span class="hl-comment"># np.outer(a, b)：外积，a是列向量(m×1)，b是行向量(1×n) → m×n矩阵</span>
+<span class="hl-comment">#   U[:,i]：U的第i列（左奇异向量, 2维）</span>
+<span class="hl-comment">#   VT[i,:]：VT的第i行（右奇异向量, 2维）</span>
+<span class="hl-comment">#   s[i] * outer：奇异值σᵢ缩放这一层的贡献</span>
+<span class="hl-comment"># σᵢ × (uᵢ 和 vᵢ 的外积) = 第i层矩阵</span>
+    layer = s[i] * np.outer(U[:, i], VT[i, :])
+<span class="hl-comment"># f-string, :.1f=保留1位小数显示奇异值</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"\n第 {i+1} 层 (σ={s[i]:.1f}):"</span>)
+<span class="hl-comment"># 打印这一层矩阵——σ越大贡献越大</span>
+    <span class="hl-builtin">print</span>(layer)
+
+<span class="hl-comment"># 验证：两层加起来应等于原矩阵 A</span>
+<span class="hl-comment"># s[0]*outer(U[:,0], VT[0,:])：第一层（σ₁,u₁,v₁）</span>
+<span class="hl-comment"># s[1]*outer(U[:,1], VT[1,:])：第二层（σ₂,u₂,v₂）</span>
+<span class="hl-comment"># \ 是Python行连接符，用于把长语句分成两行写</span>
+reconstructed = s[<span class="hl-number">0</span>]*np.outer(U[:,<span class="hl-number">0</span>], VT[<span class="hl-number">0</span>,:]) + \
+<span class="hl-comment"># σ₂ · u₂ · v₂^T = 第二层</span>
+               s[<span class="hl-number">1</span>]*np.outer(U[:,<span class="hl-number">1</span>], VT[<span class="hl-number">1</span>,:])
+<span class="hl-comment"># 验证重建结果，应和原始A一样</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n两层之和:\n{reconstructed}"</span>)
+<span class="hl-comment"># allclose：容忍浮点误差的近似相等 → True</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"等于 A？ {np.allclose(A, reconstructed)}"</span>)
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-<p>误差约 $10^{-5}$——和 $\epsilon$ 同一量级。定义不是空洞的，是能在计算机上跑通的。</p>
-<hr>
-<h2>二、偏导数：只看一个踏板</h2>
-<p>如果函数有两个输入 $f(x,y)$——就像开车同时有<strong>油门</strong>和<strong>方向盘</strong>。偏导数就是问：「我只踩油门（$x$ 变），方向盘不动（$y$ 不变），高度变化多快？」</p>
-<p>$$\frac{\partial f}{\partial x} = \lim_{\epsilon \to 0} \frac{f(x+\epsilon, y) - f(x, y)}{\epsilon}$$</p>
-<p>$\partial$（读作 "round d"）这个符号只是提醒你：不止一个变量，但我现在只看这一个。</p>
-<p><strong>偏导数的计算规则——简单到离谱：</strong> 对 $x$ 求偏导时，把 $y$ 当成常数就行（就像把 $y$ 当成数字 5）。</p>
-<p>例子：$f(x,y) = x^2 + 3xy + y^3$。</p>
-<ul>
-<li>对 $x$ 求偏导：$\frac{\partial f}{\partial x} = 2x + 3y + 0$。$y^3$ 看成常数 → 导数 = 0</li>
-<li>对 $y$ 求偏导：$\frac{\partial f}{\partial y} = 0 + 3x + 3y^2$。$x^2$ 看成常数 → 导数 = 0</li>
-</ul>
-<h3>代码验证：偏导数数值计算</h3>
-<pre><code><span class="hl-comment"># 00-08 第二步：偏导数数值计算——验证 ∂f/∂x 和 ∂f/∂y</span>
+
+<h2>二、扔掉小奇异值——只用一层</h2>
+
+<p>$\sigma_1 = 4$，$\sigma_2 = 2$。第一层贡献大，第二层贡献小。如果<strong>只用第一层</strong>（扔掉第二层），结果差多少？</p>
+
+<pre><code><span class="hl-comment"># 00-07 第二步：只用最大的奇异值重建——看看误差多大</span>
 <span class="hl-comment"># 导入numpy，别名np</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
-<span class="hl-comment"># 定义二元函数 g(x,y) = x² + 3xy + y³</span>
-<span class="hl-keyword">def</span> <span class="hl-funcdef">g</span>(x, y):
-    <span class="hl-comment"># docstring：说明函数公式</span>
-    <span class="hl-string">"""f(x,y) = x² + 3xy + y³"""</span>
-    <span class="hl-comment"># x**2=x², 3*x*y=3xy, y**3=y³</span>
-    <span class="hl-keyword">return</span> x**<span class="hl-number">2</span> + <span class="hl-number">3</span>*x*y + y**<span class="hl-number">3</span>
+<span class="hl-comment"># 同一个矩阵 A = [[3,1],[1,3]]</span>
+A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],
+<span class="hl-comment"># 2×2对称矩阵，奇异值σ₁=4, σ₂=2</span>
+              [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])
+<span class="hl-comment"># SVD分解：U(2×2), s=[4,2], VT(2×2)</span>
+U, s, VT = np.linalg.svd(A)
 
-<span class="hl-comment"># 对x的偏导数：f是原函数，x,y是求导点，eps=微小步长ε</span>
-<span class="hl-keyword">def</span> <span class="hl-funcdef">partial_x</span>(f, x, y, eps=<span class="hl-number">1e-5</span>):
-    <span class="hl-comment"># 偏导数定义：∂f/∂x = lim_{ε→0} (f(x+ε,y)−f(x,y))/ε</span>
-    <span class="hl-string">"""对 x 的偏导：只动 x，y 不动"""</span>
-    <span class="hl-comment"># 只改变x（加ε），y保持不变 → 数值近似偏导</span>
-    <span class="hl-keyword">return</span> (f(x + eps, y) - f(x, y)) / eps
+<span class="hl-comment"># 只用 k=1 个最大奇异值重建——扔掉σ₂这一层</span>
+<span class="hl-comment"># k=1：只保留第一个（最大的）奇异值</span>
+k = <span class="hl-number">1</span>
+<span class="hl-comment"># 生成器表达式 sum(... for i in range(k))：对前k个索引求和</span>
+<span class="hl-comment"># 每个i：s[i] * outer(U[:,i], VT[i,:]) = σᵢ · uᵢ · vᵢ^T</span>
+<span class="hl-comment"># 只用前k=1个奇异值：∑ σᵢ uᵢ vᵢ^T (i=0)</span>
+A_1 = <span class="hl-builtin">sum</span>(s[i] * np.outer(U[:, i], VT[i, :])
+<span class="hl-comment"># range(k)=range(1)=[0]：只循环一次</span>
+          <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(k))
 
-<span class="hl-comment"># 对y的偏导数</span>
-<span class="hl-keyword">def</span> <span class="hl-funcdef">partial_y</span>(f, x, y, eps=<span class="hl-number">1e-5</span>):
-    <span class="hl-comment"># 偏导数定义：∂f/∂y = lim_{ε→0} (f(x,y+ε)−f(x,y))/ε</span>
-    <span class="hl-string">"""对 y 的偏导：只动 y，x 不动"""</span>
-    <span class="hl-comment"># 只改变y（加ε），x保持不变 → 数值近似偏导</span>
-    <span class="hl-keyword">return</span> (f(x, y + eps) - f(x, y)) / eps
+<span class="hl-comment"># 计算重建误差——用Frobenius范数衡量矩阵间"距离"</span>
+<span class="hl-comment"># norm(..., 'fro')：Frobenius范数 = √(Σ所有元素平方)</span>
+error = np.linalg.norm(A - A_1, <span class="hl-string">'fro'</span>)
+<span class="hl-comment"># 即把矩阵展平成一维，算欧几里得距离</span>
 
-<span class="hl-comment"># 在点 (2, 3) 验证——把x₀=2, y₀=3代入偏导公式</span>
-<span class="hl-comment"># 测试点：x₀=2.0, y₀=3.0（浮点数）</span>
-x0, y0 = <span class="hl-number">2.0</span>, <span class="hl-number">3.0</span>
-<span class="hl-comment"># 理论：∂f/∂x = 2x + 3y（对x求偏导，y当常数）→ 2*2 + 3*3 = 4+9 = 13</span>
-<span class="hl-comment"># 理论：∂f/∂y = 3x + 3y²（对y求偏导，x当常数）→ 3*2 + 3*9 = 6+27 = 33</span>
-px_num = partial_x(g, x0, y0)             <span class="hl-comment"># 数值计算 ∂g/∂x 在 (2,3) 的值 → 应≈13.0</span>
-py_num = partial_y(g, x0, y0)             <span class="hl-comment"># 数值计算 ∂g/∂y 在 (2,3) 的值 → 应≈33.0</span>
-<span class="hl-comment"># :.6f=保留6位小数，误差约10⁻⁵量级</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"∂f/∂x  数值={px_num:.6f}  理论=13"</span>)
-<span class="hl-comment"># 数值结果和理论值非常接近</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"∂f/∂y  数值={py_num:.6f}  理论=33"</span>)
+<span class="hl-comment"># 打印标题</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"只用 {k} 个奇异值重建:"</span>)
+<span class="hl-comment"># 打印近似矩阵A₁——和原A对比</span>
+<span class="hl-builtin">print</span>(A_1)
+<span class="hl-comment"># 打印原始矩阵</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n原始 A:"</span>)
+<span class="hl-comment"># 打印原始矩阵，方便对照</span>
+<span class="hl-builtin">print</span>(A)
+<span class="hl-comment"># :.3f = 保留3位小数显示误差</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n误差 = {error:.3f}"</span>)
+<span class="hl-comment"># 误差÷原始范数×100%=相对误差百分比</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"相对误差 = {error / np.linalg.norm(A, 'fro') * 100:.1f}%"</span>)
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-<p>把 $y$ 当成常数——这个规则不是死记的，是「只动 $x$，$y$ 不动」这个定义的直接结果。</p>
-<hr>
-<h2>三、梯度：把所有偏导数打包</h2>
-<p>偏导数一个个算完之后，把它们装进一个向量里——这就是<strong>梯度</strong>：</p>
-$$\nabla f = \begin{bmatrix} \frac{\partial f}{\partial x} \\[4pt] \frac{\partial f}{\partial y} \end{bmatrix}$$
-<p>对 $f(x,y) = x^2 + 3xy + y^3$，梯度 = $\begin{bmatrix} 2x+3y \\ 3x+3y^2 \end{bmatrix}$。</p>
-<p>在点 $(2,3)$ 处，梯度 = $\begin{bmatrix} 13 \\ 33 \end{bmatrix}$。</p>
-<p>梯度的几何含义是下一课（00-07）的主题——这里先知道它就是把所有偏导打包成一个向量。</p>
-<hr>
-<h2>💭 概念题</h2>
-<ol>
-<li>导数 $f'(3) = -2$ 意味着什么？在 $x=3$ 附近，$x$ 增大一点，$f(x)$ 会怎样变化？——考察：导数的符号含义</li>
-<li>$f(x) = 7$（常数函数）的导数是多少？从「坡度」的角度解释——考察：常数的导数为零的直觉</li>
-<li>对 $f(x,y) = x^2y + \sin(x)$，分别求 $\frac{\partial f}{\partial x}$ 和 $\frac{\partial f}{\partial y}$——考察：偏导数把另一变量当常数</li>
-</ol>
-<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
-<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-07/">← 00-07</a><a href="../../">📖 目录</a><a href="../00-09/">00-09 →</a></nav>
+
+<p>只用 1 个奇异值（丢掉了一半信息），误差约 40%。不算小——但这个思路在<strong>更大的矩阵</strong>上威力巨大。如果一个矩阵有 100 个奇异值、只有前 5 个比较大，丢掉后 95 个可能只损失 1%。</p>
+
+<h2>三、更大的例子：5×3 矩阵</h2>
+
+<pre><code><span class="hl-comment"># 00-07 第三步：5×3 矩阵，用前 k 个奇异值重建</span>
+<span class="hl-comment"># 导入numpy，别名np</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 固定随机种子=42，保证每次运行生成的"随机"数相同（可复现）</span>
+np.random.seed(<span class="hl-number">42</span>)
+
+<span class="hl-comment"># 生成一个"接近低秩"的 5×3 矩阵：第3列是前两列的线性组合</span>
+<span class="hl-comment"># randn(5,3)：从标准正态分布N(0,1)中抽取 → 5行3列随机矩阵</span>
+A = np.random.randn(<span class="hl-number">5</span>, <span class="hl-number">3</span>)
+<span class="hl-comment"># A[:,0]：取A的第0列（所有行）→ 5个元素的列向量</span>
+<span class="hl-comment"># A[:,1]：取A的第1列 → 5个元素的列向量</span>
+<span class="hl-comment"># A[:,2] = 0.5*A[:,0] + 0.3*A[:,1]：第3列由前两列线性组合而成</span>
+<span class="hl-comment"># 广播：标量×列向量 = 每个元素乘标量，再加起来</span>
+A[:, <span class="hl-number">2</span>] = A[:, <span class="hl-number">0</span>] * <span class="hl-number">0.5</span> + A[:, <span class="hl-number">1</span>] * <span class="hl-number">0.3</span>
+<span class="hl-comment"># 后果：第3个奇异值会非常小（列线性相关）</span>
+
+<span class="hl-comment"># SVD分解：U(5×5), s(3个奇异值), VT(3×3)</span>
+U, s, VT = np.linalg.svd(A)
+
+<span class="hl-comment"># A.shape → (5, 3)，即5行3列</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"A 形状: {A.shape}"</span>)
+<span class="hl-comment"># :.3f=保留3位，σ₃应远小于前两个</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"奇异值: σ₁={s[0]:.3f}, σ₂={s[1]:.3f}, σ₃={s[2]:.3f}"</span>)
+<span class="hl-comment"># 空行，让输出更好看</span>
+<span class="hl-builtin">print</span>()
+<span class="hl-comment"># 打印原始矩阵，方便和重建版本对比</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"原始 A:"</span>)
+<span class="hl-comment"># round(A, 3)：四舍五入到3位小数，让输出整洁</span>
+<span class="hl-builtin">print</span>(np.round(A, <span class="hl-number">3</span>))
+
+<span class="hl-comment"># 分别试验：只用1个奇异值 vs 用前2个奇异值</span>
+<span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>]:
+<span class="hl-comment"># A_k = Σ_{i=0}^{k-1} σᵢ uᵢ vᵢ^T —— 用前k个奇异值重建</span>
+<span class="hl-comment"># 生成器表达式：for i in range(k) 依次取i=0,...,k-1</span>
+<span class="hl-comment"># 用前k个奇异值重建：∑_{i=0}^{k-1} σᵢ uᵢ vᵢ^T</span>
+    A_k = <span class="hl-builtin">sum</span>(s[i] * np.outer(U[:, i], VT[i, :])
+<span class="hl-comment"># sum()对生成器产生的k个矩阵逐元素求和</span>
+              <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(k))
+<span class="hl-comment"># Frobenius范数 = √(Σ|Aᵢⱼ−A_kᵢⱼ|²)</span>
+    error = np.linalg.norm(A - A_k, <span class="hl-string">'fro'</span>)
+<span class="hl-comment"># 相对误差 = 绝对误差÷原矩阵大小×100%</span>
+    rel_err = error / np.linalg.norm(A, <span class="hl-string">'fro'</span>) * <span class="hl-number">100</span>
+<span class="hl-comment"># 显示k和对应的误差</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"\nk={k}: 误差={error:.3f}, 相对={rel_err:.1f}%"</span>)
+<span class="hl-comment"># 打印近似矩阵（四舍五入便于阅读）</span>
+    <span class="hl-builtin">print</span>(np.round(A_k, <span class="hl-number">3</span>))
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<p>第三个奇异值很小（因为我们故意让第三列 ≈ 前两列的线性组合）。只用前 2 个奇异值重建，误差可能不到 1%——<strong>15 个数字的矩阵，用 10 个数字的"压缩版"几乎无损恢复。</strong></p>
+
+<h2>四、伪逆——长方形矩阵的"逆"</h2>
+
+<p>$A$ 是 $m \times n$ 长方形矩阵时，不能求 $A^{-1}$（只有方阵才有逆）。但 SVD 可以构造一个<strong>"最接近逆的东西"</strong>——伪逆 $A^+$：</p>
+
+$$A^+ = V \Sigma^+ U^T$$
+
+<p>其中 $\Sigma^+$ 是<strong>把非零奇异值取倒数然后转置</strong>。</p>
+
+<p>举个例子立即就清楚了：</p>
+
+<pre><code><span class="hl-comment"># 00-07 第四步：伪逆 — 手搓 vs 内置 —— 长方矩阵的"逆"</span>
+<span class="hl-comment"># 导入numpy，别名np</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 3×2 长方形矩阵——不是方阵，无法求普通逆</span>
+<span class="hl-comment"># np.array创建3行2列矩阵：[[1,2],[3,4],[5,6]]</span>
+A = np.array([[<span class="hl-number">1</span>, <span class="hl-number">2</span>],
+<span class="hl-comment"># 3个方程，2个未知数 → 超定方程组</span>
+              [<span class="hl-number">3</span>, <span class="hl-number">4</span>],
+<span class="hl-comment"># 形状 (3, 2)</span>
+              [<span class="hl-number">5</span>, <span class="hl-number">6</span>]])
+
+<span class="hl-comment"># 方法1: numpy 内置伪逆函数——一行搞定</span>
+<span class="hl-comment"># pinv()返回Moore-Penrose伪逆，形状 (2,3)</span>
+A_plus_np = np.linalg.pinv(A)
+<span class="hl-comment"># 3×2矩阵的伪逆是2×3，和转置形状一样</span>
+
+<span class="hl-comment"># 方法2: 用 SVD 手搓伪逆——A⁺ = V Σ⁺ U^T</span>
+<span class="hl-comment"># SVD分解 A=UΣV^T：U(3×3), s=[σ₁,σ₂], VT(2×2)</span>
+U, s, VT = np.linalg.svd(A)
+
+<span class="hl-comment"># 构造 Σ⁺（Sigma的伪逆）：先把非零奇异值取倒数，再转置</span>
+<span class="hl-comment"># np.diag([1/σ₁, 1/σ₂]) → 2×2对角矩阵 [[1/σ₁,0],[0,1/σ₂]]</span>
+sigma_inv = np.diag(<span class="hl-number">1.0</span> / s)
+<span class="hl-comment"># 先创建2×3的全零矩阵——Σ⁺的容器</span>
+sigma_plus = np.zeros((<span class="hl-number">2</span>, <span class="hl-number">3</span>))
+<span class="hl-comment"># 左上角2×2子矩阵填入 1/σᵢ 对角线值</span>
+sigma_plus[:<span class="hl-number">2</span>, :<span class="hl-number">2</span>] = sigma_inv
+<span class="hl-comment"># [:2,:2] = 前2行×前2列切片</span>
+
+<span class="hl-comment"># 组装伪逆：A⁺ = V Σ⁺ U^T</span>
+<span class="hl-comment"># VT.T = V（转置回来）, U.T = U^T（U的转置）</span>
+<span class="hl-comment"># (2×2) @ (2×3) @ (3×3) → (2×3) = 和pinv一样的形状</span>
+A_plus_manual = VT.T @ sigma_plus @ U.T
+
+<span class="hl-comment"># round到4位，和手搓对比</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"numpy pinv:\n"</span>, np.round(A_plus_np, <span class="hl-number">4</span>))
+<span class="hl-comment"># 手搓结果，两者应完全一致</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"\n手搓:\n"</span>, np.round(A_plus_manual, <span class="hl-number">4</span>))
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n一致？ {np.allclose(A_plus_np, A_plus_manual)}"</span>) <span class="hl-comment"># allclose容忍浮点误差 → True</span>
+
+<span class="hl-comment"># 伪逆有什么用？——解超定方程组 Ax = b（最小二乘解）</span>
+<span class="hl-comment"># 目标向量b，形状(3,)——3个方程的目标值</span>
+b = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>])
+<span class="hl-comment"># x = A⁺b，(2×3)@(3,)→(2,)，最小二乘最优解</span>
+x = A_plus_np @ b
+<span class="hl-comment"># 这个x让||Ax−b||（误差范数）达到最小</span>
+<span class="hl-comment"># 打印最小二乘解</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n解 Ax ≈ b: x = {np.round(x, 4)}"</span>)
+<span class="hl-comment"># A@x：(3×2)@(2,)→(3,) 验证近似结果</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"验证 Ax = {np.round(A @ x, 4)}"</span>)
+<span class="hl-comment"># 原始目标b</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"目标 b = {b}"</span>)
+<span class="hl-comment"># 残差范数——越小说明解越好</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"||Ax-b|| = {np.linalg.norm(A @ x - b):.4f}"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<p>伪逆的本质是：<strong>把非零奇异值取倒数</strong>——因为 SVD 告诉我们 $A$ 在这些方向上拉伸了 $\sigma$ 倍，要"撤销"这个拉伸，就除以 $\sigma$。</p>
+
+<div class="callout callout-info">
+<strong>伪逆和最小二乘：</strong><br>
+方程 $A\mathbf{x} = \mathbf{b}$（$A$ 是 $3\times 2$，3 个方程 2 个未知数）一般无解。<br>
+$\mathbf{x} = A^+ \mathbf{b}$ 给出的是<strong>最接近的近似解</strong>——让 $\|A\mathbf{x} - \mathbf{b}\|$ 最小。<br>
+这就是<strong>最小二乘</strong>。线性回归本质上就是在做这件事。
 </div>
+
+<h2>💭 概念题</h2>
+
+<div class="exercise">
+<h3>1. 截断的直觉</h3>
+<p>一个 100×100 的矩阵有 80 个非零奇异值。只保留前 5 个重建，误差 0.3%。这说明什么？后 75 个奇异值大概多小？</p>
+<p>——考察：奇异值衰减速度 = 矩阵"低秩程度"</p>
+</div>
+
+<div class="exercise">
+<h3>2. 伪逆 vs 普通逆</h3>
+<p>$A$ 是 $2\times 2$ 可逆方阵。用 SVD 证明 $A^+ = A^{-1}$。（提示：$A = U\Sigma V^T$，所以 $A^{-1} = V\Sigma^{-1} U^T$）</p>
+<p>——考察：伪逆是普通逆的推广</p>
+</div>
+
+<div class="exercise">
+<h3>3. 秩和零奇异值</h3>
+<p>如果 $A$ 是 $5 \times 5$ 矩阵，`np.linalg.svd` 返回的奇异值中有一个是 0（或极接近 0）。$A$ 的秩是多少？`np.linalg.matrix_rank(A)` 会返回什么？验证代码。</p>
+<p>——考察：秩 = 非零奇异值的个数</p>
+</div>
+
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-07/">← 00-06</a><a href="../../">📖 目录</a><a href="../00-10/">00-08 →</a></nav>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  });
+</script>
+
 <script>
 (function(){
   document.querySelectorAll('pre code').forEach(function(block){
@@ -184,4 +320,6 @@ $$\nabla f = \begin{bmatrix} \frac{\partial f}{\partial x} \\[4pt] \frac{\partia
 })();
 </script>
 
-</body></html>
+</body>
+</html>
+

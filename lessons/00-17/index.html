@@ -1,122 +1,179 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>00-17 条件概率与贝叶斯 · 深度学习数学</title>
-<link rel="stylesheet" href="../../css/style.css?v=20260601">
+<title>00-17 积分入门 · 深度学习数学</title>
+<link rel="stylesheet" href="../../css/style.css?v=20260602">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
 onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 </head><body>
-<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-14</span>
-<span><a href="../00-13/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-15/">下一课 →</a></span></nav>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-17</span>
+<span><a href="../00-16/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-18/">下一课 →</a></span></nav>
 <div class="container">
-<h1>00-17 条件概率与贝叶斯</h1>
+<h1>00-17 积分入门</h1>
 <hr>
-<h2>一、条件概率：知道了点什么，概率就变了</h2>
-<p><strong>画面：</strong> 你在街上随机抓一个人。他是左撇子的概率大约是 10%。但如果我告诉你<strong>「这个人在用左手写字」</strong>——那他是左撇子的概率瞬间变成接近 100%。</p>
-<p>「知道了新信息之后」的概率，就是<strong>条件概率</strong>。</p>
-$$P(A \mid B) = \frac{P(A \cap B)}{P(B)}$$
+<h2>一、曲线下的面积——微积分的另一半</h2>
+<p><strong>画面：</strong> 你有一张速度-时间图。横轴是时间（秒），纵轴是速度（米/秒）。从第 0 秒到第 10 秒，你走了多远？</p>
+<p>如果速度恒定（比如一直 5 m/s），答案很简单：$5 \times 10 = 50$ 米——就是矩形面积。</p>
+<p>但如果速度在变呢？第 1 秒 3 m/s，第 2 秒 7 m/s，第 3 秒 4 m/s……曲线弯来弯去。这时候距离 = <strong>曲线下的面积</strong>。</p>
+<p>这就是<strong>积分</strong>要解决的问题：给一条曲线 $f(x)$，算它下面从 $a$ 到 $b$ 的面积。</p>
+<div class="callout callout-info">
+<strong>🔗 微积分两块拼图：</strong><br>
+<strong>微分</strong>（00-08）：给定路程，求瞬时速度——切线斜率<br>
+<strong>积分</strong>（本课）：给定速度，求总路程——曲线下面积<br>
+两者互为逆运算，就像加法和减法。
+</div>
+<h3>用矩形逼近——黎曼和的直觉</h3>
+<p>曲线弯，不好直接算面积。但如果我们<strong>把它切成很多细条</strong>，每条近似成矩形呢？</p>
+<p><strong>步骤：</strong></p>
+<ol>
+<li>把区间 $[a, b]$ 切成 $n$ 等份，每份宽度 $\Delta x = \frac{b-a}{n}$</li>
+<li>在每一小段上，取该段某一点的函数值作为矩形的高</li>
+<li>把所有矩形面积加起来：$\sum_{i=1}^{n} f(x_i) \cdot \Delta x$</li>
+<li>$n$ 越大（条越细），近似越精确。$n \to \infty$ 时，逼近真实面积</li>
+</ol>
+<p>这就是<strong>黎曼和</strong>的核心思想——用直线逼近曲线，用有限算无限。</p>
+<p><strong>画面：</strong> 想象你在数一堆硬币。先把它们铺开，竖着切成 10 列，每列的高度就是硬币摞起来的个数。总硬币数 ≈ 每列高度 × 列宽。列越窄，数得越准。积分就是把列宽缩到无穷小，然后加总。</p>
+<hr>
+<h2>二、积分符号——一个拉长的 S</h2>
+<p>黎曼和的极限写法太啰嗦。莱布尼茨发明了一个简洁的符号：</p>
+$$\int_a^b f(x)\,dx$$
 <p><strong>逐符号拆开：</strong></p>
 <ul>
-<li>$P(A \mid B)$：读作「在 B 发生的条件下，A 发生的概率」</li>
-<li>$P(A \cap B)$：A 和 B <strong>同时</strong>发生的概率</li>
-<li>$P(B)$：B 发生的概率（不管 A 发不发生）</li>
-<li>整体含义：在所有 B 发生的情况里，A 也发生的比例。相当于把 B 当成<strong>新的全集</strong>，看 A 在里面占多少</li>
+<li>$\int$：积分号——一个拉长的 S，来自拉丁文 "Summa"（总和）。提醒你积分本质是「无穷多小条之和」</li>
+<li>$a$ 和 $b$：积分下限和上限——从哪到哪。$a$ 写下面，$b$ 写上面</li>
+<li>$f(x)$：被积函数——曲线的高度</li>
+<li>$dx$：积分变量和「无穷小宽度」——黎曼和里 $\Delta x$ 的极限形态。提醒你每条矩形的宽在极限下变成 0</li>
 </ul>
-<p><strong>直观理解：</strong> 原来是「全世界里 A 有多少」，条件概率是「<strong>只看 B 的世界里</strong> A 有多少」。分母 $P(B)$ 就是把这个新世界归一化到 1。</p>
-<h3>乘法公式：倒过来用</h3>
-<p>把条件概率公式两边乘 $P(B)$：</p>
-$$P(A \cap B) = P(A \mid B) \cdot P(B)$$
-<p>这看起来平凡，但非常有用——它把「同时发生」拆成两步：<strong>先发生 B，再在 B 发生的条件下发生 A</strong>。</p>
+<p>整个符号读作：「从 a 到 b，f(x) 对 x 的积分」。意思是：把 f(x) 的曲线从 a 到 b 切成无穷多条宽 dx 的细条，每条面积 $f(x) \cdot dx$，全加起来。</p>
+<div class="callout callout-info">
+<strong>📝 $dx$ 不是装饰：</strong> $dx$ 告诉你积分变量是谁。$\int f(x)\,dx$ 是对 $x$ 积分，$\int f(t)\,dt$ 是对 $t$ 积分——被积函数一样，但变量不同。它也是「乘上无穷小宽度」的记号残余——$\int$ 是加总，$dx$ 是被加的东西的「宽度」。
+</div>
 <hr>
-<h2>二、全概率公式：拆开来看</h2>
-<p><strong>画面：</strong> 工厂有三台机器 A、B、C，分别生产 50%、30%、20% 的产品。A 的次品率 1%，B 的次品率 2%，C 的次品率 5%。随机抽一件，它是次品的概率是多少？</p>
-<p>直接想有点乱——但可以<strong>按机器拆开</strong>：次品可能来自 A、B、或 C。把每种情况加起来：</p>
-$$\begin{aligned}
-P(\text{次品}) &= P(\text{次品} \mid A) \cdot P(A) + P(\text{次品} \mid B) \cdot P(B) + P(\text{次品} \mid C) \cdot P(C) \\
-&= 0.01 \times 0.5 + 0.02 \times 0.3 + 0.05 \times 0.2 \\
-&= 0.005 + 0.006 + 0.01 = 0.021
-\end{aligned}$$
-<p>这就是<strong>全概率公式</strong>：把一个复杂事件拆成互斥的几种情况，分别算再加起来。</p>
-$$P(A) = \sum_i P(A \mid B_i) \cdot P(B_i)$$
-<p>前提：$B_1, B_2, \dots$ 是<strong>互斥且穷尽的</strong>——把所有可能的情况全覆盖，且彼此不重叠。三台机器恰好满足这点。</p>
+<h2>三、两个最简单的例子</h2>
+<h3>例 1：常数函数——矩形面积</h3>
+<p>$f(x) = c$（常数）。曲线是一条水平线，高度恒为 $c$。从 $a$ 到 $b$ 下面的面积显然是矩形：</p>
+$$\int_a^b c\,dx = c \cdot (b - a)$$
+<p>因为每条宽 $\Delta x$ 的矩形高度都是 $c$，$n$ 条加起来：$c \cdot \Delta x \cdot n = c \cdot (b-a)$。</p>
+<p>如果 $c=3$，$a=1$，$b=5$：面积 = $3 \times 4 = 12$。</p>
+<h3>例 2：线性函数——三角形 + 矩形</h3>
+<p>$f(x) = x$。从 $0$ 到 $b$ 下面的面积是一个直角三角形（底 $b$，高 $b$）：</p>
+$$\int_0^b x\,dx = \frac{b^2}{2}$$
+<p>因为三角形面积 = $\frac{1}{2} \times 底 \times 高 = \frac{b^2}{2}$。</p>
+<p>从 $a$ 到 $b$（$a \geq 0$）：</p>
+$$\int_a^b x\,dx = \frac{b^2}{2} - \frac{a^2}{2}$$
+<p>就是大三角形减掉前面小的那块。</p>
+<p>更一般地，如果把 $x$ 看成 $x^1$，积分会让幂次 +1 并除以新幂次：</p>
+$$\int x^n\,dx = \frac{x^{n+1}}{n+1} + C$$
+<p>这就是<strong>幂函数的积分公式</strong>——和求导公式 $\frac{d}{dx}x^n = nx^{n-1}$ 恰好对称：求导降幂乘系数，积分升幂除系数。</p>
+<div class="callout callout-info">
+<strong>🧩 $+C$ 是什么？</strong> 不定积分（没有上下限）时，需要加上常数 $C$。因为 $\frac{x^2}{2}$ 的导数是 $x$，$\frac{x^2}{2} + 100$ 的导数也是 $x$——常数求导后消失。所以反过来，积分时所有常数都「可能」存在，用 $+C$ 表示。定积分（有上下限）时 $C$ 会抵消，所以不用写。
+</div>
 <hr>
-<h2>三、贝叶斯公式：把因果倒过来</h2>
-<p>刚才工厂问题是「知因求果」：知道是哪台机器 → 算次品率。</p>
-<p>贝叶斯公式是<strong>知果求因</strong>：拿到了一个次品 → 它最可能是哪台机器生产的？</p>
-<p>从条件概率定义出发：</p>
-$$P(B \mid A) = \frac{P(A \cap B)}{P(A)} = \frac{P(A \mid B) \cdot P(B)}{P(A)}$$
-<p>分子用了乘法公式 $P(A \cap B) = P(A \mid B) \cdot P(B)$。把分母用全概率展开：</p>
-$$\boxed{P(B_i \mid A) = \frac{P(A \mid B_i) \cdot P(B_i)}{\sum_j P(A \mid B_j) \cdot P(B_j)}}$$
-<p><strong>这个公式的灵魂：</strong> 把因果关系翻转了。$P(A \mid B_i)$ 是「B 导致 A 的概率」（因→果），而 $P(B_i \mid A)$ 是「看到 A 后反推 B 的概率」（果→因）。</p>
-<p><strong>逐零件命名：</strong></p>
+<h2>四、微积分基本定理——导数与积分的互逆</h2>
+<p>这是微积分里最重要的一句话：<strong>导数和积分互为逆运算</strong>。</p>
+<p><strong>直观画面：</strong> 你有一个水桶，水龙头在往里面滴水。</p>
 <ul>
-<li>$P(B_i)$：<strong>先验概率</strong>（prior）——看到证据之前，对 $B_i$ 的信念。机器 C 只产 20%，先天就不太可能是它</li>
-<li>$P(A \mid B_i)$：<strong>似然</strong>（likelihood）——如果 $B_i$ 是真的，看到证据 A 的可能性。C 的次品率 5%，比较高</li>
-<li>$P(B_i \mid A)$：<strong>后验概率</strong>（posterior）——看到证据之后，修正过的信念。尽管 C 先天概率低，但它的次品率高，后验概率可能反超</li>
+<li><strong>导数视角：</strong> 你知道桶里水位随时间的变化曲线 $h(t)$，求任意时刻的进水速度 → $h'(t)$</li>
+<li><strong>积分视角：</strong> 你知道进水速度随时间的变化 $v(t)$，求 0 到 T 一共进了多少水 → $\int_0^T v(t)\,dt$</li>
 </ul>
-<h3>经典例子：体检阳性，我真的有病吗？</h3>
-<p>一种病发病率 1%。检测准确率 99%（有病的人 99% 测出阳性，没病的人 99% 测出阴性）。你测出阳性——你有病的概率是多少？</p>
-<p>直觉说 ~99%。<strong>错。答案是 ~50%。</strong> 来算：</p>
-<p><strong>已知条件：</strong></p>
-<ul>
-<li>$P(病) = 0.01$（先验——发病率）</li>
-<li>$P(阳性 \mid 病) = 0.99$（有病被检出的概率——灵敏度）</li>
-<li>$P(阴性 \mid 没病) = 0.99$，所以 $P(阳性 \mid 没病) = 0.01$（假阳性率）</li>
-</ul>
-<p><strong>算 $P(病 \mid 阳性)$：</strong> 贝叶斯公式：</p>
-$$\begin{aligned}
-P(病 \mid 阳性) &= \frac{P(阳性 \mid 病) \cdot P(病)}{P(阳性 \mid 病) \cdot P(病) + P(阳性 \mid 没病) \cdot P(没病)} \\[8pt]
-&= \frac{0.99 \times 0.01}{0.99 \times 0.01 + 0.01 \times 0.99} \\[8pt]
-&= \frac{0.0099}{0.0099 + 0.0099} = \frac{0.0099}{0.0198} = 0.5
-\end{aligned}$$
-<p><strong>为什么只有 50%？</strong> 因为发病率太低了（1%）。10000 个人里，有 100 个真病人（99 个测出阳性）和 9900 个好人（99 个假阳性）。阳性总共 99+99=198 人，其中只有 99 个真有病——恰好一半。</p>
-<figure><img src="assets/bayes_area.png" alt="贝叶斯体检阳性树状图"><figcaption>10000 人：有病 100 人（99 阳性），没病 9900 人（99 假阳性）。阳性共 198 人，真阳性只有一半。</figcaption></figure>
-<p>假阳性虽然比例低（1%），但<strong>没病的人基数太大</strong>（9900），假阳性的绝对人数（99）和真阳性（99）一样多。这就是<strong>基础率忽略</strong>——直觉只盯住了 99% 的准确率，忘了发病率 1% 这个先验。</p>
-<pre><code><span class="hl-comment"># 00-17 贝叶斯公式：模拟体检阳性问题（发病率1%，检测准确率99%）</span>
+<p>这两个操作互为逆：</p>
+$$\frac{d}{dx}\left[\int_a^x f(t)\,dt\right] = f(x)$$
+<p>先积分再求导，回到原函数：</p>
+$$\int_a^b f'(x)\,dx = f(b) - f(a)$$
+<p>先求导再积分，回到原函数的变化量。</p>
+<p><strong>不严格但准确的直觉：</strong> 积分是求导的逆运算，就像除法是乘法的逆运算。你知道 $2 \times 3 = 6$，反过来求「什么数乘以 3 等于 6」就是积分在干的事。</p>
+<p>微积分基本定理把「面积问题」和「切线问题」连接起来了——你用求导的逆运算（反导数）就能算出面积，不用每次切矩形！</p>
+<hr>
+<h2>五、积分与概率——面积就是概率</h2>
+<p>回到 00-16 学的概率密度函数 $f(x)$。连续随机变量 $X$ 落在区间 $[a, b]$ 的概率：</p>
+$$P(a \leq X \leq b) = \int_a^b f(x)\,dx$$
+<p><strong>画面：</strong> 概率密度曲线像一座山。你想知道身高在 170-175cm 之间的人占多少比例——那就是这座山在 170 到 175 之间的<strong>面积</strong>。整座山的总面积一定是 1（总概率 = 100%）。</p>
+<p>这就是为什么概率密度可以大于 1（山可以很尖），但<strong>积分</strong>（面积）必须在 0 到 1 之间。密度是高度，概率是面积——两回事。</p>
+<div class="callout callout-info">
+<strong>📐 积分在深度学习里无处不在：</strong><br>
+• 损失函数：对整个数据集的误差求和 → 连续形式就是积分<br>
+• 概率论：$\mathbb{E}[X] = \int x f(x)\,dx$ ——期望也是积分<br>
+• 信息论：熵 $H = -\int f(x) \ln f(x)\,dx$ ——信息量的加权平均<br>
+• 归一化：softmax 的分母，归一化流中的 Jacobian 行列式积分
+</div>
+<hr>
+<h2>六、代码：用黎曼和逼近积分</h2>
+<p>我们用手算 $\int_0^3 x^2\,dx$。解析解：$\frac{x^3}{3}\big|_0^3 = \frac{27}{3} - 0 = 9$。</p>
+<p>下面用黎曼和（矩形法）逼近，看 $n$ 变大时怎么收敛到 9：</p>
+<pre><code><span class="hl-comment"># 00-17 黎曼和：用矩形逼近 ∫₀³ x² dx，解析解 = 9</span>
 <span class="hl-comment"># 导入numpy，别名np</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-<span class="hl-comment"># 模拟 100000 人的体检数据</span>
-<span class="hl-comment"># 总模拟人数：10万</span>
-N = <span class="hl-number">100000</span>
-<span class="hl-comment"># default_rng(seed)：新版随机数生成器，seed保证可复现</span>
-rng = np.random.default_rng(<span class="hl-number">42</span>)
-<span class="hl-comment"># 1% 的人真有病 → 生成10万个布尔值，True概率=0.01</span>
-<span class="hl-comment"># random(N)：生成N个[0,1)均匀随机数，<0.01→True(有病)</span>
-has_disease = rng.random(N) &lt; <span class="hl-number">0.01</span>
-<span class="hl-comment"># np.where(条件, 真时取值, 假时取值)：按条件二选一</span>
-<span class="hl-comment"># 有病的人：99% 测出阳性（灵敏度）；没病的人：1% 假阳性</span>
-test_positive = np.where(
-    has_disease,                          <span class="hl-comment"># 条件：是否有病（布尔数组）</span>
-    <span class="hl-comment"># 真有病 → 99%概率测出阳性（灵敏度）</span>
-    rng.random(N) &lt; <span class="hl-number">0.99</span>,
-    <span class="hl-comment"># 没病的 → 1%概率假阳性</span>
-    rng.random(N) &lt; <span class="hl-number">0.01</span>
-)
-<span class="hl-comment"># 在测出阳性的人里，有多少真有病？→ P(病|阳性)</span>
-positives = test_positive.sum()           <span class="hl-comment"># .sum()对布尔数组：True=1 → 阳性总人数</span>
-true_positives = (test_positive & has_disease).sum()  <span class="hl-comment"># & 逻辑与：阳性且真有病 → 真阳性人数</span>
-<span class="hl-comment"># 阳性人数 ≈ 198人(99真阳性+99假阳性)</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"阳性总人数: {positives}"</span>)
-<span class="hl-comment"># 真有病且阳性 ≈ 99人</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"真阳性(真有病): {true_positives}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"P(病|阳性) = {true_positives}/{positives} = {true_positives/positives:.3f}"</span>)
-<span class="hl-comment"># :.3f = 保留3位小数，大约 0.500——和贝叶斯公式算的一样</span>
+
+<span class="hl-comment"># 被积函数：f(x) = x²</span>
+<span class="hl-keyword">def</span> f(x):
+    <span class="hl-keyword">return</span> x**2
+
+<span class="hl-comment"># 积分区间 [a, b] = [0, 3]</span>
+a, b = <span class="hl-number">0</span>, <span class="hl-number">3</span>
+
+<span class="hl-comment"># 用不同数量的矩形逼近：n=10, 100, 1000, 10000</span>
+<span class="hl-keyword">for</span> n in [<span class="hl-number">10</span>, <span class="hl-number">100</span>, <span class="hl-number">1000</span>, <span class="hl-number">10000</span>]:
+    <span class="hl-comment"># np.linspace(a,b,n+1)：在[a,b]之间均匀取n+1个点 → n个小区间</span>
+    x_edges = np.linspace(a, b, n+<span class="hl-number">1</span>)
+    <span class="hl-comment"># 每个小矩形的宽度 Δx = (b-a)/n</span>
+    dx = (b - a) / n
+    <span class="hl-comment"># 用右端点法：取每个小区间右端点的函数值作为矩形高</span>
+    <span class="hl-comment"># x_edges[1:] 取从第1个到最后一个点（n个右端点）</span>
+    x_right = x_edges[<span class="hl-number">1</span>:]
+    <span class="hl-comment"># 高度数组 = f(每个右端点x值)</span>
+    heights = f(x_right)
+    <span class="hl-comment"># 黎曼和：Σ f(xᵢ) · Δx → 所有矩形面积之和</span>
+    riemann_sum = np.sum(heights) * dx
+    <span class="hl-comment"># f-string输出：n值和对应的黎曼和近似值</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"n={n:5d}  →  黎曼和 = {riemann_sum:.6f}"</span>)
+
+<span class="hl-comment"># 解析解（精确值）：∫₀³ x² dx = x³/3|₀³ = 27/3 = 9</span>
+exact = <span class="hl-number">9</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n解析解（精确值）：{exact}"</span>)
+
+<span class="hl-comment"># 用 n=10000 的误差展示收敛效果</span>
+x_edges = np.linspace(a, b, <span class="hl-number">10001</span>)
+riemann_10k = np.sum(f(x_edges[<span class="hl-number">1</span>:])) * ((b-a)/<span class="hl-number">10000</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"n=10000 误差：{abs(riemann_10k - exact):.8f}"</span>)
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-<p>贝叶斯公式不是在玩符号——它纠正了一个真实的思维错误。</p>
+<p>输出大约：n=10 → 9.135，n=100 → 9.0135，n=1000 → 9.00135，n=10000 → 9.000135。看到没？每多一个数量级的细分，误差就减少约 10 倍——黎曼和一阶收敛。</p>
+<p>注：右端点法对递增函数会<strong>高估</strong>面积（取右边最高点），左端点法会低估。取中点更准。</p>
+<h3>进阶：用梯形法改进</h3>
+<p>矩形法的升级版——每条不用矩形，用<strong>梯形</strong>（上边是斜线，更像原曲线）：</p>
+<pre><code><span class="hl-comment"># 00-17 梯形法：比矩形法收敛更快（二阶）</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 同样的 f(x)=x², 区间[0,3]</span>
+a, b = <span class="hl-number">0</span>, <span class="hl-number">3</span>
+<span class="hl-keyword">def</span> f(x): <span class="hl-keyword">return</span> x**2
+
+<span class="hl-keyword">for</span> n in [<span class="hl-number">10</span>, <span class="hl-number">100</span>, <span class="hl-number">1000</span>]:
+    <span class="hl-comment"># n+1个等间距点（包含两端）</span>
+    x = np.linspace(a, b, n+<span class="hl-number">1</span>)
+    y = f(x)
+    dx = (b - a) / n
+    <span class="hl-comment"># 梯形公式：面积 ≈ Δx/2 · [y₀ + 2y₁ + 2y₂ + ... + 2yₙ₋₁ + yₙ]</span>
+    <span class="hl-comment"># 两端系数为1，中间系数为2 → 头和尾各算半次，中间算完整</span>
+    trapezoid_sum = dx * (<span class="hl-number">0.5</span>*y[<span class="hl-number">0</span>] + np.sum(y[<span class="hl-number">1</span>:-<span class="hl-number">1</span>]) + <span class="hl-number">0.5</span>*y[-<span class="hl-number">1</span>])
+    <span class="hl-comment"># f-string，保留8位小数</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"n={n:4d}  梯形法 = {trapezoid_sum:.8f}  误差={abs(trapezoid_sum-9):.2e}"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<p>梯形法 $n=10$ 的误差就已经比矩形法 $n=100$ 还小——二阶收敛，快得多。</p>
 <hr>
 <h2>💭 概念题</h2>
 <ol>
-<li>为什么阳性率 99%、发病率 1% 的情况下，$P(病 \mid 阳性)$ 只有 ~50%？用「假阳性人数 vs 真阳性人数」解释。——考察：基础率忽略</li>
-<li>如果发病率从 1% 变成 10%，$P(病 \mid 阳性)$ 大约是多少？先估算再算。——考察：先验对后验的影响</li>
-<li>工厂例子：拿到一个次品，它来自机器 C 的概率是多少？——考察：贝叶斯公式完整计算</li>
+<li>用黎曼和（右端点法）估算 $\int_1^4 \frac{1}{x}\,dx$，取 $n=4$。画出 4 个矩形的位置（x 在 1、1.75、2.5、3.25、4 的哪一段取函数值？）。这个近似值比真实值大还是小？为什么？——考察：黎曼和的几何理解（$\frac{1}{x}$ 递减 → 右端点法会低估）</li>
+<li>概率密度函数 $f(x) = 2x$ 定义在 $[0, 1]$ 上。验证 $\int_0^1 2x\,dx = 1$（总概率为 1）。并求 $P(0.3 \leq X \leq 0.7)$。——考察：积分与概率的连接，以及面积 = 概率</li>
 </ol>
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-16/">← 00-16</a><a href="../../">📖 目录</a><a href="../00-18/">00-18 →</a></nav>
+<a href="../00-18/">← 00-16</a><a href="../../">📖 目录</a><a href="../00-18/">00-18 →</a></nav>
 </div>
 <script>
 (function(){

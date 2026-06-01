@@ -1,134 +1,124 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>00-14 离散分布 · 深度学习数学</title>
+<title>00-14 链式法则 · 深度学习数学</title>
 <link rel="stylesheet" href="../../css/style.css?v=20260601">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
 onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 </head><body>
-<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-11</span>
-<span><a href="../00-10/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-12/">下一课 →</a></span></nav>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-14</span>
+<span><a href="../00-11/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-13/">下一课 →</a></span></nav>
 <div class="container">
-<h1>00-14 离散分布</h1>
+<h1>00-14 链式法则</h1>
+<p>如果说梯度是"往哪走"，那链式法则就是"在多层的机器里，最里面那颗螺丝钉拧一下，最终输出会变多少"。这条规则单独看简单，但它是后面所有复杂求导的基础。</p>
+<figure><img src="assets/gear_chain.png" alt="齿轮链"><figcaption>三级齿轮咬合：拧第一个齿轮 → 带动第二个 → 带动第三个。总传动比 = 各级传动比相乘</figcaption></figure>
 <hr>
-<h2>一、随机变量：知道规律但不知道结果</h2>
-<p><strong>画面：</strong> 你在微信上给朋友发了一条消息。根据经验，70% 的概率他秒回，20% 的概率半小时后回，10% 的概率忘了回。你<strong>不知道这次会怎样</strong>，但你<strong>知道每种可能性的比例</strong>。这就是随机变量：一个取值不确定但分布规律确定的量。</p>
-<p>数学里写：$X = \text{"回复所需时间"}$。$X$ 可以取「秒回」「半小时」「不回」三个值。</p>
+<h2>一、咬合的齿轮：链式法则的直觉</h2>
+<p><strong>画面：</strong> 你面前有三个咬合在一起的齿轮。你转动第一个齿轮（输入 $x$），它带动第二个齿轮（中间结果 $g(x)$），第二个带动第三个（最终输出 $f(g(x))$）。</p>
+<p>现在问：<strong>你拧第一个齿轮 1 圈，最后一个齿轮转几圈？</strong></p>
+<p>答案 = <strong>第一个齿轮到第二个齿轮的传动比</strong> × <strong>第二个齿轮到第三个齿轮的传动比</strong>。</p>
+<p>这就是链式法则：</p>
+$$h(x) = f(g(x)) \quad\Rightarrow\quad h'(x) = f'(g(x)) \cdot g'(x)$$
+<div class="callout callout-info">
+<h3>推导：为什么是乘法？为什么是 f'(g(x)) 而不是 f'(x)？</h3>
+<p><strong>从定义出发：</strong></p>
+$$h'(x) = \lim_{\Delta x \to 0} \frac{f(g(x+\Delta x)) - f(g(x))}{\Delta x}$$
+<p>令 $\Delta u = g(x+\Delta x) - g(x)$（中间变量因为 $x$ 变而变的量）。则 $g(x+\Delta x) = g(x) + \Delta u$，代入：</p>
+$$h'(x) = \lim_{\Delta x \to 0} \frac{f(g(x)+\Delta u) - f(g(x))}{\Delta x}$$
+<p><strong>关键技巧——凑出两个差商的乘积：</strong></p>
+$$= \lim_{\Delta x \to 0} \underbrace{\frac{f(g(x)+\Delta u) - f(g(x))}{\Delta u}}_{\text{外层 f 在 g(x) 处的导数}} \cdot \underbrace{\frac{\Delta u}{\Delta x}}_{\text{内层 g 的差商}}$$
+<p>当 $\Delta x \to 0$ 时，$\Delta u \to 0$（因为 $g$ 可导则连续），所以：</p>
+$$h'(x) = f'(g(x)) \cdot g'(x)$$
+<p><strong>推导同时回答了三个问题：</strong></p>
+<ol>
+<li><strong>为什么是乘法？</strong> 因为我们凑出了两个差商的乘积——外层的 $\frac{\Delta f}{\Delta u}$ 和内层的 $\frac{\Delta u}{\Delta x}$。</li>
+<li><strong>为什么是 $f'(g(x))$ 而不是 $f'(x)$？</strong> 外层的差商是 $\frac{f(g(x)+\Delta u)-f(g(x))}{\Delta u}$——外层 $f$ 是在 <strong>$u=g(x)$ 处</strong>取值，不是在 $x$ 处取值。</li>
+<li><strong>从几何上看：</strong> $x$ 变一点 → $u$ 变 $g'(x)$ 倍 → $y$ 变 $f'(u)$ 倍。两步放大倍数相乘 = 总放大倍数。函数图像上：复合函数在 $x$ 处的切线斜率 = 外层在 $u=g(x)$ 处的切线斜率 × 内层在 $x$ 处的切线斜率。</li>
+</ol>
+</div>
+<ul>
+<li>$g'(x)$：拧输入 $x$，中间结果 $g(x)$ 怎么变（第一个传动比）</li>
+<li>$f'(g(x))$：中间结果 $g(x)$ 变一点，最终输出怎么变（第二个传动比）</li>
+<li>乘起来：输入→输出的<strong>总传动比</strong></li>
+</ul>
+<p>来一个具体例子：$h(x) = \sin(x^2)$</p>
+<ul>
+<li>内层齿轮 $g(x) = x^2$，传动比 $g'(x) = 2x$</li>
+<li>外层齿轮 $f(u) = \sin(u)$，传动比 $f'(u) = \cos(u)$</li>
+<li>注意：外层传动比要<strong>在 $u=x^2$ 那个位置算</strong>，不是在 $x$ 处算</li>
+<li>总传动比：$h'(x) = \cos(x^2) \cdot 2x$</li>
+</ul>
 <hr>
-<h2>二、PMF：三个盒子，按比例抽</h2>
-<p><strong>画面：</strong> 桌上有三个盒子，标着「秒回」「半小时」「不回」。你有 10 个筹码要往里放——秒回盒放 7 个，半小时盒放 2 个，不回盒放 1 个。总共 10 个筹码。</p>
-<p>现在从这三个盒子里<strong>按筹码比例随机抽一个</strong>——抽到秒回的概率 = 7/10 = 70%，半小时 = 20%，不回 = 10%。</p>
-<p>PMF（概率质量函数）就是给每个可能的取值分配一个"筹码重量"。所有筹码加起来 = 1。</p>
-<p>$$P(X = x_i) = p_i, \quad \sum_i p_i = 1$$</p>
-<h3>为什么 $\sum p_i = 1$？——「所有结果必有一个发生」</h3>
-<p>这个条件不是外加的约束，而是概率本身的<strong>底层逻辑</strong>。做一次实验，结果必然是所有可能取值中的某一个——不可能逃出这个集合。把所有结果的概率加起来，就是「一定会有某个结果发生」这件事的概率，也就是 1 = 100%。</p>
-<p>反过来想：如果 $\sum p_i < 1$，说明还有「概率凭空消失了」——这违背了概率的完备性；如果 $\sum p_i > 1$，说明两个不同结果在概率上「重叠了」——这违背了互斥性。所以 $\sum p_i = 1$ 既是定义，也是检验一个人造分布是否合法的标准。</p>
+<h2>二、多列齿轮：多条路径求和</h2>
+<p>如果一个输入变量通过<strong>多条路径</strong>影响最终输出——就像一台机器同时驱动两条传送带——那总传动比 = 各条路径的传动比<strong>之和</strong>：</p>
+$$\frac{dz}{dx} = \frac{\partial z}{\partial y_1} \cdot \frac{dy_1}{dx} + \frac{\partial z}{\partial y_2} \cdot \frac{dy_2}{dx} + \cdots$$
+<div class="callout callout-info">
+<h3>推导：为什么是求和？</h3>
+<p>设 $z = f(y_1(x), y_2(x))$——最终输出 $z$ 通过两个中间变量 $y_1, y_2$ 依赖于 $x$。</p>
+<p><strong>全微分：</strong> $x$ 变 $\Delta x$，导致 $y_1$ 变 $\Delta y_1 \approx \frac{dy_1}{dx}\Delta x$，$y_2$ 变 $\Delta y_2 \approx \frac{dy_2}{dx}\Delta x$。</p>
+<p>$y_1$ 和 $y_2$ 各自的变化都会影响 $z$——总变化 = 各路径贡献之和：</p>
+$$\Delta z \approx \frac{\partial z}{\partial y_1} \cdot \Delta y_1 + \frac{\partial z}{\partial y_2} \cdot \Delta y_2$$
+<p>代入 $\Delta y_1$ 和 $\Delta y_2$ 的表达式：</p>
+$$\Delta z \approx \frac{\partial z}{\partial y_1} \cdot \frac{dy_1}{dx}\Delta x + \frac{\partial z}{\partial y_2} \cdot \frac{dy_2}{dx}\Delta x$$
+<p>两边除以 $\Delta x$，取极限 $\Delta x \to 0$：</p>
+$$\frac{dz}{dx} = \frac{\partial z}{\partial y_1} \cdot \frac{dy_1}{dx} + \frac{\partial z}{\partial y_2} \cdot \frac{dy_2}{dx}$$
+<p><strong>直觉：</strong> 就像两条水渠汇入一个水库——上游放水，两条渠各自带走一部分水，水库水位变化 = 两条渠的贡献加起来。链式法则的加法来自<strong>各路径独立贡献的叠加</strong>。</p>
+</div>
+<p><strong>画面：</strong> 发动机驱动两条传送带，两条传送带都汇到一个包装箱。发动机加速 → 两条传送带都加速 → 包装箱加速。总效应 = 两条路径的效应相加。</p>
+<div class="callout callout-info">
+<h3>多级齿轮的启示：连乘导致极度敏感</h3>
+<p>100 级齿轮咬合在一起。如果每级传动比都 &lt; 1（比如 0.25），100 次连乘后 → $0.25^{100} \approx 0$——第一个齿轮拧 10000 圈，最后一个纹丝不动。如果每级都 &gt; 1，最后一个会疯狂加速。</p>
+<p><strong>这和深度学习有什么关系？</strong> 神经网络的反向传播就是在用链式法则求梯度——每一层的局部导数连乘起来。100 层网络 → 100 个因子连乘。大多数因子 &lt; 1 → 梯度指数衰减（<strong>梯度消失</strong>，浅层学不到东西）；大多数因子 &gt; 1 → 梯度指数爆炸（<strong>梯度爆炸</strong>，更新一步跨太远）。深层网络训练困难的根源就在这里——不是网络不聪明，是链式法则的乘法性质让深层梯度对每一层的缩放极其敏感。</p>
+</div>
 <hr>
-<h2>三、伯努利分布：抛一次硬币</h2>
-<p>只有两种结果：成功（1）和失败（0）。</p>
-<p>$$P(X=1) = p, \quad P(X=0) = 1-p$$</p>
-<p><strong>画面：</strong> 一枚偏心的硬币，正面概率 $p=0.7$。抛一次，不是正面就是反面——就这么简单。</p>
-<pre><code><span class="hl-comment"># 00-14 伯努利分布：模拟抛偏心硬币1000次</span>
-<span class="hl-comment"># 导入numpy，别名np</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-<span class="hl-comment"># seed()：固定随机种子，保证每次运行结果一样</span>
-np.random.seed(<span class="hl-number">42</span>)
-<span class="hl-comment"># 正面概率 p=0.7（偏心硬币正面更重）</span>
-p = <span class="hl-number">0.7</span>
-<span class="hl-comment"># np.random.random(1000) → 生成1000个[0,1)均匀分布的随机小数</span>
-<span class="hl-comment"># < p → 小于0.7的变成True（正面），≥0.7的变成False（反面）</span>
-<span class="hl-comment"># 结果：布尔数组，True=正面(约70%)</span>
-flips = np.random.random(<span class="hl-number">1000</span>) &lt; p
-<span class="hl-comment"># .mean() 对布尔数组：True当作1、False当作0 → 平均值=正面比例</span>
-<span class="hl-comment"># :.3f = 保留3位小数</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"p=0.7, 抛1000次: 正面比例 {flips.mean():.3f}"</span>)
-</code></pre>
-
-<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-<hr>
-<h2>四、二项分布：抛 n 次硬币</h2>
-<h3>4.1 公式推导——先算一种排法，再乘排法数</h3>
-<p>推导二项分布公式，分两步走：</p>
-<p><strong>第一步：考虑一个特定排列的概率。</strong></p>
-<p>假设 n=5 次抛硬币，我们关心恰好 k=2 次正面的情况。一个具体的排列是：<strong>正、正、反、反、反</strong>（前两次正面，后三次反面）。</p>
-<p>每次抛硬币是独立的，所以这个<strong>特定排列</strong>发生的概率 = 各次结果的概率直接相乘：</p>
-<p>$$P(\text{正正反反反}) = p \cdot p \cdot (1-p) \cdot (1-p) \cdot (1-p) = p^2 (1-p)^{5-2}$$</p>
-<p>推广到一般情况：n 次中恰好 k 次正面、n-k 次反面的<strong>任意一个特定排列</strong>，其概率都是：</p>
-<p>$$\boxed{p^k (1-p)^{n-k}}$$</p>
-<p><strong>第二步：有多少种这样的排列？</strong></p>
-<p>「恰好 k 次正面」不要求正面出现在哪几次——n 次试验中，随便选哪 k 个位置放正面，剩下的自然就是反面。从 n 个位置里选 k 个，就是一个<strong>组合数</strong>问题：</p>
-<p>$$\binom{n}{k} = \frac{n!}{k!(n-k)!}$$</p>
-<p>每种排列的概率都是 $p^k (1-p)^{n-k}$，而且这些排列是<strong>互斥的</strong>（一次实验只能出现其中一个排列），所以总概率 = 排列数 × 每个排列的概率：</p>
-<p>$$\boxed{P(X=k) = \binom{n}{k} p^k (1-p)^{n-k}}$$</p>
-<h3>4.2 直观验证——为什么中间鼓、两头瘪？</h3>
-<p>$p^k (1-p)^{n-k}$ 这个因子在 k 取中间值时并不一定最大（取决于 p）。真正让中间鼓起来的是 $\binom{n}{k}$：</p>
-<table style="margin:1em auto;border-collapse:collapse;">
-<tr><th style="padding:4px 12px;border:1px solid #ccc;">k</th><th style="padding:4px 12px;border:1px solid #ccc;">0</th><th style="padding:4px 12px;border:1px solid #ccc;">1</th><th style="padding:4px 12px;border:1px solid #ccc;">2</th><th style="padding:4px 12px;border:1px solid #ccc;">3</th><th style="padding:4px 12px;border:1px solid #ccc;">4</th><th style="padding:4px 12px;border:1px solid #ccc;">5</th></tr>
-<tr><td style="padding:4px 12px;border:1px solid #ccc;font-weight:bold;">C(5,k)</td><td style="padding:4px 12px;border:1px solid #ccc;">1</td><td style="padding:4px 12px;border:1px solid #ccc;">5</td><td style="padding:4px 12px;border:1px solid #ccc;">10</td><td style="padding:4px 12px;border:1px solid #ccc;">10</td><td style="padding:4px 12px;border:1px solid #ccc;">5</td><td style="padding:4px 12px;border:1px solid #ccc;">1</td></tr>
-</table>
-<p>「正正反反反」只有 1 种排法；「2 正 3 反」却有 $\binom{5}{2}=10$ 种。排列方式越多，这件事就越容易发生。</p>
-<figure><img src="assets/binomial_hist.png" alt="二项分布"><figcaption>n=10, p=0.5。k=5 的柱子最高——$\binom{10}{5}=252$ 种排法，远多于两端的 $\binom{10}{0}=1$ 种</figcaption></figure>
-<pre><code><span class="hl-comment"># 00-14 二项分布：模拟抛10次硬币，重复10000轮</span>
-<span class="hl-comment"># n=每轮抛10次，p=公平硬币(正面概率0.5)</span>
-n, p = <span class="hl-number">10</span>, <span class="hl-number">0.5</span>
-<span class="hl-comment"># np.random.binomial(n, p, size)：模拟 size 轮，每轮抛 n 次</span>
-<span class="hl-comment"># 返回 size 个整数，每个 = 该轮正面出现的次数(0~n)</span>
-<span class="hl-comment"># 10000轮的正面次数数组</span>
-results = np.random.binomial(n, p, size=<span class="hl-number">10000</span>)
-<span class="hl-comment"># 检验k=3,5,7这三个正面次数的概率</span>
-<span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">3</span>, <span class="hl-number">5</span>, <span class="hl-number">7</span>]:
-    freq = np.mean(results == k)              <span class="hl-comment"># results==k → 布尔数组，mean() → 频率≈概率</span>
-    <span class="hl-comment"># :.4f = 保留4位小数</span>
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"P(X={k}) ≈ {freq:.4f}"</span>)
-<span class="hl-comment"># P(X=5) 最大 ← C(10,5)=252种排法最多（中间鼓）</span>
-<span class="hl-comment"># P(X=3) ≈ P(X=7) ← 对称分布（p=0.5公平硬币）</span>
-</code></pre>
-
-<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-<hr>
-<h2>五、多项分布：不止两个盒子</h2>
-<h3>5.1 从二项到多项——思想的自然推广</h3>
-<p>二项分布是「两种结果，做 n 次」；多项分布是「m 种结果，做 n 次」。比如掷一个六面骰子 n=10 次，每次有 6 种可能的结果，每种结果有各自的概率 $p_1, p_2, \dots, p_6$（公平骰子的话 $p_i = 1/6$）。</p>
-<p>我们关心的是：10 次掷完，面 1 出现 $k_1$ 次、面 2 出现 $k_2$ 次、……、面 6 出现 $k_6$ 次的概率是多少？其中 $\sum_{i=1}^m k_i = n$。</p>
-<h3>5.2 公式推导——完全复刻二项分布的思路</h3>
-<p>跟二项分布一样，分两步。</p>
-<p><strong>第一步：一个特定排列的概率。</strong></p>
-<p>假设有一种具体的排列——比如前 $k_1$ 次都是结果 1，接下来 $k_2$ 次都是结果 2，……，最后 $k_m$ 次都是结果 m。由于每次试验独立，这个排列的概率是：</p>
-<p>$$\underbrace{p_1 \cdot p_1 \cdots p_1}_{k_1 \text{ 个}} \cdot \underbrace{p_2 \cdots p_2}_{k_2 \text{ 个}} \cdots \underbrace{p_m \cdots p_m}_{k_m \text{ 个}} = p_1^{k_1} p_2^{k_2} \cdots p_m^{k_m}$$</p>
-<p>任何<strong>指定了哪个位置是哪个结果</strong>的排列，概率都是这个表达式——因为乘法可交换，乘积只取决于每个 $p_i$ 出现了多少次，而与顺序无关。</p>
-<p><strong>第二步：有多少种排列方式？</strong></p>
-<p>n 次试验中，有 $k_1$ 个位置放结果 1、$k_2$ 个放结果 2、……、$k_m$ 个放结果 m。这是一个「多重组合数」问题——把 n 个位置分成 m 组，每组大小分别为 $k_1, k_2, \dots, k_m$：</p>
-<p>$$\binom{n}{k_1, k_2, \dots, k_m} = \frac{n!}{k_1! \, k_2! \, \cdots \, k_m!}$$</p>
-<p>理解这个公式：先给 n 个试验排一个顺序（$n!$ 种），但同一类结果内部 $k_i$ 个位置互换不产生新排列——所以要除以各组的内部排列数 $k_i!$。</p>
-<p>所有排列互斥，概率相加，得到多项分布的 PMF：</p>
-<p>$$\boxed{P(X_1=k_1,\dots,X_m=k_m) = \frac{n!}{k_1! \, k_2! \, \cdots \, k_m!}\; p_1^{k_1} p_2^{k_2} \cdots p_m^{k_m}}$$</p>
-<p>其中 $\sum k_i = n$，$\sum p_i = 1$。</p>
-<h3>5.3 代码验证</h3>
-<p>掷六面骰子，每面概率都是 1/6——六个盒子，每个放一样多的筹码。</p>
-<pre><code><span class="hl-comment"># 00-14 多项分布：掷六面骰子1000次</span>
-<span class="hl-comment"># np.random.multinomial(n, pvals)：掷骰子n次，每面概率pvals</span>
-<span class="hl-comment"># [1/6]*6 → [0.1667,0.1667,0.1667,0.1667,0.1667,0.1667] 公平骰子</span>
-<span class="hl-comment"># 返回长度为6的数组，分别是面1~6的出现次数</span>
-dice = np.random.multinomial(<span class="hl-number">1000</span>, [<span class="hl-number">1</span>/<span class="hl-number">6</span>]*<span class="hl-number">6</span>)
-<span class="hl-comment"># 六个面各自的出现次数</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"掷骰1000次: {dice}"</span>)
-<span class="hl-comment"># .sum()：所有面的次数之和 — 一定 = 1000</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"总和={dice.sum()}"</span>)
-</code></pre>
-
-<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ 全部代码到 online-python.com 运行</a></p>
+<h2>三、手算一个例子：$(wx-y)^2$ 的导数</h2>
+<p>$L = (wx - y)^2$。假设 $y$ 是常数（一个目标值），我们想知道 $w$ 变一点，$L$ 变多少。</p>
+<ul>
+<li>内层：$u(w) = wx - y$，$\frac{du}{dw} = x$</li>
+<li>外层：$L(u) = u^2$，$\frac{dL}{du} = 2u$</li>
+<li>链式：$\frac{dL}{dw} = 2(wx-y) \cdot x$</li>
+</ul>
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-comment"># ===== sin(x²) 验证链式法则 =====</span>
+<span class="hl-keyword">def</span> <span class="hl-func">h</span>(x):
+<span class="hl-comment"># 复合函数</span>
+<span class="hl-keyword">return</span> np.sin(x ** <span class="hl-number">2</span>)
+<span class="hl-keyword">def</span> <span class="hl-func">h_grad</span>(x):
+<span class="hl-comment"># 链式：cos(x²)·2x</span>
+<span class="hl-keyword">return</span> np.cos(x ** <span class="hl-number">2</span>) * <span class="hl-number">2</span> * x
+<span class="hl-comment"># 数值验证（中央差分）</span>
+<span class="hl-keyword">def</span> <span class="hl-func">num_grad</span>(f, x, eps=<span class="hl-number">1e-5</span>):
+<span class="hl-keyword">return</span> (f(x+eps) - f(x-eps)) / (<span class="hl-number">2</span>*eps)
+x = <span class="hl-number">1.5</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"h'(1.5) 数值={num_grad(h,x):.6f}  解析={h_grad(x):.6f}"</span>)
+<span class="hl-comment"># 两个值应该几乎相同</span>
+<span class="hl-comment"># ===== 线性回归：一步梯度下降 =====</span>
+w, x_val, y = <span class="hl-number">0.5</span>, <span class="hl-number">2.0</span>, <span class="hl-number">1.0</span>
+<span class="hl-comment"># 前向：输入 → 预测 → 差值</span>
+<span class="hl-comment"># 预测 = 0.5×2.0 = 1.0</span>
+pred = w * x_val
+<span class="hl-comment"># 差值的平方 = (1.0-1.0)² = 0.0</span>
+L = (pred - y) ** <span class="hl-number">2</span>
+<span class="hl-comment"># 从外层往内层，用链式法则求 ∂L/∂w</span>
+<span class="hl-comment"># 外层：∂L/∂pred</span>
+dloss_dpred = <span class="hl-number">2</span> * (pred - y)
+<span class="hl-comment"># 内层：∂pred/∂w = x</span>
+dpred_dw = x_val
+<span class="hl-comment"># 链式！∂L/∂w</span>
+dloss_dw = dloss_dpred * dpred_dw
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\nL={L:.3f}  ∂L/∂w={dloss_dw:.3f}"</span>)</code></pre>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
 <hr>
 <h2>💭 概念题</h2>
 <ol>
-<li>抛 10 次公平硬币。为什么 P(X=5) 最大，P(X=0) 最小？从组合数 C(10,k) 的形状解释——哪种 k 值对应的排列方式最多？——考察：二项分布中间鼓的本质</li>
-<li>PMF 要求所有概率之和 = 1。$[0.1, 0.1, 0.7, 0.1]$ 满足这个条件吗？它代表什么意思？——考察：PMF 定义验证</li>
-<li>抛一枚 p=0.9 的偏心硬币 10 次。P(X=9) 和 P(X=1) 哪个更大？不用算，用直觉判断。——考察：二项分布的偏斜（p 偏离 0.5 时钟形不对称）</li>
+<li>用齿轮比喻解释：如果每一级齿轮的传动比都是 0.25（减速），100 级串联后，拧第一个齿轮 10000 圈，最后一个转几圈？——考察：连乘的指数衰减效应</li>
+<li>为什么求 $h(x)=f(g(x))$ 的导数时必须先算出 $g(x)$ 的值？用齿轮比喻：你必须知道第二个齿轮现在卡在哪个齿上，才能算这一级的传动比。——考察：复合函数求导的计算顺序</li>
+<li>$h(x) = (2x+1)^3$，用链式法则手算 $h'(x)$。先分别写出外导和内导，再乘起来。——考察：链式法则的手算练习</li>
 </ol>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-13/">← 00-13</a><a href="../../">📖 目录</a><a href="../00-15/">00-15 →</a></nav>
+<a href="../00-13/">← 00-11</a><a href="../../">📖 目录</a><a href="../00-15/">00-13 →</a></nav>
 </div>
 <script>
 (function(){

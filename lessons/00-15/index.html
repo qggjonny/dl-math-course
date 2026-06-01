@@ -1,209 +1,233 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>00-15 连续分布 · 深度学习数学</title>
-<link rel="stylesheet" href="../../css/style.css?v=20260601">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
-</head><body>
-<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-12</span>
-<span><a href="../00-11/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-13/">下一课 →</a></span></nav>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>00-15 凸性与优化 · 深度学习数学</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../css/style.css?v=20260601">
+</head>
+<body>
+
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-15</span>
+<span><a href="../00-14/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-18/">下一课 →</a></span></nav>
+
 <div class="container">
-<h1>00-15 连续分布</h1>
-<p>上节课的 PMF 用柱子高度表示概率。但这招对「气温 25.317°C」完全没用——它有无限精度，你没法给每一个可能的气温画一根柱子。连续分布需要换一种思考方式。</p>
-<hr>
-<h2>一、单点概率 = 0：一根针尖戳不到一个点</h2>
-<blockquote><strong>连续随机变量取任意一个确定值的概率 = 0。</strong></blockquote>
-<p><strong>画面：</strong> 闭着眼睛往一张纸上扔一根针。针尖恰好戳中坐标 (3.1415926535..., 2.7182818284...) 的概率是多少？零。因为纸上无穷多个点，针尖恰好戳中<em>某特定一个点</em>在数学上是零概率事件。</p>
-<p>但针尖戳中一个<strong>区域</strong>——比如戳中左边三分之一——概率就是 1/3。因为区域有面积，而点没有面积。</p>
-<div class="callout callout-info">
-<strong>📐 推导：为什么单点概率严格为 0？</strong><br>
-积分就是求面积。对于任意单点 $x=a$：
-$$P(X=a) = \int_a^a f(x)\,dx = 0$$
-积分上下限相同 → 区间宽度为零 → 面积必为零。无论 $f(a)$ 有多高，乘上宽度 0，结果就是 0。<br><br>
-<strong>类比：</strong> 一根线段有长度，但线段上的一个「点」长度为零。连续分布的概率由<em>区间长度</em>承载，单点不贡献任何概率。
-</div>
-<p>所以连续分布的概率不看「柱子的高度」，而是看 <strong>PDF 曲线下方的面积</strong>：</p>
-<figure>
-<img src="assets/uniform_area.png" alt="概率 = 面积">
-<figcaption>均匀分布 U(1,4)：面积 = 宽 × 高 = 1。子区间 [c,d] 的概率 = (d−c)/(b−a)</figcaption>
-</figure>
-<p>$$P(a \le X \le b) = \int_a^b f(x)\,dx$$</p>
-<p>翻译：$X$ 落在 $[a,b]$ 的概率 = 曲线下方、$x=a$ 到 $x=b$ 夹出来的<strong>面积</strong>。</p>
-<div class="callout callout-info">
-<strong>PDF 两条铁律：</strong><br>
-① $f(x) \ge 0$ — 密度不能是负数<br>
-② $\int_{-\infty}^{\infty} f(x)\,dx = 1$ — 总面积恰好 = 1（所有情况概率之和）
-</div>
-<hr>
-<h2>二、均匀分布：诚实的「没有偏好」</h2>
-<p>$[a,b]$ 内每个点的密度一样。PDF 是一段水平线。没有任何偏好——如果你完全不知道气温可能是多少，均匀分布是最诚实的假设。</p>
-<div class="callout callout-info">
-<strong>📐 推导：PDF 的高度从哪来？</strong><br>
-设 PDF 在 $[a,b]$ 内为常数 $c$，区间外为 0。由总面积 = 1：
-$$\int_a^b c\,dx = c \cdot (b-a) = 1 \quad\Rightarrow\quad c = \frac{1}{b-a}$$
-直观：宽 $(b-a)$ 的矩形面积要等于 1，高度自然就是 $\frac{1}{b-a}$。区间越宽，密度越矮；区间越窄，密度越高。这就是「均匀」的数学含义——每个子区间的概率正比于它的长度，和位置无关。
-</div>
-<hr>
-<h2>三、正态分布：最常用的钟形曲线</h2>
-<p>两个数字决定一切：</p>
-<figure>
-<img src="assets/normal_mu.png" alt="μ 控制中心">
-<figcaption>μ 控制中心。σ 相同 → 形状不变，只是左右平移</figcaption>
-</figure>
-<figure>
-<img src="assets/normal_sigma.png" alt="σ 控制胖瘦">
-<figcaption>σ 控制胖瘦。σ 越大越矮越胖。总面积恒为 1，胖了就得矮</figcaption>
-</figure>
-<h3>公式拆零件：</h3>
-$$f(x) = \frac{1}{\sigma\sqrt{2\pi}} \exp\!\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)$$
+
+<p style="color:var(--text-light);font-size:0.9em">🌱 阶段 0 · 第 13 课</p>
+<h1>凸性与优化</h1>
+
+<h2>一、梯度下降的"体检报告"</h2>
+
+<p>00-10 学了梯度下降——小球沿坡度往下滚，每一步往梯度反方向走。但有一个问题没回答：</p>
+
+<blockquote>
+<strong>小球最后停在哪里？是全局最低点，还是某个坑里？</strong>
+</blockquote>
+
+<p>这完全取决于"地形"是不是<strong>凸的</strong>。</p>
+
+<h2>二、凸函数的几何画面</h2>
+
+<p><strong>画面：</strong> 拿一根橡皮筋，两端固定在曲线上。如果函数是凸的，<strong>橡皮筋永远在曲线的上方</strong>（或重合）。</p>
+
+<p>换成数学：对任意两点 $x_1, x_2$ 和任意比例 $t \in [0, 1]$：</p>
+
+$$f(tx_1 + (1-t)x_2) \le t f(x_1) + (1-t) f(x_2)$$
+
+<p>左边是<strong>曲线上</strong>的函数值，右边是<strong>弦上</strong>的值。凸函数就是「弦在曲线上方」。</p>
+
+<p><strong>一句话：</strong>凸函数的图像像一个碗，随便选两个点，连线的中点比两个端点的函数值平均值低。</p>
+
+<h2>三、正例和反例</h2>
+
 <table>
-<tr><th>零件</th><th>在干什么</th></tr>
-<tr><td>$(x-\mu)^2$</td><td>离中心多远。远处→平方很大→exp 里很负→密度≈0</td></tr>
-<tr><td>$2\sigma^2$（分母）</td><td>σ 越大，同样距离被大分母稀释→衰减变慢→钟变胖</td></tr>
-<tr><td>$\frac{1}{\sigma\sqrt{2\pi}}$</td><td>归一化。σ 翻倍→系数减半，把胖钟拉矮保持面积=1</td></tr>
+  <tr><th>函数</th><th>凸？</th><th>画面</th></tr>
+  <tr><td>$f(x) = x^2$</td><td>✅ 凸</td><td>U 形碗，只有一个底</td></tr>
+  <tr><td>$f(x) = e^x$</td><td>✅ 凸</td><td>指数增长，越来越陡</td></tr>
+  <tr><td>$f(x) = -\ln x$（$x > 0$）</td><td>✅ 凸</td><td>递减但向下弯，像滑雪坡</td></tr>
+  <tr><td>$f(x) = x^3$</td><td>❌ 非凸</td><td>S 形，左边凸右边凹</td></tr>
+  <tr><td>$f(x) = \sin x$</td><td>❌ 非凸</td><td>波浪形，有无穷多个坑</td></tr>
 </table>
-<p><strong>验证直觉：</strong> σ=1 → f(0)≈0.399。σ=2 → f(0)≈0.199。恰好减半！因为钟宽了一倍，高度必须减半来保持总面积。</p>
-<div class="callout callout-info">
-<strong>📐 推导：$\pi$ 从哪冒出来的？</strong><br>
-你可能好奇：明明是概率分布，为什么杀出来一个圆周率 $\pi$？它来自<strong>高斯积分</strong>的归一化：
-$$\int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}$$
-推导技巧：把平方积分转到极坐标——
-$$\left(\int_{-\infty}^{\infty} e^{-x^2}dx\right)^2 = \int_{-\infty}^{\infty}\int_{-\infty}^{\infty} e^{-(x^2+y^2)}dx\,dy = \int_0^{2\pi}\int_0^{\infty} e^{-r^2}r\,dr\,d\theta = \pi$$
-角度积分一圈 $\int_0^{2\pi}d\theta = 2\pi$，$r$ 的积分贡献 $\frac{1}{2}$，合起来就是 $\pi$。正态分布的系数 $\frac{1}{\sigma\sqrt{2\pi}}$ 就是把这个 $\sqrt{\pi}$ 摊平成总面积 = 1 的结果。
-</div>
-<hr>
-<h2>四、CDF：一把刷子从左扫到右</h2>
-<p><strong>画面：</strong> 一把刷子从最左边往右刷，每刷过一段曲线，就把下面的颜料扫进桶里。桶从空的（F(-∞)=0）慢慢涨，到最右边刚好满（F(+∞)=1）。</p>
-<div class="callout callout-info">
-<strong>📐 推导：PDF 与 CDF 的微积分关系</strong><br>
-CDF $F(x)$ 是 PDF $f(t)$ 从 $-\infty$ 到 $x$ 的累积：
-$$F(x) = \int_{-\infty}^x f(t)\,dt$$
-反过来，PDF 是 CDF 的导数——CDF 的瞬时变化率就是该点的密度：
-$$f(x) = F'(x)$$
-<strong>直觉：</strong> 刷子扫过某一点时桶里进颜料的「速度」就是那一点的密度值。密度高处进得快（CDF 陡），密度低处进得慢（CDF 平）。所以 CDF 永远单调不减——颜料只进不出。
-</div>
-<figure>
-<img src="assets/normal_cdf.png" alt="CDF">
-<figcaption>CDF 从 0 单调升到 1，永不下降。F(μ)=0.5</figcaption>
-</figure>
-<hr>
-<h2>五、68-95-99.7 法则</h2>
-<figure>
-<img src="assets/normal_68_95_99.png" alt="68-95-99.7">
-<figcaption>±1σ→68.3% &emsp; ±2σ→95.5% &emsp; ±3σ→99.7%</figcaption>
-</figure>
-<p>σ 是天然尺子。1σ=正常，2σ=少见，3σ=极端。<strong>不是线性增长</strong>——钟的尾巴指数衰减，3σ 之外概率微乎其微。</p>
-<div class="callout callout-info">
-<strong>📐 推导：为什么 68 → 95 → 99.7 不是线性？用密度值说话</strong><br>
-标准正态 $\mathcal{N}(0,1)$ 在各点的密度：
-<table>
-<tr><th>$x$（离中心几 σ）</th><th>$f(x)$（该点密度）</th><th>相对中心的比例</th></tr>
-<tr><td>0</td><td>0.3989</td><td>100% — 最高</td></tr>
-<tr><td>1</td><td>0.2420</td><td>60.7% — 降了近四成</td></tr>
-<tr><td>2</td><td>0.0540</td><td>13.5% — 只剩一成多</td></tr>
-<tr><td>3</td><td>0.0044</td><td>1.1% — 几乎没了</td></tr>
-</table>
-每往外走 1σ，密度以 $e^{-x^2/2}$ 的速度指数暴跌。±3σ 处的密度只有中心的约 1%，所以再往外面积几乎不增长。<br><br>
-<strong>结论：</strong> 从 ±1σ 到 ±2σ，概率增加了 27.2%（因为密度还不太低），但从 ±2σ 到 ±3σ 只增加了 4.2%（因为密度已经微乎其微）。不是线性比例——这是指数衰减的直接后果。
-</div>
-<hr>
-<h2>六、正态分布为什么无处不在：中心极限定理导引</h2>
-<p><strong>画面：米粒堆山丘。</strong> 往桌上倒一堆米，米粒会堆成一座山丘——中间高、四周低，轮廓像钟形曲线。为什么？</p>
-<p>每粒米落下时是随机的（可能偏左、可能偏右），但成千上万粒米叠加后，「偏左」和「偏右」互相抵消，最终大多数米稳定在中心附近。每次多倒一粒，山丘就更接近完美的钟形。</p>
-<div class="callout callout-info">
-<strong>中心极限定理（CLT）的直觉表述：</strong><br>
-大量<strong>独立</strong>随机变量的<strong>和</strong>，无论各自原本是什么分布（均匀、指数、甚至离散），加起来后的分布趋向于<strong>正态分布</strong>。<br><br>
-$$\frac{X_1 + X_2 + \cdots + X_n - n\mu}{\sigma\sqrt{n}} \;\xrightarrow{d}\; \mathcal{N}(0,1)$$
-<strong>关键条件：</strong> 每个变量方差有限、互相独立。现实中绝大多数「总量」型变量都满足——身高 = 基因 + 营养 + 环境 + 测量误差，每一项都是独立的小因素，叠加后就变成正态。
-</div>
-<p><strong>深度学习的应用：</strong></p>
-<ul>
-<li><strong>权重初始化：</strong> Xavier/He 初始化从正态分布采样，确保信号在前向传播中不爆炸不消失</li>
-<li><strong>Batch Normalization：</strong> 把每层输出强行拉回均值 0 方差 1，利用正态的稳定性质</li>
-<li><strong>VAE 潜在空间：</strong> 编码器输出 $\mu$ 和 $\sigma$，解码器从 $\mathcal{N}(\mu,\sigma^2)$ 采样——假设潜在变量天然服从正态</li>
-<li><strong>扩散模型：</strong> 每一步加高斯噪声、每一步去高斯噪声，整个生成过程围绕正态分布构建</li>
-</ul>
-<p>正态分布之所以是「默认分布」，不是因为数学家偏爱它——而是<strong>大量微小随机因素叠加后，数学上必然如此</strong>。米粒堆山丘，数据堆正态。</p>
-<hr>
-<h2>🖥️ 代码</h2>
-<pre><code><span class="hl-comment"># 00-15 连续分布：均匀分布 + 正态分布的 PDF/CDF/68-95-99.7 法则</span>
-<span class="hl-comment"># 导入numpy，别名np</span>
+
+<pre><code><span class="hl-comment"># 00-13 凸 vs 非凸 — 用二阶导数判断</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-<span class="hl-comment"># ===== 均匀分布 U(0,1) =====</span>
-<span class="hl-comment"># 区间[0,1]，浮点数类型</span>
-a, b = <span class="hl-number">0.0</span>, <span class="hl-number">1.0</span>
-<span class="hl-comment"># PDF高度 = 1/宽度，因为总面积必须=1</span>
-h = <span class="hl-number">1.0</span> / (b - a)
-<span class="hl-comment"># 子区间[0.2, 0.5]</span>
-c, d = <span class="hl-number">0.2</span>, <span class="hl-number">0.5</span>
-prob = (d-c) / (b-a)                    <span class="hl-comment"># 概率 = 子区间宽度/总宽度（矩形面积之比）</span>
-<span class="hl-comment"># 理论概率：0.3/1.0 = 0.3</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"P({c}≤X≤{d}) = {prob}"</span>)
-<span class="hl-comment"># 用蒙特卡洛模拟验证理论值</span>
-<span class="hl-comment"># seed()：固定随机种子，保证结果可复现</span>
-np.random.seed(<span class="hl-number">42</span>)
-<span class="hl-comment"># uniform(a,b,size)：生成10万个[0,1)均匀随机数</span>
-samples = np.random.uniform(a, b, <span class="hl-number">100000</span>)
-<span class="hl-comment"># 逻辑与(&)：统计落在子区间内的样本数</span>
-in_int = np.<span class="hl-builtin">sum</span>((samples>=c) & (samples<=d))
-<span class="hl-comment"># sum()对布尔数组：True=1，直接计数</span>
-<span class="hl-comment"># :.4f = 保留4位小数，应≈0.3000</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"模拟 P = {in_int/100000:.4f}"</span>)
-<span class="hl-comment"># ===== 正态 PDF（手工实现正态密度函数）=====</span>
-<span class="hl-comment"># x=输入值，mu=均值(中心)，sigma=标准差(胖瘦)</span>
-<span class="hl-keyword">def</span> <span class="hl-func">normal_pdf</span>(x, mu, sigma):
-    <span class="hl-comment"># 归一化系数：1/(σ√(2π))，保证总面积为1</span>
-    c = <span class="hl-number">1.0</span>/(sigma*np.sqrt(<span class="hl-number">2</span>*np.pi))
-<span class="hl-comment"># σ翻倍→系数减半，钟变胖变矮</span>
-    <span class="hl-comment"># 指数部分：-(x-μ)²/(2σ²)，决定离中心多远</span>
-    e = -<span class="hl-number">0.5</span>*((x-mu)/sigma)**<span class="hl-number">2</span>
-<span class="hl-comment"># x离μ越远→指数越负→exp趋近0→密度趋近0</span>
-    <span class="hl-comment"># np.exp()：e的幂，支持数组运算（自动广播）</span>
-    <span class="hl-keyword">return</span> c * np.exp(e)
-<span class="hl-comment"># 验证 σ 减半效应：σ翻倍 → 中心密度减半（总面积守恒）</span>
-<span class="hl-comment"># 遍历三个不同的σ值</span>
-<span class="hl-keyword">for</span> s <span class="hl-keyword">in</span> [<span class="hl-number">0.5</span>,<span class="hl-number">1.0</span>,<span class="hl-number">2.0</span>]:
-    <span class="hl-comment"># 在μ=0处密度：σ=0.5→高，σ=2→矮</span>
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"σ={s:.1f}: f(0)={normal_pdf(0,0,s):.4f}"</span>)
-<span class="hl-comment"># ===== 模拟验证 68-95-99.7 法则 =====</span>
-<span class="hl-comment"># normal(μ,σ,size)：生成10万个标准正态(均值0,标准差1)样本</span>
-sn = np.random.normal(<span class="hl-number">0</span>,<span class="hl-number">1</span>,<span class="hl-number">100000</span>)
-<span class="hl-comment"># k=1,2,3 → ±1σ, ±2σ, ±3σ</span>
-<span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>,<span class="hl-number">2</span>,<span class="hl-number">3</span>]:
-    r = np.mean((sn>=-k)&(sn<=k))         <span class="hl-comment"># mean()：落在[-k,k]内的样本比例（频率≈概率）</span>
-    <span class="hl-comment"># 字典取理论值：±1σ→68.27%, ±2σ→95.45%, ±3σ→99.73%</span>
-    t = {<span class="hl-number">1</span>:<span class="hl-number">0.6827</span>,<span class="hl-number">2</span>:<span class="hl-number">0.9545</span>,<span class="hl-number">3</span>:<span class="hl-number">0.9973</span>}[k]
-    <span class="hl-comment"># 模拟值 vs 理论值，高度吻合</span>
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"±{k}σ: sim={r:.4f} theory={t:.4f}"</span>)
-<span class="hl-comment"># ===== CDF 数值积分（用矩形法近似积分）=====</span>
-<span class="hl-comment"># linspace(-4,4,501)：[-4,4]等间距取501个点，步长=8/500=0.016</span>
-xg = np.linspace(-<span class="hl-number">4</span>,<span class="hl-number">4</span>,<span class="hl-number">501</span>)
-<span class="hl-comment"># np.cumsum()：累积求和 → 每个位置=之前所有PDF值的累积</span>
-<span class="hl-comment"># 乘以Δx(dx=步长) → 矩形面积累加 → CDF的近似</span>
-<span class="hl-comment"># cumsum(501个密度值)×步长 → 近似CDF</span>
-cdf = np.cumsum(normal_pdf(xg,<span class="hl-number">0</span>,<span class="hl-number">1</span>)) * (xg[<span class="hl-number">1</span>]-xg[<span class="hl-number">0</span>])
-<span class="hl-comment"># 取x≈-2, 0, 2处的CDF值</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"F(-2)≈{cdf[125]:.4f} F(0)≈{cdf[250]:.4f} F(2)≈{cdf[375]:.4f}"</span>)
-<span class="hl-comment"># CDF(-2)≈0.023, CDF(0)=0.5, CDF(2)≈0.977 → 和正态表一致</span>
+
+<span class="hl-keyword">def</span> <span class="hl-func">is_convex_1d</span>(f, xs):
+<span class="hl-comment">"""对一维函数采样，检查弦在曲线上方（数值验证凸性）</span>
+<span class="hl-comment">    f: 待检查的函数</span>
+<span class="hl-comment">    xs: 采样点数组</span>
+<span class="hl-comment">    返回: True 表示在这些采样点上看起来是凸的</span>
+<span class="hl-comment">    """</span>
+    n = <span class="hl-builtin">len</span>(xs)
+    <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(n):
+        <span class="hl-keyword">for</span> j <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(i+<span class="hl-number">1</span>, n):
+            <span class="hl-keyword">for</span> t <span class="hl-keyword">in</span> [<span class="hl-number">0.25</span>, <span class="hl-number">0.5</span>, <span class="hl-number">0.75</span>]:
+                xi, xj = xs[i], xs[j]        <span class="hl-comment"># 选两个端点</span>
+<span class="hl-comment"># 弦上的一点</span>
+                x_mid = t*xi + (<span class="hl-number">1</span>-t)*xj
+<span class="hl-comment"># 凸函数条件：f(中间点) ≤ t*f(xi) + (1-t)*f(xj)</span>
+                <span class="hl-keyword">if</span> f(x_mid) > t*f(xi) + (<span class="hl-number">1</span>-t)*f(xj) + <span class="hl-number">1e-10</span>:
+                    <span class="hl-keyword">return</span> <span class="hl-builtin">False</span>
+    <span class="hl-keyword">return</span> <span class="hl-builtin">True</span>
+
+xs = np.linspace(-<span class="hl-number">3</span>, <span class="hl-number">3</span>, <span class="hl-number">30</span>)
+
+<span class="hl-comment"># True</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"x² 凸?"</span>, is_convex_1d(<span class="hl-keyword">lambda</span> x: x**<span class="hl-number">2</span>, xs))
+<span class="hl-comment"># False</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"x³ 凸?"</span>, is_convex_1d(<span class="hl-keyword">lambda</span> x: x**<span class="hl-number">3</span>, xs))
+<span class="hl-comment"># False</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"sin(x) 凸?"</span>, is_convex_1d(np.sin, xs))
+<span class="hl-comment"># True</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"eˣ 凸?"</span>, is_convex_1d(np.exp, xs))
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
-<hr>
-<h2>💭 概念题</h2>
-<ol>
-<li>"取一个确定值的概率 = 0"但现实中气温 25°C 完全可以发生。用「针尖戳纸」的比喻解释为什么不矛盾。——考察：数学理想化 vs 测量精度</li>
-<li>从总面积 = 1 的硬约束出发：如果 σ 从 1 翻到 2，钟变胖了。峰值 f(0) 应该是原来的几分之几？——考察：归一化系数 1/(σ√2π) 的直觉</li>
-<li>为什么 68-95-99.7 不是线性？±3σ 为什么不等于 3×68.3%？用"钟的尾巴指数衰减"来解释。——考察：正态分布的尾部衰减速度</li>
-<li>均匀分布的 PDF 高度 c=1/(b-a) 是怎么推导出来的？——考察：总面积=1 的约束</li>
-<li>米粒堆山丘的比喻体现了哪个定理？列举两个深度学习中的实际应用。——考察：中心极限定理的理解与迁移</li>
-</ol>
-<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-14/">← 00-14</a><a href="../../">📖 目录</a><a href="../00-16/">00-16 →</a></nav>
+
+<h2>四、二阶导数判定法</h2>
+
+<p>一维函数判断凸性有个简单方法：看<strong>二阶导数</strong>。</p>
+
+$$f''(x) \ge 0 \text{ 对所有 } x \quad\Longleftrightarrow\quad f \text{ 是凸函数}$$
+
+<p><strong>直觉：</strong> $f''(x)$ 是<strong>坡度的变化率</strong>。$f'' \ge 0$ 意味着<strong>越往前走坡越陡</strong>——函数向上弯。就像碗的侧面：从碗边走到碗底，坡度从陡变缓再变陡，但没有"反向弯"。</p>
+
+$$f''(x) < 0 \quad\Longrightarrow\quad \text{上凸，凹的（像倒扣的碗）}$$
+
+<pre><code><span class="hl-comment"># 二阶导验证凸性</span>
+<span class="hl-keyword">def</span> <span class="hl-func">check_convexity_2nd</span>(f, f_dd, xs):
+<span class="hl-comment">"""给定函数的解析二阶导数，验证凸性</span>
+<span class="hl-comment">    f: 原函数</span>
+<span class="hl-comment">    f_dd: 二阶导函数</span>
+<span class="hl-comment">    xs: 检查点</span>
+<span class="hl-comment">    """</span>
+    <span class="hl-keyword">for</span> x <span class="hl-keyword">in</span> xs:
+        dd = f_dd(x)                     <span class="hl-comment"># 二阶导数值</span>
+<span class="hl-comment"># 如果有个点的二阶导 < 0</span>
+        <span class="hl-keyword">if</span> dd < -<span class="hl-number">1e-10</span>:
+            <span class="hl-builtin">print</span>(<span class="hl-string">f"  x={x:.1f}: f''={dd:.2f} < 0 → 非凸"</span>)
+            <span class="hl-keyword">return</span> <span class="hl-builtin">False</span>
+    <span class="hl-keyword">return</span> <span class="hl-builtin">True</span>
+
+xs = np.linspace(-<span class="hl-number">3</span>, <span class="hl-number">3</span>, <span class="hl-number">20</span>)
+
+<span class="hl-builtin">print</span>(<span class="hl-string">"x²: 二阶导 = 2 ≥ 0"</span>,
+      <span class="hl-string">"→ 凸"</span> <span class="hl-keyword">if</span> check_convexity_2nd(<span class="hl-keyword">lambda</span> x: x**<span class="hl-number">2</span>,
+                                            <span class="hl-keyword">lambda</span> x: <span class="hl-number">2</span>, xs)
+      <span class="hl-keyword">else</span> <span class="hl-string">"→ 非凸"</span>)
+<span class="hl-comment"># f(x)=x², f''(x)=2 恒≥0</span>
+
+<span class="hl-builtin">print</span>(<span class="hl-string">"\nx³: 二阶导 = 6x，可正可负"</span>,
+      <span class="hl-string">"→ 凸"</span> <span class="hl-keyword">if</span> check_convexity_2nd(<span class="hl-keyword">lambda</span> x: x**<span class="hl-number">3</span>,
+                                            <span class="hl-keyword">lambda</span> x: <span class="hl-number">6</span>*x, xs)
+      <span class="hl-keyword">else</span> <span class="hl-string">"→ 非凸"</span>)
+<span class="hl-comment"># f(x)=x³, f''(x)=6x: x<0时负,x>0时正</span>
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<h2>五、多元函数：Hessian 矩阵</h2>
+
+<p>对多元函数 $f(\mathbf{x})$，二阶导变成一个<strong>矩阵</strong>——Hessian：</p>
+
+$$H_{ij} = \frac{\partial^2 f}{\partial x_i \partial x_j}$$
+
+<p><strong>画面：</strong> 一维时 $f''(x) \ge 0$ 说明碗向上弯。多元时，所有方向都向上弯 = Hessian 是<strong>半正定矩阵</strong>。</p>
+
+<p>回到 00-05 特征值的直觉：半正定 = 所有特征值 ≥ 0。等价于沿任何方向 $\mathbf{v}$，都有 $\mathbf{v}^T H \mathbf{v} \ge 0$（二阶方向导数非负）。</p>
+
+<pre><code><span class="hl-comment"># 多元凸函数：f(x,y) = x² + y²（抛物面）</span>
+<span class="hl-keyword">def</span> <span class="hl-func">f</span>(X):
+<span class="hl-comment">"""f(x,y) = x² + y²，X 是 2 维向量 [x, y]</span>
+<span class="hl-comment">    二阶导矩阵（Hessian）= [[2, 0], [0, 2]]</span>
+<span class="hl-comment">    特征值 = 2, 2 → 都 ≥ 0 → 凸 ✅</span>
+<span class="hl-comment">    """</span>
+    <span class="hl-keyword">return</span> X[<span class="hl-number">0</span>]**<span class="hl-number">2</span> + X[<span class="hl-number">1</span>]**<span class="hl-number">2</span>
+
+<span class="hl-keyword">def</span> <span class="hl-func">f2</span>(X):
+<span class="hl-comment">"""f(x,y) = x² − y²（马鞍面）</span>
+<span class="hl-comment">    Hessian = [[2, 0], [0, -2]]</span>
+<span class="hl-comment">    特征值 = 2, −2 → 有负的 → 非凸 ❌</span>
+<span class="hl-comment">    """</span>
+    <span class="hl-keyword">return</span> X[<span class="hl-number">0</span>]**<span class="hl-number">2</span> - X[<span class="hl-number">1</span>]**<span class="hl-number">2</span>
+
+<span class="hl-comment"># 用有限差分近似 Hessian</span>
+eps = <span class="hl-number">1e-5</span>
+<span class="hl-keyword">for</span> name, func <span class="hl-keyword">in</span> [(<span class="hl-string">"x²+y²"</span>, f), (<span class="hl-string">"x²−y²"</span>, f2)]:
+<span class="hl-comment"># 在 (1, 1) 处算 Hessian</span>
+    x0 = np.array([<span class="hl-number">1.0</span>, <span class="hl-number">1.0</span>])
+<span class="hl-comment"># 手动计算 2×2 Hessian 矩阵的每个元素</span>
+<span class="hl-comment"># H[0,0] = ∂²f/∂x²: 对 x 做两次差分</span>
+    f0 = func(x0)
+<span class="hl-comment"># x+eps, y 不变</span>
+    x1 = x0 + np.array([eps, <span class="hl-number">0</span>])
+<span class="hl-comment"># x-eps, y 不变</span>
+    x2 = x0 - np.array([eps, <span class="hl-number">0</span>])
+    H00 = (func(x1) - <span class="hl-number">2</span>*f0 + func(x2)) / eps**<span class="hl-number">2</span>
+<span class="hl-comment"># 同理 H[1,1] = ∂²f/∂y²</span>
+    y1 = x0 + np.array([<span class="hl-number">0</span>, eps])
+    y2 = x0 - np.array([<span class="hl-number">0</span>, eps])
+    H11 = (func(y1) - <span class="hl-number">2</span>*f0 + func(y2)) / eps**<span class="hl-number">2</span>
+<span class="hl-comment"># 交叉项用中心差分近似</span>
+    H = np.array([[H00, <span class="hl-number">0</span>], [<span class="hl-number">0</span>, H11]])
+    eigs = np.linalg.eigvals(H)          <span class="hl-comment"># Hessian 特征值</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"{name}: Hessian 特征值 = {np.round(eigs,2)}, 凸? {np.all(eigs >= 0)}"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<h2>六、凸 = 梯度下降保证收敛到全局最优</h2>
+
+<p><strong>结论：</strong> 如果损失函数是凸的，梯度下降<strong>一定会</strong>走到全局最低点——不管从哪个起点出发。</p>
+
+<p><strong>如果不是凸的（神经网络就是这样）：</strong></p>
+<ul>
+  <li>可能卡在<strong>局部最优</strong>（local minimum）——附近最低但不是全局最低</li>
+  <li>可能卡在<strong>鞍点</strong>（saddle point）——某个方向是谷底、另一个方向是山脊</li>
+  <li>好在实践中，大网络的鞍点和局部最优往往没那么差——这是深度学习的"蜜汁好运"</li>
+</ul>
+
+<div class="callout callout-warn">
+<strong>为什么凸性重要：</strong> 线性回归的 MSE 是凸函数 → 一定有唯一解析解。逻辑回归的交叉熵是凸函数 → 梯度下降一定收敛。但神经网络没有这个保证——一切靠经验调参。
 </div>
+
+<h2>💭 概念题</h2>
+
+<div class="exercise">
+<h3>1. 凸函数的局部 vs 全局</h3>
+<p>凸函数如果有局部最小值，那一定是全局最小值。为什么？从"弦在曲线上方"这个定义出发解释。</p>
+<p>——考察：凸函数定义的推论</p>
+</div>
+
+<div class="exercise">
+<h3>2. 神经网络为什么非凸</h3>
+<p>一个最简单的两层神经网络 $f(x) = \sigma(w_2 \cdot \sigma(w_1 x))$，其中 $\sigma$ 是 ReLU。为什么它的损失函数几乎不可能是凸的？给出直觉。</p>
+<p>——考察：非线性激活函数破坏凸性</p>
+</div>
+
+<div class="exercise">
+<h3>3. 凸函数求和</h3>
+<p>$f(x)=x^2$ 是凸的，$g(x)=e^x$ 也是凸的。$h(x) = f(x) + g(x) = x^2 + e^x$ 是凸的吗？验证二阶导数。一般规律是什么？</p>
+<p>——考察：凸函数的加法性质</p>
+</div>
+
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-14/">← 00-12</a><a href="../../">📖 目录</a><a href="../00-18/">00-14 →</a></nav>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  });
+</script>
+
 <script>
 (function(){
   document.querySelectorAll('pre code').forEach(function(block){
@@ -230,4 +254,6 @@ cdf = np.cumsum(normal_pdf(xg,<span class="hl-number">0</span>,<span class="hl-n
 })();
 </script>
 
-</body></html>
+</body>
+</html>
+

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>00-21 条件概率与贝叶斯 · 深度学习数学</title>
+<link rel="stylesheet" href="../../css/style.css?v=20260601">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head><body>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-21</span>
+<span><a href="../00-15/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-19/">下一课 →</a></span></nav>
+<div class="container">
+<h1>00-21 条件概率与贝叶斯</h1>
+<hr>
+<h2>一、条件概率：知道了点什么，概率就变了</h2>
+<p><strong>画面：</strong> 你在街上随机抓一个人。他是左撇子的概率大约是 10%。但如果我告诉你<strong>「这个人在用左手写字」</strong>——那他是左撇子的概率瞬间变成接近 100%。</p>
+<p>「知道了新信息之后」的概率，就是<strong>条件概率</strong>。</p>
+$$P(A \mid B) = \frac{P(A \cap B)}{P(B)}$$
+<p><strong>逐符号拆开：</strong></p>
+<ul>
+<li>$P(A \mid B)$：读作「在 B 发生的条件下，A 发生的概率」</li>
+<li>$P(A \cap B)$：A 和 B <strong>同时</strong>发生的概率</li>
+<li>$P(B)$：B 发生的概率（不管 A 发不发生）</li>
+<li>整体含义：在所有 B 发生的情况里，A 也发生的比例。相当于把 B 当成<strong>新的全集</strong>，看 A 在里面占多少</li>
+</ul>
+<p><strong>直观理解：</strong> 原来是「全世界里 A 有多少」，条件概率是「<strong>只看 B 的世界里</strong> A 有多少」。分母 $P(B)$ 就是把这个新世界归一化到 1。</p>
+<h3>乘法公式：倒过来用</h3>
+<p>把条件概率公式两边乘 $P(B)$：</p>
+$$P(A \cap B) = P(A \mid B) \cdot P(B)$$
+<p>这看起来平凡，但非常有用——它把「同时发生」拆成两步：<strong>先发生 B，再在 B 发生的条件下发生 A</strong>。</p>
+<hr>
+<h2>二、全概率公式：拆开来看</h2>
+<p><strong>画面：</strong> 工厂有三台机器 A、B、C，分别生产 50%、30%、20% 的产品。A 的次品率 1%，B 的次品率 2%，C 的次品率 5%。随机抽一件，它是次品的概率是多少？</p>
+<p>直接想有点乱——但可以<strong>按机器拆开</strong>：次品可能来自 A、B、或 C。把每种情况加起来：</p>
+$$\begin{aligned}
+P(\text{次品}) &= P(\text{次品} \mid A) \cdot P(A) + P(\text{次品} \mid B) \cdot P(B) + P(\text{次品} \mid C) \cdot P(C) \\
+&= 0.01 \times 0.5 + 0.02 \times 0.3 + 0.05 \times 0.2 \\
+&= 0.005 + 0.006 + 0.01 = 0.021
+\end{aligned}$$
+<p>这就是<strong>全概率公式</strong>：把一个复杂事件拆成互斥的几种情况，分别算再加起来。</p>
+$$P(A) = \sum_i P(A \mid B_i) \cdot P(B_i)$$
+<p>前提：$B_1, B_2, \dots$ 是<strong>互斥且穷尽的</strong>——把所有可能的情况全覆盖，且彼此不重叠。三台机器恰好满足这点。</p>
+<hr>
+<h2>三、贝叶斯公式：把因果倒过来</h2>
+<p>刚才工厂问题是「知因求果」：知道是哪台机器 → 算次品率。</p>
+<p>贝叶斯公式是<strong>知果求因</strong>：拿到了一个次品 → 它最可能是哪台机器生产的？</p>
+<p>从条件概率定义出发：</p>
+$$P(B \mid A) = \frac{P(A \cap B)}{P(A)} = \frac{P(A \mid B) \cdot P(B)}{P(A)}$$
+<p>分子用了乘法公式 $P(A \cap B) = P(A \mid B) \cdot P(B)$。把分母用全概率展开：</p>
+$$\boxed{P(B_i \mid A) = \frac{P(A \mid B_i) \cdot P(B_i)}{\sum_j P(A \mid B_j) \cdot P(B_j)}}$$
+<p><strong>这个公式的灵魂：</strong> 把因果关系翻转了。$P(A \mid B_i)$ 是「B 导致 A 的概率」（因→果），而 $P(B_i \mid A)$ 是「看到 A 后反推 B 的概率」（果→因）。</p>
+<p><strong>逐零件命名：</strong></p>
+<ul>
+<li>$P(B_i)$：<strong>先验概率</strong>（prior）——看到证据之前，对 $B_i$ 的信念。机器 C 只产 20%，先天就不太可能是它</li>
+<li>$P(A \mid B_i)$：<strong>似然</strong>（likelihood）——如果 $B_i$ 是真的，看到证据 A 的可能性。C 的次品率 5%，比较高</li>
+<li>$P(B_i \mid A)$：<strong>后验概率</strong>（posterior）——看到证据之后，修正过的信念。尽管 C 先天概率低，但它的次品率高，后验概率可能反超</li>
+</ul>
+<h3>经典例子：体检阳性，我真的有病吗？</h3>
+<p>一种病发病率 1%。检测准确率 99%（有病的人 99% 测出阳性，没病的人 99% 测出阴性）。你测出阳性——你有病的概率是多少？</p>
+<p>直觉说 ~99%。<strong>错。答案是 ~50%。</strong> 来算：</p>
+<p><strong>已知条件：</strong></p>
+<ul>
+<li>$P(病) = 0.01$（先验——发病率）</li>
+<li>$P(阳性 \mid 病) = 0.99$（有病被检出的概率——灵敏度）</li>
+<li>$P(阴性 \mid 没病) = 0.99$，所以 $P(阳性 \mid 没病) = 0.01$（假阳性率）</li>
+</ul>
+<p><strong>算 $P(病 \mid 阳性)$：</strong> 贝叶斯公式：</p>
+$$\begin{aligned}
+P(病 \mid 阳性) &= \frac{P(阳性 \mid 病) \cdot P(病)}{P(阳性 \mid 病) \cdot P(病) + P(阳性 \mid 没病) \cdot P(没病)} \\[8pt]
+&= \frac{0.99 \times 0.01}{0.99 \times 0.01 + 0.01 \times 0.99} \\[8pt]
+&= \frac{0.0099}{0.0099 + 0.0099} = \frac{0.0099}{0.0198} = 0.5
+\end{aligned}$$
+<p><strong>为什么只有 50%？</strong> 因为发病率太低了（1%）。10000 个人里，有 100 个真病人（99 个测出阳性）和 9900 个好人（99 个假阳性）。阳性总共 99+99=198 人，其中只有 99 个真有病——恰好一半。</p>
+<figure><img src="assets/bayes_area.png" alt="贝叶斯体检阳性树状图"><figcaption>10000 人：有病 100 人（99 阳性），没病 9900 人（99 假阳性）。阳性共 198 人，真阳性只有一半。</figcaption></figure>
+<p>假阳性虽然比例低（1%），但<strong>没病的人基数太大</strong>（9900），假阳性的绝对人数（99）和真阳性（99）一样多。这就是<strong>基础率忽略</strong>——直觉只盯住了 99% 的准确率，忘了发病率 1% 这个先验。</p>
+<pre><code><span class="hl-comment"># 00-17 贝叶斯公式：模拟体检阳性问题（发病率1%，检测准确率99%）</span>
+<span class="hl-comment"># 导入numpy，别名np</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-comment"># 模拟 100000 人的体检数据</span>
+<span class="hl-comment"># 总模拟人数：10万</span>
+N = <span class="hl-number">100000</span>
+<span class="hl-comment"># default_rng(seed)：新版随机数生成器，seed保证可复现</span>
+rng = np.random.default_rng(<span class="hl-number">42</span>)
+<span class="hl-comment"># 1% 的人真有病 → 生成10万个布尔值，True概率=0.01</span>
+<span class="hl-comment"># random(N)：生成N个[0,1)均匀随机数，<0.01→True(有病)</span>
+has_disease = rng.random(N) &lt; <span class="hl-number">0.01</span>
+<span class="hl-comment"># np.where(条件, 真时取值, 假时取值)：按条件二选一</span>
+<span class="hl-comment"># 有病的人：99% 测出阳性（灵敏度）；没病的人：1% 假阳性</span>
+test_positive = np.where(
+    has_disease,                          <span class="hl-comment"># 条件：是否有病（布尔数组）</span>
+    <span class="hl-comment"># 真有病 → 99%概率测出阳性（灵敏度）</span>
+    rng.random(N) &lt; <span class="hl-number">0.99</span>,
+    <span class="hl-comment"># 没病的 → 1%概率假阳性</span>
+    rng.random(N) &lt; <span class="hl-number">0.01</span>
+)
+<span class="hl-comment"># 在测出阳性的人里，有多少真有病？→ P(病|阳性)</span>
+positives = test_positive.sum()           <span class="hl-comment"># .sum()对布尔数组：True=1 → 阳性总人数</span>
+true_positives = (test_positive & has_disease).sum()  <span class="hl-comment"># & 逻辑与：阳性且真有病 → 真阳性人数</span>
+<span class="hl-comment"># 阳性人数 ≈ 198人(99真阳性+99假阳性)</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"阳性总人数: {positives}"</span>)
+<span class="hl-comment"># 真有病且阳性 ≈ 99人</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"真阳性(真有病): {true_positives}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"P(病|阳性) = {true_positives}/{positives} = {true_positives/positives:.3f}"</span>)
+<span class="hl-comment"># :.3f = 保留3位小数，大约 0.500——和贝叶斯公式算的一样</span>
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<p>贝叶斯公式不是在玩符号——它纠正了一个真实的思维错误。</p>
+<hr>
+<h2>💭 概念题</h2>
+<ol>
+<li>为什么阳性率 99%、发病率 1% 的情况下，$P(病 \mid 阳性)$ 只有 ~50%？用「假阳性人数 vs 真阳性人数」解释。——考察：基础率忽略</li>
+<li>如果发病率从 1% 变成 10%，$P(病 \mid 阳性)$ 大约是多少？先估算再算。——考察：先验对后验的影响</li>
+<li>工厂例子：拿到一个次品，它来自机器 C 的概率是多少？——考察：贝叶斯公式完整计算</li>
+</ol>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-20/">← 00-16</a><a href="../../">📖 目录</a><a href="../00-22/">00-18 →</a></nav>
+</div>
+<script>
+(function(){
+  document.querySelectorAll('pre code').forEach(function(block){
+    var wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 复制';
+    btn.onclick = function(){
+      var text = block.innerText;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = '✅ 已复制';
+        btn.classList.add('copied');
+        setTimeout(function(){
+          btn.textContent = '📋 复制';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    };
+    block.parentNode.insertBefore(wrapper, block);
+    wrapper.appendChild(btn);
+    wrapper.appendChild(block);
+  });
+})();
+</script>
+
+</body></html>

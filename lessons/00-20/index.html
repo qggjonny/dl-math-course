@@ -1,171 +1,177 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>00-20 信息论：熵、交叉熵、KL 散度 · 深度学习数学</title>
+<title>00-20 期望与方差 · 深度学习数学</title>
 <link rel="stylesheet" href="../../css/style.css?v=20260601">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
 onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+<style>
+.derivation {
+background: #f8fafb;
+border-left: 4px solid #6c8ebf;
+margin: 1.2rem 0;
+padding: 0.8rem 1.2rem;
+border-radius: 0 6px 6px 0;
+}
+.derivation summary {
+font-weight: bold;
+color: #4a6d8c;
+cursor: pointer;
+font-size: 1.02em;
+}
+.derivation summary:hover { color: #2b4f6e; }
+.derivation .step { margin: 0.35rem 0 0.35rem 1.5rem; }
+.derivation .comment { color: #888; font-size: 0.9em; margin-left: 3rem; }
+</style>
 </head><body>
-<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-15</span>
-<span><a href="../00-14/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../01-01/">下一课 →</a></span></nav>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-20</span>
+<span><a href="../00-14/">← 上一课</a> &nbsp; <a href="../../">目录</a></span></nav>
 <div class="container">
-<h1>00-20 信息论：熵、交叉熵、KL 散度</h1>
+<h1>00-20 期望与方差</h1>
 <hr>
-<h2>一、信息量：越不可能的事，信息越大</h2>
-<p><strong>画面：</strong> 有人告诉你两件事——</p>
-<blockquote>
-「明天太阳会升起来。」→ 你心想：废话。<br>
-「明天会下雪。」（你在三亚）→ 你震惊：怎么可能！
-</blockquote>
-<p>第一条信息量几乎为零——你早就知道。第二条信息量巨大——概率极低的事件真的发生了。</p>
-<p><strong>信息量与概率成反比。</strong> 数学上定义为：</p>
-$$I(x) = -\log P(x)$$
-<p>概率越小 → $-\log P$ 越大 → 信息量越大。对数底取 2 时单位是<strong>比特</strong>（bit），取 $e$ 时单位是<strong>奈特</strong>（nat）。深度学习里通常用 $e$。</p>
-<p>例子：公平硬币正面概率 $P=0.5$，信息量 $-\ln(0.5) = 0.693$ nat。如果 $P=0.99$（几乎确定），信息量 $-\ln(0.99) \approx 0.01$ nat——几乎没信息。</p>
+<h2>一、期望：平衡木的支点</h2>
+<p><strong>画面：</strong> 一根长木条，上面站着六个小人，分别站在位置 1, 2, 3, 4, 5, 6（骰子的六个面）。你在这根木条下面放一个支点，放在哪个位置木条刚好平衡不倾斜？</p>
+<p>当所有人都一样重时（公平骰子），支点放在正中间 3.5 的位置。这就是期望——<strong>概率加权的平衡支点</strong>。</p>
+$$\mathbb{E}[X] = 1\times\frac{1}{6} + 2\times\frac{1}{6} + \cdots + 6\times\frac{1}{6} = 3.5$$
+<p><strong>期望 ≠ 最可能的值。</strong> 骰子没有"最可能的面"（均匀分布）。期望 3.5 是对长期平均的预测——掷一万次取平均，结果趋向 3.5。不是对下一次掷几点的预测。</p>
+<figure><img src="assets/balance_beam.png" alt="平衡木期望"><figcaption>六个等重小人站在 1~6 的位置。支点在 3.5 处刚好平衡——这就是期望</figcaption></figure>
+<p><strong>连续版：</strong> 把求和换成积分：$\mathbb{E}[X] = \int_{-\infty}^{\infty} x \cdot f(x)\,dx$。每个 $x$ 用它的概率密度加权。</p>
+<!-- ====== 推导 5：离散→连续的黎曼和桥接 ====== -->
+<details class="derivation">
+<summary>📐 推导：从离散期望到连续期望（黎曼和桥接）</summary>
+<p>离散期望的定义是对所有可能取值概率加权求和：</p>
+$$\mathbb{E}[X] = \sum_i x_i \cdot P(X = x_i) = \sum_i x_i \cdot p_i$$
+<p>过渡到连续情形时，把实数轴切成宽度为 $\Delta x$ 的小段。$X$ 落在 $[x, x+\Delta x]$ 内的概率近似为 $f(x) \cdot \Delta x$（密度 × 宽度）：</p>
+$$\mathbb{E}[X] \approx \sum_k x_k \cdot f(x_k) \cdot \Delta x$$
+<p class="step">这就是<strong>黎曼和</strong>的形式：每个小区间里的 $x$ 值，用该点的概率密度 × 区间宽度来加权。</p>
+<p>令 $\Delta x \to 0$，黎曼和的极限就是定积分：</p>
+$$\mathbb{E}[X] = \lim_{\Delta x \to 0} \sum_k x_k \cdot f(x_k) \cdot \Delta x = \int_{-\infty}^{\infty} x \cdot f(x)\,dx$$
+<p class="comment">核心直觉：$p_i$（概率质量）→ $f(x)\,dx$（概率密度 × 无穷小宽度）。$\sum$ 变成 $\int$，一切照旧。</p>
+</details>
 <hr>
-<h2>二、熵：平均来看，有多不确定？</h2>
-<p>信息量是一件事的。如果你想描述<strong>整个概率分布</strong>的不确定性——把所有可能结果的信息量按概率加权平均：</p>
-$$\boxed{H(P) = -\sum_x P(x) \ln P(x)}$$
-<p>这就是<strong>熵</strong>。它衡量的是：从这个分布里随机抽一个结果，<strong>平均会得到多少 surprise</strong>。</p>
-<p><strong>极值情况：</strong></p>
+<h2>二、方差：射飞镖的散布程度</h2>
+<p><strong>画面：</strong> 你和朋友比赛扔飞镖。你们俩的平均命中点都在靶心（期望都是 0），但你的飞镖散布得很开——满靶子都是孔——而朋友的飞镖全挤在靶心周围。谁的方差大？你的大。差多少？方差给出精确的数字。</p>
+$$\text{Var}(X) = \mathbb{E}[(X - \mu)^2]$$
+<p><strong>逐符号拆开：</strong></p>
 <ul>
-<li>确定性分布 $P=[1, 0, 0]$（只有一个选项，概率 100%）：$H = -1\ln1 - 0 - 0 = 0$。零不确定性。</li>
-<li>均匀分布 $P=[\frac13, \frac13, \frac13]$：$H = -3 \times \frac13 \ln\frac13 = \ln 3 \approx 1.099$。最大化——你完全不知道会抽到哪个。</li>
+<li>$X - \mu$：每个数据点偏离均值多少（可正可负）</li>
+<li>平方 $(X-\mu)^2$：消除正负抵消（偏左和偏右不能互相抵消——都是"偏离"）</li>
+<li>$\mathbb{E}[\cdot]$：取所有偏离平方的加权平均</li>
 </ul>
-<p>在分类问题里：如果模型的预测分布熵很高（接近均匀）→ 模型很不确定。熵很低（接近 one-hot）→ 模型很自信。</p>
-<pre><code><span class="hl-comment"># 00-20 熵：衡量一个概率分布的不确定性</span>
-<span class="hl-comment"># 导入numpy，别名np</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-<span class="hl-comment"># probs：概率数组，如 [0.95, 0.03, 0.02]</span>
-<span class="hl-keyword">def</span> <span class="hl-func">entropy</span>(probs):
-    <span class="hl-string">"""H(P) = -Σ p_i ln(p_i)"""</span>
-<span class="hl-comment"># 只算 p > 0 的项（ln(0) 数学上无定义，也会产生-inf）</span>
-    <span class="hl-comment"># H = -Σ pᵢ log(pᵢ)，只对 pᵢ>0 的项求和（log0无定义）</span>
-    <span class="hl-keyword">return</span> -np.sum(probs[probs > <span class="hl-number">0</span>] * np.log(probs[probs > <span class="hl-number">0</span>]))
-<span class="hl-comment">#        np.log()：自然对数ln（底e→单位nat）</span>
-<span class="hl-comment">#        probs[probs>0]：布尔索引，只取概率>0的元素</span>
-<span class="hl-comment">#        -sum(p_i * ln(p_i)) → 非负值，熵越小越确定</span>
-<span class="hl-comment"># 三个猫狗鸟分类——展示不同确定程度对应的熵值</span>
-<span class="hl-comment"># 模型：95%确定是猫，熵应≈0.2（很确定）</span>
-confident = np.array([<span class="hl-number">0.95</span>, <span class="hl-number">0.03</span>, <span class="hl-number">0.02</span>])
-<span class="hl-comment"># 模型：不太确定，熵应≈1.1（中等）</span>
-uncertain = np.array([<span class="hl-number">0.40</span>, <span class="hl-number">0.35</span>, <span class="hl-number">0.25</span>])
-<span class="hl-comment"># 完全均匀分布，熵应=ln(3)≈1.099（最大）</span>
-uniform   = np.array([<span class="hl-number">1</span>/<span class="hl-number">3</span>, <span class="hl-number">1</span>/<span class="hl-number">3</span>, <span class="hl-number">1</span>/<span class="hl-number">3</span>])
-<span class="hl-comment"># ~0.2 —— 几乎确定</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"熵(确定)  = {entropy(confident):.4f}"</span>)
-<span class="hl-comment"># ~1.1 —— 比较混乱</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"熵(不确定)= {entropy(uncertain):.4f}"</span>)
-<span class="hl-comment"># ~1.099 = ln(3) —— 完全不确定的最大熵</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"熵(均匀)  = {entropy(uniform):.4f}"</span>)
-</code></pre>
-
-<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-<hr>
-<h2>三、交叉熵：我的模型和真相差多远？</h2>
-<p>真实分布是 $P$（比如图片的真标签：100% 是猫）。模型的预测是 $Q$（输出 [0.7, 0.2, 0.1]）。怎么量化模型错得有多离谱？</p>
-<p>用<strong>交叉熵</strong>：</p>
-$$\boxed{H(P, Q) = -\sum_x P(x) \ln Q(x)}$$
-<p>和熵公式对比——唯一的区别：<strong>对数里是 $Q$ 而不是 $P$</strong>。也就是：真实的分布 $P$ 来决定「哪个结果重要」，但用模型预测的概率 $Q$ 来算信息量。</p>
-<p><strong>画面：</strong> 真实标签说「这就是猫」（$P = [1, 0, 0]$）。如果模型也输出 $Q = [0.99, 0.01, 0]$，交叉熵 = $-\ln(0.99) \approx 0.01$——很小，模型几乎没错。如果模型瞎猜 $Q = [0.01, 0.5, 0.49]$，交叉熵 = $-\ln(0.01) \approx 4.6$——巨大，模型被狠狠打脸。</p>
-<p><strong>分类任务里交叉熵为什么当损失函数？</strong> 交叉熵最小 = 模型的预测分布 $Q$ 最接近真实分布 $P$。梯度下降让交叉熵越来越小 → 模型的预测越来越准。</p>
-<pre><code><span class="hl-comment"># 00-20 交叉熵：衡量模型预测与真实标签的差距</span>
-<span class="hl-comment"># p_true=真实分布(one-hot)，q_pred=模型预测</span>
-<span class="hl-keyword">def</span> <span class="hl-func">cross_entropy</span>(p_true, q_pred):
-    <span class="hl-string">"""H(P,Q) = -Σ p_i ln(q_i)"""</span>
-<span class="hl-comment"># 只算 p > 0 的项（真实概率为0的类别不参与损失计算）</span>
-    <span class="hl-comment"># mask：布尔数组，标记哪些位置p_i>0</span>
-    mask = p_true > <span class="hl-number">0</span>
-    <span class="hl-comment"># H(P,Q) = -Σ pᵢ log(qᵢ)，用真实分布p算、模型预测q做log</span>
-    <span class="hl-keyword">return</span> -np.sum(p_true[mask] * np.log(q_pred[mask]))
-<span class="hl-comment">#        p_true[mask]：真实概率>0的项（one-hot时只有一个1.0）</span>
-<span class="hl-comment">#        np.log(q_pred[mask])：模型对"真类别"预测概率的ln</span>
-<span class="hl-comment">#        叉熵越小 → 模型预测越接近真实分布</span>
-<span class="hl-comment"># 真标签：猫（one-hot编码：[猫=1, 狗=0, 鸟=0]）</span>
-<span class="hl-comment"># 真实标签：100%是猫</span>
-y_true = np.array([<span class="hl-number">1.0</span>, <span class="hl-number">0.0</span>, <span class="hl-number">0.0</span>])
-<span class="hl-comment"># 三个模型的预测——展示不同程度的偏差</span>
-<span class="hl-comment"># 好：90%确定是猫 → 交叉熵 =-ln(0.90)≈0.105</span>
-good  = np.array([<span class="hl-number">0.90</span>, <span class="hl-number">0.05</span>, <span class="hl-number">0.05</span>])
-<span class="hl-comment"># 一般：一半确定是猫 → 交叉熵 =-ln(0.50)≈0.693</span>
-ok    = np.array([<span class="hl-number">0.50</span>, <span class="hl-number">0.30</span>, <span class="hl-number">0.20</span>])
-<span class="hl-comment"># 差：认为很可能是狗 → 交叉熵 =-ln(0.10)≈2.303</span>
-bad   = np.array([<span class="hl-number">0.10</span>, <span class="hl-number">0.60</span>, <span class="hl-number">0.30</span>])
-<span class="hl-comment"># ~0.105 — 模型几乎没错</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"交叉熵(好) = {cross_entropy(y_true, good):.4f}"</span>)
-<span class="hl-comment"># ~0.693 — 有偏差</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"交叉熵(一般)= {cross_entropy(y_true, ok):.4f}"</span>)
-<span class="hl-comment"># ~2.303 — 错得离谱</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"交叉熵(差) = {cross_entropy(y_true, bad):.4f}"</span>)
-</code></pre>
-
-<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-<p>模型越好 → 交叉熵越小。这就是训练分类模型时最小化的那个数。</p>
-<hr>
-<h2>四、KL 散度：两个分布"形状"差多少？</h2>
-<p>交叉熵 = 熵 + <strong>KL 散度</strong>。推导只差一行——把 $D_{KL}$ 的定义展开再拆分：</p>
-
+<p><strong>计算捷径：</strong> $\text{Var}(X) = \mathbb{E}[X^2] - \mu^2$——用"平方的平均"减去"平均的平方"。手算时方便很多，不用先减均值再平方。</p>
+<!-- ====== 推导 3：Var(X) = E[X²] - μ² ====== -->
+<details class="derivation">
+<summary>📐 推导：$\text{Var}(X) = \mathbb{E}[X^2] - \mu^2$</summary>
+<p>从定义出发，展开平方：</p>
 $$\begin{aligned}
-D_{\mathrm{KL}}(P \parallel Q) &= \sum_x P(x) \ln\frac{P(x)}{Q(x)} \\
-&= \sum_x P(x) \big[\ln P(x) - \ln Q(x)\big] \\
-&= \underbrace{\sum_x P(x) \ln P(x)}_{-H(P)} \;-\; \underbrace{\sum_x P(x) \ln Q(x)}_{-H(P,Q)} \\
-&= -H(P) + H(P, Q)
+\text{Var}(X) &= \mathbb{E}\big[(X - \mu)^2\big] \\[4pt]
+&= \mathbb{E}\big[X^2 - 2\mu X + \mu^2\big] \quad \text{(展开平方)} \\[4pt]
+&= \mathbb{E}[X^2] - 2\mu\,\mathbb{E}[X] + \mu^2 \quad \text{(期望的线性性质)} \\[4pt]
+&= \mathbb{E}[X^2] - 2\mu \cdot \mu + \mu^2 \quad (\mathbb{E}[X] = \mu) \\[4pt]
+&= \mathbb{E}[X^2] - 2\mu^2 + \mu^2 \\[4pt]
+&= \mathbb{E}[X^2] - \mu^2
 \end{aligned}$$
-
-<p>移项即得：$H(P,Q) = H(P) + D_{\mathrm{KL}}(P \parallel Q)$。</p>
-
-<p><strong>KL 散度的定义公式：</strong></p>
-$$\boxed{D_{\mathrm{KL}}(P \parallel Q) = \sum_x P(x) \ln\frac{P(x)}{Q(x)}}$$
-<p><strong>KL 散度衡量的是：</strong> 用 $Q$ 来近似 $P$，比直接用 $P$ 多浪费了多少信息。熵 $H(P)$ 是「最低消费」——数据本身的不确定性。KL 散度是「超额消费」——模型不好带来的额外成本。</p>
-<p><strong>关键性质：</strong></p>
+<p class="comment">关键两步都在用<strong>期望的线性</strong>：$\mathbb{E}[X^2 - 2\mu X + \mu^2] = \mathbb{E}[X^2] - 2\mu\mathbb{E}[X] + \mu^2$。常数 $\mu^2$ 的期望就是它自己（$\mathbb{E}[c] = c$）。</p>
+</details>
+<div class="callout callout-info">
+<h3>为什么用平方不用绝对值？</h3>
+<p>方差还有另一种写法：$\mathbb{E}[|X-\mu|]$——用绝对值度量偏离。为什么不用这种？</p>
+<p><strong>关键原因：光滑性。</strong></p>
+<p>画一下 $|x|$ 和 $x^2$ 的图像你就懂了：</p>
 <ul>
-<li>$D_{\mathrm{KL}}(P \parallel Q) \ge 0$，当且仅当 $P=Q$ 时等于 0（两个分布完全一样）</li>
-<li>不对称：$D_{\mathrm{KL}}(P \parallel Q) \neq D_{\mathrm{KL}}(Q \parallel P)$。不是真正的「距离」</li>
+<li><strong>绝对值曲线</strong>在 $x=0$ 处有个<strong>尖角</strong>（V 字形）。尖角处<strong>不可导</strong>——要优化它，站在尖角上不知道该往左还是往右</li>
+<li><strong>平方曲线</strong>在 $x=0$ 处是<strong>光滑的碗底</strong>（U 字形）。处处可导——要优化它，碗底的坡一步步把你引向最小值</li>
 </ul>
-<p><strong>为什么训练时用交叉熵而不是 KL 散度？</strong> 因为 $H(P)$（真实标签的熵）是常数——训练数据固定了就不变。最小化交叉熵 = 最小化 KL 散度，所以交叉熵就够了。</p>
-<pre><code><span class="hl-comment"># 00-20 KL 散度：验证 H(P,Q) = H(P) + D_KL(P||Q)</span>
-<span class="hl-comment"># p=真实分布，q=模型预测分布</span>
-<span class="hl-keyword">def</span> <span class="hl-func">kl_divergence</span>(p, q):
-    <span class="hl-string">"""D_KL(P||Q) = Σ p_i ln(p_i/q_i)"""</span>
-    <span class="hl-comment"># 只算真实概率>0的项（避免ln(0)）</span>
-    mask = p > <span class="hl-number">0</span>
-    <span class="hl-comment"># D_KL = Σ pᵢ log(pᵢ/qᵢ)，衡量q偏离p的程度</span>
-    <span class="hl-keyword">return</span> np.sum(p[mask] * np.log(p[mask] / q[mask]))
-<span class="hl-comment">#        ln(p_i/q_i)：比值越大 → 模型预测偏离越大 → KL散度越大</span>
-<span class="hl-comment">#        D_KL≥0恒成立（吉布斯不等式），P=Q时D_KL=0</span>
-<span class="hl-comment"># 真实标签：one-hot（猫）</span>
-y_true = np.array([<span class="hl-number">1.0</span>, <span class="hl-number">0.0</span>, <span class="hl-number">0.0</span>])
-<span class="hl-comment"># 模型预测：90%猫，5%狗，5%鸟</span>
-pred   = np.array([<span class="hl-number">0.90</span>, <span class="hl-number">0.05</span>, <span class="hl-number">0.05</span>])
-H_P = entropy(y_true)                     <span class="hl-comment"># 真实标签的熵：one-hot的熵恒为0</span>
-H_PQ = cross_entropy(y_true, pred)        <span class="hl-comment"># 交叉熵：-ln(0.90) ≈ 0.105</span>
-D_KL = kl_divergence(y_true, pred)        <span class="hl-comment"># KL散度：计算"额外成本"</span>
-<span class="hl-comment"># 0.0000 —— one-hot没有不确定性</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"H(P)    = {H_P:.4f}"</span>)
-<span class="hl-comment"># 0.1054 —— 交叉熵≈KL散度（因为H(P)=0）</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"H(P,Q)  = {H_PQ:.4f}"</span>)
-<span class="hl-comment"># 0.1054 —— 模型不好带来的额外成本</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"D_KL    = {D_KL:.4f}"</span>)
-<span class="hl-comment"># 验证恒等式：H(P,Q) = H(P) + D_KL(P||Q)</span>
-<span class="hl-comment"># 验证恒等式：交叉熵 = 熵 + KL散度</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"H(P,Q) = H(P) + D_KL? {abs(H_PQ - (H_P + D_KL)) &lt; 1e-10}"</span>)
-<span class="hl-comment"># abs(差值) < 1e-10 → True，浮点误差范围内相等 ✓</span>
-<span class="hl-comment"># 结论：训练时最小化交叉熵 = 最小化KL散度（H(P)是常数无影响）</span>
-</code></pre>
-
-<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<p>想象你在一个尖角上站着（绝对值），一脚踩下去不知道该往哪边滑。光滑的碗底（平方）就不会有这个问题——每一步都明确知道要往哪个方向走。</p>
+<p>这个性质在优化里至关重要。所有用梯度的方法（梯度下降）都要求函数是可导的。平方让方差变得「可优化」，绝对值不行。这就是方差不用绝对值的深层原因——不仅是为了消除正负抵消，还是为了让优化器能在光滑的坡上安心走路。</p>
+</div>
+<p><strong>标准差 $\sigma = \sqrt{\text{Var}(X)}$：</strong> 方差单位是原单位平方（比如「平方厘米」），开根号后单位和原数据一致（「厘米」）。σ 就是天然的距离尺子。</p>
+<hr>
+<h2>三、两条硬核性质</h2>
+<h3>期望是线性的——不管独不独立</h3>
+<p>$$\mathbb{E}[aX + b] = a\cdot\mathbb{E}[X] + b$$</p>
+<!-- ====== 推导 1：E[aX+b] = aE[X] + b ====== -->
+<details class="derivation">
+<summary>📐 推导：$\mathbb{E}[aX + b] = a\,\mathbb{E}[X] + b$</summary>
+<p>从离散期望的 $\Sigma$ 定义展开：</p>
+$$\begin{aligned}
+\mathbb{E}[aX + b] &= \sum_i (a x_i + b) \cdot P(X = x_i) \\[4pt]
+&= \sum_i \big(a x_i \cdot p_i + b \cdot p_i\big) \\[4pt]
+&= a \sum_i x_i \cdot p_i \;+\; b \sum_i p_i \\[4pt]
+&= a \cdot \mathbb{E}[X] \;+\; b \cdot 1 \\[4pt]
+&= a\,\mathbb{E}[X] + b
+\end{aligned}$$
+<p class="comment">第二行拆括号：$(ax_i + b)p_i = a x_i p_i + b p_i$。第三行把 $a$ 和 $b$ 分别提到求和外面。第四行用 $\sum p_i = 1$（概率归一化）。</p>
+</details>
+<p>$$\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]$$</p>
+<!-- ====== 推导 2：E[X+Y] = E[X] + E[Y]（联合分布展开） ====== -->
+<details class="derivation">
+<summary>📐 推导：$\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]$（从联合分布展开，不要求独立）</summary>
+<p>从联合概率质量函数 $P(X=x, Y=y)$ 出发：</p>
+$$\begin{aligned}
+\mathbb{E}[X + Y] &= \sum_x \sum_y (x + y) \cdot P(X = x,\; Y = y) \\[4pt]
+&= \sum_x \sum_y x \cdot P(X = x, Y = y) \;+\; \sum_x \sum_y y \cdot P(X = x, Y = y) \\[4pt]
+&= \sum_x x \underbrace{\sum_y P(X = x, Y = y)}_{=\,P(X = x)} \;+\; \sum_y y \underbrace{\sum_x P(X = x, Y = y)}_{=\,P(Y = y)} \\[4pt]
+&= \sum_x x \cdot P(X = x) \;+\; \sum_y y \cdot P(Y = y) \\[4pt]
+&= \mathbb{E}[X] + \mathbb{E}[Y]
+\end{aligned}$$
+<p class="comment"><strong>关键：</strong>第三步对 $y$ 求和（边缘化）得到 $X$ 的边缘分布 $P(X=x)$。这一步<strong>不依赖 $X$ 和 $Y$ 是否独立</strong>——边缘化总是成立的。这就是为什么期望的加法不需要独立性假设。</p>
+</details>
+<p><strong>不管 $X$ 和 $Y$ 是否独立，期望的加法都成立。</strong>这是期望最强大的性质。</p>
+<h3>方差不是线性的——平移被吃掉</h3>
+<p>$$\text{Var}(aX + b) = a^2\cdot\text{Var}(X)$$</p>
+<p><strong>常数 $b$ 消失了！</strong> 全班所有人同时长高 10cm——每个人离均值的距离完全不变，方差当然不变。<strong>平移不改变分散程度。</strong></p>
+<p>$a$ 被平方了：如果全班身高翻倍（a=2），方差变成原来的 4 倍。不仅散得更开，而且<strong>平方放大</strong>了差异。</p>
+<!-- ====== 推导 4：Var(aX+b) = a²Var(X) ====== -->
+<details class="derivation">
+<summary>📐 推导：$\text{Var}(aX + b) = a^2\,\text{Var}(X)$（注意 $b$ 如何抵消）</summary>
+<p>令 $\mu = \mathbb{E}[X]$。首先算变换后的期望（用推导 1 的结果）：</p>
+$$\mathbb{E}[aX + b] = a\mu + b$$
+<p>代入方差的定义：</p>
+$$\begin{aligned}
+\text{Var}(aX + b) &= \mathbb{E}\Big[\big(aX + b - \mathbb{E}[aX + b]\big)^2\Big] \\[4pt]
+&= \mathbb{E}\Big[\big(aX + b - (a\mu + b)\big)^2\Big] \\[4pt]
+&= \mathbb{E}\Big[\big(aX - a\mu\big)^2\Big] \quad \text{（$b$ 和 $b$ 相消！）} \\[4pt]
+&= \mathbb{E}\big[a^2 (X - \mu)^2\big] \\[4pt]
+&= a^2 \cdot \mathbb{E}\big[(X - \mu)^2\big] \\[4pt]
+&= a^2 \cdot \text{Var}(X)
+\end{aligned}$$
+<p class="comment">第三步是核心：$+b$ 在 $aX+b$ 里和 $-b$ 在 $-(a\mu+b)$ 里正好抵消。<strong>平移量 $b$ 完全不进入方差</strong>——因为它同时作用于每个点和均值，差值不变。第五步 $a^2$ 被提到期望外面（$a^2$ 是常数）。</p>
+</details>
+<hr>
+<h2>🖥️ 代码</h2>
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+np.random.seed(<span class="hl-number">42</span>)
+<span class="hl-comment"># 从 N(μ=5, σ=2) 抽 100000 个样本</span>
+<span class="hl-comment"># loc=μ(均值), scale=σ(标准差), size=样本数</span>
+samples = np.random.normal(loc=<span class="hl-number">5</span>, scale=<span class="hl-number">2</span>, size=<span class="hl-number">100000</span>)
+<span class="hl-comment"># 样本均值 ≈ 期望</span>
+mu = np.mean(samples)
+<span class="hl-comment"># ddof=0: 除以 n（总体方差）</span>
+var = np.var(samples, ddof=<span class="hl-number">0</span>)
+<span class="hl-comment"># ddof=1: 除以 n-1（样本无偏估计）</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"μ≈{mu:.3f} σ²≈{var:.3f} σ≈{np.std(samples,ddof=0):.3f}"</span>)
+<span class="hl-comment"># 验证 E[aX+b] = aE[X]+b</span>
+a, b = <span class="hl-number">3</span>, <span class="hl-number">10</span>
+trans = a * samples + b
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\nE[aX+b]={np.mean(trans):.1f} = aE[X]+b={a*mu+b:.1f} ✓"</span>)
+<span class="hl-comment"># 验证 Var(aX+b) = a²Var(X)，b 消失</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"Var(aX+b)={np.var(trans,ddof=0):.1f} = a²Var(X)={a**2*var:.1f} ✓"</span>)
+<span class="hl-comment"># 掷骰子：理论 E=3.5, Var≈2.917</span>
+dice = np.random.randint(<span class="hl-number">1</span>,<span class="hl-number">7</span>,size=<span class="hl-number">100000</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n骰子: E[X]≈{np.mean(dice):.3f} Var≈{np.var(dice,ddof=0):.3f}"</span>)</code></pre>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
 <hr>
 <h2>💭 概念题</h2>
 <ol>
-<li>抛一枚公平硬币，熵是多少？抛一枚永远出正面的硬币，熵是多少？哪个更大，为什么？——考察：熵与确定性的关系</li>
-<li>真标签是 $P=[1,0,0]$，模型预测 $Q=[0.3,0.4,0.3]$。交叉熵是多少？如果 $Q$ 变成 $[0.6,0.2,0.2]$，交叉熵变大还是变小？——考察：交叉熵反映预测准确度</li>
-<li>$H(P,Q) \ge H(P)$ 这个不等式为什么恒成立？从 KL 散度的非负性解释。——考察：交叉熵、熵、KL 散度三者的关系</li>
+<li>方差用平方 $(X-\mu)^2$ 而不是绝对值 $|X-\mu|$。一个重要原因：平方函数处处光滑可导，绝对值在 0 处有个尖角（不可导）。想象你在一个尖角上站着，不知道该往左还是往右——光滑的坡就没有这个问题。——考察：函数光滑性对优化的影响</li>
+<li>全班 40 人身高的方差是 100 cm²。如果所有人同时长高 5cm，方差变成多少？如果所有人都变成原来的 1.1 倍（均值和差异都放大），方差变成多少？——考察：Var(aX+b)的性质</li>
+<li>如果你有一个数据集，把每个数都减去均值、除以标准差，处理完后的数据均值是多少？方差是多少？——考察：标准化的统计效果（每减均值 → 新均值为 0；每除标准差 → 新方差为 1）</li>
 </ol>
-<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-19/">← 00-19</a><a href="../../">📖 目录</a><a href="../01-01/">01-01 →</a></nav>
+<a href="../00-19/">← 00-15</a><a href="../../">📖 目录</a><a href="../00-21/">00-17 →</a></nav>
 </div>
 <script>
 (function(){

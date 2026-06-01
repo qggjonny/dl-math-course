@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>00-24 信息论：熵、交叉熵、KL 散度 · 深度学习数学</title>
+<link rel="stylesheet" href="../../css/style.css?v=20260601">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head><body>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-24</span>
+<span><a href="../00-18/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../01-01/">下一课 →</a></span></nav>
+<div class="container">
+<h1>00-24 信息论：熵、交叉熵、KL 散度</h1>
+<hr>
+<h2>一、信息量：越不可能的事，信息越大</h2>
+<p><strong>画面：</strong> 有人告诉你两件事——</p>
+<blockquote>
+「明天太阳会升起来。」→ 你心想：废话。<br>
+「明天会下雪。」（你在三亚）→ 你震惊：怎么可能！
+</blockquote>
+<p>第一条信息量几乎为零——你早就知道。第二条信息量巨大——概率极低的事件真的发生了。</p>
+<p><strong>信息量与概率成反比。</strong> 数学上定义为：</p>
+$$I(x) = -\log P(x)$$
+<p>概率越小 → $-\log P$ 越大 → 信息量越大。对数底取 2 时单位是<strong>比特</strong>（bit），取 $e$ 时单位是<strong>奈特</strong>（nat）。深度学习里通常用 $e$。</p>
+<p>例子：公平硬币正面概率 $P=0.5$，信息量 $-\ln(0.5) = 0.693$ nat。如果 $P=0.99$（几乎确定），信息量 $-\ln(0.99) \approx 0.01$ nat——几乎没信息。</p>
+<hr>
+<h2>二、熵：平均来看，有多不确定？</h2>
+<p>信息量是一件事的。如果你想描述<strong>整个概率分布</strong>的不确定性——把所有可能结果的信息量按概率加权平均：</p>
+$$\boxed{H(P) = -\sum_x P(x) \ln P(x)}$$
+<p>这就是<strong>熵</strong>。它衡量的是：从这个分布里随机抽一个结果，<strong>平均会得到多少 surprise</strong>。</p>
+<p><strong>极值情况：</strong></p>
+<ul>
+<li>确定性分布 $P=[1, 0, 0]$（只有一个选项，概率 100%）：$H = -1\ln1 - 0 - 0 = 0$。零不确定性。</li>
+<li>均匀分布 $P=[\frac13, \frac13, \frac13]$：$H = -3 \times \frac13 \ln\frac13 = \ln 3 \approx 1.099$。最大化——你完全不知道会抽到哪个。</li>
+</ul>
+<p>在分类问题里：如果模型的预测分布熵很高（接近均匀）→ 模型很不确定。熵很低（接近 one-hot）→ 模型很自信。</p>
+<pre><code><span class="hl-comment"># 00-20 熵：衡量一个概率分布的不确定性</span>
+<span class="hl-comment"># 导入numpy，别名np</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-comment"># probs：概率数组，如 [0.95, 0.03, 0.02]</span>
+<span class="hl-keyword">def</span> <span class="hl-func">entropy</span>(probs):
+    <span class="hl-string">"""H(P) = -Σ p_i ln(p_i)"""</span>
+<span class="hl-comment"># 只算 p > 0 的项（ln(0) 数学上无定义，也会产生-inf）</span>
+    <span class="hl-comment"># H = -Σ pᵢ log(pᵢ)，只对 pᵢ>0 的项求和（log0无定义）</span>
+    <span class="hl-keyword">return</span> -np.sum(probs[probs > <span class="hl-number">0</span>] * np.log(probs[probs > <span class="hl-number">0</span>]))
+<span class="hl-comment">#        np.log()：自然对数ln（底e→单位nat）</span>
+<span class="hl-comment">#        probs[probs>0]：布尔索引，只取概率>0的元素</span>
+<span class="hl-comment">#        -sum(p_i * ln(p_i)) → 非负值，熵越小越确定</span>
+<span class="hl-comment"># 三个猫狗鸟分类——展示不同确定程度对应的熵值</span>
+<span class="hl-comment"># 模型：95%确定是猫，熵应≈0.2（很确定）</span>
+confident = np.array([<span class="hl-number">0.95</span>, <span class="hl-number">0.03</span>, <span class="hl-number">0.02</span>])
+<span class="hl-comment"># 模型：不太确定，熵应≈1.1（中等）</span>
+uncertain = np.array([<span class="hl-number">0.40</span>, <span class="hl-number">0.35</span>, <span class="hl-number">0.25</span>])
+<span class="hl-comment"># 完全均匀分布，熵应=ln(3)≈1.099（最大）</span>
+uniform   = np.array([<span class="hl-number">1</span>/<span class="hl-number">3</span>, <span class="hl-number">1</span>/<span class="hl-number">3</span>, <span class="hl-number">1</span>/<span class="hl-number">3</span>])
+<span class="hl-comment"># ~0.2 —— 几乎确定</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"熵(确定)  = {entropy(confident):.4f}"</span>)
+<span class="hl-comment"># ~1.1 —— 比较混乱</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"熵(不确定)= {entropy(uncertain):.4f}"</span>)
+<span class="hl-comment"># ~1.099 = ln(3) —— 完全不确定的最大熵</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"熵(均匀)  = {entropy(uniform):.4f}"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<hr>
+<h2>三、交叉熵：我的模型和真相差多远？</h2>
+<p>真实分布是 $P$（比如图片的真标签：100% 是猫）。模型的预测是 $Q$（输出 [0.7, 0.2, 0.1]）。怎么量化模型错得有多离谱？</p>
+<p>用<strong>交叉熵</strong>：</p>
+$$\boxed{H(P, Q) = -\sum_x P(x) \ln Q(x)}$$
+<p>和熵公式对比——唯一的区别：<strong>对数里是 $Q$ 而不是 $P$</strong>。也就是：真实的分布 $P$ 来决定「哪个结果重要」，但用模型预测的概率 $Q$ 来算信息量。</p>
+<p><strong>画面：</strong> 真实标签说「这就是猫」（$P = [1, 0, 0]$）。如果模型也输出 $Q = [0.99, 0.01, 0]$，交叉熵 = $-\ln(0.99) \approx 0.01$——很小，模型几乎没错。如果模型瞎猜 $Q = [0.01, 0.5, 0.49]$，交叉熵 = $-\ln(0.01) \approx 4.6$——巨大，模型被狠狠打脸。</p>
+<p><strong>分类任务里交叉熵为什么当损失函数？</strong> 交叉熵最小 = 模型的预测分布 $Q$ 最接近真实分布 $P$。梯度下降让交叉熵越来越小 → 模型的预测越来越准。</p>
+<pre><code><span class="hl-comment"># 00-20 交叉熵：衡量模型预测与真实标签的差距</span>
+<span class="hl-comment"># p_true=真实分布(one-hot)，q_pred=模型预测</span>
+<span class="hl-keyword">def</span> <span class="hl-func">cross_entropy</span>(p_true, q_pred):
+    <span class="hl-string">"""H(P,Q) = -Σ p_i ln(q_i)"""</span>
+<span class="hl-comment"># 只算 p > 0 的项（真实概率为0的类别不参与损失计算）</span>
+    <span class="hl-comment"># mask：布尔数组，标记哪些位置p_i>0</span>
+    mask = p_true > <span class="hl-number">0</span>
+    <span class="hl-comment"># H(P,Q) = -Σ pᵢ log(qᵢ)，用真实分布p算、模型预测q做log</span>
+    <span class="hl-keyword">return</span> -np.sum(p_true[mask] * np.log(q_pred[mask]))
+<span class="hl-comment">#        p_true[mask]：真实概率>0的项（one-hot时只有一个1.0）</span>
+<span class="hl-comment">#        np.log(q_pred[mask])：模型对"真类别"预测概率的ln</span>
+<span class="hl-comment">#        叉熵越小 → 模型预测越接近真实分布</span>
+<span class="hl-comment"># 真标签：猫（one-hot编码：[猫=1, 狗=0, 鸟=0]）</span>
+<span class="hl-comment"># 真实标签：100%是猫</span>
+y_true = np.array([<span class="hl-number">1.0</span>, <span class="hl-number">0.0</span>, <span class="hl-number">0.0</span>])
+<span class="hl-comment"># 三个模型的预测——展示不同程度的偏差</span>
+<span class="hl-comment"># 好：90%确定是猫 → 交叉熵 =-ln(0.90)≈0.105</span>
+good  = np.array([<span class="hl-number">0.90</span>, <span class="hl-number">0.05</span>, <span class="hl-number">0.05</span>])
+<span class="hl-comment"># 一般：一半确定是猫 → 交叉熵 =-ln(0.50)≈0.693</span>
+ok    = np.array([<span class="hl-number">0.50</span>, <span class="hl-number">0.30</span>, <span class="hl-number">0.20</span>])
+<span class="hl-comment"># 差：认为很可能是狗 → 交叉熵 =-ln(0.10)≈2.303</span>
+bad   = np.array([<span class="hl-number">0.10</span>, <span class="hl-number">0.60</span>, <span class="hl-number">0.30</span>])
+<span class="hl-comment"># ~0.105 — 模型几乎没错</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"交叉熵(好) = {cross_entropy(y_true, good):.4f}"</span>)
+<span class="hl-comment"># ~0.693 — 有偏差</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"交叉熵(一般)= {cross_entropy(y_true, ok):.4f}"</span>)
+<span class="hl-comment"># ~2.303 — 错得离谱</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"交叉熵(差) = {cross_entropy(y_true, bad):.4f}"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<p>模型越好 → 交叉熵越小。这就是训练分类模型时最小化的那个数。</p>
+<hr>
+<h2>四、KL 散度：两个分布"形状"差多少？</h2>
+<p>交叉熵 = 熵 + <strong>KL 散度</strong>。推导只差一行——把 $D_{KL}$ 的定义展开再拆分：</p>
+
+$$\begin{aligned}
+D_{\mathrm{KL}}(P \parallel Q) &= \sum_x P(x) \ln\frac{P(x)}{Q(x)} \\
+&= \sum_x P(x) \big[\ln P(x) - \ln Q(x)\big] \\
+&= \underbrace{\sum_x P(x) \ln P(x)}_{-H(P)} \;-\; \underbrace{\sum_x P(x) \ln Q(x)}_{-H(P,Q)} \\
+&= -H(P) + H(P, Q)
+\end{aligned}$$
+
+<p>移项即得：$H(P,Q) = H(P) + D_{\mathrm{KL}}(P \parallel Q)$。</p>
+
+<p><strong>KL 散度的定义公式：</strong></p>
+$$\boxed{D_{\mathrm{KL}}(P \parallel Q) = \sum_x P(x) \ln\frac{P(x)}{Q(x)}}$$
+<p><strong>KL 散度衡量的是：</strong> 用 $Q$ 来近似 $P$，比直接用 $P$ 多浪费了多少信息。熵 $H(P)$ 是「最低消费」——数据本身的不确定性。KL 散度是「超额消费」——模型不好带来的额外成本。</p>
+<p><strong>关键性质：</strong></p>
+<ul>
+<li>$D_{\mathrm{KL}}(P \parallel Q) \ge 0$，当且仅当 $P=Q$ 时等于 0（两个分布完全一样）</li>
+<li>不对称：$D_{\mathrm{KL}}(P \parallel Q) \neq D_{\mathrm{KL}}(Q \parallel P)$。不是真正的「距离」</li>
+</ul>
+<p><strong>为什么训练时用交叉熵而不是 KL 散度？</strong> 因为 $H(P)$（真实标签的熵）是常数——训练数据固定了就不变。最小化交叉熵 = 最小化 KL 散度，所以交叉熵就够了。</p>
+<pre><code><span class="hl-comment"># 00-20 KL 散度：验证 H(P,Q) = H(P) + D_KL(P||Q)</span>
+<span class="hl-comment"># p=真实分布，q=模型预测分布</span>
+<span class="hl-keyword">def</span> <span class="hl-func">kl_divergence</span>(p, q):
+    <span class="hl-string">"""D_KL(P||Q) = Σ p_i ln(p_i/q_i)"""</span>
+    <span class="hl-comment"># 只算真实概率>0的项（避免ln(0)）</span>
+    mask = p > <span class="hl-number">0</span>
+    <span class="hl-comment"># D_KL = Σ pᵢ log(pᵢ/qᵢ)，衡量q偏离p的程度</span>
+    <span class="hl-keyword">return</span> np.sum(p[mask] * np.log(p[mask] / q[mask]))
+<span class="hl-comment">#        ln(p_i/q_i)：比值越大 → 模型预测偏离越大 → KL散度越大</span>
+<span class="hl-comment">#        D_KL≥0恒成立（吉布斯不等式），P=Q时D_KL=0</span>
+<span class="hl-comment"># 真实标签：one-hot（猫）</span>
+y_true = np.array([<span class="hl-number">1.0</span>, <span class="hl-number">0.0</span>, <span class="hl-number">0.0</span>])
+<span class="hl-comment"># 模型预测：90%猫，5%狗，5%鸟</span>
+pred   = np.array([<span class="hl-number">0.90</span>, <span class="hl-number">0.05</span>, <span class="hl-number">0.05</span>])
+H_P = entropy(y_true)                     <span class="hl-comment"># 真实标签的熵：one-hot的熵恒为0</span>
+H_PQ = cross_entropy(y_true, pred)        <span class="hl-comment"># 交叉熵：-ln(0.90) ≈ 0.105</span>
+D_KL = kl_divergence(y_true, pred)        <span class="hl-comment"># KL散度：计算"额外成本"</span>
+<span class="hl-comment"># 0.0000 —— one-hot没有不确定性</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"H(P)    = {H_P:.4f}"</span>)
+<span class="hl-comment"># 0.1054 —— 交叉熵≈KL散度（因为H(P)=0）</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"H(P,Q)  = {H_PQ:.4f}"</span>)
+<span class="hl-comment"># 0.1054 —— 模型不好带来的额外成本</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"D_KL    = {D_KL:.4f}"</span>)
+<span class="hl-comment"># 验证恒等式：H(P,Q) = H(P) + D_KL(P||Q)</span>
+<span class="hl-comment"># 验证恒等式：交叉熵 = 熵 + KL散度</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"H(P,Q) = H(P) + D_KL? {abs(H_PQ - (H_P + D_KL)) &lt; 1e-10}"</span>)
+<span class="hl-comment"># abs(差值) < 1e-10 → True，浮点误差范围内相等 ✓</span>
+<span class="hl-comment"># 结论：训练时最小化交叉熵 = 最小化KL散度（H(P)是常数无影响）</span>
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<hr>
+<h2>💭 概念题</h2>
+<ol>
+<li>抛一枚公平硬币，熵是多少？抛一枚永远出正面的硬币，熵是多少？哪个更大，为什么？——考察：熵与确定性的关系</li>
+<li>真标签是 $P=[1,0,0]$，模型预测 $Q=[0.3,0.4,0.3]$。交叉熵是多少？如果 $Q$ 变成 $[0.6,0.2,0.2]$，交叉熵变大还是变小？——考察：交叉熵反映预测准确度</li>
+<li>$H(P,Q) \ge H(P)$ 这个不等式为什么恒成立？从 KL 散度的非负性解释。——考察：交叉熵、熵、KL 散度三者的关系</li>
+</ol>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-23/">← 00-19</a><a href="../../">📖 目录</a><a href="../01-01/">01-01 →</a></nav>
+</div>
+<script>
+(function(){
+  document.querySelectorAll('pre code').forEach(function(block){
+    var wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 复制';
+    btn.onclick = function(){
+      var text = block.innerText;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = '✅ 已复制';
+        btn.classList.add('copied');
+        setTimeout(function(){
+          btn.textContent = '📋 复制';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    };
+    block.parentNode.insertBefore(wrapper, block);
+    wrapper.appendChild(btn);
+    wrapper.appendChild(block);
+  });
+})();
+</script>
+
+</body></html>

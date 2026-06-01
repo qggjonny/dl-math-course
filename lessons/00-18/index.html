@@ -1,216 +1,135 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>00-18 最大似然估计 MLE · 深度学习数学</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-  <link rel="stylesheet" href="../../css/style.css?v=20260601">
-</head>
-<body>
-
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>00-18 离散分布 · 深度学习数学</title>
+<link rel="stylesheet" href="../../css/style.css?v=20260601">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head><body>
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-18</span>
-<span><a href="../00-17/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-19/">下一课 →</a></span></nav>
-
+<span><a href="../00-12/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-14/">下一课 →</a></span></nav>
 <div class="container">
-
-<p style="color:var(--text-light);font-size:0.9em">🌱 阶段 0 · 第 18 课</p>
-<h1>最大似然估计 MLE</h1>
-
-<h2>一、反问题：看到结果，猜原因</h2>
-
-<p><strong>画面：</strong> 你走进一间屋子，发现地上有几根头发、一杯没喝完的咖啡。你想知道：刚才在这里的人更喜欢喝咖啡还是喝茶？</p>
-
-<p>你没法直接知道，但可以<strong>反推</strong>：如果这个人喝咖啡，地上出现这些现象的概率有多大？如果喝茶呢？比较这两个概率——哪个更高，哪个解释更合理。</p>
-
-<p>这就是<strong>似然</strong>的直觉：</p>
-
-$$P(\text{观察到这些} \mid \text{假设这个参数})$$
-
-<p>数据是固定的，参数是变量。<strong>在所有可能的参数值中，选那个"让观测数据出现概率最大"的参数。</strong></p>
-
-<h2>二、抛硬币的例子</h2>
-
-<p>抛一枚硬币 10 次，7 次正面。硬币正面概率 $\theta$ 是多少？</p>
-
-<p>如果 $\theta = 0.5$（公平硬币），出现"10 次中 7 次正面"的概率：</p>
-
-$$P(7\text{正} \mid \theta=0.5) = \binom{10}{7} (0.5)^7 (0.5)^3 \approx 0.117$$
-
-<p>如果 $\theta = 0.7$：</p>
-
-$$P(7\text{正} \mid \theta=0.7) = \binom{10}{7} (0.7)^7 (0.3)^3 \approx 0.267$$
-
-<p>$0.267 > 0.117$——$\theta=0.7$ 比 $\theta=0.5$ 更有可能产生这个结果。<strong>那最可能的是哪个？</strong></p>
-
-<h2>三、似然函数</h2>
-
-<p>把概率写成 $\theta$ 的函数——这就是<strong>似然函数</strong>：</p>
-
-$$L(\theta) = P(\text{数据} \mid \theta) = \binom{10}{7} \theta^7 (1-\theta)^3$$
-
-<p>$\binom{10}{7}$ 是常数，不影响最大化。所以最大化 $L(\theta)$ 等价于最大化：</p>
-
-$$\theta^7 (1-\theta)^3$$
-
-<pre><code><span class="hl-comment"># 00-18 似然函数 — 抛硬币 10 次 7 正，猜 θ</span>
+<h1>00-18 离散分布</h1>
+<hr>
+<h2>一、随机变量：知道规律但不知道结果</h2>
+<p><strong>画面：</strong> 你在微信上给朋友发了一条消息。根据经验，70% 的概率他秒回，20% 的概率半小时后回，10% 的概率忘了回。你<strong>不知道这次会怎样</strong>，但你<strong>知道每种可能性的比例</strong>。这就是随机变量：一个取值不确定但分布规律确定的量。</p>
+<p>数学里写：$X = \text{"回复所需时间"}$。$X$ 可以取「秒回」「半小时」「不回」三个值。</p>
+<hr>
+<h2>二、PMF：三个盒子，按比例抽</h2>
+<p><strong>画面：</strong> 桌上有三个盒子，标着「秒回」「半小时」「不回」。你有 10 个筹码要往里放——秒回盒放 7 个，半小时盒放 2 个，不回盒放 1 个。总共 10 个筹码。</p>
+<p>现在从这三个盒子里<strong>按筹码比例随机抽一个</strong>——抽到秒回的概率 = 7/10 = 70%，半小时 = 20%，不回 = 10%。</p>
+<p>PMF（概率质量函数）就是给每个可能的取值分配一个"筹码重量"。所有筹码加起来 = 1。</p>
+<p>$$P(X = x_i) = p_i, \quad \sum_i p_i = 1$$</p>
+<h3>为什么 $\sum p_i = 1$？——「所有结果必有一个发生」</h3>
+<p>这个条件不是外加的约束，而是概率本身的<strong>底层逻辑</strong>。做一次实验，结果必然是所有可能取值中的某一个——不可能逃出这个集合。把所有结果的概率加起来，就是「一定会有某个结果发生」这件事的概率，也就是 1 = 100%。</p>
+<p>反过来想：如果 $\sum p_i < 1$，说明还有「概率凭空消失了」——这违背了概率的完备性；如果 $\sum p_i > 1$，说明两个不同结果在概率上「重叠了」——这违背了互斥性。所以 $\sum p_i = 1$ 既是定义，也是检验一个人造分布是否合法的标准。</p>
+<hr>
+<h2>三、伯努利分布：抛一次硬币</h2>
+<p>只有两种结果：成功（1）和失败（0）。</p>
+<p>$$P(X=1) = p, \quad P(X=0) = 1-p$$</p>
+<p><strong>画面：</strong> 一枚偏心的硬币，正面概率 $p=0.7$。抛一次，不是正面就是反面——就这么简单。</p>
+<pre><code><span class="hl-comment"># 00-14 伯努利分布：模拟抛偏心硬币1000次</span>
+<span class="hl-comment"># 导入numpy，别名np</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-
-<span class="hl-comment"># 100 个候选 θ 值</span>
-thetas = np.linspace(<span class="hl-number">0.01</span>, <span class="hl-number">0.99</span>, <span class="hl-number">100</span>)
-<span class="hl-comment"># L(θ) = θ⁷(1-θ)³</span>
-likelihood = thetas**<span class="hl-number">7</span> * (<span class="hl-number">1</span> - thetas)**<span class="hl-number">3</span>
-best_idx = np.argmax(likelihood)              <span class="hl-comment"># 似然最大的 θ 的下标</span>
-
-<span class="hl-builtin">print</span>(<span class="hl-string">f"最大似然估计 θ̂ = {thetas[best_idx]:.3f}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"直觉：7/10 = {7/10}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"一致！MLE = 样本比例"</span>)
-</code></pre>
-
-<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-
-<p>结果 $\hat{\theta}_{\text{MLE}} = 0.7$。直觉正确：抛 10 次 7 正，正面率最可能是 0.7。</p>
-
-<h2>四、对数似然——把乘变加</h2>
-
-<p>实际问题中数据量很大，$\theta_1 \times \theta_2 \times \cdots \times \theta_N$ 会溢出或下溢。对策：<strong>取对数</strong>。</p>
-
-<p>$\ln$ 是单调增函数，所以最大化 $L(\theta)$ 和最大化 $\ln L(\theta)$ 等价：</p>
-
-$$\ell(\theta) = \ln L(\theta) = 7\ln\theta + 3\ln(1-\theta) + \text{常数}$$
-
-<p>乘法变成加法——好算了。然后对 $\theta$ 求导：</p>
-
-$$\frac{d\ell}{d\theta} = \frac{7}{\theta} - \frac{3}{1-\theta} = 0 \quad\Longrightarrow\quad \hat{\theta} = \frac{7}{10}$$
-
-<p>一般情况：$n$ 次试验 $k$ 次成功 → $\hat{\theta}_{\text{MLE}} = k/n$。</p>
-
-<h2>五、MLE 通向损失函数</h2>
-
-<p>这是 MLE 最核心的用途——<strong>它解释了为什么交叉熵是分类的损失函数、MSE 是回归的损失函数。</strong></p>
-
-<p><strong>回归：假设误差服从高斯分布。</strong></p>
-
-<p>模型预测 $\hat{y}$，真实值 $y$。假设 $y = \hat{y} + \varepsilon$，$\varepsilon \sim \mathcal{N}(0, \sigma^2)$：</p>
-
-$$P(y \mid \hat{y}) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y - \hat{y})^2}{2\sigma^2}\right)$$
-
-<p>$N$ 个独立样本的似然：</p>
-
-$$L = \prod_{i=1}^N \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right)$$
-
-<p>取对数——把连乘变成连加：</p>
-
-$$\begin{aligned}
-\ell &= \ln L = \ln\prod_{i=1}^N \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right) \\[4pt]
-&= \sum_{i=1}^N \ln\left[\frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right)\right] \\[4pt]
-&= \underbrace{N \ln\frac{1}{\sqrt{2\pi\sigma^2}}}_{\text{常数，不依赖 }\hat{y}_i} \;+\; \sum_{i=1}^N \left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right)
-\end{aligned}$$
-
-<p>常数项 $N\ln(1/\sqrt{2\pi\sigma^2})$ 不含模型参数 $\hat{y}_i$，不影响优化——最大化 $\ell$ 时可以丢掉。因子 $1/(2\sigma^2) > 0$ 是正常数，最小化时也可省略。所以：</p>
-
-$$\text{最大化 }\ell \;\Longleftrightarrow\; \text{最小化 } \sum_{i=1}^N (y_i - \hat{y}_i)^2$$
-
-<p><strong>最大化 $\ell$ = 最小化 $\sum (y_i - \hat{y}_i)^2$ → MSE！</strong></p>
-
-<p><strong>分类：假设标签服从伯努利/类别分布。</strong></p>
-
-<p>二分类，模型预测概率 $\hat{p}$，真实标签 $y \in \{0,1\}$：</p>
-
-$$P(y \mid \hat{p}) = \hat{p}^y (1-\hat{p})^{1-y}$$
-
-<p>取负对数：</p>
-
-$$-\ln L = -\sum_{i=1}^N \big[y_i \ln \hat{p}_i + (1-y_i) \ln(1-\hat{p}_i)\big]$$
-
-<p><strong>这就是交叉熵损失！</strong></p>
-
-<pre><code><span class="hl-comment"># 00-18 用 MLE 拟合高斯分布 — 从数据反推均值和方差</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-
-<span class="hl-comment"># 生成真实分布为 N(5, 2²) 的 1000 个样本</span>
+<span class="hl-comment"># seed()：固定随机种子，保证每次运行结果一样</span>
 np.random.seed(<span class="hl-number">42</span>)
-true_mu, true_sigma = <span class="hl-number">5.0</span>, <span class="hl-number">2.0</span>
-data = np.random.normal(true_mu, true_sigma, <span class="hl-number">1000</span>)
-
-<span class="hl-comment"># MLE 估计：高斯分布的 MLE 就是样本均值和样本标准差</span>
-mu_hat = np.mean(data)                       <span class="hl-comment"># μ̂ = (1/N) Σ xᵢ</span>
-sigma_hat = np.std(data)                     <span class="hl-comment"># σ̂ = sqrt((1/N) Σ (xᵢ-μ)²)</span>
-
-<span class="hl-builtin">print</span>(<span class="hl-string">f"真实参数: μ={true_mu}, σ={true_sigma}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"MLE 估计: μ̂={mu_hat:.3f}, σ̂={sigma_hat:.3f}"</span>)
-
-<span class="hl-comment"># 验证：算对数似然</span>
-<span class="hl-keyword">def</span> <span class="hl-func">log_likelihood</span>(mu, sigma, data):
-<span class="hl-comment">"""高斯分布的对数似然</span>
-<span class="hl-comment">    mu: 均值</span>
-<span class="hl-comment">    sigma: 标准差</span>
-<span class="hl-comment">    data: 观测数据</span>
-<span class="hl-comment">    """</span>
-    n = <span class="hl-builtin">len</span>(data)
-<span class="hl-comment"># log L = -n/2·log(2πσ²) - 1/(2σ²)·Σ(xᵢ-μ)²</span>
-    <span class="hl-keyword">return</span> -n/<span class="hl-number">2</span>*np.log(<span class="hl-number">2</span>*np.pi*sigma**<span class="hl-number">2</span>) - np.<span class="hl-builtin">sum</span>((data-mu)**<span class="hl-number">2</span>)/(<span class="hl-number">2</span>*sigma**<span class="hl-number">2</span>)
-
-ll_mle = log_likelihood(mu_hat, sigma_hat, data)
-<span class="hl-comment"># 故意用错误参数</span>
-ll_off = log_likelihood(<span class="hl-number">4.0</span>, <span class="hl-number">2.5</span>, data)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\nMLE 对数似然: {ll_mle:.1f}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"错误参数对数似然: {ll_off:.1f}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"MLE 更高 ✓"</span>)
+<span class="hl-comment"># 正面概率 p=0.7（偏心硬币正面更重）</span>
+p = <span class="hl-number">0.7</span>
+<span class="hl-comment"># np.random.random(1000) → 生成1000个[0,1)均匀分布的随机小数</span>
+<span class="hl-comment"># < p → 小于0.7的变成True（正面），≥0.7的变成False（反面）</span>
+<span class="hl-comment"># 结果：布尔数组，True=正面(约70%)</span>
+flips = np.random.random(<span class="hl-number">1000</span>) &lt; p
+<span class="hl-comment"># .mean() 对布尔数组：True当作1、False当作0 → 平均值=正面比例</span>
+<span class="hl-comment"># :.3f = 保留3位小数</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"p=0.7, 抛1000次: 正面比例 {flips.mean():.3f}"</span>)
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<hr>
+<h2>四、二项分布：抛 n 次硬币</h2>
+<h3>4.1 公式推导——先算一种排法，再乘排法数</h3>
+<p>推导二项分布公式，分两步走：</p>
+<p><strong>第一步：考虑一个特定排列的概率。</strong></p>
+<p>假设 n=5 次抛硬币，我们关心恰好 k=2 次正面的情况。一个具体的排列是：<strong>正、正、反、反、反</strong>（前两次正面，后三次反面）。</p>
+<p>每次抛硬币是独立的，所以这个<strong>特定排列</strong>发生的概率 = 各次结果的概率直接相乘：</p>
+<p>$$P(\text{正正反反反}) = p \cdot p \cdot (1-p) \cdot (1-p) \cdot (1-p) = p^2 (1-p)^{5-2}$$</p>
+<p>推广到一般情况：n 次中恰好 k 次正面、n-k 次反面的<strong>任意一个特定排列</strong>，其概率都是：</p>
+<p>$$\boxed{p^k (1-p)^{n-k}}$$</p>
+<p><strong>第二步：有多少种这样的排列？</strong></p>
+<p>「恰好 k 次正面」不要求正面出现在哪几次——n 次试验中，随便选哪 k 个位置放正面，剩下的自然就是反面。从 n 个位置里选 k 个，就是一个<strong>组合数</strong>问题：</p>
+<p>$$\binom{n}{k} = \frac{n!}{k!(n-k)!}$$</p>
+<p>每种排列的概率都是 $p^k (1-p)^{n-k}$，而且这些排列是<strong>互斥的</strong>（一次实验只能出现其中一个排列），所以总概率 = 排列数 × 每个排列的概率：</p>
+<p>$$\boxed{P(X=k) = \binom{n}{k} p^k (1-p)^{n-k}}$$</p>
+<h3>4.2 直观验证——为什么中间鼓、两头瘪？</h3>
+<p>$p^k (1-p)^{n-k}$ 这个因子在 k 取中间值时并不一定最大（取决于 p）。真正让中间鼓起来的是 $\binom{n}{k}$：</p>
+<table style="margin:1em auto;border-collapse:collapse;">
+<tr><th style="padding:4px 12px;border:1px solid #ccc;">k</th><th style="padding:4px 12px;border:1px solid #ccc;">0</th><th style="padding:4px 12px;border:1px solid #ccc;">1</th><th style="padding:4px 12px;border:1px solid #ccc;">2</th><th style="padding:4px 12px;border:1px solid #ccc;">3</th><th style="padding:4px 12px;border:1px solid #ccc;">4</th><th style="padding:4px 12px;border:1px solid #ccc;">5</th></tr>
+<tr><td style="padding:4px 12px;border:1px solid #ccc;font-weight:bold;">C(5,k)</td><td style="padding:4px 12px;border:1px solid #ccc;">1</td><td style="padding:4px 12px;border:1px solid #ccc;">5</td><td style="padding:4px 12px;border:1px solid #ccc;">10</td><td style="padding:4px 12px;border:1px solid #ccc;">10</td><td style="padding:4px 12px;border:1px solid #ccc;">5</td><td style="padding:4px 12px;border:1px solid #ccc;">1</td></tr>
+</table>
+<p>「正正反反反」只有 1 种排法；「2 正 3 反」却有 $\binom{5}{2}=10$ 种。排列方式越多，这件事就越容易发生。</p>
+<figure><img src="assets/binomial_hist.png" alt="二项分布"><figcaption>n=10, p=0.5。k=5 的柱子最高——$\binom{10}{5}=252$ 种排法，远多于两端的 $\binom{10}{0}=1$ 种</figcaption></figure>
+<pre><code><span class="hl-comment"># 00-14 二项分布：模拟抛10次硬币，重复10000轮</span>
+<span class="hl-comment"># n=每轮抛10次，p=公平硬币(正面概率0.5)</span>
+n, p = <span class="hl-number">10</span>, <span class="hl-number">0.5</span>
+<span class="hl-comment"># np.random.binomial(n, p, size)：模拟 size 轮，每轮抛 n 次</span>
+<span class="hl-comment"># 返回 size 个整数，每个 = 该轮正面出现的次数(0~n)</span>
+<span class="hl-comment"># 10000轮的正面次数数组</span>
+results = np.random.binomial(n, p, size=<span class="hl-number">10000</span>)
+<span class="hl-comment"># 检验k=3,5,7这三个正面次数的概率</span>
+<span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">3</span>, <span class="hl-number">5</span>, <span class="hl-number">7</span>]:
+    freq = np.mean(results == k)              <span class="hl-comment"># results==k → 布尔数组，mean() → 频率≈概率</span>
+    <span class="hl-comment"># :.4f = 保留4位小数</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"P(X={k}) ≈ {freq:.4f}"</span>)
+<span class="hl-comment"># P(X=5) 最大 ← C(10,5)=252种排法最多（中间鼓）</span>
+<span class="hl-comment"># P(X=3) ≈ P(X=7) ← 对称分布（p=0.5公平硬币）</span>
+</code></pre>
 
-<h2>六、MLE 和贝叶斯的区别</h2>
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<hr>
+<h2>五、多项分布：不止两个盒子</h2>
+<h3>5.1 从二项到多项——思想的自然推广</h3>
+<p>二项分布是「两种结果，做 n 次」；多项分布是「m 种结果，做 n 次」。比如掷一个六面骰子 n=10 次，每次有 6 种可能的结果，每种结果有各自的概率 $p_1, p_2, \dots, p_6$（公平骰子的话 $p_i = 1/6$）。</p>
+<p>我们关心的是：10 次掷完，面 1 出现 $k_1$ 次、面 2 出现 $k_2$ 次、……、面 6 出现 $k_6$ 次的概率是多少？其中 $\sum_{i=1}^m k_i = n$。</p>
+<h3>5.2 公式推导——完全复刻二项分布的思路</h3>
+<p>跟二项分布一样，分两步。</p>
+<p><strong>第一步：一个特定排列的概率。</strong></p>
+<p>假设有一种具体的排列——比如前 $k_1$ 次都是结果 1，接下来 $k_2$ 次都是结果 2，……，最后 $k_m$ 次都是结果 m。由于每次试验独立，这个排列的概率是：</p>
+<p>$$\underbrace{p_1 \cdot p_1 \cdots p_1}_{k_1 \text{ 个}} \cdot \underbrace{p_2 \cdots p_2}_{k_2 \text{ 个}} \cdots \underbrace{p_m \cdots p_m}_{k_m \text{ 个}} = p_1^{k_1} p_2^{k_2} \cdots p_m^{k_m}$$</p>
+<p>任何<strong>指定了哪个位置是哪个结果</strong>的排列，概率都是这个表达式——因为乘法可交换，乘积只取决于每个 $p_i$ 出现了多少次，而与顺序无关。</p>
+<p><strong>第二步：有多少种排列方式？</strong></p>
+<p>n 次试验中，有 $k_1$ 个位置放结果 1、$k_2$ 个放结果 2、……、$k_m$ 个放结果 m。这是一个「多重组合数」问题——把 n 个位置分成 m 组，每组大小分别为 $k_1, k_2, \dots, k_m$：</p>
+<p>$$\binom{n}{k_1, k_2, \dots, k_m} = \frac{n!}{k_1! \, k_2! \, \cdots \, k_m!}$$</p>
+<p>理解这个公式：先给 n 个试验排一个顺序（$n!$ 种），但同一类结果内部 $k_i$ 个位置互换不产生新排列——所以要除以各组的内部排列数 $k_i!$。</p>
+<p>所有排列互斥，概率相加，得到多项分布的 PMF：</p>
+<p>$$\boxed{P(X_1=k_1,\dots,X_m=k_m) = \frac{n!}{k_1! \, k_2! \, \cdots \, k_m!}\; p_1^{k_1} p_2^{k_2} \cdots p_m^{k_m}}$$</p>
+<p>其中 $\sum k_i = n$，$\sum p_i = 1$。</p>
+<h3>5.3 代码验证</h3>
+<p>掷六面骰子，每面概率都是 1/6——六个盒子，每个放一样多的筹码。</p>
+<pre><code><span class="hl-comment"># 00-14 多项分布：掷六面骰子1000次</span>
+<span class="hl-comment"># np.random.multinomial(n, pvals)：掷骰子n次，每面概率pvals</span>
+<span class="hl-comment"># [1/6]*6 → [0.1667,0.1667,0.1667,0.1667,0.1667,0.1667] 公平骰子</span>
+<span class="hl-comment"># 返回长度为6的数组，分别是面1~6的出现次数</span>
+dice = np.random.multinomial(<span class="hl-number">1000</span>, [<span class="hl-number">1</span>/<span class="hl-number">6</span>]*<span class="hl-number">6</span>)
+<span class="hl-comment"># 六个面各自的出现次数</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"掷骰1000次: {dice}"</span>)
+<span class="hl-comment"># .sum()：所有面的次数之和 — 一定 = 1000</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"总和={dice.sum()}"</span>)
+</code></pre>
 
-<p>00-17 学了贝叶斯定理：$P(\theta \mid \text{数据}) \propto P(\text{数据} \mid \theta) \cdot P(\theta)$。</p>
-
-<ul>
-  <li><strong>MLE：</strong>只看 $P(\text{数据} \mid \theta)$，最大化它——不管 $\theta$ 本身有多大概率出现</li>
-  <li><strong>贝叶斯：</strong>还要乘先验 $P(\theta)$——如果 $\theta=0.99$ 按理说很罕见，贝叶斯会惩罚它</li>
-  <li><strong>MAP（最大后验）：</strong>贝叶斯中最大化 $P(\theta \mid \text{数据})$ 而非 $P(\text{数据} \mid \theta)$</li>
-</ul>
-
-<div class="callout callout-tip">
-<strong>为什么深度学习都选 MLE：</strong> 数据量大的时候，似然主导，先验的影响很小。MLE 和 MAP 差别不大。所以等价于：做回归就最小化 MSE，做分类就最小化交叉熵——不需要显式计算先验。
-</div>
-
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ 全部代码到 online-python.com 运行</a></p>
+<hr>
 <h2>💭 概念题</h2>
-
-<div class="exercise">
-<h3>1. MLE 为什么不总是对的</h3>
-<p>抛 3 次硬币，3 次全是正面。MLE 估计 $\hat{\theta} = 1.0$。这个估计合理吗？有什么问题？贝叶斯方法会怎么修正？</p>
-<p>——考察：小样本下 MLE 的过拟合、先验的修正作用</p>
-</div>
-
-<div class="exercise">
-<h3>2. MSE 和交叉熵的来源</h3>
-<p>为什么回归用 MSE 而不交叉熵？分类用交叉熵而不用 MSE？从"假设数据服从什么分布"的角度解释。</p>
-<p>——考察：MLE → 损失函数的推导链条</p>
-</div>
-
-<div class="exercise">
-<h3>3. 对数似然为什么方便</h3>
-<p>有 1000 个独立样本，似然是 1000 个小概率的乘积。直接用 $L = \prod p_i$ 会有什么问题？取对数解决了什么？</p>
-<p>——考察：数值稳定性和求导便利性</p>
-</div>
-
+<ol>
+<li>抛 10 次公平硬币。为什么 P(X=5) 最大，P(X=0) 最小？从组合数 C(10,k) 的形状解释——哪种 k 值对应的排列方式最多？——考察：二项分布中间鼓的本质</li>
+<li>PMF 要求所有概率之和 = 1。$[0.1, 0.1, 0.7, 0.1]$ 满足这个条件吗？它代表什么意思？——考察：PMF 定义验证</li>
+<li>抛一枚 p=0.9 的偏心硬币 10 次。P(X=9) 和 P(X=1) 哪个更大？不用算，用直觉判断。——考察：二项分布的偏斜（p 偏离 0.5 时钟形不对称）</li>
+</ol>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-17/">← 00-17</a><a href="../../">📖 目录</a><a href="../00-19/">00-19 →</a></nav>
+<a href="../00-15/">← 00-13</a><a href="../../">📖 目录</a><a href="../00-19/">00-15 →</a></nav>
 </div>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: "$$", right: "$$", display: true},
-        {left: "$", right: "$", display: false}
-      ]
-    });
-  });
-</script>
-
 <script>
 (function(){
   document.querySelectorAll('pre code').forEach(function(block){
@@ -237,6 +156,4 @@ ll_off = log_likelihood(<span class="hl-number">4.0</span>, <span class="hl-numb
 })();
 </script>
 
-</body>
-</html>
-
+</body></html>

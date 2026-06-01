@@ -1,75 +1,206 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>00-09 梯度与方向导数 · 深度学习数学</title>
-<link rel="stylesheet" href="../../css/style.css?v=20260601">
+<title>00-09 函数、对数与指数 · 深度学习数学</title>
+<link rel="stylesheet" href="../../css/style.css?v=20260602">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
 onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 </head><body>
-<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-07</span>
-<span><a href="../00-06/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-08/">下一课 →</a></span></nav>
+<nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-09</span>
+<span><a href="../00-08/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-10/">下一课 →</a></span></nav>
 <div class="container">
-<h1>00-09 梯度与方向导数</h1>
+<h1>00-09 函数、对数与指数</h1>
 <hr>
-<h2>一、梯度：最陡的方向</h2>
-<p>把所有偏导数拼成一个向量——这就是梯度。</p>
-<p>$$\nabla f = \left[\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n}\right]$$</p>
-<p><strong>核心直觉：梯度向量指向函数值上升<em>最快</em>的方向。</strong></p>
-<p><strong>画面：</strong> 你站在山谷里，四周都是坡。你原地转一圈，总有一个方向是<strong>最陡的上坡</strong>——那就是梯度指的方向。梯度的大小 = 那个方向的坡度有多陡。梯度的反方向 = 最陡的下坡路。</p>
-<figure><img src="assets/gradient_contour.png" alt="梯度方向垂直于等高线"><figcaption>等高线越密坡越陡。梯度方向（红色箭头）始终<strong>垂直于等高线</strong>——这就是最陡上坡方向。沿等高线走（蓝色箭头）高度不变。</figcaption></figure>
+<h2>函数：一台自动售货机</h2>
+<p>想象一台自动售货机：你投进去一个数字，机器内部按固定规则处理，吐出一个数字。</p>
+<p><strong>投 3 → 吐出 7。投 5 → 吐出 11。投 0 → 吐出 1。</strong></p>
+<p>这个机器就是<strong>函数</strong>。给它一个输入 $x$，它按规则产生一个输出。记成：</p>
+$$f(x) = \text{输出}$$
+<p>$f$ 是函数的名字（就像给机器贴个标签），$x$ 是输入（投进去的东西），$f(x)$ 是输出（吐出来的东西）。</p>
+<table>
+<tr><th>术语</th><th>含义</th><th>售货机比喻</th></tr>
+<tr><td>输入 $x$</td><td>自变量，你选的数</td><td>你投进去的硬币</td></tr>
+<tr><td>输出 $f(x)$</td><td>因变量，机器算出的结果</td><td>掉出来的饮料</td></tr>
+<tr><td>定义域 (domain)</td><td>所有能投的 $x$ 的集合</td><td>机器能识别的硬币种类</td></tr>
+<tr><td>值域 (range)</td><td>所有可能吐出的值的集合</td><td>机器里所有饮料种类</td></tr>
+</table>
+<p>函数就是一个<strong>映射</strong>——把定义域里的每个元素，映射到值域里的一个元素。投一个 $x$，只能吐出一个结果（不能同时吐两瓶可乐）。但不同的 $x$ 可以吐出同一个结果（选不同按钮可能得到同一款饮料）。</p>
+<p>在深度学习中，函数无处不在：激活函数把输入映射成输出，损失函数把预测误差映射成一个数字，优化器把梯度映射成参数更新。搞懂函数，是所有后续的基石。</p>
+<h3>最简单的函数：线性函数</h3>
+<p>售货机最简单的规则是「加倍再加 1」：</p>
+$$f(x) = 2x + 1$$
+<p>$x=0 \to f(0)=1$，$x=1 \to f(1)=3$，$x=2 \to f(2)=5$……每次 $x$ 增加 1，$f(x)$ 增加 2。<strong>线性的意思是：变化是匀速的。</strong>图像是一条直线，斜率 = 2（每走一步升 2），截距 = 1（在 $x=0$ 时的高度）。</p>
+<p>线性函数很好理解，但世界不是线性的。下面进入真正有趣的部分。</p>
+<hr>
+<h2>指数函数：增长会加速</h2>
+<p>放一个细菌在培养皿里。每分钟分裂一次：1 个变 2 个，2 个变 4 个，4 个变 8 个……这不是「每次加 2」的匀速增长——这是<strong>每次翻倍</strong>。</p>
+<p>第 $n$ 分钟后，细菌数量 = $2^n$。</p>
+$$2^0 = 1,\; 2^1 = 2,\; 2^2 = 4,\; 2^3 = 8,\; 2^4 = 16,\; \dots$$
+<p>注意增长速度：从 $n=3$ 到 $n=4$，增加了 8 个。从 $n=10$ 到 $n=11$，增加了 1024 个。<strong>指数增长的特征：增长量越来越大——存量越大，增量越大。</strong>这和线性增长（每次加固定量）完全不同。</p>
+<h3>自然常数 $e$</h3>
+<p>在数学和深度学习中，最重要的指数底数不是 2，不是 10，而是一个奇怪的数：</p>
+$$e \approx 2.718281828\dots$$
+<p>$e$ 叫<strong>自然常数</strong>，和圆周率 $\pi$ 一样是个无理数（无限不循环小数）。它为什么「自然」？</p>
+<p><strong>核心原因：$e^x$ 的导数（变化率）就是它自己。</strong> 也就是说，$e^x$ 在任意点的增长速率恰好等于它当前的值——这是唯一具有这个性质的函数。这条性质让 $e^x$ 成为微积分和深度学习中最核心的函数。</p>
 <div class="callout callout-info">
-<h3>为什么梯度方向最快？——方向导数完整推导</h3>
-<p><strong>第一步：方向导数的定义。</strong></p>
-<p>你站在 $(x, y)$ 点，选一个方向 $\mathbf{u} = (u_x, u_y)$（单位向量，模=1）。往前走 $\epsilon$ 步——也就是 $x$ 变到 $x + \epsilon u_x$，$y$ 变到 $y + \epsilon u_y$。函数值变了多少？</p>
-$$D_{\mathbf{u}} f = \lim_{\epsilon \to 0} \frac{f(x + \epsilon u_x,\; y + \epsilon u_y) - f(x, y)}{\epsilon}$$
-<p>这就是方向导数的<strong>定义</strong>。注意：如果你选的方向是 $(1, 0)$（沿 $x$ 轴走），方向导数就退化成普通偏导数 $\partial f / \partial x$。</p>
-<p><strong>第二步：把方向导数拆成偏导数的组合，推出公式。</strong></p>
-<p>关键技巧——把「沿斜线走一步」拆成「先沿 $x$ 走一步，再沿 $y$ 走一步」：</p>
-$$
-\begin{aligned}
-f(x + \epsilon u_x, y + \epsilon u_y) - f(x, y)
-&= \underbrace{[f(x + \epsilon u_x, y + \epsilon u_y) - f(x, y + \epsilon u_y)]}_{\text{纯 x-变化量}}
-+ \underbrace{[f(x, y + \epsilon u_y) - f(x, y)]}_{\text{纯 y-变化量}}
-\end{aligned}
-$$
-<p>当 $\epsilon \to 0$ 时：</p>
-<ul>
-<li>纯 x-变化量 $\approx \epsilon u_x \cdot \frac{\partial f}{\partial x}$（走了 $\epsilon u_x$ 这么多，乘上 $x$ 方向的坡度）</li>
-<li>纯 y-变化量 $\approx \epsilon u_y \cdot \frac{\partial f}{\partial y}$（同理）</li>
-</ul>
-<p>全部代入方向导数的定义：</p>
-$$D_{\mathbf{u}} f = \lim_{\epsilon \to 0} \frac{\epsilon u_x \frac{\partial f}{\partial x} + \epsilon u_y \frac{\partial f}{\partial y}}{\epsilon}
-= u_x \frac{\partial f}{\partial x} + u_y \frac{\partial f}{\partial y}
-= \nabla f \cdot \mathbf{u}$$
-<p><strong>结论：方向导数 = 梯度 · 方向向量。</strong>这不是直接甩公式——是从定义出发，拆成偏导数组合，一步步推出来的。到这里还没有用到任何「最快」的说法，只是推导出了一个<strong>计算任意方向变化率的公式</strong>。</p>
-<p><strong>第三步：用点乘的几何意义回答「哪个方向最快」。</strong></p>
-<p>有了 $D_{\mathbf{u}}f = \nabla f \cdot \mathbf{u}$ 之后，看它的几何含义：</p>
-$$\nabla f \cdot \mathbf{u} = \|\nabla f\| \cdot \|\mathbf{u}\| \cdot \cos\theta = \|\nabla f\| \cdot \cos\theta$$
-<p>（$\|\mathbf{u}\|=1$ 因为 $\mathbf{u}$ 是单位向量。$\theta$ 是梯度和你的方向 $\mathbf{u}$ 之间的夹角。）</p>
-<ul>
-<li>$\theta = 0°$（和梯度<strong>同向</strong>）→ $\cos 0° = 1$ → $D_{\mathbf{u}}f = \|\nabla f\|$ → <strong>最大</strong></li>
-<li>$\theta = 90°$（和梯度<strong>垂直</strong>）→ $\cos 90° = 0$ → $D_{\mathbf{u}}f = 0$ → 高度不变（沿等高线走）</li>
-<li>$\theta = 180°$（和梯度<strong>反向</strong>）→ $\cos 180° = -1$ → $D_{\mathbf{u}}f = -\|\nabla f\|$ → <strong>下降最快</strong>（这就是梯度下降！）</li>
-</ul>
-<p><strong>推导链完整：</strong>定义 → 拆成偏导数组合 → 推出 $\nabla f \cdot \mathbf{u}$ → 点乘在 $\theta=0°$ 最大 → 所以梯度方向最快。每一步都有出处，没有循环。</p>
+<strong>🧠 直观理解 $e$：</strong> 想象银行给你 100% 年利率，但按复利计算。如果一年计息一次 → 年底 $1 变 $2。如果每半年计息一次 → 年底 $(1+0.5)^2 = 2.25$。如果每秒计息 → 年底趋近 $e \approx 2.718$。$e$ 就是「无穷细粒度复利」的极限结果。<br><br>
+在深度学习中，$e^x$（通常写成 <code>np.exp(x)</code>）出现在：softmax 激活函数、交叉熵损失、正态分布概率密度、梯度下降的动量……到处都有它。
 </div>
-<div class="callout callout-tip">
-<strong>梯度下降 = 闭着眼睛，每一步都往最陡的下坡方向踩一脚。</strong>
-$$\theta_{t+1} = \theta_t - \eta \cdot \nabla f(\theta_t)$$
-<ul>
-<li>$\theta_t$：你现在站的位置</li>
-<li>$\nabla f(\theta_t)$：这个位置的最陡上坡方向</li>
-<li><strong>负号</strong>：因为我们想<strong>下降</strong>，所以反着走</li>
-<li>$\eta$（学习率）：走多大步。太大→可能跨过山谷冲到对面山上去了；太小→半天走不到底</li>
-</ul>
+<h3>用代码看 $e^x$ 的增长</h3>
+<pre><code><span class="hl-comment"># 00-09 第一步：感受指数函数——线性 vs 指数的增长速度对比</span>
+<span class="hl-comment"># 导入numpy，别名np</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># np.exp(x) — 计算 e^x。exp = exponential（指数）</span>
+<span class="hl-comment"># 输入一个数，返回 e 的这个数次方</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"e^0 = {np.exp(0)}"</span>)      <span class="hl-comment"># 任何数的0次方都是1 → 1.0</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"e^1 = {np.exp(1)}"</span>)      <span class="hl-comment"># e^1 = e本身 → 2.71828...</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"e^2 = {np.exp(2)}"</span>)      <span class="hl-comment"># e² ≈ 7.389</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"e^5 = {np.exp(5)}"</span>)      <span class="hl-comment"># e⁵ ≈ 148.4 — 已经超过100了</span>
+
+<span class="hl-comment"># np.exp支持数组输入——对数组每个元素分别计算e^x</span>
+x = np.array([<span class="hl-number">0</span>, <span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>, <span class="hl-number">4</span>, <span class="hl-number">5</span>])        <span class="hl-comment"># 输入值 [0,1,2,...,5]</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"e^x 对 [0..5] = {np.exp(x)}"</span>)    <span class="hl-comment"># 批量输出: [1, 2.72, 7.39, 20.1, 54.6, 148.4]</span>
+
+<span class="hl-comment"># 对比线性函数 f(x) = 2x+1：</span>
+linear = <span class="hl-number">2</span> * x + <span class="hl-number">1</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"线性 2x+1   = {linear}"</span>)      <span class="hl-comment"># [1, 3, 5, 7, 9, 11] — 匀速增长</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"指数 e^x    = {np.exp(x)}"</span>)    <span class="hl-comment"># [1, 2.7, 7.4, 20, 55, 148] — 加速增长！</span>
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<p>看输出：$x=5$ 时线性只到 11，指数已经飙到 148。这就是指数爆炸——深度学习中梯度爆炸的根源。</p>
+<hr>
+<h2>对数：指数的逆运算</h2>
+<p>指数问的是：「$e$ 的多少次方等于这个数？」比如 $e^3 = 20.085$，那么：</p>
+$$\ln(20.085) = 3$$
+<p>$\ln$ 读作「natural log」（自然对数），它就是 $e^x$ 的逆运算：</p>
+<div class="callout callout-info">
+<strong>🔗 互为逆运算：</strong><br>
+$e^x = y \;\Longleftrightarrow\; \ln(y) = x$<br>
+指数问「底数的次数方等于多少」，对数问「多少次数方等于这个数」。一个向前，一个倒退。
+</div>
+<p><strong>比喻：</strong> 指数是「把细菌培养 $n$ 分钟，有多少细菌？」对数反过来问：「培养到 1000 个细菌，需要多少分钟？」</p>
+<p>如果底数是 2：$\log_2 8 = 3$（因为 $2^3=8$）。如果底数是 10：$\log_{10} 100 = 2$（因为 $10^2=100$）。在深度学习中，我们几乎只用 $\ln$（底数是 $e$）。</p>
+<h3>关键性质：对数把乘法变成加法</h3>
+<p>这是对数<strong>最重要</strong>的性质——它贯穿最大似然估计（MLE）、信息论、交叉熵损失等所有核心概念：</p>
+$$\boxed{\ln(ab) = \ln a + \ln b}$$
+<p><strong>证明：</strong> 设 $a = e^x$，$b = e^y$。那么 $ab = e^x \cdot e^y = e^{x+y}$（指数法则：同底数幂相乘，指数相加）。取对数：$\ln(ab) = \ln(e^{x+y}) = x+y = \ln a + \ln b$ ✓。</p>
+<p><strong>用数字验证：</strong> $\ln(2 \times 3) = \ln 6 \approx 1.792$，$\ln 2 + \ln 3 \approx 0.693 + 1.099 = 1.792$ ✓。</p>
+<p><strong>为什么这在深度学习中如此关键？</strong> 因为很多模型在做「乘积」——比如独立事件的联合概率 = 每个事件的概率相乘。$0.9 \times 0.8 \times 0.7 = 0.504$——乘着乘着数字变得非常小，计算机的浮点精度扛不住（下溢）。取对数后：$\ln 0.9 + \ln 0.8 + \ln 0.7 \approx -0.105 - 0.223 - 0.357 = -0.685$——都是好算的普通数字。</p>
+<p><strong>对数把乘积变成求和，稳定的求和。</strong></p>
+<h3>第二个关键性质：把指数拉到前面</h3>
+$$\boxed{\ln(a^n) = n \cdot \ln a}$$
+<p>指数 $n$ 被「拉下来」变成乘法系数。证明：$\ln(a^n) = \ln(\underbrace{a \cdot a \cdots a}_{n\text{ 个}}) = \underbrace{\ln a + \ln a + \cdots + \ln a}_{n\text{ 个}} = n \cdot \ln a$。</p>
+<p>这个性质在推导损失函数梯度时极其重要——把复杂的指数表达式变成简单的线性形式。</p>
+<h3>自然对数 vs 常用对数</h3>
+<table>
+<tr><th>写法</th><th>底数</th><th>用途</th></tr>
+<tr><td>$\ln x$</td><td>$e \approx 2.718$</td><td><strong>深度学习、微积分</strong>（导数简洁）</td></tr>
+<tr><td>$\log_{10} x$</td><td>$10$</td><td>工程（分贝、pH 值）、科学计数法</td></tr>
+<tr><td>$\log_2 x$</td><td>$2$</td><td>计算机科学（比特、二分查找）</td></tr>
+</table>
+<p>在深度学习的论文和代码中，$\log$ 几乎总是指 $\ln$（自然对数）。numpy 中也是：<code>np.log(x)</code> 就是 $\ln(x)$。</p>
+<h3>用代码验证对数性质</h3>
+<pre><code><span class="hl-comment"># 00-09 第二步：验证对数的两个核心性质</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># np.log(x) — 计算 ln(x)，自然对数（以e为底）</span>
+<span class="hl-comment"># 注意：x必须大于0，ln(0)和ln(负数)无定义</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"ln(1) = {np.log(1)}"</span>)      <span class="hl-comment"># e^0=1 → ln(1)=0.0</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"ln(e) = {np.log(np.e)}"</span>)  <span class="hl-comment"># e^1=e → ln(e)=1.0（np.e = e ≈ 2.718）</span>
+
+<span class="hl-comment"># 性质①：ln(ab) = ln(a) + ln(b)</span>
+a, b = <span class="hl-number">4</span>, <span class="hl-number">7</span>
+left = np.log(a * b)                       <span class="hl-comment"># ln(28) ≈ 3.332</span>
+right = np.log(a) + np.log(b)              <span class="hl-comment"># ln(4)+ln(7) ≈ 1.386+1.946 = 3.332</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"ln(4×7) = {left:.4f}"</span>)        <span class="hl-comment"># 3.3322</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"ln4+ln7 = {right:.4f}"</span>)      <span class="hl-comment"># 3.3322</span>
+<span class="hl-comment"># allclose容忍浮点误差判断近似相等 → True</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"相等? {np.allclose(left, right)}"</span>)
+
+<span class="hl-comment"># 性质②：ln(a^n) = n·ln(a)</span>
+n = <span class="hl-number">3</span>
+left2 = np.log(a ** n)                     <span class="hl-comment"># ln(4³) = ln(64) ≈ 4.159</span>
+right2 = n * np.log(a)                     <span class="hl-comment"># 3 × ln(4) = 3 × 1.386 = 4.159</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"ln(4³) = {left2:.4f}"</span>)       <span class="hl-comment"># 4.1589</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"3·ln4  = {right2:.4f}"</span>)     <span class="hl-comment"># 4.1589</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"相等? {np.allclose(left2, right2)}"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<hr>
+<h2>指数和对数互相「抵消」</h2>
+<p>因为是逆运算，指数和对数互相抵消——就像加法和减法、乘法和除法：</p>
+$$\ln(e^x) = x, \qquad e^{\ln x} = x \quad (x > 0)$$
+<p>用代码快速验证：</p>
+<pre><code><span class="hl-comment"># 00-09 第三步：指数和对数互为逆运算——互相抵消</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+x = <span class="hl-number">2.5</span>
+<span class="hl-comment"># ln(e^x) = x — 先exp再log，回到原点</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"ln(e^2.5) = {np.log(np.exp(x)):.6f}"</span>)  <span class="hl-comment"># 2.5 ✓</span>
+<span class="hl-comment"># e^(ln x) = x — 先log再exp，回到原点（x必须>0）</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"e^(ln 2.5) = {np.exp(np.log(x)):.6f}"</span>)  <span class="hl-comment"># 2.5 ✓</span>
+
+<span class="hl-comment"># 对数组批量操作：</span>
+vals = np.array([<span class="hl-number">0.5</span>, <span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">10</span>, <span class="hl-number">100</span>])
+<span class="hl-comment"># 全部应该回到原始值（浮点误差可忽略）</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"e^(ln vals) = {np.exp(np.log(vals))}"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<hr>
+<h2>为什么深度学习这么依赖 $\ln$？</h2>
+<p>总结四个原因：</p>
+<ol>
+<li><strong>把乘变成加：</strong> 联合概率 $p_1 \times p_2 \times \cdots \times p_n$ 取对数变成 $\ln p_1 + \ln p_2 + \cdots + \ln p_n$。避免数字太小导致的下溢，数值稳定性↑。</li>
+<li><strong>把指数拉下来：</strong> $\ln(e^x) = x$——softmax 里分子分母都有 $e^x$，取对数后化简。</li>
+<li><strong>导数简洁：</strong> $\frac{d}{dx}\ln x = \frac{1}{x}$，简单到爆炸。相比之下，$\log_{10} x$ 的导数多一个常数因子。</li>
+<li><strong>信息论基础：</strong> 信息量用 $-\ln p$ 度量（惊喜度），熵用 $-\sum p \ln p$ 算。$\ln$ 是信息的「天然语言」。</li>
+</ol>
+<div class="callout callout-info">
+<strong>📊 后续应用预览：</strong><br>
+<strong>00-11 最大似然估计：</strong> 用 $\ln$ 把似然函数的连乘变成连加 → 对数似然<br>
+<strong>00-12 信息论：</strong> 熵和交叉熵的核心公式都以 $\ln$ 为底<br>
+<strong>00-13 交叉熵损失：</strong> 分类任务的标准损失函数，就是 $-\sum y \ln(\hat{y})$<br>
+<strong>激活函数：</strong> softmax 分子是 $e^{z_i}$，sigmoid 是 $\frac{1}{1+e^{-z}}$
 </div>
 <hr>
 <h2>💭 概念题</h2>
 <ol>
-<li>梯度指向上升最快方向。为什么是"最快"？用方向导数 = 梯度与方向向量的点乘来解释。提示：$\cos\theta$ 在 $\theta=0°$（同向）时最大。——考察：方向导数的几何直觉</li>
+<li>验证 $\ln(10) + \ln(20) = \ln(200)$。用计算器或 numpy 算一下。然后解释：为什么 $\ln(ab) = \ln a + \ln b$？——考察：对数乘积性质的证明思路。</li>
+<li>某深度学习模型的损失函数是 $L = -\ln(p_1) - \ln(p_2) - \ln(p_3)$，其中 $p_1=0.9$，$p_2=0.8$，$p_3=0.7$。请用对数的性质把这个损失写成 $-\ln(\text{某个乘积})$ 的形式，并解释为什么这样写更方便计算。——考察：对数性质的实际应用 + 数值稳定性直觉。</li>
 </ol>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-08/">← 00-08</a><a href="../../">📖 目录</a><a href="../00-10/">00-10 →</a></nav>
-</div></body></html>
+<a href="../00-10/">← 00-08</a><a href="../../">📖 目录</a><a href="../00-10/">00-10 →</a></nav>
+</div>
+<script>
+(function(){
+  document.querySelectorAll('pre code').forEach(function(block){
+    var wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 复制';
+    btn.onclick = function(){
+      var text = block.innerText;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = '✅ 已复制';
+        btn.classList.add('copied');
+        setTimeout(function(){
+          btn.textContent = '📋 复制';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    };
+    block.parentNode.insertBefore(wrapper, block);
+    wrapper.appendChild(btn);
+    wrapper.appendChild(block);
+  });
+})();
+</script>
+
+</body></html>
