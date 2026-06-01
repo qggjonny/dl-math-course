@@ -98,7 +98,6 @@ blockquote {
 /* === 代码块 === */
 .code-block-wrapper {
   position: relative;
-  margin: 1.2em 0;
   padding-top: 2.5em;     /* 按钮独占区，在 pre 上方 */
 }
 .code-block-wrapper pre {
@@ -107,7 +106,7 @@ blockquote {
 .copy-btn {
   position: absolute;
   top: 4px;
-  left: 1.2em;             /* 对齐代码内边距 */
+  left: 0;
   z-index: 1;
   background: var(--bg);
   border: 1px solid var(--border);
