@@ -165,7 +165,7 @@ $$AQ = A\begin{bmatrix}\mathbf{v}_1 & \mathbf{v}_2\end{bmatrix} = \begin{bmatrix
 
 $$AQ = Q\Lambda$$
 
-<p><strong>第三步：把 $A$ 单独解出来。</strong> 两边右边乘一个矩阵，把 $Q$ 「消掉」。这个矩阵记作 $Q^{-1}$，满足 $QQ^{-1}=I$（$I$ 是单位矩阵，相当于数字 1）。于是：</p>
+<p><strong>第三步：把 $A$ 单独解出来。</strong> 两边右边乘一个矩阵，把 $Q$ 「消掉」。这个矩阵叫做 $Q$ 的<strong>逆矩阵</strong>，记作 $Q^{-1}$，满足 $QQ^{-1}=I$（$I$ 是单位矩阵，相当于数字 1）。就像数字里 $3 \times \frac{1}{3} = 1$——逆矩阵就是矩阵世界的「倒数」。于是：</p>
 
 $$AQQ^{-1} = Q\Lambda Q^{-1} \;\Longrightarrow\; A \cdot I = Q\Lambda Q^{-1} \;\Longrightarrow\; \boxed{A = Q\Lambda Q^{-1}}$$
 
@@ -175,11 +175,11 @@ $$Q^{-1} = \begin{bmatrix} 0.667 & 0.333 \\ 0.333 & -0.333 \end{bmatrix}$$
 
 <p>验证：$QQ^{-1} = \begin{bmatrix}1&0\\0&1\end{bmatrix} = I$ ✓。$Q^{-1}$ 的作用就是<strong>撤销 $Q$ 的变换</strong>——$Q$ 把空间扭过去，$Q^{-1}$ 扭回来。</p>
 
-<p><strong>第四步：走一遍完整的 $A\mathbf{x}$，看看 $Q\Lambda Q^{-1}$ 到底在做什么。</strong> 取 $\mathbf{x} = [3,1]$。</p>
+<p><strong>第四步：用具体向量验证。</strong> $A = Q\Lambda Q^{-1}$ 这个等式说的是：对<strong>任意</strong>向量 $\mathbf{x}$，$A\mathbf{x}$ 和 $Q\Lambda Q^{-1}\mathbf{x}$ 算出来一定一样。$\mathbf{x}$ 只是我们随便挑的一个测试向量——取 $\mathbf{x} = [3,1]$ 来验证。</p>
 
 <p>先硬算 $A\mathbf{x}$：$\begin{bmatrix}4&1\\2&3\end{bmatrix}\begin{bmatrix}3\\1\end{bmatrix} = \begin{bmatrix}13\\9\end{bmatrix}$。</p>
 
-<p>再走 $Q\Lambda Q^{-1}\mathbf{x}$ 这条路。从右往左，分三步：</p>
+<p>再走 $Q\Lambda Q^{-1}\mathbf{x}$ 这条路——从右往左，分三步：</p>
 
 <p><strong>① $Q^{-1}\mathbf{x}$：</strong></p>
 $$Q^{-1}\begin{bmatrix}3\\1\end{bmatrix} = \begin{bmatrix}0.667&0.333\\0.333&-0.333\end{bmatrix}\begin{bmatrix}3\\1\end{bmatrix} = \begin{bmatrix}2.33\\0.67\end{bmatrix}$$
