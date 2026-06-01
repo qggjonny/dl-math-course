@@ -237,6 +237,9 @@ numpy 跑出来：<br>
 $U = \begin{bmatrix} -0.230 & 0.883 & 0.408 \\ -0.525 & 0.241 & -0.817 \\ -0.820 & -0.402 & 0.408 \end{bmatrix}$（$3\times3$，三列互相垂直）<br>
 $\Sigma$ 对角线：$\sigma_1 = 9.53,\ \sigma_2 = 0.51$（只有 2 个奇异值，因为 $A$ 只有 2 列）<br>
 $V^T = \begin{bmatrix} -0.620 & -0.785 \\ -0.785 & 0.620 \end{bmatrix}$（$2\times2$，两行互相垂直）<br><br>
+$\Sigma$ 是 $3\times2$，结构是把 $2\times2$ 对角矩阵「补零」扩展成 $3\times2$：<br>
+$$\Sigma = \begin{bmatrix} 9.53 & 0 \\ 0 & 0.51 \\ 0 & 0 \end{bmatrix} \quad\leftarrow\ \text{对角线} = \begin{bmatrix}\sigma_1&0\\0&\sigma_2\end{bmatrix}\ \text{是 2×2 对角阵，下面补一行零变成 3×2}$$
+只有 $\min(3,2)=2$ 个奇异值——因为输入只有 2 维，最多拉伸 2 个独立方向，第三行全零说明「第三个方向没有被拉伸，直接映射到 0」。<br><br>
 注意这里的<strong>维度跃迁</strong>：$V^T$（2×2）在二维平面里旋转 → $\Sigma$（3×2）拉伸并映射到三维 → $U$（3×3）在三维空间里旋转。<br><br>
 验证：$U \Sigma V^T = A$ ✓（跑代码确认过）。SVD 对长方形矩阵同样精确成立。
 </div>
