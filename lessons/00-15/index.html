@@ -139,8 +139,7 @@ a, b = <span class="hl-number">0.0</span>, <span class="hl-number">1.0</span>
 h = <span class="hl-number">1.0</span> / (b - a)
 <span class="hl-comment"># 子区间[0.2, 0.5]</span>
 c, d = <span class="hl-number">0.2</span>, <span class="hl-number">0.5</span>
-<span class="hl-comment"># 概率 = 子区间宽度/总宽度（矩形面积之比）</span>
-prob = (d-c) / (b-a)
+prob = (d-c) / (b-a)                    <span class="hl-comment"># 概率 = 子区间宽度/总宽度（矩形面积之比）</span>
 <span class="hl-comment"># 理论概率：0.3/1.0 = 0.3</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"P({c}≤X≤{d}) = {prob}"</span>)
 <span class="hl-comment"># 用蒙特卡洛模拟验证理论值</span>
@@ -156,29 +155,28 @@ in_int = np.<span class="hl-builtin">sum</span>((samples>=c) & (samples<=d))
 <span class="hl-comment"># ===== 正态 PDF（手工实现正态密度函数）=====</span>
 <span class="hl-comment"># x=输入值，mu=均值(中心)，sigma=标准差(胖瘦)</span>
 <span class="hl-keyword">def</span> <span class="hl-func">normal_pdf</span>(x, mu, sigma):
-<span class="hl-comment"># 归一化系数：1/(σ√(2π))，保证总面积为1</span>
+    <span class="hl-comment"># 归一化系数：1/(σ√(2π))，保证总面积为1</span>
     c = <span class="hl-number">1.0</span>/(sigma*np.sqrt(<span class="hl-number">2</span>*np.pi))
 <span class="hl-comment"># σ翻倍→系数减半，钟变胖变矮</span>
-<span class="hl-comment"># 指数部分：-(x-μ)²/(2σ²)，决定离中心多远</span>
+    <span class="hl-comment"># 指数部分：-(x-μ)²/(2σ²)，决定离中心多远</span>
     e = -<span class="hl-number">0.5</span>*((x-mu)/sigma)**<span class="hl-number">2</span>
 <span class="hl-comment"># x离μ越远→指数越负→exp趋近0→密度趋近0</span>
-<span class="hl-comment"># np.exp()：e的幂，支持数组运算（自动广播）</span>
+    <span class="hl-comment"># np.exp()：e的幂，支持数组运算（自动广播）</span>
     <span class="hl-keyword">return</span> c * np.exp(e)
 <span class="hl-comment"># 验证 σ 减半效应：σ翻倍 → 中心密度减半（总面积守恒）</span>
 <span class="hl-comment"># 遍历三个不同的σ值</span>
 <span class="hl-keyword">for</span> s <span class="hl-keyword">in</span> [<span class="hl-number">0.5</span>,<span class="hl-number">1.0</span>,<span class="hl-number">2.0</span>]:
-<span class="hl-comment"># 在μ=0处密度：σ=0.5→高，σ=2→矮</span>
+    <span class="hl-comment"># 在μ=0处密度：σ=0.5→高，σ=2→矮</span>
     <span class="hl-builtin">print</span>(<span class="hl-string">f"σ={s:.1f}: f(0)={normal_pdf(0,0,s):.4f}"</span>)
 <span class="hl-comment"># ===== 模拟验证 68-95-99.7 法则 =====</span>
 <span class="hl-comment"># normal(μ,σ,size)：生成10万个标准正态(均值0,标准差1)样本</span>
 sn = np.random.normal(<span class="hl-number">0</span>,<span class="hl-number">1</span>,<span class="hl-number">100000</span>)
 <span class="hl-comment"># k=1,2,3 → ±1σ, ±2σ, ±3σ</span>
 <span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>,<span class="hl-number">2</span>,<span class="hl-number">3</span>]:
-<span class="hl-comment"># mean()：落在[-k,k]内的样本比例（频率≈概率）</span>
-    r = np.mean((sn>=-k)&(sn<=k))
-<span class="hl-comment"># 字典取理论值：±1σ→68.27%, ±2σ→95.45%, ±3σ→99.73%</span>
+    r = np.mean((sn>=-k)&(sn<=k))         <span class="hl-comment"># mean()：落在[-k,k]内的样本比例（频率≈概率）</span>
+    <span class="hl-comment"># 字典取理论值：±1σ→68.27%, ±2σ→95.45%, ±3σ→99.73%</span>
     t = {<span class="hl-number">1</span>:<span class="hl-number">0.6827</span>,<span class="hl-number">2</span>:<span class="hl-number">0.9545</span>,<span class="hl-number">3</span>:<span class="hl-number">0.9973</span>}[k]
-<span class="hl-comment"># 模拟值 vs 理论值，高度吻合</span>
+    <span class="hl-comment"># 模拟值 vs 理论值，高度吻合</span>
     <span class="hl-builtin">print</span>(<span class="hl-string">f"±{k}σ: sim={r:.4f} theory={t:.4f}"</span>)
 <span class="hl-comment"># ===== CDF 数值积分（用矩形法近似积分）=====</span>
 <span class="hl-comment"># linspace(-4,4,501)：[-4,4]等间距取501个点，步长=8/500=0.016</span>
@@ -190,4 +188,46 @@ cdf = np.cumsum(normal_pdf(xg,<span class="hl-number">0</span>,<span class="hl-n
 <span class="hl-comment"># 取x≈-2, 0, 2处的CDF值</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"F(-2)≈{cdf[125]:.4f} F(0)≈{cdf[250]:.4f} F(2)≈{cdf[375]:.4f}"</span>)
 <span class="hl-comment"># CDF(-2)≈0.023, CDF(0)=0.5, CDF(2)≈0.977 → 和正态表一致</span>
-<
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
+<hr>
+<h2>💭 概念题</h2>
+<ol>
+<li>"取一个确定值的概率 = 0"但现实中气温 25°C 完全可以发生。用「针尖戳纸」的比喻解释为什么不矛盾。——考察：数学理想化 vs 测量精度</li>
+<li>从总面积 = 1 的硬约束出发：如果 σ 从 1 翻到 2，钟变胖了。峰值 f(0) 应该是原来的几分之几？——考察：归一化系数 1/(σ√2π) 的直觉</li>
+<li>为什么 68-95-99.7 不是线性？±3σ 为什么不等于 3×68.3%？用"钟的尾巴指数衰减"来解释。——考察：正态分布的尾部衰减速度</li>
+<li>均匀分布的 PDF 高度 c=1/(b-a) 是怎么推导出来的？——考察：总面积=1 的约束</li>
+<li>米粒堆山丘的比喻体现了哪个定理？列举两个深度学习中的实际应用。——考察：中心极限定理的理解与迁移</li>
+</ol>
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-14/">← 00-14</a><a href="../../">📖 目录</a><a href="../00-16/">00-16 →</a></nav>
+</div>
+<script>
+(function(){
+  document.querySelectorAll('pre code').forEach(function(block){
+    var wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 复制';
+    btn.onclick = function(){
+      var text = block.innerText;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = '✅ 已复制';
+        btn.classList.add('copied');
+        setTimeout(function(){
+          btn.textContent = '📋 复制';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    };
+    block.parentNode.insertBefore(wrapper, block);
+    wrapper.appendChild(btn);
+    wrapper.appendChild(block);
+  });
+})();
+</script>
+
+</body></html>

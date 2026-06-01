@@ -225,12 +225,49 @@ A = np.array([[<span class="hl-number">1</span>, <span class="hl-number">2</span
 <span class="hl-comment"># M₁₁ = 5×9-6×8 = 45-48 = -3  (划掉第0行第0列后的2×2行列式)</span>
 <span class="hl-comment"># M₁₂ = 4×9-6×7 = 36-42 = -6  (划掉第0行第1列后的2×2行列式)</span>
 <span class="hl-comment"># M₁₃ = 4×8-5×7 = 32-35 = -3  (划掉第0行第1列后的2×2行列式)</span>
-<span class="hl-comment"># 手算: 1·(-3) - 2·(-6) + 3·(-3)</span>
-det_manual = 1*(5*9 - 6*8) - 2*(4*9 - 6*7) + 3*(4*8 - 5*7)
+det_manual = 1*(5*9 - 6*8) - 2*(4*9 - 6*7) + 3*(4*8 - 5*7)  <span class="hl-comment"># 手算: 1·(-3) - 2·(-6) + 3·(-3)</span>
 <span class="hl-comment">                                      # = -3 + 12 - 9 = 0</span>
 <span class="hl-comment"># 输出: 手算行列式: 0</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"手算行列式: {det_manual}"</span>)
 <span class="hl-comment"># np.linalg.det()：计算任意方阵的行列式，内部用LU分解，比降阶展开更高效</span>
 <span class="hl-comment"># :.0f=取整显示 → 输出: 0</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"np.linalg.det: {np.linalg.det(A):.0f}"</span>)
-<span class="hl-comment"># 行列式=0 → 矩阵把三维空间压扁了，三个列向量共面，体积为0</span><
+<span class="hl-comment"># 行列式=0 → 矩阵把三维空间压扁了，三个列向量共面，体积为0</span></code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<hr>
+<h2>💭 概念题</h2>
+<ol>
+<li>矩阵把单位正方形扭成平行四边形。行列式为 0 时，平行四边形变成了什么？——考察：行列式=0 的几何含义</li>
+<li>用降阶展开手算 $\begin{bmatrix}2&0&1\\0&3&0\\1&0&2\end{bmatrix}$ 的行列式。提示：中间那列有两个 0，沿第二行或第二列展开最省事。——考察：3×3 降阶展开</li>
+</ol>
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-03/">← 00-03</a><a href="../../">📖 目录</a><a href="../00-05/">00-05 →</a></nav>
+</div>
+<script>
+(function(){
+  document.querySelectorAll('pre code').forEach(function(block){
+    var wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 复制';
+    btn.onclick = function(){
+      var text = block.innerText;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = '✅ 已复制';
+        btn.classList.add('copied');
+        setTimeout(function(){
+          btn.textContent = '📋 复制';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    };
+    block.parentNode.insertBefore(wrapper, block);
+    wrapper.appendChild(btn);
+    wrapper.appendChild(block);
+  });
+})();
+</script>
+
+</body></html>

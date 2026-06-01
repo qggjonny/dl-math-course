@@ -62,8 +62,7 @@ $$\theta^7 (1-\theta)^3$$
 thetas = np.linspace(<span class="hl-number">0.01</span>, <span class="hl-number">0.99</span>, <span class="hl-number">100</span>)
 <span class="hl-comment"># L(θ) = θ⁷(1-θ)³</span>
 likelihood = thetas**<span class="hl-number">7</span> * (<span class="hl-number">1</span> - thetas)**<span class="hl-number">3</span>
-<span class="hl-comment"># 似然最大的 θ 的下标</span>
-best_idx = np.argmax(likelihood)
+best_idx = np.argmax(likelihood)              <span class="hl-comment"># 似然最大的 θ 的下标</span>
 
 <span class="hl-builtin">print</span>(<span class="hl-string">f"最大似然估计 θ̂ = {thetas[best_idx]:.3f}"</span>)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"直觉：7/10 = {7/10}"</span>)
@@ -137,17 +136,15 @@ true_mu, true_sigma = <span class="hl-number">5.0</span>, <span class="hl-number
 data = np.random.normal(true_mu, true_sigma, <span class="hl-number">1000</span>)
 
 <span class="hl-comment"># MLE 估计：高斯分布的 MLE 就是样本均值和样本标准差</span>
-<span class="hl-comment"># μ̂ = (1/N) Σ xᵢ</span>
-mu_hat = np.mean(data)
-<span class="hl-comment"># σ̂ = sqrt((1/N) Σ (xᵢ-μ)²)</span>
-sigma_hat = np.std(data)
+mu_hat = np.mean(data)                       <span class="hl-comment"># μ̂ = (1/N) Σ xᵢ</span>
+sigma_hat = np.std(data)                     <span class="hl-comment"># σ̂ = sqrt((1/N) Σ (xᵢ-μ)²)</span>
 
 <span class="hl-builtin">print</span>(<span class="hl-string">f"真实参数: μ={true_mu}, σ={true_sigma}"</span>)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"MLE 估计: μ̂={mu_hat:.3f}, σ̂={sigma_hat:.3f}"</span>)
 
 <span class="hl-comment"># 验证：算对数似然</span>
 <span class="hl-keyword">def</span> <span class="hl-func">log_likelihood</span>(mu, sigma, data):
-    <span class="hl-comment">"""高斯分布的对数似然</span>
+<span class="hl-comment">"""高斯分布的对数似然</span>
 <span class="hl-comment">    mu: 均值</span>
 <span class="hl-comment">    sigma: 标准差</span>
 <span class="hl-comment">    data: 观测数据</span>
@@ -162,4 +159,84 @@ ll_off = log_likelihood(<span class="hl-number">4.0</span>, <span class="hl-numb
 <span class="hl-builtin">print</span>(<span class="hl-string">f"\nMLE 对数似然: {ll_mle:.1f}"</span>)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"错误参数对数似然: {ll_off:.1f}"</span>)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"MLE 更高 ✓"</span>)
-<
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<h2>六、MLE 和贝叶斯的区别</h2>
+
+<p>00-17 学了贝叶斯定理：$P(\theta \mid \text{数据}) \propto P(\text{数据} \mid \theta) \cdot P(\theta)$。</p>
+
+<ul>
+  <li><strong>MLE：</strong>只看 $P(\text{数据} \mid \theta)$，最大化它——不管 $\theta$ 本身有多大概率出现</li>
+  <li><strong>贝叶斯：</strong>还要乘先验 $P(\theta)$——如果 $\theta=0.99$ 按理说很罕见，贝叶斯会惩罚它</li>
+  <li><strong>MAP（最大后验）：</strong>贝叶斯中最大化 $P(\theta \mid \text{数据})$ 而非 $P(\text{数据} \mid \theta)$</li>
+</ul>
+
+<div class="callout callout-tip">
+<strong>为什么深度学习都选 MLE：</strong> 数据量大的时候，似然主导，先验的影响很小。MLE 和 MAP 差别不大。所以等价于：做回归就最小化 MSE，做分类就最小化交叉熵——不需要显式计算先验。
+</div>
+
+<h2>💭 概念题</h2>
+
+<div class="exercise">
+<h3>1. MLE 为什么不总是对的</h3>
+<p>抛 3 次硬币，3 次全是正面。MLE 估计 $\hat{\theta} = 1.0$。这个估计合理吗？有什么问题？贝叶斯方法会怎么修正？</p>
+<p>——考察：小样本下 MLE 的过拟合、先验的修正作用</p>
+</div>
+
+<div class="exercise">
+<h3>2. MSE 和交叉熵的来源</h3>
+<p>为什么回归用 MSE 而不交叉熵？分类用交叉熵而不用 MSE？从"假设数据服从什么分布"的角度解释。</p>
+<p>——考察：MLE → 损失函数的推导链条</p>
+</div>
+
+<div class="exercise">
+<h3>3. 对数似然为什么方便</h3>
+<p>有 1000 个独立样本，似然是 1000 个小概率的乘积。直接用 $L = \prod p_i$ 会有什么问题？取对数解决了什么？</p>
+<p>——考察：数值稳定性和求导便利性</p>
+</div>
+
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-17/">← 00-17</a><a href="../../">📖 目录</a><a href="../00-19/">00-19 →</a></nav>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  });
+</script>
+
+<script>
+(function(){
+  document.querySelectorAll('pre code').forEach(function(block){
+    var wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 复制';
+    btn.onclick = function(){
+      var text = block.innerText;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = '✅ 已复制';
+        btn.classList.add('copied');
+        setTimeout(function(){
+          btn.textContent = '📋 复制';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    };
+    block.parentNode.insertBefore(wrapper, block);
+    wrapper.appendChild(btn);
+    wrapper.appendChild(block);
+  });
+})();
+</script>
+
+</body>
+</html>
+

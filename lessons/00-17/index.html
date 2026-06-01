@@ -88,22 +88,60 @@ has_disease = rng.random(N) &lt; <span class="hl-number">0.01</span>
 <span class="hl-comment"># np.where(条件, 真时取值, 假时取值)：按条件二选一</span>
 <span class="hl-comment"># 有病的人：99% 测出阳性（灵敏度）；没病的人：1% 假阳性</span>
 test_positive = np.where(
-<span class="hl-comment"># 条件：是否有病（布尔数组）</span>
-    has_disease,
-<span class="hl-comment"># 真有病 → 99%概率测出阳性（灵敏度）</span>
+    has_disease,                          <span class="hl-comment"># 条件：是否有病（布尔数组）</span>
+    <span class="hl-comment"># 真有病 → 99%概率测出阳性（灵敏度）</span>
     rng.random(N) &lt; <span class="hl-number">0.99</span>,
-<span class="hl-comment"># 没病的 → 1%概率假阳性</span>
+    <span class="hl-comment"># 没病的 → 1%概率假阳性</span>
     rng.random(N) &lt; <span class="hl-number">0.01</span>
 )
 <span class="hl-comment"># 在测出阳性的人里，有多少真有病？→ P(病|阳性)</span>
-<span class="hl-comment"># .sum()对布尔数组：True=1 → 阳性总人数</span>
-positives = test_positive.sum()
-<span class="hl-comment"># & 逻辑与：阳性且真有病 → 真阳性人数</span>
-true_positives = (test_positive & has_disease).sum()
+positives = test_positive.sum()           <span class="hl-comment"># .sum()对布尔数组：True=1 → 阳性总人数</span>
+true_positives = (test_positive & has_disease).sum()  <span class="hl-comment"># & 逻辑与：阳性且真有病 → 真阳性人数</span>
 <span class="hl-comment"># 阳性人数 ≈ 198人(99真阳性+99假阳性)</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"阳性总人数: {positives}"</span>)
 <span class="hl-comment"># 真有病且阳性 ≈ 99人</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"真阳性(真有病): {true_positives}"</span>)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"P(病|阳性) = {true_positives}/{positives} = {true_positives/positives:.3f}"</span>)
 <span class="hl-comment"># :.3f = 保留3位小数，大约 0.500——和贝叶斯公式算的一样</span>
-<
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<p>贝叶斯公式不是在玩符号——它纠正了一个真实的思维错误。</p>
+<hr>
+<h2>💭 概念题</h2>
+<ol>
+<li>为什么阳性率 99%、发病率 1% 的情况下，$P(病 \mid 阳性)$ 只有 ~50%？用「假阳性人数 vs 真阳性人数」解释。——考察：基础率忽略</li>
+<li>如果发病率从 1% 变成 10%，$P(病 \mid 阳性)$ 大约是多少？先估算再算。——考察：先验对后验的影响</li>
+<li>工厂例子：拿到一个次品，它来自机器 C 的概率是多少？——考察：贝叶斯公式完整计算</li>
+</ol>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-16/">← 00-16</a><a href="../../">📖 目录</a><a href="../00-18/">00-18 →</a></nav>
+</div>
+<script>
+(function(){
+  document.querySelectorAll('pre code').forEach(function(block){
+    var wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 复制';
+    btn.onclick = function(){
+      var text = block.innerText;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = '✅ 已复制';
+        btn.classList.add('copied');
+        setTimeout(function(){
+          btn.textContent = '📋 复制';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    };
+    block.parentNode.insertBefore(wrapper, block);
+    wrapper.appendChild(btn);
+    wrapper.appendChild(block);
+  });
+})();
+</script>
+
+</body></html>

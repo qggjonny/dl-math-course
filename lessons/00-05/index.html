@@ -78,14 +78,12 @@ A = np.array([[<span class="hl-number">4</span>, <span class="hl-number">1</span
               [<span class="hl-number">2</span>, <span class="hl-number">3</span>]])
 
 <span class="hl-comment"># 迹 = 对角线元素之和 → a+d = 4+3 = 7</span>
-<span class="hl-comment"># trace()返回矩阵对角线之和，整数7</span>
-trace = np.trace(A)
+trace = np.trace(A)                       <span class="hl-comment"># trace()返回矩阵对角线之和，整数7</span>
 <span class="hl-comment"># f-string输出：迹 = 7</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"迹 = {trace}"</span>)
 
 <span class="hl-comment"># 行列式 = ad−bc = 4×3 − 1×2 = 10</span>
-<span class="hl-comment"># linalg.det()计算行列式，浮点数10.0</span>
-det_A = np.linalg.det(A)
+det_A = np.linalg.det(A)                  <span class="hl-comment"># linalg.det()计算行列式，浮点数10.0</span>
 <span class="hl-comment"># :.0f = 保留0位小数，输出整数形式 "10"</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"行列式 = {det_A:.0f}"</span>)
 
@@ -102,4 +100,126 @@ lambda1 = (<span class="hl-number">7</span> + discriminant) / <span class="hl-nu
 lambda2 = (<span class="hl-number">7</span> - discriminant) / <span class="hl-number">2</span>
 <span class="hl-comment"># 输出：λ₁ = 5.0, λ₂ = 2.0</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"λ₁ = {lambda1}, λ₂ = {lambda2}"</span>)
-<
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<h4>两个恒等式是怎么来的？</h4>
+<p>特征方程展开后是 $\lambda^2 - \text{tr}(A)\lambda + \det(A) = 0$。这是标准二次方程 $x^2 + bx + c = 0$ 的形式（这里 $b = -\text{tr}(A)$，$c = \det(A)$）。</p>
+<p>二次方程有一个定理（韦达定理）：<strong>所有根之和 = $-b$，所有根之积 = $c$</strong>。拿 $x^2 - 7x + 10 = 0$ 来说：两根 2 和 5，和是 7（= $-(-7)$），积是 10。为什么？因为二次方程可以写成 $(x - r_1)(x - r_2) = 0$，展开后 $x^2 - (r_1+r_2)x + r_1 r_2 = 0$，对应系数就得到关系。</p>
+<p>应用到特征方程 $\lambda^2 - \text{tr}(A)\lambda + \det(A) = 0$：</p>
+<div class="callout callout-info">
+<strong>恒等式 ①：$\lambda_1 + \lambda_2 = \text{tr}(A)$</strong> — 特征值之和 = 迹（对角线之和）<br>
+<strong>恒等式 ②：$\lambda_1 \times \lambda_2 = \det(A)$</strong> — 特征值之积 = 行列式
+</div>
+<p><strong>走一遍例子验证：</strong> $A = \begin{bmatrix} 4 & 1 \\ 2 & 3 \end{bmatrix}$，迹 = 7，行列式 = 10。解出 $\lambda_1=5, \lambda_2=2$。5+2=7 ✓，5×2=10 ✓。</p>
+<h3>特征值与行列式的关系</h3>
+<p>行列式 = <strong>所有特征值相乘</strong>：</p>
+$$\det(A) = \lambda_1 \times \lambda_2 \times \cdots \times \lambda_n$$
+<div class="callout callout-info">
+<strong>📐 从 2×2 → n×n：</strong>
+<p><strong>① 2×2 回顾。</strong> 特征方程 $\lambda^2 - \text{tr}(A)\lambda + \det(A) = 0$，常数项 = $\det(A)$。同时因式分解 $(\lambda_1 - \lambda)(\lambda_2 - \lambda)$ 展开后常数项 = $\lambda_1\lambda_2$。同一多项式两种写法 → $\det(A) = \lambda_1\lambda_2$。</p>
+<p><strong>② 3×3 验证。</strong> 用 00-04 学的降阶展开（沿第一行，符号 + - + 来自行交换次数：第 1 列 0 次→正，第 2 列 1 次→负，第 3 列 2 次→正），算一个具体例子——矩阵 $A = \begin{bmatrix} 3 & 1 & 0 \\ 1 & 2 & 1 \\ 0 & 1 & 3 \end{bmatrix}$ 的特征多项式：</p>
+$$\begin{aligned}
+\det(A-\lambda I) &= \begin{vmatrix} 3-\lambda & 1 & 0 \\ 1 & 2-\lambda & 1 \\ 0 & 1 & 3-\lambda \end{vmatrix} \\[4pt]
+&= (3-\lambda)\!\begin{vmatrix}2-\lambda&1\\1&3-\lambda\end{vmatrix} - 1\!\begin{vmatrix}1&1\\0&3-\lambda\end{vmatrix} + 0 \\[4pt]
+&= (3-\lambda)[(2-\lambda)(3-\lambda)-1] - (3-\lambda) \\[4pt]
+&= (3-\lambda)(\lambda^2 - 5\lambda + 4) \\[4pt]
+&= (3-\lambda)(\lambda-1)(\lambda-4)
+\end{aligned}$$
+<p>令 $\lambda=0$，常数项 = $\det(A) = 3 \times (-1) \times (-4) = 12$。因式分解给出的特征值 $1,3,4$，乘积也是 12 ✓。</p>
+<p><strong>③ n×n——同样的逻辑。</strong> 降阶展开把 $\det(A-\lambda I)$ 拆成 $ad-bc$ 的组合。令 $\lambda=0$，所有含 $\lambda$ 的项消失，<strong>常数项恰好等于 $\det(A)$</strong>。同时特征多项式因式分解为 $(\lambda_1-\lambda)\cdots(\lambda_n-\lambda)$，令 $\lambda=0$，常数项 = $\lambda_1\cdots\lambda_n$。</p>
+<p><strong>同一個多项式，两种写法，常数项必须相等 → $\det(A) = \prod_{i=1}^n \lambda_i$。</strong></p>
+</div>
+<p>如果有一个特征值 = 0，行列式就是 0——空间被压扁了。面积放大倍数 = 每个方向放大倍数的乘积。多直观！</p>
+<h3>求出 λ 之后，怎么求特征向量 v？</h3>
+<p>有了特征值，把每个 λ 代回 $(A - \lambda I)\mathbf{v} = \mathbf{0}$，解出 v。</p>
+<p><strong>对 λ₁ = 5：</strong></p>
+$$A - 5I = \begin{bmatrix} 4-5 & 1 \\ 2 & 3-5 \end{bmatrix} = \begin{bmatrix} -1 & 1 \\ 2 & -2 \end{bmatrix}$$
+<p>解 $\begin{bmatrix} -1 & 1 \\ 2 & -2 \end{bmatrix} \begin{bmatrix} v_x \\ v_y \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$。第一行：$-v_x + v_y = 0$，所以 $v_y = v_x$。第二行 $2v_x - 2v_y = 0$ 是同一回事（第一行 × (-2)）。也就是说，只要 $v_y = v_x$ 就行——有无穷多解，取最简单的一个：</p>
+$$\mathbf{v}_1 = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$$
+<p><strong>对 λ₂ = 2：</strong></p>
+$$A - 2I = \begin{bmatrix} 4-2 & 1 \\ 2 & 3-2 \end{bmatrix} = \begin{bmatrix} 2 & 1 \\ 2 & 1 \end{bmatrix}$$
+<p>第一行：$2v_x + v_y = 0$，所以 $v_y = -2v_x$。取 $v_x = 1$：</p>
+$$\mathbf{v}_2 = \begin{bmatrix} 1 \\ -2 \end{bmatrix}$$
+<p><strong>验证：</strong> $A\mathbf{v}_1 = \begin{bmatrix} 4&1\\2&3 \end{bmatrix} \begin{bmatrix} 1\\1 \end{bmatrix} = \begin{bmatrix} 5\\5 \end{bmatrix} = 5 \cdot \begin{bmatrix} 1\\1 \end{bmatrix}$ ✓。$A\mathbf{v}_2 = \begin{bmatrix} 4&1\\2&3 \end{bmatrix} \begin{bmatrix} 1\\-2 \end{bmatrix} = \begin{bmatrix} 2\\-4 \end{bmatrix} = 2 \cdot \begin{bmatrix} 1\\-2 \end{bmatrix}$ ✓。</p>
+<p><strong>推导链完整：</strong> 特征方程 → 二次方程求 λ → 代入 $(A-\lambda I)\mathbf{v}=0$ → 解线性方程组 → 得到 v。下面用代码验证全过程：</p>
+<pre><code><span class="hl-comment"># 00-05 第二步：用 np.linalg.eig 验证——特征值就是"不扭方向"的拉伸倍数</span>
+<span class="hl-comment"># 导入numpy，别名np</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 同样的矩阵 A = [[4,1],[2,3]]</span>
+A = np.array([[<span class="hl-number">4</span>, <span class="hl-number">1</span>],
+<span class="hl-comment"># 外层列表每元素一行 → 2×2矩阵</span>
+              [<span class="hl-number">2</span>, <span class="hl-number">3</span>]])
+
+<span class="hl-comment"># np.linalg.eig 返回两个值（元组解包）：</span>
+<span class="hl-comment">#   eigvals → 特征值一维数组（按降序排列）</span>
+<span class="hl-comment">#   eigvecs → 特征向量矩阵，每列是一个特征向量（按对应列归一化）</span>
+eigvals, eigvecs = np.linalg.eig(A)         <span class="hl-comment"># eigvals=[5., 2.]（浮点数）, eigvecs 2×2矩阵</span>
+<span class="hl-comment"># 输出 [5. 2.] — λ₁=5, λ₂=2</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"特征值: {eigvals}"</span>)
+
+<span class="hl-comment"># 解释：λ₁=5 → 这个方向被拉长5倍；λ₂=2 → 这个方向被拉长2倍</span>
+
+<span class="hl-comment"># 特征值之积 = 行列式（面积放大倍数）</span>
+<span class="hl-comment"># .det()返回行列式 → 10 = 5×2 ✓</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"行列式 = {np.linalg.det(A):.0f}"</span>)
+
+<span class="hl-comment"># 验证定义：对第一个特征向量 v1，A @ v1 应该 = λ₁ × v1</span>
+<span class="hl-comment"># 取第0列 → 第一个特征向量（2维向量）</span>
+v1 = eigvecs[:, <span class="hl-number">0</span>]
+<span class="hl-comment"># 第一个特征值 → 5.0</span>
+l1 = eigvals[<span class="hl-number">0</span>]
+<span class="hl-comment"># A @ v1：矩阵乘法，矩阵把v1变换后的结果</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"A@v1 = {A @ v1}"</span>)
+<span class="hl-comment"># l1 * v1：标量乘向量，单纯缩放v1的每个分量</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"λ×v1 = {l1 * v1}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"相等? {np.allclose(A @ v1, l1 * v1)}"</span>) <span class="hl-comment"># allclose：容忍浮点误差的近似相等判断 → True</span>
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<h3>特例：对角矩阵</h3>
+<p>如果矩阵只有对角线上有数，其余全是 0：</p>
+$$A = \begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}$$
+<p>这个矩阵把 x 方向拉长 2 倍，y 方向拉长 3 倍——<strong>没有任何扭转</strong>。所以：</p>
+<ul>
+<li>特征值 = 2 和 3（就是对角线上的数）</li>
+<li>特征向量 = $[1,0]$ 和 $[0,1]$（就是坐标轴方向）</li>
+</ul>
+<p>看到对角矩阵 → 特征值就在对角线上，不用算。</p>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
+<hr>
+<h2>💭 概念题</h2>
+<ol>
+<li>用特征方程手算 $A = \begin{bmatrix} 3 & 0 \\ 0 & 5 \end{bmatrix}$ 的特征值和特征向量。行列式是多少？验证 $\lambda_1+\lambda_2=$ 迹 和 $\lambda_1\lambda_2=$ 行列式。——考察：对角矩阵特征值 + 迹/行列式恒等式</li>
+</ol>
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-04/">← 00-04</a><a href="../../">📖 目录</a><a href="../00-06/">00-06 →</a></nav>
+</div>
+<script>
+(function(){
+  document.querySelectorAll('pre code').forEach(function(block){
+    var wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 复制';
+    btn.onclick = function(){
+      var text = block.innerText;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = '✅ 已复制';
+        btn.classList.add('copied');
+        setTimeout(function(){
+          btn.textContent = '📋 复制';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    };
+    block.parentNode.insertBefore(wrapper, block);
+    wrapper.appendChild(btn);
+    wrapper.appendChild(block);
+  });
+})();
+</script>
+
+</body></html>

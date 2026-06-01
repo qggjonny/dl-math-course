@@ -79,10 +79,81 @@ n, p = <span class="hl-number">10</span>, <span class="hl-number">0.5</span>
 results = np.random.binomial(n, p, size=<span class="hl-number">10000</span>)
 <span class="hl-comment"># 检验k=3,5,7这三个正面次数的概率</span>
 <span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">3</span>, <span class="hl-number">5</span>, <span class="hl-number">7</span>]:
-<span class="hl-comment"># results==k → 布尔数组，mean() → 频率≈概率</span>
-    freq = np.mean(results == k)
-<span class="hl-comment"># :.4f = 保留4位小数</span>
+    freq = np.mean(results == k)              <span class="hl-comment"># results==k → 布尔数组，mean() → 频率≈概率</span>
+    <span class="hl-comment"># :.4f = 保留4位小数</span>
     <span class="hl-builtin">print</span>(<span class="hl-string">f"P(X={k}) ≈ {freq:.4f}"</span>)
 <span class="hl-comment"># P(X=5) 最大 ← C(10,5)=252种排法最多（中间鼓）</span>
 <span class="hl-comment"># P(X=3) ≈ P(X=7) ← 对称分布（p=0.5公平硬币）</span>
-<
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<hr>
+<h2>五、多项分布：不止两个盒子</h2>
+<h3>5.1 从二项到多项——思想的自然推广</h3>
+<p>二项分布是「两种结果，做 n 次」；多项分布是「m 种结果，做 n 次」。比如掷一个六面骰子 n=10 次，每次有 6 种可能的结果，每种结果有各自的概率 $p_1, p_2, \dots, p_6$（公平骰子的话 $p_i = 1/6$）。</p>
+<p>我们关心的是：10 次掷完，面 1 出现 $k_1$ 次、面 2 出现 $k_2$ 次、……、面 6 出现 $k_6$ 次的概率是多少？其中 $\sum_{i=1}^m k_i = n$。</p>
+<h3>5.2 公式推导——完全复刻二项分布的思路</h3>
+<p>跟二项分布一样，分两步。</p>
+<p><strong>第一步：一个特定排列的概率。</strong></p>
+<p>假设有一种具体的排列——比如前 $k_1$ 次都是结果 1，接下来 $k_2$ 次都是结果 2，……，最后 $k_m$ 次都是结果 m。由于每次试验独立，这个排列的概率是：</p>
+<p>$$\underbrace{p_1 \cdot p_1 \cdots p_1}_{k_1 \text{ 个}} \cdot \underbrace{p_2 \cdots p_2}_{k_2 \text{ 个}} \cdots \underbrace{p_m \cdots p_m}_{k_m \text{ 个}} = p_1^{k_1} p_2^{k_2} \cdots p_m^{k_m}$$</p>
+<p>任何<strong>指定了哪个位置是哪个结果</strong>的排列，概率都是这个表达式——因为乘法可交换，乘积只取决于每个 $p_i$ 出现了多少次，而与顺序无关。</p>
+<p><strong>第二步：有多少种排列方式？</strong></p>
+<p>n 次试验中，有 $k_1$ 个位置放结果 1、$k_2$ 个放结果 2、……、$k_m$ 个放结果 m。这是一个「多重组合数」问题——把 n 个位置分成 m 组，每组大小分别为 $k_1, k_2, \dots, k_m$：</p>
+<p>$$\binom{n}{k_1, k_2, \dots, k_m} = \frac{n!}{k_1! \, k_2! \, \cdots \, k_m!}$$</p>
+<p>理解这个公式：先给 n 个试验排一个顺序（$n!$ 种），但同一类结果内部 $k_i$ 个位置互换不产生新排列——所以要除以各组的内部排列数 $k_i!$。</p>
+<p>所有排列互斥，概率相加，得到多项分布的 PMF：</p>
+<p>$$\boxed{P(X_1=k_1,\dots,X_m=k_m) = \frac{n!}{k_1! \, k_2! \, \cdots \, k_m!}\; p_1^{k_1} p_2^{k_2} \cdots p_m^{k_m}}$$</p>
+<p>其中 $\sum k_i = n$，$\sum p_i = 1$。</p>
+<h3>5.3 代码验证</h3>
+<p>掷六面骰子，每面概率都是 1/6——六个盒子，每个放一样多的筹码。</p>
+<pre><code><span class="hl-comment"># 00-14 多项分布：掷六面骰子1000次</span>
+<span class="hl-comment"># np.random.multinomial(n, pvals)：掷骰子n次，每面概率pvals</span>
+<span class="hl-comment"># [1/6]*6 → [0.1667,0.1667,0.1667,0.1667,0.1667,0.1667] 公平骰子</span>
+<span class="hl-comment"># 返回长度为6的数组，分别是面1~6的出现次数</span>
+dice = np.random.multinomial(<span class="hl-number">1000</span>, [<span class="hl-number">1</span>/<span class="hl-number">6</span>]*<span class="hl-number">6</span>)
+<span class="hl-comment"># 六个面各自的出现次数</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"掷骰1000次: {dice}"</span>)
+<span class="hl-comment"># .sum()：所有面的次数之和 — 一定 = 1000</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"总和={dice.sum()}"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ 全部代码到 online-python.com 运行</a></p>
+<hr>
+<h2>💭 概念题</h2>
+<ol>
+<li>抛 10 次公平硬币。为什么 P(X=5) 最大，P(X=0) 最小？从组合数 C(10,k) 的形状解释——哪种 k 值对应的排列方式最多？——考察：二项分布中间鼓的本质</li>
+<li>PMF 要求所有概率之和 = 1。$[0.1, 0.1, 0.7, 0.1]$ 满足这个条件吗？它代表什么意思？——考察：PMF 定义验证</li>
+<li>抛一枚 p=0.9 的偏心硬币 10 次。P(X=9) 和 P(X=1) 哪个更大？不用算，用直觉判断。——考察：二项分布的偏斜（p 偏离 0.5 时钟形不对称）</li>
+</ol>
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-13/">← 00-13</a><a href="../../">📖 目录</a><a href="../00-15/">00-15 →</a></nav>
+</div>
+<script>
+(function(){
+  document.querySelectorAll('pre code').forEach(function(block){
+    var wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 复制';
+    btn.onclick = function(){
+      var text = block.innerText;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = '✅ 已复制';
+        btn.classList.add('copied');
+        setTimeout(function(){
+          btn.textContent = '📋 复制';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    };
+    block.parentNode.insertBefore(wrapper, block);
+    wrapper.appendChild(btn);
+    wrapper.appendChild(block);
+  });
+})();
+</script>
+
+</body></html>
