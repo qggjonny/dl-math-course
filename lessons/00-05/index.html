@@ -142,7 +142,31 @@ $$A - 2I = \begin{bmatrix} 4-2 & 1 \\ 2 & 3-2 \end{bmatrix} = \begin{bmatrix} 2 
 <p>第一行：$2v_x + v_y = 0$，所以 $v_y = -2v_x$。取 $v_x = 1$：</p>
 $$\mathbf{v}_2 = \begin{bmatrix} 1 \\ -2 \end{bmatrix}$$
 <p><strong>验证：</strong> $A\mathbf{v}_1 = \begin{bmatrix} 4&1\\2&3 \end{bmatrix} \begin{bmatrix} 1\\1 \end{bmatrix} = \begin{bmatrix} 5\\5 \end{bmatrix} = 5 \cdot \begin{bmatrix} 1\\1 \end{bmatrix}$ ✓。$A\mathbf{v}_2 = \begin{bmatrix} 4&1\\2&3 \end{bmatrix} \begin{bmatrix} 1\\-2 \end{bmatrix} = \begin{bmatrix} 2\\-4 \end{bmatrix} = 2 \cdot \begin{bmatrix} 1\\-2 \end{bmatrix}$ ✓。</p>
-<p><strong>推导链完整：</strong> 特征方程 → 二次方程求 λ → 代入 $(A-\lambda I)\mathbf{v}=0$ → 解线性方程组 → 得到 v。下面用代码验证全过程：</p>
+
+<h3>把两个特征向量打包——矩阵形式的特征值分解</h3>
+
+<p>上面我们一个个处理了两个特征向量。能不能<strong>把它们打包成矩阵</strong>，一次性表达？</p>
+
+<p>把 $\mathbf{v}_1$ 和 $\mathbf{v}_2$ 作为<strong>列</strong>放进一个矩阵 $Q$，把 $\lambda_1$ 和 $\lambda_2$ 放在对角线上组成 $\Lambda$：</p>
+
+$$Q = \begin{bmatrix} \mathbf{v}_1 & \mathbf{v}_2 \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 1 & -2 \end{bmatrix}, \quad
+\Lambda = \begin{bmatrix} \lambda_1 & 0 \\ 0 & \lambda_2 \end{bmatrix} = \begin{bmatrix} 5 & 0 \\ 0 & 2 \end{bmatrix}$$
+
+<p>现在 $A\mathbf{v}_1 = \lambda_1\mathbf{v}_1$ 和 $A\mathbf{v}_2 = \lambda_2\mathbf{v}_2$ 可以合并写成：</p>
+
+$$A Q = A\begin{bmatrix}\mathbf{v}_1 & \mathbf{v}_2\end{bmatrix} = \begin{bmatrix}A\mathbf{v}_1 & A\mathbf{v}_2\end{bmatrix} = \begin{bmatrix}\lambda_1\mathbf{v}_1 & \lambda_2\mathbf{v}_2\end{bmatrix} = Q\Lambda$$
+
+<p>两边右乘 $Q^{-1}$（$Q$ 的逆矩阵），得到：</p>
+
+$$\boxed{A = Q \Lambda Q^{-1}}$$
+
+<p><strong>这就是矩阵形式的特征值分解。</strong>读法（从右往左）：$Q^{-1}$ 把向量转到特征基 → $\Lambda$ 沿特征方向缩放 → $Q$ 转回原坐标系。</p>
+
+<div class="callout callout-info">
+<strong>需要条件：$Q$ 必须可逆</strong>（特征向量线性无关，不能共线）。对于对称矩阵，特征向量自动互相垂直，$Q$ 还是正交矩阵（$Q^{-1} = Q^T$）。
+</div>
+
+<p><strong>推导链完整：</strong> 特征方程 → 二次方程求 λ → 代入 $(A-\lambda I)\mathbf{v}=0$ → 解线性方程组 → 得到 v → <strong>打包成 $A = Q\Lambda Q^{-1}$</strong>。下面用代码验证全过程：</p>
 <pre><code><span class="hl-comment"># 00-05 第二步：用 np.linalg.eig 验证——特征值就是"不扭方向"的拉伸倍数</span>
 <span class="hl-comment"># 导入numpy，别名np</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
