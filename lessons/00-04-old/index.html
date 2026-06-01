@@ -209,9 +209,9 @@ $$f(x) = f(a) + f'(a)(x-a) + \\frac{f''(a)}{2!}(x-a)^2 + \\frac{f'''(a)}{3!}(x-a
     <span class="hl-keyword">return</span> x ** <span class="hl-number">2</span>
 
 <span class="hl-keyword">for</span> x <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>]:
-    <span class="hl-comment"># 数值近似</span>
+<span class="hl-comment"># 数值近似</span>
     n = num_grad(sq, x)
-    <span class="hl-comment"># 理论：f'(x)=2x</span>
+<span class="hl-comment"># 理论：f'(x)=2x</span>
     t = <span class="hl-number">2</span> * x
     <span class="hl-builtin">print</span>(<span class="hl-string">f"f'({x}) 数值={n:.6f}  理论={t}"</span>)
 
@@ -223,90 +223,10 @@ x = <span class="hl-number">0.0</span>
 lr = <span class="hl-number">0.1</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"\n从 x=0 出发，目标 x=2"</span>)
 <span class="hl-keyword">for</span> step <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">30</span>):
-    <span class="hl-comment"># 当前位置的坡度</span>
+<span class="hl-comment"># 当前位置的坡度</span>
     grad = <span class="hl-number">2</span>*x - <span class="hl-number">4</span>
-    <span class="hl-comment"># 沿着坡度反方向走一步</span>
+<span class="hl-comment"># 沿着坡度反方向走一步</span>
     x = x - lr * grad
     <span class="hl-keyword">if</span> step % <span class="hl-number">5</span> == <span class="hl-number">0</span>:
         <span class="hl-builtin">print</span>(<span class="hl-string">f"  第{step:2d}步: x={x:.4f}  坡度={grad:+.4f}"</span>)
-        <span class="hl-comment"># 坡度从 -4 逐渐变成 0，x 从 0 逐渐滑到 2</span></code></pre>
-<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
-
-<div class="callout callout-info">
-<h3>为什么中央差分比单边更精确？——泰勒展开揭密</h3>
-
-<p>代码注释说「误差抵消了一部分」——到底怎么抵消的？用泰勒展开来算。</p>
-
-<p><strong>单边差分（只看往前）：</strong></p>
-
-$$f(x+\epsilon) = f(x) + \epsilon f'(x) + \frac{\epsilon^2}{2} f''(x) + \frac{\epsilon^3}{6} f'''(x) + O(\epsilon^4)$$
-
-<p>移项：</p>
-
-$$\frac{f(x+\epsilon)-f(x)}{\epsilon} = f'(x) + \underbrace{\frac{\epsilon}{2}f''(x) + O(\epsilon^2)}_{\text{误差项：首项是 } O(\epsilon)}$$
-
-<p>误差的主导项是 $\frac{\epsilon}{2}f''(x)$——和 $\epsilon$ 成正比。$\epsilon$ 缩小 10 倍，误差大约缩小 10 倍。</p>
-
-<p><strong>中央差分（看前后）：</strong>写出 $f(x+\epsilon)$ 和 $f(x-\epsilon)$ 两个泰勒展开：</p>
-
-$$
-\begin{aligned}
-f(x+\epsilon) &= f(x) + \epsilon f'(x) + \frac{\epsilon^2}{2} f''(x) + \frac{\epsilon^3}{6} f'''(x) + \frac{\epsilon^4}{24} f''''(x) + \cdots \\[4pt]
-f(x-\epsilon) &= f(x) - \epsilon f'(x) + \frac{\epsilon^2}{2} f''(x) - \frac{\epsilon^3}{6} f'''(x) + \frac{\epsilon^4}{24} f''''(x) - \cdots
-\end{aligned}
-$$
-
-<p><strong>相减：</strong>$f(x+\epsilon) - f(x-\epsilon)$：</p>
-
-<ul>
-  <li>$f(x)$ 消掉（都有，相减得 0）</li>
-  <li>$\epsilon f'(x) - (-\epsilon f'(x)) = 2\epsilon f'(x)$ ← 保留</li>
-  <li>$\frac{\epsilon^2}{2}f''(x) - \frac{\epsilon^2}{2}f''(x) = 0$ ← <strong>抵！消！了！</strong></li>
-  <li>$\frac{\epsilon^3}{6}f'''(x) - (-\frac{\epsilon^3}{6}f'''(x)) = \frac{\epsilon^3}{3}f'''(x)$</li>
-</ul>
-
-$$\frac{f(x+\epsilon)-f(x-\epsilon)}{2\epsilon} = f'(x) + \underbrace{\frac{\epsilon^2}{6}f'''(x) + O(\epsilon^4)}_{\text{误差项：首项是 } O(\epsilon^2)}$$
-
-<p><strong>关键：</strong>相减时 $\epsilon^2$ 项<strong>同号抵消</strong>了！剩余误差主导项是 $\frac{\epsilon^2}{6}f'''(x)$——和 $\epsilon^2$ 成正比。$\epsilon$ 缩小 10 倍，误差缩小 100 倍。这就是为什么中央差分比单边差分高一个精度量级。</p>
-
-<p><strong>直观理解：</strong>单边差分就像只看了看你前方一毫米的地形，就猜整条路的坡度——局部信息有限。中央差分同时看了前方和后方，左右信息对称，把「地形弯曲」带来的偏差对消掉了。</p>
-</div>
-
-<hr>
-<h2>💭 概念题</h2>
-<ol>
-<li>梯度指向上升最快方向。为什么是"最快"？用方向导数 = 梯度与方向向量的点乘来解释。提示：$\cos\theta$ 在 $\theta=0°$（同向）时最大。——考察：方向导数的几何直觉</li>
-<li>学习率太大的后果：画面上你站在山谷一边，步子太大跨到对面山上去了，再一步又跨回来，来回振荡——永远到不了谷底。试算一下 lr=1.5 在 x=1 处会发生什么。梯度是 $f'(1)=2\times1-4=-2$，更新后 x 变成多少？——考察：梯度下降的发散条件</li>
-<li>中央差分为什么比单边差分更精确？中央用 $(x+\epsilon)$ 和 $(x-\epsilon)$ 两边的信息取平均，单边只用一边。在你心里过一遍：x² 的中央差分计算结果比单边差分更接近 2x 吗？——考察：对称差分抵消误差</li>
-</ol>
-
-<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-03/">← 00-03</a><a href="../../">📖 目录</a><a href="../00-05/">00-05 →</a></nav>
-</div>
-<script>
-(function(){
-  document.querySelectorAll('pre code').forEach(function(block){
-    var wrapper = document.createElement('div');
-    wrapper.className = 'code-block-wrapper';
-    var btn = document.createElement('button');
-    btn.className = 'copy-btn';
-    btn.textContent = '📋 复制';
-    btn.onclick = function(){
-      var text = block.innerText;
-      navigator.clipboard.writeText(text).then(function(){
-        btn.textContent = '✅ 已复制';
-        btn.classList.add('copied');
-        setTimeout(function(){
-          btn.textContent = '📋 复制';
-          btn.classList.remove('copied');
-        }, 2000);
-      });
-    };
-    block.parentNode.insertBefore(wrapper, block);
-    wrapper.appendChild(btn);
-    wrapper.appendChild(block);
-  });
-})();
-</script>
-
-</body></html>
+<span class="hl-comment"># 坡度从 -4 逐渐变成 0，x 从 0 逐渐滑到 2</span><

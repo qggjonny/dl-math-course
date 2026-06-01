@@ -153,7 +153,7 @@ sigma_hat = np.std(data)
 <span class="hl-comment">    data: 观测数据</span>
 <span class="hl-comment">    """</span>
     n = <span class="hl-builtin">len</span>(data)
-    <span class="hl-comment"># log L = -n/2·log(2πσ²) - 1/(2σ²)·Σ(xᵢ-μ)²</span>
+<span class="hl-comment"># log L = -n/2·log(2πσ²) - 1/(2σ²)·Σ(xᵢ-μ)²</span>
     <span class="hl-keyword">return</span> -n/<span class="hl-number">2</span>*np.log(<span class="hl-number">2</span>*np.pi*sigma**<span class="hl-number">2</span>) - np.<span class="hl-builtin">sum</span>((data-mu)**<span class="hl-number">2</span>)/(<span class="hl-number">2</span>*sigma**<span class="hl-number">2</span>)
 
 ll_mle = log_likelihood(mu_hat, sigma_hat, data)
@@ -162,84 +162,4 @@ ll_off = log_likelihood(<span class="hl-number">4.0</span>, <span class="hl-numb
 <span class="hl-builtin">print</span>(<span class="hl-string">f"\nMLE 对数似然: {ll_mle:.1f}"</span>)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"错误参数对数似然: {ll_off:.1f}"</span>)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"MLE 更高 ✓"</span>)
-</code></pre>
-
-<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-
-<h2>六、MLE 和贝叶斯的区别</h2>
-
-<p>00-17 学了贝叶斯定理：$P(\theta \mid \text{数据}) \propto P(\text{数据} \mid \theta) \cdot P(\theta)$。</p>
-
-<ul>
-  <li><strong>MLE：</strong>只看 $P(\text{数据} \mid \theta)$，最大化它——不管 $\theta$ 本身有多大概率出现</li>
-  <li><strong>贝叶斯：</strong>还要乘先验 $P(\theta)$——如果 $\theta=0.99$ 按理说很罕见，贝叶斯会惩罚它</li>
-  <li><strong>MAP（最大后验）：</strong>贝叶斯中最大化 $P(\theta \mid \text{数据})$ 而非 $P(\text{数据} \mid \theta)$</li>
-</ul>
-
-<div class="callout callout-tip">
-<strong>为什么深度学习都选 MLE：</strong> 数据量大的时候，似然主导，先验的影响很小。MLE 和 MAP 差别不大。所以等价于：做回归就最小化 MSE，做分类就最小化交叉熵——不需要显式计算先验。
-</div>
-
-<h2>💭 概念题</h2>
-
-<div class="exercise">
-<h3>1. MLE 为什么不总是对的</h3>
-<p>抛 3 次硬币，3 次全是正面。MLE 估计 $\hat{\theta} = 1.0$。这个估计合理吗？有什么问题？贝叶斯方法会怎么修正？</p>
-<p>——考察：小样本下 MLE 的过拟合、先验的修正作用</p>
-</div>
-
-<div class="exercise">
-<h3>2. MSE 和交叉熵的来源</h3>
-<p>为什么回归用 MSE 而不交叉熵？分类用交叉熵而不用 MSE？从"假设数据服从什么分布"的角度解释。</p>
-<p>——考察：MLE → 损失函数的推导链条</p>
-</div>
-
-<div class="exercise">
-<h3>3. 对数似然为什么方便</h3>
-<p>有 1000 个独立样本，似然是 1000 个小概率的乘积。直接用 $L = \prod p_i$ 会有什么问题？取对数解决了什么？</p>
-<p>——考察：数值稳定性和求导便利性</p>
-</div>
-
-<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-17/">← 00-17</a><a href="../../">📖 目录</a><a href="../00-19/">00-19 →</a></nav>
-</div>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: "$$", right: "$$", display: true},
-        {left: "$", right: "$", display: false}
-      ]
-    });
-  });
-</script>
-
-<script>
-(function(){
-  document.querySelectorAll('pre code').forEach(function(block){
-    var wrapper = document.createElement('div');
-    wrapper.className = 'code-block-wrapper';
-    var btn = document.createElement('button');
-    btn.className = 'copy-btn';
-    btn.textContent = '📋 复制';
-    btn.onclick = function(){
-      var text = block.innerText;
-      navigator.clipboard.writeText(text).then(function(){
-        btn.textContent = '✅ 已复制';
-        btn.classList.add('copied');
-        setTimeout(function(){
-          btn.textContent = '📋 复制';
-          btn.classList.remove('copied');
-        }, 2000);
-      });
-    };
-    block.parentNode.insertBefore(wrapper, block);
-    wrapper.appendChild(btn);
-    wrapper.appendChild(block);
-  });
-})();
-</script>
-
-</body>
-</html>
-
+<
