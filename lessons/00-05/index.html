@@ -181,18 +181,58 @@ $$Q^{-1} = \begin{bmatrix} 0.667 & 0.333 \\ 0.333 & -0.333 \end{bmatrix}$$
 
 <p>再走 $Q\Lambda Q^{-1}\mathbf{x}$ 这条路——从右往左，分三步：</p>
 
-<p><strong>① $Q^{-1}\mathbf{x}$：</strong></p>
+<p><strong>① $Q^{-1}\mathbf{x}$ — 换到特征基。</strong></p>
+
+<p>先算结果：</p>
 $$Q^{-1}\begin{bmatrix}3\\1\end{bmatrix} = \begin{bmatrix}0.667&0.333\\0.333&-0.333\end{bmatrix}\begin{bmatrix}3\\1\end{bmatrix} = \begin{bmatrix}2.33\\0.67\end{bmatrix}$$
 
-<p>这个结果的意思是 $\mathbf{x} = 2.33\mathbf{v}_1 + 0.67\mathbf{v}_2$（验算：$2.33\begin{bmatrix}1\\1\end{bmatrix} + 0.67\begin{bmatrix}1\\-2\end{bmatrix} = \begin{bmatrix}3\\1\end{bmatrix}$ ✓）。<strong>$Q^{-1}$ 把 $\mathbf{x}$ 从「x-y 坐标」翻译成了「沿 $\mathbf{v}_1$ 走几步、沿 $\mathbf{v}_2$ 走几步」。</strong></p>
+<p>算出来的是 $[2.33, 0.67]$。但<strong>为什么</strong>这个结果就是「在特征基里的坐标」？来推导。</p>
 
-<p><strong>② $\Lambda(Q^{-1}\mathbf{x})$：</strong></p>
+<p><strong>出发点：</strong> 任意向量 $\mathbf{x}$ 都可以用 $\mathbf{v}_1$ 和 $\mathbf{v}_2$ 的组合来表示（因为它们不共线，张成整个平面）。存在唯一的系数 $c_1, c_2$ 使：</p>
+
+$$\mathbf{x} = c_1\mathbf{v}_1 + c_2\mathbf{v}_2$$
+
+<p><strong>把右边写成矩阵形式：</strong></p>
+
+$$\mathbf{x} = \begin{bmatrix}\mathbf{v}_1 & \mathbf{v}_2\end{bmatrix} \begin{bmatrix}c_1 \\ c_2\end{bmatrix} = Q\begin{bmatrix}c_1 \\ c_2\end{bmatrix}$$
+
+<p><strong>两边左乘 $Q^{-1}$：</strong></p>
+
+$$Q^{-1}\mathbf{x} = Q^{-1}Q\begin{bmatrix}c_1 \\ c_2\end{bmatrix} = I\begin{bmatrix}c_1 \\ c_2\end{bmatrix} = \begin{bmatrix}c_1 \\ c_2\end{bmatrix}$$
+
+<p>这个推导说 $Q^{-1}\mathbf{x}$ 直接等于 $[c_1, c_2]$。而 $[c_1, c_2]$ 恰好就是 $\mathbf{x}$ 在特征基里的坐标：$c_1$ 告诉你「沿 $\mathbf{v}_1$ 走几步」，$c_2$ 告诉你「沿 $\mathbf{v}_2$ 走几步」。$Q^{-1}$ 就是一个<strong>坐标翻译器</strong>。</p>
+
+<p>验算：$2.33\begin{bmatrix}1\\1\end{bmatrix} + 0.67\begin{bmatrix}1\\-2\end{bmatrix} = \begin{bmatrix}2.33+0.67\\2.33-1.33\end{bmatrix} = \begin{bmatrix}3\\1\end{bmatrix}$ ✓</p>
+
+<div class="callout callout-info">
+<strong>两套坐标，同一个点：</strong><br>
+标准基：「沿 x 轴走 3，沿 y 轴走 1」→ 点 $(3,1)$<br>
+特征基：「沿 $\mathbf{v}_1$ 走 2.33，沿 $\mathbf{v}_2$ 走 0.67」→ 同一个点<br><br>
+$Q^{-1}$ 做的事就是<strong>把标准基坐标翻译成特征基坐标</strong>。就像同样一个位置，有人用「经度+纬度」说，有人用「离A村多远+离B村多远」说——两个说法指向同一个点，$Q^{-1}$ 就是翻译官。
+</div>
+
+<p><strong>② $\Lambda(Q^{-1}\mathbf{x})$ — 在特征基里缩放。</strong></p>
 $$\Lambda\begin{bmatrix}2.33\\0.67\end{bmatrix} = \begin{bmatrix}5&0\\0&2\end{bmatrix}\begin{bmatrix}2.33\\0.67\end{bmatrix} = \begin{bmatrix}11.67\\1.33\end{bmatrix}$$
 
-<p>$\mathbf{v}_1$ 分量 ×5，$\mathbf{v}_2$ 分量 ×2。因为现在坐标轴就是拉伸方向，<strong>缩放变成各管各的，互不干扰。</strong></p>
+<p>$\mathbf{v}_1$ 分量 ×5，$\mathbf{v}_2$ 分量 ×2。现在坐标轴就是拉伸方向，<strong>缩放变成各管各的，互不干扰。</strong>对角矩阵 $\Lambda$ 的精髓：每一行只影响自己的分量，别的分量碰都不碰。</p>
 
-<p><strong>③ $Q(\Lambda Q^{-1}\mathbf{x})$：</strong></p>
+<p><strong>③ $Q(\Lambda Q^{-1}\mathbf{x})$ — 换回标准基。</strong></p>
 $$Q\begin{bmatrix}11.67\\1.33\end{bmatrix} = 11.67\mathbf{v}_1 + 1.33\mathbf{v}_2 = \begin{bmatrix}13\\9\end{bmatrix}$$
+
+<p>算完了，但<strong>为什么 $Q$ 乘这个结果就是「换回」？</strong></p>
+
+<p>看 $Q$ 的定义：$Q = \begin{bmatrix}\mathbf{v}_1 & \mathbf{v}_2\end{bmatrix}$。$Q$ 乘任意向量 $[a, b]$ <strong>就是</strong> $a\mathbf{v}_1 + b\mathbf{v}_2$——这是矩阵乘法的定义，不管你给它什么坐标。</p>
+
+<p>所以 $Q\begin{bmatrix}11.67\\1.33\end{bmatrix}$ 的含义是：<strong>$11.67$ 个 $\mathbf{v}_1$ 加 $1.33$ 个 $\mathbf{v}_2$。</strong></p>
+
+<p>而「$a$ 个 $\mathbf{v}_1$ 加 $b$ 个 $\mathbf{v}_2$」恰好就是<strong>这个点在标准 x-y 坐标系里的位置</strong>！因为 $\mathbf{v}_1=[1,1]$ 和 $\mathbf{v}_2=[1,-2]$ 本身的坐标就是用标准基写的，$11.67\times[1,1] + 1.33\times[1,-2]$ 算出来就是标准的 $[x,y]$ 坐标。</p>
+
+<div class="callout callout-info">
+<strong>$Q$ 和 $Q^{-1}$ 互为翻译器：</strong><br>
+$Q^{-1}$：标准基坐标 → 特征基坐标（找到「沿每个特征向量走几步」）<br>
+$Q$：特征基坐标 → 标准基坐标（把「走几步」翻译回 x-y 位置）<br><br>
+就像中文→英文和英文→中文——两个翻译官互为逆操作。
+</div>
 
 <p>和直接算 $A\mathbf{x}$ 的结果一模一样 ✓。</p>
 
@@ -201,8 +241,42 @@ $$Q\begin{bmatrix}11.67\\1.33\end{bmatrix} = 11.67\mathbf{v}_1 + 1.33\mathbf{v}_
 类比拧螺丝：$Q^{-1}$ = 把螺丝刀对准螺纹方向，$\Lambda$ = 轻松拧进去，$Q$ = 摆正。找到对的视角，复杂变简单。
 </div>
 
+<h3>补充：正交矩阵与对称矩阵</h3>
+
+<p>上面说了 $A = Q\Lambda Q^{-1}$。但如果特征向量互相垂直且长度都是 1，事情会变简单——$Q^{-1}$ 不用算了，直接用 $Q^T$（转置）就行。这涉及到两个概念：<strong>正交矩阵</strong>和<strong>对称矩阵</strong>。</p>
+
+<h4>正交矩阵</h4>
+
+<p><strong>定义：</strong> 一个方阵 $Q$ 如果满足 $Q^T Q = I$（转置 × 自身 = 单位矩阵），就叫<strong>正交矩阵</strong>。</p>
+
+<p><strong>直接推论：</strong> $Q^{-1} = Q^T$。因为 $Q^T Q = I$ 的意思是 $Q^T$ 恰好是 $Q$ 的逆——不用高斯消元、不用算行列式，直接翻转行列就行。</p>
+
+<p><strong>几何画面：</strong> 正交矩阵的列向量都互相垂直（点乘为 0）且长度都是 1。正交矩阵作用于空间时做的是<strong>纯旋转</strong>（可能加翻转）——不拉伸、不压缩、不切变。因为所有列向量长度都是 1 且互相垂直，它只是把整个坐标系平转到另一个方向，形状完全不改变。</p>
+
+<p>直观理解：$Q$ 把空间转了一个角度，$Q^{-1}$ 应该转回来。往反方向转 = 转置——旋转 $\theta$ 角的矩阵的逆就是旋转 $-\theta$ 角的矩阵，而它恰好等于转置。</p>
+
+<p>用我们的例子验证：$\mathbf{v}_1=[1,1]$ 和 $\mathbf{v}_2=[1,-2]$ <strong>不</strong>互相垂直（点乘 = $1\times 1 + 1\times(-2) = -1 \neq 0$），所以 $Q$ 不是正交矩阵，$Q^{-1}$ 不能简单地用 $Q^T$ 替代。如果特征向量互相垂直且归一化，那逆矩阵就省了——翻一下行列就得到。</p>
+
+<h4>对称矩阵</h4>
+
+<p><strong>定义：</strong> 矩阵 $A$ 如果 $A = A^T$（等于自己的转置——沿对角线翻过去一模一样），就叫<strong>对称矩阵</strong>。</p>
+
+$$A = \begin{bmatrix} a & b \\ b & c \end{bmatrix}, \qquad A^T = \begin{bmatrix} a & b \\ b & c \end{bmatrix} = A$$
+
+<p>对角线是镜子——$a_{12}=a_{21}$，对称位置上的数必须相等。我们的例子 $A=\begin{bmatrix}4&1\\2&3\end{bmatrix}$ <strong>不是</strong>对称矩阵（$1\neq 2$），所以 $\mathbf{v}_1$ 和 $\mathbf{v}_2$ 不垂直。</p>
+
+<p><strong>对称矩阵的黄金性质：</strong> 实对称矩阵的特征向量<strong>天生互相垂直</strong>。这是线性代数里的重要定理——不需要额外条件，只要 $A=A^T$，它的特征向量就必然可以选成正交的。</p>
+
+<h4>两者结合——最佳情况</h4>
+
+<p>如果 $A$ 是对称矩阵 → 特征向量互相垂直 → 缩成单位长度 → $Q$ 变成正交矩阵 → $Q^{-1}=Q^T$ → 特征值分解简化为：</p>
+
+$$\boxed{A = Q\Lambda Q^T}$$
+
+<p>比 $A = Q\Lambda Q^{-1}$ 简洁多了——不用算逆矩阵！而且这个结构和下一课 SVD 的 $A = U\Sigma V^T$ 一脉相承。对称矩阵是对角化的「最佳情况」。</p>
+
 <div class="callout callout-info">
-<strong>补充：如果特征向量互相垂直且长度都是 1，</strong>$Q$ 就是<strong>正交矩阵</strong>，此时 $Q^{-1} = Q^T$（转置，行列互换即可——不用费劲算逆矩阵）。对称矩阵（$A=A^T$）的特征向量天生垂直，所以对称矩阵的特征值分解常写成 $A = Q\Lambda Q^T$。这和第六课 SVD 的 $A = U\Sigma V^T$ 结构一致。
+<strong>串联：</strong> 对称矩阵 → 垂直的特征向量 → 正交 $Q$ → $Q^{-1}=Q^T$ → $A=Q\Lambda Q^T$ → 和 SVD 的 $U\Sigma V^T$ 精神一致（都是「旋转→缩放→旋转回来」）。
 </div>
 
 <p><strong>推导链完整：</strong> 特征方程 → 二次方程求 λ → 代入 $(A-\lambda I)\mathbf{v}=0$ → 解线性方程组 → 得到 v → <strong>打包成 $A = Q\Lambda Q^{-1}$</strong>。下面用代码验证全过程：</p>
