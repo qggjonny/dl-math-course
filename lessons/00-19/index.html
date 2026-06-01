@@ -75,7 +75,7 @@ $$\Sigma = \begin{bmatrix}
     <span class="hl-comment"># 标准差 = sqrt(特征值) = 轴长</span>
     stds = np.sqrt(eigs)
     corr = Sigma[<span class="hl-number">0</span>, <span class="hl-number">1</span>] / np.sqrt(Sigma[<span class="hl-number">0</span>,<span class="hl-number">0</span>]*Sigma[<span class="hl-number">1</span>,<span class="hl-number">1</span>])
-                                             <span class="hl-comment"># ρ = σ₁₂ / (σ₁·σ₂)</span>
+    <span class="hl-comment"># ρ = σ₁₂ / (σ₁·σ₂)</span>
     <span class="hl-builtin">print</span>(<span class="hl-string">f"{label}:"</span>)
     <span class="hl-builtin">print</span>(<span class="hl-string">f"  μ = {mu}"</span>)
     <span class="hl-builtin">print</span>(<span class="hl-string">f"  Σ = {Sigma}"</span>)
@@ -119,7 +119,7 @@ $$D_M(\mathbf{x}) = \sqrt{(\mathbf{x} - \boldsymbol{\mu})^T \Sigma^{-1} (\mathbf
     <span class="hl-comment"># x - μ</span>
     diff = x - mu
     <span class="hl-keyword">return</span> np.sqrt(diff @ np.linalg.inv(Sigma) @ diff)
-                                             <span class="hl-comment"># sqrt((x-μ)^T Σ⁻¹ (x-μ))</span>
+    <span class="hl-comment"># sqrt((x-μ)^T Σ⁻¹ (x-μ))</span>
 
 mu = np.array([<span class="hl-number">0</span>, <span class="hl-number">0</span>])
 <span class="hl-comment"># 高度相关 ρ=0.9</span>

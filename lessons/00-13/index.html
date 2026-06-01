@@ -65,11 +65,11 @@ $$f(tx_1 + (1-t)x_2) \le t f(x_1) + (1-t) f(x_2)$$
     <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(n):
         <span class="hl-keyword">for</span> j <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(i+<span class="hl-number">1</span>, n):
             <span class="hl-keyword">for</span> t <span class="hl-keyword">in</span> [<span class="hl-number">0.25</span>, <span class="hl-number">0.5</span>, <span class="hl-number">0.75</span>]:
-                <span class="hl-comment"># 选两个端点</span>
+    <span class="hl-comment"># 选两个端点</span>
                 xi, xj = xs[i], xs[j]
-                <span class="hl-comment"># 弦上的一点</span>
+    <span class="hl-comment"># 弦上的一点</span>
                 x_mid = t*xi + (<span class="hl-number">1</span>-t)*xj
-                <span class="hl-comment"># 凸函数条件：f(中间点) ≤ t*f(xi) + (1-t)*f(xj)</span>
+    <span class="hl-comment"># 凸函数条件：f(中间点) ≤ t*f(xi) + (1-t)*f(xj)</span>
                 <span class="hl-keyword">if</span> f(x_mid) > t*f(xi) + (<span class="hl-number">1</span>-t)*f(xj) + <span class="hl-number">1e-10</span>:
                     <span class="hl-keyword">return</span> <span class="hl-builtin">False</span>
     <span class="hl-keyword">return</span> <span class="hl-builtin">True</span>
@@ -120,13 +120,13 @@ xs = np.linspace(-<span class="hl-number">3</span>, <span class="hl-number">3</s
       <span class="hl-string">"→ 凸"</span> <span class="hl-keyword">if</span> check_convexity_2nd(<span class="hl-keyword">lambda</span> x: x**<span class="hl-number">2</span>,
                                             <span class="hl-keyword">lambda</span> x: <span class="hl-number">2</span>, xs)
       <span class="hl-keyword">else</span> <span class="hl-string">"→ 非凸"</span>)
-                                   <span class="hl-comment"># f(x)=x², f''(x)=2 恒≥0</span>
+    <span class="hl-comment"># f(x)=x², f''(x)=2 恒≥0</span>
 
 <span class="hl-builtin">print</span>(<span class="hl-string">"\nx³: 二阶导 = 6x，可正可负"</span>,
       <span class="hl-string">"→ 凸"</span> <span class="hl-keyword">if</span> check_convexity_2nd(<span class="hl-keyword">lambda</span> x: x**<span class="hl-number">3</span>,
                                             <span class="hl-keyword">lambda</span> x: <span class="hl-number">6</span>*x, xs)
       <span class="hl-keyword">else</span> <span class="hl-string">"→ 非凸"</span>)
-                                   <span class="hl-comment"># f(x)=x³, f''(x)=6x: x<0时负,x>0时正</span>
+    <span class="hl-comment"># f(x)=x³, f''(x)=6x: x<0时负,x>0时正</span>
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>

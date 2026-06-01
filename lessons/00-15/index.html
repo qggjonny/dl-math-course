@@ -150,7 +150,7 @@ np.random.seed(<span class="hl-number">42</span>)
 samples = np.random.uniform(a, b, <span class="hl-number">100000</span>)
 <span class="hl-comment"># 逻辑与(&)：统计落在子区间内的样本数</span>
 in_int = np.<span class="hl-builtin">sum</span>((samples>=c) & (samples<=d))
-                                          <span class="hl-comment"># sum()对布尔数组：True=1，直接计数</span>
+    <span class="hl-comment"># sum()对布尔数组：True=1，直接计数</span>
 <span class="hl-comment"># :.4f = 保留4位小数，应≈0.3000</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"模拟 P = {in_int/100000:.4f}"</span>)
 <span class="hl-comment"># ===== 正态 PDF（手工实现正态密度函数）=====</span>
@@ -158,10 +158,10 @@ in_int = np.<span class="hl-builtin">sum</span>((samples>=c) & (samples<=d))
 <span class="hl-keyword">def</span> <span class="hl-func">normal_pdf</span>(x, mu, sigma):
     <span class="hl-comment"># 归一化系数：1/(σ√(2π))，保证总面积为1</span>
     c = <span class="hl-number">1.0</span>/(sigma*np.sqrt(<span class="hl-number">2</span>*np.pi))
-                                            <span class="hl-comment"># σ翻倍→系数减半，钟变胖变矮</span>
+    <span class="hl-comment"># σ翻倍→系数减半，钟变胖变矮</span>
     <span class="hl-comment"># 指数部分：-(x-μ)²/(2σ²)，决定离中心多远</span>
     e = -<span class="hl-number">0.5</span>*((x-mu)/sigma)**<span class="hl-number">2</span>
-                                            <span class="hl-comment"># x离μ越远→指数越负→exp趋近0→密度趋近0</span>
+    <span class="hl-comment"># x离μ越远→指数越负→exp趋近0→密度趋近0</span>
     <span class="hl-comment"># np.exp()：e的幂，支持数组运算（自动广播）</span>
     <span class="hl-keyword">return</span> c * np.exp(e)
 <span class="hl-comment"># 验证 σ 减半效应：σ翻倍 → 中心密度减半（总面积守恒）</span>

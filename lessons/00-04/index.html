@@ -217,9 +217,9 @@ $$\det(A) = a_{11}\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 <span class="hl-comment"># np.array(嵌套列表) → 创建3×3矩阵</span>
 A = np.array([[<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>],
-              <span class="hl-comment"># 第1行: [4,5,6]</span>
+    <span class="hl-comment"># 第1行: [4,5,6]</span>
               [<span class="hl-number">4</span>, <span class="hl-number">5</span>, <span class="hl-number">6</span>],
-              <span class="hl-comment"># 第2行: [7,8,9]，注意第2行=第1行×2-第0行，三行不独立</span>
+    <span class="hl-comment"># 第2行: [7,8,9]，注意第2行=第1行×2-第0行，三行不独立</span>
               [<span class="hl-number">7</span>, <span class="hl-number">8</span>, <span class="hl-number">9</span>]])
 <span class="hl-comment"># 手算验证：沿第一行展开 det = a₁₁·M₁₁ - a₁₂·M₁₂ + a₁₃·M₁₃</span>
 <span class="hl-comment"># M₁₁ = 5×9-6×8 = 45-48 = -3  (划掉第0行第0列后的2×2行列式)</span>
