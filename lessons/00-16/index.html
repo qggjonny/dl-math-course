@@ -170,4 +170,31 @@ dice = np.random.randint(<span class="hl-number">1</span>,<span class="hl-number
 </ol>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
 <a href="../00-15/">← 00-15</a><a href="../../">📖 目录</a><a href="../00-17/">00-17 →</a></nav>
-</div></body></html>
+</div>
+<script>
+(function(){
+  document.querySelectorAll('pre code').forEach(function(block){
+    var wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 复制';
+    btn.onclick = function(){
+      var text = block.innerText;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = '✅ 已复制';
+        btn.classList.add('copied');
+        setTimeout(function(){
+          btn.textContent = '📋 复制';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    };
+    block.parentNode.insertBefore(wrapper, block);
+    wrapper.appendChild(btn);
+    wrapper.appendChild(block);
+  });
+})();
+</script>
+
+</body></html>

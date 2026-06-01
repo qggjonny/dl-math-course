@@ -96,6 +96,39 @@ blockquote {
 }
 
 /* === 代码块 === */
+.code-block-wrapper {
+  position: relative;
+  margin: 1.2em 0;
+}
+.code-block-wrapper pre {
+  margin: 0;
+  padding-top: 2.6em;   /* 给按钮留空间 */
+}
+.copy-btn {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  z-index: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.copy-btn:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.copy-btn.copied {
+  background: #e8f5e9;
+  color: #2d7d46;
+  border-color: #2d7d46;
+}
 pre {
   background: var(--code-bg);
   border: 1px solid var(--border);
