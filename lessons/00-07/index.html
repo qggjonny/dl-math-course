@@ -41,7 +41,7 @@ A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span
 U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># U=左奇异向量(2×2), s=奇异值1D数组[σ₁,σ₂], VT=右奇异向量转置(2×2)</span>
 
 <span class="hl-builtin">print</span>(<span class="hl-string">"原始矩阵 A:"</span>)                  <span class="hl-comment"># 打印原始矩阵，方便和后面的图层对比</span>
-<span class="hl-builtin">print</span>(A)
+<span class="hl-builtin">print</span>(A)                                           <span class="hl-comment"># 打印原始矩阵，方便对照</span>
 
 <span class="hl-comment"># 逐层拆开——SVD可以写成：A = σ₁·u₁·v₁^T + σ₂·u₂·v₂^T + ...</span>
 <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-builtin">len</span>(s)):                <span class="hl-comment"># range(len(s))：遍历每个奇异值, i=0,1</span>
@@ -50,7 +50,7 @@ U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># U=左奇�
     <span class="hl-comment">#   U[:,i]：U的第i列（左奇异向量, 2维）</span>
     <span class="hl-comment">#   VT[i,:]：VT的第i行（右奇异向量, 2维）</span>
     <span class="hl-comment">#   s[i] * outer：奇异值σᵢ缩放这一层的贡献</span>
-    layer = s[i] * np.outer(U[:, i], VT[i, :])
+    layer = s[i] * np.outer(U[:, i], VT[i, :])                    <span class="hl-comment"># σᵢ × (uᵢ 和 vᵢ 的外积) = 第i层矩阵</span>
     <span class="hl-builtin">print</span>(<span class="hl-string">f"\n第 {i+1} 层 (σ={s[i]:.1f}):"</span>)  <span class="hl-comment"># f-string, :.1f=保留1位小数显示奇异值</span>
     <span class="hl-builtin">print</span>(layer)                            <span class="hl-comment"># 打印这一层矩阵——σ越大贡献越大</span>
 
@@ -59,7 +59,7 @@ U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># U=左奇�
 <span class="hl-comment"># s[1]*outer(U[:,1], VT[1,:])：第二层（σ₂,u₂,v₂）</span>
 <span class="hl-comment"># \ 是Python行连接符，用于把长语句分成两行写</span>
 reconstructed = s[<span class="hl-number">0</span>]*np.outer(U[:,<span class="hl-number">0</span>], VT[<span class="hl-number">0</span>,:]) + \
-               s[<span class="hl-number">1</span>]*np.outer(U[:,<span class="hl-number">1</span>], VT[<span class="hl-number">1</span>,:])
+               s[<span class="hl-number">1</span>]*np.outer(U[:,<span class="hl-number">1</span>], VT[<span class="hl-number">1</span>,:])                       <span class="hl-comment"># σ₂ · u₂ · v₂^T = 第二层</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"\n两层之和:\n{reconstructed}"</span>)  <span class="hl-comment"># 验证重建结果，应和原始A一样</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"等于 A？ {np.allclose(A, reconstructed)}"</span>)  <span class="hl-comment"># allclose：容忍浮点误差的近似相等 → True</span>
 </code></pre>
@@ -81,7 +81,7 @@ U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># SVD分解�
 k = <span class="hl-number">1</span>                                     <span class="hl-comment"># k=1：只保留第一个（最大的）奇异值</span>
 <span class="hl-comment"># 生成器表达式 sum(... for i in range(k))：对前k个索引求和</span>
 <span class="hl-comment"># 每个i：s[i] * outer(U[:,i], VT[i,:]) = σᵢ · uᵢ · vᵢ^T</span>
-A_1 = <span class="hl-builtin">sum</span>(s[i] * np.outer(U[:, i], VT[i, :])
+A_1 = <span class="hl-builtin">sum</span>(s[i] * np.outer(U[:, i], VT[i, :])               <span class="hl-comment"># 只用前k=1个奇异值：∑ σᵢ uᵢ vᵢ^T (i=0)</span>
           <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(k))              <span class="hl-comment"># range(k)=range(1)=[0]：只循环一次</span>
 
 <span class="hl-comment"># 计算重建误差——用Frobenius范数衡量矩阵间"距离"</span>
@@ -91,7 +91,7 @@ error = np.linalg.norm(A - A_1, <span class="hl-string">'fro'</span>)      <span
 <span class="hl-builtin">print</span>(<span class="hl-string">f"只用 {k} 个奇异值重建:"</span>)       <span class="hl-comment"># 打印标题</span>
 <span class="hl-builtin">print</span>(A_1)                                  <span class="hl-comment"># 打印近似矩阵A₁——和原A对比</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"\n原始 A:"</span>)                        <span class="hl-comment"># 打印原始矩阵</span>
-<span class="hl-builtin">print</span>(A)
+<span class="hl-builtin">print</span>(A)                                           <span class="hl-comment"># 打印原始矩阵，方便对照</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"\n误差 = {error:.3f}"</span>)           <span class="hl-comment"># :.3f = 保留3位小数显示误差</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"相对误差 = {error / np.linalg.norm(A, 'fro') * 100:.1f}%"</span>)  <span class="hl-comment"># 误差÷原始范数×100%=相对误差百分比</span>
 </code></pre>
@@ -120,13 +120,13 @@ U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># SVD分解�
 <span class="hl-builtin">print</span>(<span class="hl-string">f"A 形状: {A.shape}"</span>)             <span class="hl-comment"># A.shape → (5, 3)，即5行3列</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"奇异值: σ₁={s[0]:.3f}, σ₂={s[1]:.3f}, σ₃={s[2]:.3f}"</span>)  <span class="hl-comment"># :.3f=保留3位，σ₃应远小于前两个</span>
 <span class="hl-builtin">print</span>()                                    <span class="hl-comment"># 空行，让输出更好看</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">"原始 A:"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">"原始 A:"</span>)                                      <span class="hl-comment"># 打印原始矩阵，方便和重建版本对比</span>
 <span class="hl-builtin">print</span>(np.round(A, <span class="hl-number">3</span>))                    <span class="hl-comment"># round(A, 3)：四舍五入到3位小数，让输出整洁</span>
 
 <span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>]:                        <span class="hl-comment"># 分别试验：只用1个奇异值 vs 用前2个奇异值</span>
     <span class="hl-comment"># A_k = Σ_{i=0}^{k-1} σᵢ uᵢ vᵢ^T —— 用前k个奇异值重建</span>
     <span class="hl-comment"># 生成器表达式：for i in range(k) 依次取i=0,...,k-1</span>
-    A_k = <span class="hl-builtin">sum</span>(s[i] * np.outer(U[:, i], VT[i, :])
+    A_k = <span class="hl-builtin">sum</span>(s[i] * np.outer(U[:, i], VT[i, :])               <span class="hl-comment"># 用前k个奇异值重建：∑_{i=0}^{k-1} σᵢ uᵢ vᵢ^T</span>
               <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(k))      <span class="hl-comment"># sum()对生成器产生的k个矩阵逐元素求和</span>
     error = np.linalg.norm(A - A_k, <span class="hl-string">'fro'</span>)  <span class="hl-comment"># Frobenius范数 = √(Σ|Aᵢⱼ−A_kᵢⱼ|²)</span>
     rel_err = error / np.linalg.norm(A, <span class="hl-string">'fro'</span>) * <span class="hl-number">100</span>  <span class="hl-comment"># 相对误差 = 绝对误差÷原矩阵大小×100%</span>

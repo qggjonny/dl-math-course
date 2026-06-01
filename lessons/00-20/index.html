@@ -40,7 +40,7 @@ $$\boxed{H(P) = -\sum_x P(x) \ln P(x)}$$
 <span class="hl-keyword">def</span> <span class="hl-func">entropy</span>(probs):                      <span class="hl-comment"># probs：概率数组，如 [0.95, 0.03, 0.02]</span>
     <span class="hl-string">"""H(P) = -Σ p_i ln(p_i)"""</span>
     <span class="hl-comment"># 只算 p > 0 的项（ln(0) 数学上无定义，也会产生-inf）</span>
-    <span class="hl-keyword">return</span> -np.sum(probs[probs > <span class="hl-number">0</span>] * np.log(probs[probs > <span class="hl-number">0</span>]))
+    <span class="hl-keyword">return</span> -np.sum(probs[probs > <span class="hl-number">0</span>] * np.log(probs[probs > <span class="hl-number">0</span>]))  <span class="hl-comment"># H = -Σ pᵢ log(pᵢ)，只对 pᵢ>0 的项求和（log0无定义）</span>
     <span class="hl-comment">#        np.log()：自然对数ln（底e→单位nat）</span>
     <span class="hl-comment">#        probs[probs>0]：布尔索引，只取概率>0的元素</span>
     <span class="hl-comment">#        -sum(p_i * ln(p_i)) → 非负值，熵越小越确定</span>
@@ -67,7 +67,7 @@ $$\boxed{H(P, Q) = -\sum_x P(x) \ln Q(x)}$$
     <span class="hl-string">"""H(P,Q) = -Σ p_i ln(q_i)"""</span>
     <span class="hl-comment"># 只算 p > 0 的项（真实概率为0的类别不参与损失计算）</span>
     mask = p_true > <span class="hl-number">0</span>                     <span class="hl-comment"># mask：布尔数组，标记哪些位置p_i>0</span>
-    <span class="hl-keyword">return</span> -np.sum(p_true[mask] * np.log(q_pred[mask]))
+    <span class="hl-keyword">return</span> -np.sum(p_true[mask] * np.log(q_pred[mask]))    <span class="hl-comment"># H(P,Q) = -Σ pᵢ log(qᵢ)，用真实分布p算、模型预测q做log</span>
     <span class="hl-comment">#        p_true[mask]：真实概率>0的项（one-hot时只有一个1.0）</span>
     <span class="hl-comment">#        np.log(q_pred[mask])：模型对"真类别"预测概率的ln</span>
     <span class="hl-comment">#        叉熵越小 → 模型预测越接近真实分布</span>
@@ -110,7 +110,7 @@ $$\boxed{D_{\mathrm{KL}}(P \parallel Q) = \sum_x P(x) \ln\frac{P(x)}{Q(x)}}$$
 <span class="hl-keyword">def</span> <span class="hl-func">kl_divergence</span>(p, q):                <span class="hl-comment"># p=真实分布，q=模型预测分布</span>
     <span class="hl-string">"""D_KL(P||Q) = Σ p_i ln(p_i/q_i)"""</span>
     mask = p > <span class="hl-number">0</span>                         <span class="hl-comment"># 只算真实概率>0的项（避免ln(0)）</span>
-    <span class="hl-keyword">return</span> np.sum(p[mask] * np.log(p[mask] / q[mask]))
+    <span class="hl-keyword">return</span> np.sum(p[mask] * np.log(p[mask] / q[mask]))    <span class="hl-comment"># D_KL = Σ pᵢ log(pᵢ/qᵢ)，衡量q偏离p的程度</span>
     <span class="hl-comment">#        ln(p_i/q_i)：比值越大 → 模型预测偏离越大 → KL散度越大</span>
     <span class="hl-comment">#        D_KL≥0恒成立（吉布斯不等式），P=Q时D_KL=0</span>
 y_true = np.array([<span class="hl-number">1.0</span>, <span class="hl-number">0.0</span>, <span class="hl-number">0.0</span>])        <span class="hl-comment"># 真实标签：one-hot（猫）</span>
@@ -122,7 +122,7 @@ D_KL = kl_divergence(y_true, pred)        <span class="hl-comment"># KL散度：
 <span class="hl-builtin">print</span>(<span class="hl-string">f"H(P,Q)  = {H_PQ:.4f}"</span>)           <span class="hl-comment"># 0.1054 —— 交叉熵≈KL散度（因为H(P)=0）</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"D_KL    = {D_KL:.4f}"</span>)           <span class="hl-comment"># 0.1054 —— 模型不好带来的额外成本</span>
 <span class="hl-comment"># 验证恒等式：H(P,Q) = H(P) + D_KL(P||Q)</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"H(P,Q) = H(P) + D_KL? {abs(H_PQ - (H_P + D_KL)) &lt; 1e-10}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"H(P,Q) = H(P) + D_KL? {abs(H_PQ - (H_P + D_KL)) &lt; 1e-10}"</span>)  <span class="hl-comment"># 验证恒等式：交叉熵 = 熵 + KL散度</span>
 <span class="hl-comment"># abs(差值) < 1e-10 → True，浮点误差范围内相等 ✓</span>
 <span class="hl-comment"># 结论：训练时最小化交叉熵 = 最小化KL散度（H(P)是常数无影响）</span>
 </code></pre>
