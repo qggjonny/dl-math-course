@@ -43,129 +43,136 @@ $$A = \begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix}, \quad
 <p>取 8 个均匀分布的方向（每 45° 一个），每个方向上取一个<strong>长度为 1 的向量</strong>。用 $A$ 分别去乘它们——看看每个向量被拉伸了多少、转到了哪个方向。</p>
 
 <pre><code><span class="hl-comment"># 00-06 第一步：对8个方向上的单位向量，用A去乘，观察谁被拉得最长</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy，别名np</span>
 
-A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],            <span class="hl-comment"># 待研究的矩阵 2×2</span>
-              [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])
+A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],                    <span class="hl-comment"># np.array(嵌套列表) → 创建二维数组（矩阵）</span>
+              [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])                   <span class="hl-comment"># 外层列表的每个元素是一行 → 2行2列</span>
 
-angles = np.linspace(<span class="hl-number">0</span>, <span class="hl-number">2</span>*np.pi, <span class="hl-number">9</span>)[:-<span class="hl-number">1</span>]  <span class="hl-comment"># 8个角度: 0°,45°,90°...315°</span>
-                                                <span class="hl-comment"># [:-1] 去掉最后一个(360°=0°重复)</span>
+<span class="hl-comment"># 生成8个均匀分布的角度（360°/8 = 45°间隔）</span>
+angles = np.linspace(<span class="hl-number">0</span>, <span class="hl-number">2</span>*np.pi, <span class="hl-number">9</span>)[:-<span class="hl-number">1</span>]  <span class="hl-comment"># linspace(0,2π,9)：等间距生成 [0,π/4,π/2,...,2π] 共9个</span>
+                                                <span class="hl-comment"># [:-1]：切片去掉最后一个(2π=0° 与第一个重复)</span>
+                                                <span class="hl-comment"># 最终得到8个角度：0°,45°,90°,...,315°</span>
 
-<span class="hl-builtin">print</span>(<span class="hl-string">"输入向量 → 输出向量 → 输出长度（拉伸倍数）"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">"-"</span> * <span class="hl-number">50</span>)
-<span class="hl-keyword">for</span> angle <span class="hl-keyword">in</span> angles:
-    v = np.array([np.cos(angle), np.sin(angle)])  <span class="hl-comment"># 单位向量，长度=1</span>
-    w = A @ v                                      <span class="hl-comment"># A 作用在 v 上，得到输出向量 w</span>
-    stretch = np.linalg.norm(w)                    <span class="hl-comment"># w 的长度 = 这个方向上的拉伸倍数</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"输入向量 → 输出向量 → 输出长度（拉伸倍数）"</span>)  <span class="hl-comment"># 表头</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"-"</span> * <span class="hl-number">50</span>)                           <span class="hl-comment"># "-"*50 → 50个减号做分隔线</span>
+
+<span class="hl-keyword">for</span> angle <span class="hl-keyword">in</span> angles:                      <span class="hl-comment"># 遍历8个角度(弧度制)</span>
+    <span class="hl-comment"># cos(θ)=x分量, sin(θ)=y分量 → 合成一个长度为1的向量</span>
+    v = np.array([np.cos(angle), np.sin(angle)])  <span class="hl-comment"># 角度θ方向上的单位向量</span>
+                                                   <span class="hl-comment"># cos²θ+sin²θ=1 → 长度一定为1</span>
+    w = A @ v                                      <span class="hl-comment"># @ = 矩阵乘法：A(2×2) @ v(2×1) → w(2×1)</span>
+                                                   <span class="hl-comment"># A把输入向量v变换成输出向量w</span>
+    stretch = np.linalg.norm(w)                    <span class="hl-comment"># norm()=欧几里得长度 √(w[0]²+w[1]²)</span>
+                                                   <span class="hl-comment"># 值>1=被拉伸，值<1=被压缩</span>
     
+    <span class="hl-comment"># f-string中 :+.2f = 带正负号保留2位小数</span>
     <span class="hl-builtin">print</span>(<span class="hl-string">f"v=[{v[0]:+.2f},{v[1]:+.2f}] → "</span>
           <span class="hl-string">f"w=[{w[0]:+.2f},{w[1]:+.2f}] 拉伸={stretch:.2f}倍"</span>)
 
-<span class="hl-comment"># 谁被拉得最长？谁最短？</span>
+<span class="hl-comment"># 在8个方向中，找出拉伸倍数最大和最小的</span>
+<span class="hl-comment"># 列表推导式：对每个角度，重复"构造向量→用A变换→量长度"</span>
 stretches = [np.linalg.norm(A @ np.array([np.cos(a), np.sin(a)]))
-             <span class="hl-keyword">for</span> a <span class="hl-keyword">in</span> angles]
-max_idx = np.argmax(stretches)
-min_idx = np.argmin(stretches)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\n最大拉伸: {stretches[max_idx]:.2f}倍（角度 {np.degrees(angles[max_idx]):.0f}°）"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"最小拉伸: {stretches[min_idx]:.2f}倍（角度 {np.degrees(angles[min_idx]):.0f}°）"</span>)
-</code></pre>
-
-<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-
-<p>跑完你会发现：<strong>45° 方向（向量 [0.707, 0.707]）被拉了 4 倍——是所有方向里拉伸最多的。135° 方向只拉 2 倍——最少。</strong></p>
-
-<p>这两个特殊方向，就是 SVD 要抓的东西：</p>
-<ul>
-  <li>拉伸最多的方向 → <strong>最大奇异值</strong>（$\sigma_1 = 4$）</li>
-  <li>拉伸最少的方向 → <strong>次大奇异值</strong>（$\sigma_2 = 2$）</li>
-</ul>
-
-<h2>三、从 8 个方向扩展到无数个方向——椭圆</h2>
-
-<p>上面只看了 8 个方向。如果<strong>把所有可能的方向都考虑进来</strong>——每个方向上放一个长度为 1 的向量——这些向量的终点连起来就是一个<strong>单位圆</strong>。</p>
-
-<p>用矩阵 $A$ 去乘圆上的每一个点，得到的点连起来就是<strong>一个椭圆</strong>。</p>
-
-<div class="callout callout-info">
-<strong>"矩阵变换一个圆"到底是什么意思？</strong><br><br>
-不是矩阵「吃掉了」一个圆。而是：<br>
-① 圆的本质 = 无数个长度为 1、方向各异的向量（的终点）<br>
-② 对每个向量，做 $A\mathbf{v}$（你已经会的操作）<br>
-③ 所有输出向量的终点围成椭圆<br><br>
-所以「圆变椭圆」=「对大量向量逐个做矩阵乘法，观察结果的形状」。和 $A\mathbf{x}$ 没有本质区别，只是做了很多次。
-</div>
-
+             <span class="hl-keyword">for</span> a <span class="hl-keyword">in</span> angles]                <span class="hl-comment"># 结果：8个拉伸倍数组成的列表</span>
 <pre><code><span class="hl-comment"># 00-06 第二步：用100个方向，密集采样，验证输出围成椭圆</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy</span>
 
-A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],
+A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],                    <span class="hl-comment"># 同一个矩阵 A（方便和第一步的结果对照）</span>
               [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])
 
-<span class="hl-comment"># 在单位圆上取 100 个点（每个点 = 一个长度为1的向量）</span>
-angles = np.linspace(<span class="hl-number">0</span>, <span class="hl-number">2</span>*np.pi, <span class="hl-number">100</span>)
-circle_x = np.cos(angles)                   <span class="hl-comment"># 100 个点的 x 坐标</span>
-circle_y = np.sin(angles)                   <span class="hl-comment"># 100 个点的 y 坐标</span>
-circle = np.vstack([circle_x, circle_y])    <span class="hl-comment"># 形状 (2, 100) — 每一列是一个点</span>
+<span class="hl-comment"># 在单位圆上均匀取100个点——每个点 = 一个方向上的单位向量</span>
+angles = np.linspace(<span class="hl-number">0</span>, <span class="hl-number">2</span>*np.pi, <span class="hl-number">100</span>)   <span class="hl-comment"># 从0到2π等间距生成100个角度</span>
+circle_x = np.cos(angles)                   <span class="hl-comment"># cos作用于数组的每个元素 → 100个x坐标</span>
+circle_y = np.sin(angles)                   <span class="hl-comment"># sin作用于数组的每个元素 → 100个y坐标</span>
+circle = np.vstack([circle_x, circle_y])    <span class="hl-comment"># vstack：垂直堆叠两个(100,)数组 → (2,100)</span>
+                                            <span class="hl-comment"># 第0行=所有x坐标，第1行=所有y坐标</span>
+                                            <span class="hl-comment"># 每一列是一个单位向量（共100列）</span>
 
-<span class="hl-comment"># 用 A 同时乘所有 100 个向量 → (2,2) × (2,100) = (2,100)</span>
-ellipse = A @ circle                        <span class="hl-comment"># 100 个输出向量，围成椭圆</span>
+<span class="hl-comment"># 用A同时乘所有100个向量 — 矩阵乘法的批量模式</span>
+<span class="hl-comment"># A(2×2) @ circle(2×100) → ellipse(2×100)</span>
+ellipse = A @ circle                        <span class="hl-comment"># 一次运算完成100次变换！</span>
+                                            <span class="hl-comment"># 结果：100个输出向量，每一列是一个输出点</span>
 
-<span class="hl-comment"># 输出点的范围——用来判断椭圆的长轴和短轴</span>
-x_vals = ellipse[<span class="hl-number">0</span>, :]                      <span class="hl-comment"># 所有输出点的 x 坐标</span>
-y_vals = ellipse[<span class="hl-number">1</span>, :]                      <span class="hl-comment"># 所有输出点的 y 坐标</span>
+<span class="hl-comment"># 取出所有输出点的x坐标和y坐标（用于后续分析）</span>
+x_vals = ellipse[<span class="hl-number">0</span>, :]                      <span class="hl-comment"># ellipse第0行、所有列 → 100个x值</span>
+y_vals = ellipse[<span class="hl-number">1</span>, :]                      <span class="hl-comment"># ellipse第1行、所有列 → 100个y值</span>
 
-<span class="hl-builtin">print</span>(<span class="hl-string">f"输出 x 范围: [{x_vals.min():.1f}, {x_vals.max():.1f}]"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"输出 y 范围: [{y_vals.min():.1f}, {y_vals.max():.1f}]"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"输出 x 范围: [{x_vals.min():.1f}, {x_vals.max():.1f}]"</span>)  <span class="hl-comment"># 输出点的x坐标范围</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"输出 y 范围: [{y_vals.min():.1f}, {y_vals.max():.1f}]"</span>)  <span class="hl-comment"># 输出点的y坐标范围</span>
 
-<span class="hl-comment"># 找到离原点最远的输出点——这就是最大奇异值对应的方向</span>
-distances = np.linalg.norm(ellipse, axis=<span class="hl-number">0</span>)   <span class="hl-comment"># 每个输出向量的长度</span>
-max_idx = np.argmax(distances)              <span class="hl-comment"># 最长的那根</span>
-min_idx = np.argmin(distances)              <span class="hl-comment"># 最短的那根</span>
+<span class="hl-comment"># 计算每个输出点到原点的距离 — 即该方向上的拉伸倍数</span>
+distances = np.linalg.norm(ellipse, axis=<span class="hl-number">0</span>)   <span class="hl-comment"># axis=0：沿第0轴（列方向）计算每列的norm</span>
+                                            <span class="hl-comment"># 返回(100,)数组，第i个=第i个输出向量的长度</span>
+max_idx = np.argmax(distances)              <span class="hl-comment"># 距离最大的点的索引→椭圆长轴端点</span>
+min_idx = np.argmin(distances)              <span class="hl-comment"># 距离最小的点的索引→椭圆短轴端点</span>
 
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\n椭圆长轴（最大拉伸）: 长度={distances[max_idx]:.1f}，方向=[{ellipse[0,max_idx]:.1f},{ellipse[1,max_idx]:.1f}]"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"
+椭圆长轴（最大拉伸）: 长度={distances[max_idx]:.1f}，方向=[{ellipse[0,max_idx]:.1f},{ellipse[1,max_idx]:.1f}]"</span>)
 <span class="hl-builtin">print</span>(<span class="hl-string">f"椭圆短轴（最小拉伸）: 长度={distances[min_idx]:.1f}，方向=[{ellipse[0,min_idx]:.1f},{ellipse[1,min_idx]:.1f}]"</span>)
-</code></pre>
+</code></pre>100) = (2,100)</span>
+ellipse = A @ circle   <pre><code><span class="hl-comment"># 00-06 第三步：用 numpy 的 SVD 函数，把 A 拆成 U Σ V^T 三步</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy</span>
 
-<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-
-<p>结论：<strong>长轴指向 [2.83, 2.83] 方向，长度 ≈ 4；短轴指向 [-1.41, 1.41] 方向，长度 ≈ 2。</strong></p>
-
-<p>这两个方向<strong>互相垂直</strong>（点乘 = 2.83×(-1.41) + 2.83×1.41 = 0 ✓），它们是矩阵 $A$ 的<strong>左奇异向量</strong>。</p>
-
-<h2>四、SVD 公式登场——现在它不神秘了</h2>
-
-<p>有了上面的直觉，SVD 就是三件事的合并：</p>
-
-$$A = U \Sigma V^T$$
-
-<table>
-  <tr><th>矩阵</th><th>做什么</th><th>对应刚才看到的什么</th></tr>
-  <tr>
-    <td>$U$</td>
-    <td>椭圆两个轴的方向（单位化）</td>
-    <td>长轴方向 [0.707, 0.707] 和短轴方向 [-0.707, 0.707]</td>
-  </tr>
-  <tr>
-    <td>$\Sigma$</td>
-    <td>两个轴的<strong>长度</strong></td>
-    <td>对角线上的 4 和 2——就是那两个拉伸倍数</td>
-  </tr>
-  <tr>
-    <td>$V^T$</td>
-    <td>「这两个方向在被拉伸<strong>之前</strong>指向哪里」</td>
-    <td>长轴在被拉之前是 45°，短轴在被拉之前是 135°</td>
-  </tr>
-</table>
-
-<p><strong>一句话：</strong> $V^T$ 把坐标轴转到位 → $\Sigma$ 沿这两个方向分别拉伸 → $U$ 把拉伸后的轴转到最终方位。三步走。</p>
-
-<p>用代码验证：</p>
-
-<pre><code><span class="hl-comment"># 00-06 第三步：用 numpy 的 SVD 函数，把 A 拆成三步</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-
-A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],
+A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],                    <span class="hl-comment"># 还是同一个矩阵</span>
               [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])
+
+<span class="hl-comment"># np.linalg.svd() 直接做奇异值分解</span>
+U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># 三个返回值：U(左奇异向量)、s(奇异值1D数组)、V^T(右奇异向量的转置)</span>
+                                            <span class="hl-comment"># s 是一维数组 [σ₁, σ₂]，不是对角矩阵</span>
+
+<span class="hl-builtin">print</span>(<span class="hl-string">"U (椭圆轴方向) =
+"</span>, U)           <span class="hl-comment"># U的每一列是输出椭圆的一个轴方向（单位向量）</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"
+Σ 对角线: σ₁={s[0]}, σ₂={s[1]}"</span>)   <span class="hl-comment"># 奇异值 = 椭圆的长轴半径和短轴半径</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">"
+V^T (轴被拉伸之前的方位) =
+"</span>, VT)  <span class="hl-comment"># V^T的每一行指向"被拉伸前"的方向</span>
+
+<span class="hl-comment"># 验证：把三步合成起来，应该等于原矩阵</span>
+Sigma = np.diag(s)                         <span class="<pre><code><span class="hl-comment"># 00-06 第四步：长方形矩阵（非方阵）也能做 SVD</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy</span>
+
+A = np.array([[<span class="hl-number">1</span>, <span class="hl-number">2</span>],                     <span class="hl-comment"># 行数(3) ≠ 列数(2) → 长方形矩阵</span>
+              [<span class="hl-number">3</span>, <span class="hl-number">4</span>],                     <span class="hl-comment"># 3行2列 = 3个样本、2个特征</span>
+              [<span class="hl-number">5</span>, <span class="hl-number">6</span>]])
+
+U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># 对长方形矩阵照样做SVD</span>
+                                            <span class="hl-comment"># U: 3×3（输入空间的维数）</span>
+                                            <span class="hl-comment"># s: 只有min(3,2)=2个奇异值</span>
+                                            <span class="hl-comment"># VT: 2×2（输出空间的维数）</span>
+
+<span class="hl-builtin">print</span>(<span class="hl-string">f"A 形状: {A.shape}"</span>)               <span class="hl-comment"># .shape属性：返回元组 (行数, 列数)</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"U 形状: {U.shape}  (椭圆轴方向，在 3 维空间里)"</span>)  <span class="hl-comment"># U的列是3维向量</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"奇异值: σ₁={s[0]:.2f}, σ₂={s[1]:.2f}"</span>)  <span class="hl-comment"># 只有2个奇异值（因为只有2列）</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"V^T 形状: {VT.shape}  (被拉伸之前的方位，在 2 维空间里)"</span>)
+
+<span class="hl-comment"># 验证 U Σ V^T = A。但Σ需要是3×2才能和U(3×3)、V^T(2×2)相乘</span>
+<span class="hl-comment"># 构造3×2的Σ矩阵：左上角2×2对角块=diag(s)，其<pre><code><span class="hl-comment"># 验证：σ = √(A^T A 的特征值) — 奇异值和特征值的关系</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy</span>
+
+A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],                    <span class="hl-comment"># 同样用2×2矩阵做验证</span>
+              [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])
+
+<span class="hl-comment"># 第一步：计算 A^T A。注意：任何矩阵乘自己的转置一定是方阵</span>
+ATA = A.T @ A                              <span class="hl-comment"># A.T = A的转置。A^T(2×2) @ A(2×2) = (2×2) 对称方阵</span>
+                                            <span class="hl-comment"># A^T A 一定是对称的，因为 (A^T A)^T = A^T A</span>
+eigvals = np.linalg.eigvals(ATA)           <span class="hl-comment"># eigvals()：计算方阵的所有特征值</span>
+                                            <span class="hl-comment"># 返回1D数组，包含按任意顺序排列的特征值</span>
+eigvals = np.sort(eigvals)[::-<span class="hl-number">1</span>]           <span class="hl-comment"># sort()：从小到大排序</span>
+                                            <span class="hl-comment"># [::-1]：切片步长=-1 → 反转 → 从大到小</span>
+                                            <span class="hl-comment"># 这样第i个特征值就对应第i个奇异值</span>
+
+<span class="hl-comment"># 第二步：奇异值 = √特征值</span>
+sigma_from_eig = np.sqrt(eigvals)          <span class="hl-comment"># np.sqrt()：对数组每个元素开平方根</span>
+                                            <span class="hl-comment"># 返回 [√λ₁, √λ₂]</span>
+
+<span class="hl-comment"># 第三步：直接用SVD算奇异值，做对比</span>
+_, s, _ = np.linalg.svd(A)                 <span class="hl-comment"># _ 表示"我不关心这个返回值"，只取奇异值s</span>
+
+<span class="hl-builtin">print</span>(<span class="hl-string">f"A^T A 的特征值: {eigvals}"</span>)       <span class="hl-comment"># 应该 = [16, 4]（因为 σ=[4,2], λ=σ²）</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"sqrt(特征值) = {sigma_from_eig}"</span>)   <span class="hl-comment"># 应该 = [4, 2]</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"SVD 奇异值  = {s}"</span>)                <span class="hl-comment"># 应该 = [4, 2]</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"一致？ {np.allclose(sigma_from_eig, s)}"</span>)  <span class="hl-comment"># 验证两种方法的结果是否相同</span>
+</code></pre>        [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])
 
 U, s, VT = np.linalg.svd(A)                <span class="hl-comment"># U, 奇异值(1D数组), V^T</span>
 
@@ -266,8 +273,6 @@ _, s, _ = np.linalg.svd(A)
 <p>——考察：奇异值个数 = min(m, n)</p>
 </div>
 
-<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-05/">← 00-05</a><a href="../../">📖 目录</a><a href="../00-07/">00-07 →</a></nav>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
 <a href="../00-05/">← 00-05</a><a href="../../">📖 目录</a><a href="../00-07/">00-07 →</a></nav>
 </div>
