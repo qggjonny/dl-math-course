@@ -143,89 +143,66 @@ $$A - 2I = \begin{bmatrix} 4-2 & 1 \\ 2 & 3-2 \end{bmatrix} = \begin{bmatrix} 2 
 $$\mathbf{v}_2 = \begin{bmatrix} 1 \\ -2 \end{bmatrix}$$
 <p><strong>验证：</strong> $A\mathbf{v}_1 = \begin{bmatrix} 4&1\\2&3 \end{bmatrix} \begin{bmatrix} 1\\1 \end{bmatrix} = \begin{bmatrix} 5\\5 \end{bmatrix} = 5 \cdot \begin{bmatrix} 1\\1 \end{bmatrix}$ ✓。$A\mathbf{v}_2 = \begin{bmatrix} 4&1\\2&3 \end{bmatrix} \begin{bmatrix} 1\\-2 \end{bmatrix} = \begin{bmatrix} 2\\-4 \end{bmatrix} = 2 \cdot \begin{bmatrix} 1\\-2 \end{bmatrix}$ ✓。</p>
 
-<h3>把两个特征向量打包——矩阵形式的特征值分解</h3>
+<h3>打包成矩阵——从 $A\mathbf{v}=\lambda\mathbf{v}$ 到 $A=Q\Lambda Q^{-1}$</h3>
 
-<p>上面我们一个个处理了两个特征向量。现在<strong>打包成矩阵</strong>，一次性表达。</p>
+<p>我们已经求出两个特征向量和特征值。出发点是这两个等式：</p>
 
-<p>把 $\mathbf{v}_1$ 和 $\mathbf{v}_2$ 作为<strong>列</strong>放进矩阵 $Q$，把 $\lambda_1,\lambda_2$ 放在对角线上组成 $\Lambda$：</p>
+$$A\mathbf{v}_1 = 5\mathbf{v}_1, \qquad A\mathbf{v}_2 = 2\mathbf{v}_2$$
 
-$$Q = \begin{bmatrix} \mathbf{v}_1 & \mathbf{v}_2 \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 1 & -2 \end{bmatrix}, \quad
-\Lambda = \begin{bmatrix} \lambda_1 & 0 \\ 0 & \lambda_2 \end{bmatrix} = \begin{bmatrix} 5 & 0 \\ 0 & 2 \end{bmatrix}$$
+<p><strong>第一步：把 $\mathbf{v}_1,\mathbf{v}_2$ 并排成矩阵，$\lambda_1,\lambda_2$ 放对角线上。</strong></p>
 
-<p>$A\mathbf{v}_1 = \lambda_1\mathbf{v}_1$ 和 $A\mathbf{v}_2 = \lambda_2\mathbf{v}_2$ 现在可以合并写成矩阵乘法：$AQ = Q\Lambda$（左边：$A$ 分别乘两列；右边：两列各自缩放）。两边右乘 $Q$ 的逆矩阵 $Q^{-1}$，就得到：</p>
+$$Q = \begin{bmatrix} \mathbf{v}_1 & \mathbf{v}_2 \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 1 & -2 \end{bmatrix}, \qquad
+\Lambda = \begin{bmatrix} 5 & 0 \\ 0 & 2 \end{bmatrix}$$
 
-$$\boxed{A = Q \Lambda Q^{-1}}$$
+<p>$Q$ 的每一列是一个特征向量，$\Lambda$ 的对角线上是特征值。</p>
 
-<p>这就是矩阵形式的特征值分解。但公式里有几个新东西需要拆开讲——<strong>什么是逆矩阵？$Q^{-1}$ 为什么能把向量翻译到特征基？公式里的两次「旋转」在做什么？</strong>一步一步来。</p>
+<p><strong>第二步：把两个等式合并成一个矩阵等式。</strong> 计算 $AQ$（$A$ 分别乘 $Q$ 的两列）：</p>
 
-<h4>① $Q$ 做了什么？</h4>
+$$AQ = A\begin{bmatrix}\mathbf{v}_1 & \mathbf{v}_2\end{bmatrix} = \begin{bmatrix}A\mathbf{v}_1 & A\mathbf{v}_2\end{bmatrix}
+= \begin{bmatrix}5\mathbf{v}_1 & 2\mathbf{v}_2\end{bmatrix}$$
 
-<p>$Q$ 的列是 $\mathbf{v}_1$ 和 $\mathbf{v}_2$。它把一个标准基向量送到对应的特征向量：</p>
+<p>右边恰好等于 $Q\Lambda$：$Q\Lambda$ 的第一列 = $Q \times$（$\Lambda$ 的第一列）= $Q\begin{bmatrix}5\\0\end{bmatrix} = 5\mathbf{v}_1 + 0\mathbf{v}_2 = 5\mathbf{v}_1$。同理第二列 = $2\mathbf{v}_2$。所以：</p>
 
-$$Q\begin{bmatrix}1\\0\end{bmatrix} = 1\cdot\mathbf{v}_1 + 0\cdot\mathbf{v}_2 = \mathbf{v}_1, \qquad
-Q\begin{bmatrix}0\\1\end{bmatrix} = 0\cdot\mathbf{v}_1 + 1\cdot\mathbf{v}_2 = \mathbf{v}_2$$
+$$AQ = Q\Lambda$$
 
-<p>推广：$Q$ 把任意坐标 $[c_1, c_2]$ 送到 $c_1\mathbf{v}_1 + c_2\mathbf{v}_2$——即「用特征向量当尺子量出来的点」。</p>
+<p><strong>第三步：把 $A$ 单独解出来。</strong> 两边右边乘一个矩阵，把 $Q$ 「消掉」。这个矩阵记作 $Q^{-1}$，满足 $QQ^{-1}=I$（$I$ 是单位矩阵，相当于数字 1）。于是：</p>
 
-<h4>② $Q^{-1}$：反方向操作，提取特征基坐标</h4>
+$$AQQ^{-1} = Q\Lambda Q^{-1} \;\Longrightarrow\; A \cdot I = Q\Lambda Q^{-1} \;\Longrightarrow\; \boxed{A = Q\Lambda Q^{-1}}$$
 
-<p><strong>逆矩阵 $Q^{-1}$ 就是反着来——把特征向量送回去。</strong>因为 $Q$ 把 $\mathbf{e}_1$ 送到 $\mathbf{v}_1$，所以 $Q^{-1}$ 把 $\mathbf{v}_1$ 送回 $\mathbf{e}_1$：</p>
-
-$$Q^{-1}\mathbf{v}_1 = \begin{bmatrix}1\\0\end{bmatrix}, \qquad Q^{-1}\mathbf{v}_2 = \begin{bmatrix}0\\1\end{bmatrix}$$
-
-<p>代 $Q = \begin{bmatrix}1&1\\1&-2\end{bmatrix}$，用 numpy 算出（00-02 学过求逆矩阵）：</p>
+<p>用 numpy 算出 $Q^{-1}$：</p>
 
 $$Q^{-1} = \begin{bmatrix} 0.667 & 0.333 \\ 0.333 & -0.333 \end{bmatrix}$$
 
-<p>验证：$Q^{-1}Q = I = \begin{bmatrix}1&0\\0&1\end{bmatrix}$ ✓（先扭再反扭 = 什么都没做）。</p>
+<p>验证：$QQ^{-1} = \begin{bmatrix}1&0\\0&1\end{bmatrix} = I$ ✓。$Q^{-1}$ 的作用就是<strong>撤销 $Q$ 的变换</strong>——$Q$ 把空间扭过去，$Q^{-1}$ 扭回来。</p>
 
-<p><strong>关键洞察：$Q^{-1}$ 能提取一个向量在特征基里的坐标。</strong>什么意思？任意向量 $\mathbf{x}$ 都可以写成特征向量的组合：$\mathbf{x} = c_1\mathbf{v}_1 + c_2\mathbf{v}_2$。把 $Q^{-1}$ 作用上去：</p>
+<p><strong>第四步：走一遍完整的 $A\mathbf{x}$，看看 $Q\Lambda Q^{-1}$ 到底在做什么。</strong> 取 $\mathbf{x} = [3,1]$。</p>
 
-$$Q^{-1}\mathbf{x} = Q^{-1}(c_1\mathbf{v}_1 + c_2\mathbf{v}_2) = c_1Q^{-1}\mathbf{v}_1 + c_2Q^{-1}\mathbf{v}_2 = c_1\begin{bmatrix}1\\0\end{bmatrix} + c_2\begin{bmatrix}0\\1\end{bmatrix} = \begin{bmatrix}c_1\\c_2\end{bmatrix}$$
+<p>先硬算 $A\mathbf{x}$：$\begin{bmatrix}4&1\\2&3\end{bmatrix}\begin{bmatrix}3\\1\end{bmatrix} = \begin{bmatrix}13\\9\end{bmatrix}$。</p>
 
-<p>结果恰好是 $[c_1, c_2]$——<strong>$Q^{-1}$ 把向量从「x-y 世界」翻译到了「$\mathbf{v}_1$-$\mathbf{v}_2$ 世界」。</strong></p>
+<p>再走 $Q\Lambda Q^{-1}\mathbf{x}$ 这条路。从右往左，分三步：</p>
 
-<p>用具体数字走一遍。取 $\mathbf{x} = [3,1]$，用 $Q^{-1}$ 算它在特征基里的坐标：</p>
-
+<p><strong>① $Q^{-1}\mathbf{x}$：</strong></p>
 $$Q^{-1}\begin{bmatrix}3\\1\end{bmatrix} = \begin{bmatrix}0.667&0.333\\0.333&-0.333\end{bmatrix}\begin{bmatrix}3\\1\end{bmatrix} = \begin{bmatrix}2.33\\0.67\end{bmatrix}$$
 
-<p>验证一下是不是真的：$2.33 \times \mathbf{v}_1 + 0.67 \times \mathbf{v}_2 = 2.33\begin{bmatrix}1\\1\end{bmatrix} + 0.67\begin{bmatrix}1\\-2\end{bmatrix} = \begin{bmatrix}2.33+0.67\\2.33-1.33\end{bmatrix} = \begin{bmatrix}3\\1\end{bmatrix}$ ✓</p>
+<p>这个结果的意思是 $\mathbf{x} = 2.33\mathbf{v}_1 + 0.67\mathbf{v}_2$（验算：$2.33\begin{bmatrix}1\\1\end{bmatrix} + 0.67\begin{bmatrix}1\\-2\end{bmatrix} = \begin{bmatrix}3\\1\end{bmatrix}$ ✓）。<strong>$Q^{-1}$ 把 $\mathbf{x}$ 从「x-y 坐标」翻译成了「沿 $\mathbf{v}_1$ 走几步、沿 $\mathbf{v}_2$ 走几步」。</strong></p>
 
-<div class="callout callout-info">
-<strong>特征基 = 换一套坐标轴。</strong> 标准基里我们用「沿 x 轴、沿 y 轴」描述位置。特征基里我们用「沿 $\mathbf{v}_1$、沿 $\mathbf{v}_2$」描述位置。$Q^{-1}$ 就是翻译官——把标准基坐标翻译成特征基坐标。
-</div>
-
-<h4>③ 三步走通：换基 → 缩放 → 换回</h4>
-
-<p>现在公式 $A = Q\Lambda Q^{-1}$ 的意思就清楚了。对任意向量 $\mathbf{x}$，$A\mathbf{x}$ 等价于三步：</p>
-
-<p><strong>第 1 步：$Q^{-1}\mathbf{x}$ → 换到特征基。</strong> 算出 $\mathbf{x}$ 在 $\mathbf{v}_1,\mathbf{v}_2$ 方向上的分量。结果 $[2.33, 0.67]$。</p>
-
-<p><strong>第 2 步：$\Lambda(Q^{-1}\mathbf{x})$ → 在特征基里缩放。</strong> 现在坐标轴就是拉伸方向，缩放极其简单——每个分量乘以对应的 $\lambda_i$：</p>
-
+<p><strong>② $\Lambda(Q^{-1}\mathbf{x})$：</strong></p>
 $$\Lambda\begin{bmatrix}2.33\\0.67\end{bmatrix} = \begin{bmatrix}5&0\\0&2\end{bmatrix}\begin{bmatrix}2.33\\0.67\end{bmatrix} = \begin{bmatrix}11.67\\1.33\end{bmatrix}$$
 
-<p>$\mathbf{v}_1$ 分量 ×5，$\mathbf{v}_2$ 分量 ×2。<strong>对角矩阵 $\Lambda$ 的精髓：各方向独立缩放，互不干扰。</strong></p>
+<p>$\mathbf{v}_1$ 分量 ×5，$\mathbf{v}_2$ 分量 ×2。因为现在坐标轴就是拉伸方向，<strong>缩放变成各管各的，互不干扰。</strong></p>
 
-<p><strong>第 3 步：$Q(\Lambda Q^{-1}\mathbf{x})$ → 换回标准基。</strong> 把「在 $\mathbf{v}_1,\mathbf{v}_2$ 坐标系里的结果」翻译回 x-y 坐标：</p>
+<p><strong>③ $Q(\Lambda Q^{-1}\mathbf{x})$：</strong></p>
+$$Q\begin{bmatrix}11.67\\1.33\end{bmatrix} = 11.67\mathbf{v}_1 + 1.33\mathbf{v}_2 = \begin{bmatrix}13\\9\end{bmatrix}$$
 
-$$Q\begin{bmatrix}11.67\\1.33\end{bmatrix} = \begin{bmatrix}1&1\\1&-2\end{bmatrix}\begin{bmatrix}11.67\\1.33\end{bmatrix} = \begin{bmatrix}13.0\\9.0\end{bmatrix}$$
-
-<p><strong>验证：直接算 $A\mathbf{x}$：</strong> $\begin{bmatrix}4&1\\2&3\end{bmatrix}\begin{bmatrix}3\\1\end{bmatrix} = \begin{bmatrix}13\\9\end{bmatrix}$ ✓。两条路完全一样。</p>
+<p>和直接算 $A\mathbf{x}$ 的结果一模一样 ✓。</p>
 
 <div class="callout callout-info">
-<strong>两次「旋转」各司其职：</strong> $Q^{-1}$ 换视角（把问题变成最简单的形式），$\Lambda$ 做正事（纯缩放），$Q$ 换回来（把答案翻译回原来的语言）。<br><br>
-类比：你想拧一颗歪着的螺丝。$Q^{-1}$ = 把螺丝刀对准螺纹方向，$\Lambda$ = 轻松拧进去，$Q$ = 把螺丝刀摆正。标准基里 $A$ 又扭又拉一团乱麻，特征基里它变成了 $\Lambda$——一个干净的、各自独立的缩放。<strong>分解的本质就是找到那个让问题变简单的视角。</strong>
+<strong>三步的本质：</strong> $Q^{-1}$ 换到特征向量坐标系 → $\Lambda$ 沿特征方向各自缩放 → $Q$ 换回原坐标系。这就是「特征值分解」——把 $A$ 这个又扭又拉的操作，拆成一个干净的、各自独立的缩放。<br><br>
+类比拧螺丝：$Q^{-1}$ = 把螺丝刀对准螺纹方向，$\Lambda$ = 轻松拧进去，$Q$ = 摆正。找到对的视角，复杂变简单。
 </div>
 
-<h4>④ 补充：正交矩阵——当 $Q^{-1} = Q^T$ 时</h4>
-
-<p>如果特征向量互相垂直且长度都是 1，$Q$ 就是<strong>正交矩阵</strong>。正交矩阵有个神奇性质：逆 = 转置（$Q^{-1} = Q^T$，转置就是把行列互换）。不用费劲算逆矩阵，翻一下就行。</p>
-
-<p>几何含义：正交矩阵的变换是<strong>纯旋转</strong>（不拉伸不压缩）。所以「转回去」=「往反方向转」= 转置。</p>
-
 <div class="callout callout-info">
-<strong>对称矩阵自动满足：</strong> 对称矩阵（$A=A^T$）的特征向量天生互相垂直。缩成单位长度后 $Q$ 自动正交，特征值分解可写成 $A = Q\Lambda Q^T$。这跟后面第六课 SVD 的 $A = U\Sigma V^T$ 结构一模一样——提前预告。
+<strong>补充：如果特征向量互相垂直且长度都是 1，</strong>$Q$ 就是<strong>正交矩阵</strong>，此时 $Q^{-1} = Q^T$（转置，行列互换即可——不用费劲算逆矩阵）。对称矩阵（$A=A^T$）的特征向量天生垂直，所以对称矩阵的特征值分解常写成 $A = Q\Lambda Q^T$。这和第六课 SVD 的 $A = U\Sigma V^T$ 结构一致。
 </div>
 
 <p><strong>推导链完整：</strong> 特征方程 → 二次方程求 λ → 代入 $(A-\lambda I)\mathbf{v}=0$ → 解线性方程组 → 得到 v → <strong>打包成 $A = Q\Lambda Q^{-1}$</strong>。下面用代码验证全过程：</p>
