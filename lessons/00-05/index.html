@@ -145,25 +145,81 @@ $$\mathbf{v}_2 = \begin{bmatrix} 1 \\ -2 \end{bmatrix}$$
 
 <h3>把两个特征向量打包——矩阵形式的特征值分解</h3>
 
-<p>上面我们一个个处理了两个特征向量。能不能<strong>把它们打包成矩阵</strong>，一次性表达？</p>
+<p>上面我们一个一个处理了两个特征向量。现在<strong>打包成矩阵</strong>，一次性表达。</p>
 
-<p>把 $\mathbf{v}_1$ 和 $\mathbf{v}_2$ 作为<strong>列</strong>放进一个矩阵 $Q$，把 $\lambda_1$ 和 $\lambda_2$ 放在对角线上组成 $\Lambda$：</p>
+<p><strong>第一步：构造两个矩阵。</strong> 把 $\mathbf{v}_1$ 和 $\mathbf{v}_2$ 作为<strong>列</strong>放进 $Q$，把 $\lambda_1,\lambda_2$ 放对角线上组成 $\Lambda$：</p>
 
 $$Q = \begin{bmatrix} \mathbf{v}_1 & \mathbf{v}_2 \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 1 & -2 \end{bmatrix}, \quad
 \Lambda = \begin{bmatrix} \lambda_1 & 0 \\ 0 & \lambda_2 \end{bmatrix} = \begin{bmatrix} 5 & 0 \\ 0 & 2 \end{bmatrix}$$
 
-<p>现在 $A\mathbf{v}_1 = \lambda_1\mathbf{v}_1$ 和 $A\mathbf{v}_2 = \lambda_2\mathbf{v}_2$ 可以合并写成：</p>
-
-$$A Q = A\begin{bmatrix}\mathbf{v}_1 & \mathbf{v}_2\end{bmatrix} = \begin{bmatrix}A\mathbf{v}_1 & A\mathbf{v}_2\end{bmatrix} = \begin{bmatrix}\lambda_1\mathbf{v}_1 & \lambda_2\mathbf{v}_2\end{bmatrix} = Q\Lambda$$
-
-<p>两边右乘 $Q^{-1}$（$Q$ 的逆矩阵），得到：</p>
+<p>$A\mathbf{v}_1 = \lambda_1\mathbf{v}_1$ 和 $A\mathbf{v}_2 = \lambda_2\mathbf{v}_2$ 合并写成 $AQ = Q\Lambda$，两边右乘 $Q$ 的逆矩阵，得到：</p>
 
 $$\boxed{A = Q \Lambda Q^{-1}}$$
 
-<p><strong>这就是矩阵形式的特征值分解。</strong>读法（从右往左）：$Q^{-1}$ 把向量转到特征基 → $\Lambda$ 沿特征方向缩放 → $Q$ 转回原坐标系。</p>
+<p>但这里冒出了好几个新概念——<strong>逆矩阵、特征基、转两次、正交矩阵</strong>。一个一个拆开讲。</p>
+
+<h4>① 逆矩阵 $Q^{-1}$：撤销变换</h4>
+
+<p>$Q$ 把空间扭了一下（把 $\mathbf{e}_1=[1,0]$ 扭到 $\mathbf{v}_1$，$\mathbf{e}_2=[0,1]$ 扭到 $\mathbf{v}_2$）。<strong>$Q^{-1}$ 就是反着扭——把空间扭回去。</strong></p>
+
+<p>类比：你拧开水龙头（$Q$），水哗哗流；$Q^{-1}$ 就是把水龙头<strong>反方向拧回去</strong>——恢复原状。矩阵里的「逆」就是「撤销上一步的变换」。$Q^{-1}Q = I$（先扭再反扭 = 什么都没做）。</p>
+
+<p>对我们的 $Q = \begin{bmatrix}1&1\\1&-2\end{bmatrix}$，可以算出逆矩阵（00-02 学过用 numpy 求）：</p>
+
+$$Q^{-1} = \begin{bmatrix} 0.667 & 0.333 \\ 0.333 & -0.333 \end{bmatrix}$$
+
+<p>验证：$Q^{-1}Q = I = \begin{bmatrix}1&0\\0&1\end{bmatrix}$ ✓。$Q^{-1}$ 不是随便一个矩阵——它是<strong>唯一</strong>能让 $Q^{-1}Q = I$ 的矩阵。</p>
+
+<h4>② 特征基：把坐标轴换成特征向量</h4>
+
+<p>我们平时用的坐标系，x 轴是 $[1,0]$，y 轴是 $[0,1]$——这叫<strong>标准基</strong>。任何向量 $[x,y]$ 的意思是「沿 x 轴走 x 步，沿 y 轴走 y 步」。</p>
+
+<p><strong>特征基就是换一套坐标轴——用 $\mathbf{v}_1$ 和 $\mathbf{v}_2$ 当新轴。</strong>在特征基里，一个向量表示成「沿 $\mathbf{v}_1$ 方向走几步，沿 $\mathbf{v}_2$ 方向走几步」。</p>
+
+<p>$Q^{-1}$ 的作用就是<strong>把向量从标准基翻译成特征基</strong>。举个例子：向量 $\mathbf{x} = \begin{bmatrix}3\\1\end{bmatrix}$（在标准基里）。$Q^{-1}\mathbf{x}$ 算出它在特征基里的坐标：</p>
+
+$$Q^{-1}\begin{bmatrix}3\\1\end{bmatrix} = \begin{bmatrix}0.667&0.333\\0.333&-0.333\end{bmatrix}\begin{bmatrix}3\\1\end{bmatrix} = \begin{bmatrix}2.33\\0.67\end{bmatrix}$$
+
+<p>意思是：这个向量 = $2.33 \times \mathbf{v}_1 + 0.67 \times \mathbf{v}_2$。也就是说，沿着 $\mathbf{v}_1$（拉伸 5 倍的方向）走 2.33 步，沿着 $\mathbf{v}_2$（拉伸 2 倍的方向）走 0.67 步。</p>
+
+<h4>③ 为什么转两次？——换视角、做事、换回来</h4>
+
+<p>现在把三步走一遍，用同一个向量 $\mathbf{x} = [3,1]$：</p>
+
+<p><strong>第 1 步：$Q^{-1}\mathbf{x}$ → 换到特征基。</strong> 把 $\mathbf{x}$ 从「x-y 坐标系」翻译成「$\mathbf{v}_1$-$\mathbf{v}_2$ 坐标系」。结果 $[2.33, 0.67]$。</p>
+
+<p><strong>第 2 步：$\Lambda(Q^{-1}\mathbf{x})$ → 在特征基里做缩放。</strong> 因为现在坐标轴就是拉伸方向，缩放变得<strong>极其简单</strong>——只需把每个分量乘以对应的特征值：</p>
+
+$$\Lambda\begin{bmatrix}2.33\\0.67\end{bmatrix} = \begin{bmatrix}5&0\\0&2\end{bmatrix}\begin{bmatrix}2.33\\0.67\end{bmatrix} = \begin{bmatrix}11.67\\1.33\end{bmatrix}$$
+
+<p>$\mathbf{v}_1$ 分量从 2.33 拉长到 11.67（×5），$\mathbf{v}_2$ 分量从 0.67 拉长到 1.33（×2）。<strong>对角矩阵 $\Lambda$ 的精髓：每个方向独立缩放，互不干扰。</strong></p>
+
+<p><strong>第 3 步：$Q(\Lambda Q^{-1}\mathbf{x})$ → 换回标准基。</strong> 把结果从「$\mathbf{v}_1$-$\mathbf{v}_2$ 坐标系」翻译回「x-y 坐标系」：</p>
+
+$$Q\begin{bmatrix}11.67\\1.33\end{bmatrix} = \begin{bmatrix}1&1\\1&-2\end{bmatrix}\begin{bmatrix}11.67\\1.33\end{bmatrix} = \begin{bmatrix}13.0\\9.0\end{bmatrix}$$
+
+<p><strong>验证：直接算 $A\mathbf{x}$：</strong></p>
+
+$$\begin{bmatrix}4&1\\2&3\end{bmatrix}\begin{bmatrix}3\\1\end{bmatrix} = \begin{bmatrix}13\\9\end{bmatrix} \quad\checkmark$$
+
+<p>两条路结果一样！$A\mathbf{x}$（硬算）和 $Q\Lambda Q^{-1}\mathbf{x}$（换基→缩放→换回）给出同一个答案。</p>
 
 <div class="callout callout-info">
-<strong>需要条件：$Q$ 必须可逆</strong>（特征向量线性无关，不能共线）。对于对称矩阵，特征向量自动互相垂直，$Q$ 还是正交矩阵（$Q^{-1} = Q^T$）。
+<strong>两次旋转的本质：</strong> $Q^{-1}$ 和 $Q$ 不是「转来转去瞎折腾」——它们是<strong>换视角</strong>。<br><br>
+标准基里，$A$ 的变换很复杂（又扭又拉，混在一起）。但在<strong>特征基</strong>里，$A$ 变成了 $\Lambda$——一个<strong>纯粹的、各自独立的缩放</strong>，干净利落。<br><br>
+类比：你想拧一颗歪着的螺丝。直接拧（标准基）很别扭，因为施力方向和螺纹方向不匹配。你先<strong>把螺丝刀对准螺纹方向</strong>（$Q^{-1}$ 换到特征基），轻松拧进去（$\Lambda$ 纯缩放），再把螺丝刀摆正（$Q$ 换回来）。两个旋转各司其职——一个负责「对准」，一个负责「归位」。
+</div>
+
+<h4>④ 正交矩阵：当 $Q^{-1} = Q^T$ 时</h4>
+
+<p>如果特征向量<strong>互相垂直且长度都是 1</strong>（就像我们的例子，$\mathbf{v}_1=[1,1]$ 和 $\mathbf{v}_2=[1,-2]$ 虽然垂直但长度不是 1），把每个特征向量缩成单位长度后，$Q$ 就变成了<strong>正交矩阵</strong>。</p>
+
+<p>正交矩阵有个神奇性质：<strong>逆 = 转置</strong>。$Q^{-1} = Q^T$（转置就是把行和列互换）。不用费劲算逆矩阵，直接翻转行列就行。</p>
+
+<p>几何含义：正交矩阵的变换是<strong>纯旋转</strong>（或镜像翻转）——不拉伸、不压缩，只转方向。所以「转回去」就是「往反方向转同样的角度」= 转置。</p>
+
+<div class="callout callout-info">
+<strong>为什么 $Q^{-1}=Q^T$ 对对称矩阵成立？</strong> 对称矩阵（$A=A^T$）的特征向量<strong>天生互相垂直</strong>。把它们缩成单位长度后，$Q$ 自动是正交矩阵。所以对称矩阵的特征值分解可以写成 $A = Q\Lambda Q^T$——不用算逆，直接转置就行。这就和 SVD 的 $A = U\Sigma V^T$ 结构完全一样了（预习一下第六课的内容）。
 </div>
 
 <p><strong>推导链完整：</strong> 特征方程 → 二次方程求 λ → 代入 $(A-\lambda I)\mathbf{v}=0$ → 解线性方程组 → 得到 v → <strong>打包成 $A = Q\Lambda Q^{-1}$</strong>。下面用代码验证全过程：</p>
