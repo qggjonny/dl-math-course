@@ -98,69 +98,69 @@
 
 <p>来看一个「监督学习 · 分类」的最小完整例子。用 iris 数据集——根据花瓣和花萼的长宽，判断一朵鸢尾花属于哪个品种。</p>
 
-<pre><code># === 01-01 监督学习最小例子：鸢尾花分类 ===
-import numpy as np                          # 数值计算（虽然这课数据不大，导入放着）
-from sklearn.datasets import load_iris      # sklearn 自带的 iris 数据集
-from sklearn.model_selection import train_test_split  # 把数据分成「训练用的」和「测试用的」
-from sklearn.neighbors import KNeighborsClassifier    # K 近邻分类器：看离最近的几个邻居是什么品种
+<pre><code><span class="hl-comment"># === 01-01 监督学习最小例子：鸢尾花分类 ===</span>
+import numpy as np                          #<span class="hl-comment">#数值计算（虽然这课数据不大，导入放着）</span>
+from sklearn.datasets import load_iris      #<span class="hl-comment">#sklearn 自带的 iris 数据集</span>
+from sklearn.model_selection import train_test_split  #<span class="hl-comment">#把数据分成「训练用的」和「测试用的」</span>
+from sklearn.neighbors import KNeighborsClassifier    #<span class="hl-comment">#K 近邻分类器：看离最近的几个邻居是什么品种</span>
 
-# 1. 加载数据
-iris = load_iris()                          # load_iris() 返回一个 Bunch 对象（类似字典）
-X = iris.data                               # 特征矩阵：150行 × 4列
-                                             #   4列 = 花萼长度、花萼宽度、花瓣长度、花瓣宽度
-y = iris.target                             # 标签向量：150个数字（0=Setosa, 1=Versicolor, 2=Virginica）
-target_names = iris.target_names            # ['setosa' 'versicolor' 'virginica']，把数字翻译成品种名
-feature_names = iris.feature_names          # 4个特征的中文名
+<span class="hl-comment"># 1. 加载数据</span>
+iris = load_iris()                          #<span class="hl-comment">#load_iris() 返回一个 Bunch 对象（类似字典）</span>
+X = iris.data                               #<span class="hl-comment">#特征矩阵：150行 × 4列</span>
+                                             <span class="hl-comment">#   4列 = 花萼长度、花萼宽度、花瓣长度、花瓣宽度</span>
+y = iris.target                             #<span class="hl-comment">#标签向量：150个数字（0=Setosa, 1=Versicolor, 2=Virginica）</span>
+target_names = iris.target_names            #<span class="hl-comment">#['setosa' 'versicolor' 'virginica']，把数字翻译成品种名</span>
+feature_names = iris.feature_names          #<span class="hl-comment">#4个特征的中文名</span>
 
-print("=== 数据总览 ===")
-print(f"样本数: {X.shape[0]}")              # 150 朵花的记录
-print(f"特征数: {X.shape[1]}")              # 每朵花用 4 个数字描述
-print(f"特征名: {feature_names}")
-print(f"品种: {target_names}")
-print(f"\n前3个样本的特征+标签：")
+<span class="hl-builtin">print</span>("=== 数据总览 ===")
+<span class="hl-builtin">print</span>(f"样本数: {X.shape[0]}")              #<span class="hl-comment">#150 朵花的记录</span>
+<span class="hl-builtin">print</span>(f"特征数: {X.shape[1]}")              #<span class="hl-comment">#每朵花用 4 个数字描述</span>
+<span class="hl-builtin">print</span>(f"特征名: {feature_names}")
+<span class="hl-builtin">print</span>(f"品种: {target_names}")
+<span class="hl-builtin">print</span>(f"\n前3个样本的特征+标签：")
 for i in range(3):
-    # zip 把特征名和对应的数值配对，方便打印
+    <span class="hl-comment"># zip 把特征名和对应的数值配对，方便打印</span>
     feats = ", ".join(f"{name}={X[i][j]:.1f}" for j, name in enumerate(feature_names))
-    print(f"  样本{i+1}: {feats} → 标签={int(y[i])} ({target_names[y[i]]})")
+    <span class="hl-builtin">print</span>(f"  样本{i+1}: {feats} → 标签={int(y[i])} ({target_names[y[i]]})")
 
-# 2. 划分训练集和测试集
-# test_size=0.3 表示 30% 数据留作「期末考试」，70% 用于「平时练习」
-# random_state=42 固定随机种子，确保每次运行划分结果一样（可复现）
+<span class="hl-comment"># 2. 划分训练集和测试集</span>
+<span class="hl-comment"># test_size=0.3 表示 30% 数据留作「期末考试」，70% 用于「平时练习」</span>
+<span class="hl-comment"># random_state=42 固定随机种子，确保每次运行划分结果一样（可复现）</span>
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=42
 )
-print(f"\n=== 数据划分 ===")
-print(f"训练集: {X_train.shape[0]} 个样本（用来学规律）")
-print(f"测试集: {X_test.shape[0]} 个样本（用来检验泛化）")
+<span class="hl-builtin">print</span>(f"\n=== 数据划分 ===")
+<span class="hl-builtin">print</span>(f"训练集: {X_train.shape[0]} 个样本（用来学规律）")
+<span class="hl-builtin">print</span>(f"测试集: {X_test.shape[0]} 个样本（用来检验泛化）")
 
-# 3. 训练模型
-# KNeighborsClassifier: K 近邻分类器
-# n_neighbors=3 表示看最近的 3 个邻居，少数服从多数来决定新花的品种
+<span class="hl-comment"># 3. 训练模型</span>
+<span class="hl-comment"># KNeighborsClassifier: K 近邻分类器</span>
+<span class="hl-comment"># n_neighbors=3 表示看最近的 3 个邻居，少数服从多数来决定新花的品种</span>
 model = KNeighborsClassifier(n_neighbors=3)
-model.fit(X_train, y_train)                 # fit() 就是「学习」——记住训练数据的特征和标签
-print("\n✅ 训练完成！模型已经「学会」了如何根据花瓣花萼判断品种。")
+model.fit(X_train, y_train)                 #<span class="hl-comment">#fit() 就是「学习」——记住训练数据的特征和标签</span>
+<span class="hl-builtin">print</span>("\n✅ 训练完成！模型已经「学会」了如何根据花瓣花萼判断品种。")
 
-# 4. 测试泛化能力
-y_pred = model.predict(X_test)              # predict() 对测试集做预测，返回预测的标签
-accuracy = (y_pred == y_test).mean()        # 逐元素比较预测和真实标签，True=1, False=0，平均=准确率
-print(f"\n=== 测试结果 ===")
-print(f"准确率: {accuracy:.2%}")            # 约 95%+，说明模型泛化得很好
+<span class="hl-comment"># 4. 测试泛化能力</span>
+y_pred = model.predict(X_test)              #<span class="hl-comment">#predict() 对测试集做预测，返回预测的标签</span>
+accuracy = (y_pred == y_test).mean()        #<span class="hl-comment">#逐元素比较预测和真实标签，True=1, False=0，平均=准确率</span>
+<span class="hl-builtin">print</span>(f"\n=== 测试结果 ===")
+<span class="hl-builtin">print</span>(f"准确率: {accuracy:.2%}")            #<span class="hl-comment">#约 95%+，说明模型泛化得很好</span>
 
-# 5. 预测一朵新花
-# 模拟一朵「没见过的新花」：花瓣短小 + 花萼窄短
-new_flower = np.array([[4.5, 2.3, 1.3, 0.3]])  # 形状 (1, 4)：1个样本 × 4个特征
-pred_label = model.predict(new_flower)[0]       # [0] 取出预测结果（只有一个样本）
-pred_name = target_names[pred_label]            # 把数字标签翻译成品种名
-print(f"\n=== 预测新花 ===")
-print(f"新花特征: 花萼长=4.5, 花萼宽=2.3, 花瓣长=1.3, 花瓣宽=0.3")
-print(f"预测品种: {pred_name}")
+<span class="hl-comment"># 5. 预测一朵新花</span>
+<span class="hl-comment"># 模拟一朵「没见过的新花」：花瓣短小 + 花萼窄短</span>
+new_flower = np.array([[4.5, 2.3, 1.3, 0.3]])  #<span class="hl-comment">#形状 (1, 4)：1个样本 × 4个特征</span>
+pred_label = model.predict(new_flower)[0]       #<span class="hl-comment">#[0] 取出预测结果（只有一个样本）</span>
+pred_name = target_names[pred_label]            #<span class="hl-comment">#把数字标签翻译成品种名</span>
+<span class="hl-builtin">print</span>(f"\n=== 预测新花 ===")
+<span class="hl-builtin">print</span>(f"新花特征: 花萼长=4.5, 花萼宽=2.3, 花瓣长=1.3, 花瓣宽=0.3")
+<span class="hl-builtin">print</span>(f"预测品种: {pred_name}")
 
-# 6. 看一眼数据长什么样
-print(f"\n=== 各类别样本数 ===")
+<span class="hl-comment"># 6. 看一眼数据长什么样</span>
+<span class="hl-builtin">print</span>(f"\n=== 各类别样本数 ===")
 for i, name in enumerate(target_names):
-    count = (y == i).sum()                   # 统计标签为 i 的样本数
-    print(f"  {name}: {count} 朵")
-print("\n这 4 个特征 + 150 朵花 + 3 个品种 = 你写的第一个机器学习程序 🎉")</code></pre>
+    count = (y == i).sum()                   #<span class="hl-comment">#统计标签为 i 的样本数</span>
+    <span class="hl-builtin">print</span>(f"  {name}: {count} 朵")
+<span class="hl-builtin">print</span>("\n这 4 个特征 + 150 朵花 + 3 个品种 = 你写的第一个机器学习程序 🎉")</code></pre>
 
 <p><strong>这 40 行代码就是监督学习的核心流水线：</strong> 加载数据 → 划分训练/测试 → 训练（fit）→ 预测（predict）→ 评估准确率。后面 64 课不断变化的只是「模型复杂度」和「数据形态」，这个流水线框架不变。</p>
 
