@@ -213,14 +213,22 @@ $$\det(A) = a_{11}\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}
 <h3>n×n 行列式——套路不变</h3>
 <p>4×4 降成 3×3（四个 3×3 行列式），每个 3×3 再降成 2×2……一层层拆下去，<strong>最终全是 $ad-bc$ 的组合</strong>。降阶展开是行列式三条基本性质的直接推论——不是凭空定义的算法。</p>
 <p><strong>递归总结：</strong> n×n 行列式 = 沿任一行展开的 n 个 (n−1)×(n−1) 行列式的带符号和。一路递归到 2×2 的 $ad-bc$ 为止。每一步都是在做"体积 = 底面积 × 高度"的推广。</p>
-<pre><code>import numpy as np
-A = np.array([[1, 2, 3],
-[4, 5, 6],
-[7, 8, 9]])
-# 手算：1·(45-48) - 2·(36-42) + 3·(32-35) = -3+12-9 = 0
-det_manual = 1*(5*9 - 6*8) - 2*(4*9 - 6*7) + 3*(4*8 - 5*7)
-print(f"手算行列式: {det_manual}")
-print(f"np.linalg.det: {np.linalg.det(A):.0f}")</code></pre>
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np                       <span class="hl-comment"># 导入numpy科学计算库，别名np</span>
+A = np.array([[<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>],                    <span class="hl-comment"># np.array(嵌套列表) → 创建3×3矩阵</span>
+              [<span class="hl-number">4</span>, <span class="hl-number">5</span>, <span class="hl-number">6</span>],                    <span class="hl-comment"># 第1行: [4,5,6]</span>
+              [<span class="hl-number">7</span>, <span class="hl-number">8</span>, <span class="hl-number">9</span>]])                   <span class="hl-comment"># 第2行: [7,8,9]，注意第2行=第1行×2-第0行，三行不独立</span>
+<span class="hl-comment"># 手算验证：沿第一行展开 det = a₁₁·M₁₁ - a₁₂·M₁₂ + a₁₃·M₁₃</span>
+<span class="hl-comment"># M₁₁ = 5×9-6×8 = 45-48 = -3  (划掉第0行第0列后的2×2行列式)</span>
+<span class="hl-comment"># M₁₂ = 4×9-6×7 = 36-42 = -6  (划掉第0行第1列后的2×2行列式)</span>
+<span class="hl-comment"># M₁₃ = 4×8-5×7 = 32-35 = -3  (划掉第0行第1列后的2×2行列式)</span>
+det_manual = 1*(5*9 - 6*8) - 2*(4*9 - 6*7) + 3*(4*8 - 5*7)  <span class="hl-comment"># 手算: 1·(-3) - 2·(-6) + 3·(-3)</span>
+<span class="hl-comment">                                      # = -3 + 12 - 9 = 0</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"手算行列式: {det_manual}"</span>)          <span class="hl-comment"># 输出: 手算行列式: 0</span>
+<span class="hl-comment"># np.linalg.det()：计算任意方阵的行列式，内部用LU分解，比降阶展开更高效</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"np.linalg.det: {np.linalg.det(A):.0f}"</span>)  <span class="hl-comment"># :.0f=取整显示 → 输出: 0</span>
+<span class="hl-comment"># 行列式=0 → 矩阵把三维空间压扁了，三个列向量共面，体积为0</span></code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <hr>
 <h2>💭 概念题</h2>
 <ol>
