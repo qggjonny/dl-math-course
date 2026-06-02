@@ -241,100 +241,52 @@ $Q$：特征基坐标 → 标准基坐标（把「走几步」翻译回 x-y 位�
 类比拧螺丝：$Q^{-1}$ = 把螺丝刀对准螺纹方向，$\Lambda$ = 轻松拧进去，$Q$ = 摆正。找到对的视角，复杂变简单。
 </div>
 
-<h3>补充：正交矩阵与对称矩阵 — 换个对称矩阵试试</h3>
+<h3>补充：正交矩阵与对称矩阵</h3>
 
-<p>上面用 $A=\begin{bmatrix}4&1\\2&3\end{bmatrix}$ 走通了 $A=Q\Lambda Q^{-1}$ 全流程。但这个 $A$ 的 $1\neq 2$——<strong>不对称</strong>，所以特征向量 $\mathbf{v}_1=[1,1]$ 和 $\mathbf{v}_2=[1,-2]$ 不垂直（点乘 = $-1$），$Q^{-1}$ 得老老实实算。</p>
+<p>上面说了 $A = Q\Lambda Q^{-1}$。但如果特征向量互相垂直且长度都是 1，事情会变简单——$Q^{-1}$ 不用算了，直接用 $Q^T$（转置）就行。这涉及到两个概念：<strong>正交矩阵</strong>和<strong>对称矩阵</strong>。</p>
 
-<p>现在换一个<strong>对称矩阵</strong>来走一遍，看会发生什么变化。</p>
+<h4>正交矩阵</h4>
 
-<h4>对称矩阵——换 $A=\begin{bmatrix}2&1\\1&2\end{bmatrix}$</h4>
+<p><strong>定义：</strong> 一个方阵 $Q$ 如果满足 $Q^T Q = I$（转置 × 自身 = 单位矩阵），就叫<strong>正交矩阵</strong>。</p>
 
-<p><strong>定义：</strong> $A = A^T$。对角线上下的数必须相等——对角线是镜子。</p>
+<p><strong>直接推论：</strong> $Q^{-1} = Q^T$。因为 $Q^T Q = I$ 的意思是 $Q^T$ 恰好是 $Q$ 的逆——不用高斯消元、不用算行列式，直接翻转行列就行。</p>
 
-$$A = \begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix}, \qquad A^T = \begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix} = A \;\checkmark$$
+<p><strong>例子：</strong> 把平面旋转 45° 的矩阵——</p>
 
-<p><strong>算特征值：</strong> 迹 = 2+2 = 4，行列式 = 2×2 − 1×1 = 3。代入求根公式：</p>
+$$Q = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 & -1 \\ 1 & 1 \end{bmatrix} = \begin{bmatrix} 1/\sqrt{2} & -1/\sqrt{2} \\ 1/\sqrt{2} & 1/\sqrt{2} \end{bmatrix}$$
 
-$$\lambda = \frac{4 \pm \sqrt{16 - 12}}{2} = \frac{4 \pm 2}{2} \;\Longrightarrow\; \lambda_1 = 3,\; \lambda_2 = 1$$
+<p>两列是 $[1/\sqrt{2},\; 1/\sqrt{2}]$ 和 $[-1/\sqrt{2},\; 1/\sqrt{2}]$。验证：① 点乘 = $(1/\sqrt{2})(-1/\sqrt{2}) + (1/\sqrt{2})(1/\sqrt{2}) = 0$ → 互相垂直；② 每列长度 = $\sqrt{1/2+1/2} = 1$。验证 $Q^T Q = I$：</p>
 
-<p><strong>算特征向量：</strong></p>
+$$Q^T Q = \frac{1}{2}\begin{bmatrix} 1 & 1 \\ -1 & 1 \end{bmatrix}\begin{bmatrix} 1 & -1 \\ 1 & 1 \end{bmatrix} = \frac{1}{2}\begin{bmatrix} 2 & 0 \\ 0 & 2 \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} = I \;\checkmark$$
 
-<p>对 $\lambda_1=3$：$A-3I = \begin{bmatrix}-1&1\\1&-1\end{bmatrix} \;\Longrightarrow\; -v_x+v_y=0 \;\Longrightarrow\; v_y=v_x$。取 $\mathbf{v}_1 = \begin{bmatrix}1\\1\end{bmatrix}$。</p>
+<p><strong>几何画面：</strong> 正交矩阵的列向量都互相垂直（点乘为 0）且长度都是 1。正交矩阵作用于空间时做的是<strong>纯旋转</strong>（可能加翻转）——不拉伸、不压缩、不切变。因为所有列向量长度都是 1 且互相垂直，它只是把整个坐标系平转到另一个方向，形状完全不改变。</p>
 
-<p>对 $\lambda_2=1$：$A-I = \begin{bmatrix}1&1\\1&1\end{bmatrix} \;\Longrightarrow\; v_x+v_y=0 \;\Longrightarrow\; v_y=-v_x$。取 $\mathbf{v}_2 = \begin{bmatrix}1\\-1\end{bmatrix}$。</p>
+<p>直观理解：$Q$ 把空间转了一个角度，$Q^{-1}$ 应该转回来。往反方向转 = 转置——旋转 $\theta$ 角的矩阵的逆就是旋转 $-\theta$ 角的矩阵，而它恰好等于转置。</p>
 
-<p><strong>关键发现：</strong> 两个特征向量<strong>互相垂直</strong>！点乘 = $1\times 1 + 1\times(-1) = 0$。</p>
+<p>用我们的例子验证：$\mathbf{v}_1=[1,1]$ 和 $\mathbf{v}_2=[1,-2]$ <strong>不</strong>互相垂直（点乘 = $1\times 1 + 1\times(-2) = -1 \neq 0$），所以 $Q$ 不是正交矩阵，$Q^{-1}$ 不能简单地用 $Q^T$ 替代。如果特征向量互相垂直且归一化，那逆矩阵就省了——翻一下行列就得到。</p>
 
-<div class="callout callout-info">
-<strong>🔑 对称矩阵的黄金性质：</strong> 实对称矩阵的特征向量<strong>天生互相垂直</strong>。不需要额外条件，只要 $A=A^T$。这不是巧合——是线性代数里的重要定理。
-</div>
+<h4>对称矩阵</h4>
 
-<h4>正交矩阵——把特征向量缩成单位长度</h4>
+<p><strong>定义：</strong> 矩阵 $A$ 如果 $A = A^T$（等于自己的转置——沿对角线翻过去一模一样），就叫<strong>对称矩阵</strong>。</p>
 
-<p>特征向量已经垂直了。现在把它们<strong>缩成单位长度</strong>（每个向量除自己的范数），列就同时满足「互相垂直」且「长度 = 1」。</p>
+$$A = \begin{bmatrix} a & b \\ b & c \end{bmatrix}, \qquad A^T = \begin{bmatrix} a & b \\ b & c \end{bmatrix} = A$$
 
-<p>$\|\mathbf{v}_1\| = \sqrt{1^2+1^2} = \sqrt{2}$，$\|\mathbf{v}_2\| = \sqrt{1^2+(-1)^2} = \sqrt{2}$：</p>
+<p>对角线是镜子——$a_{12}=a_{21}$，对称位置上的数必须相等。我们的例子 $A=\begin{bmatrix}4&1\\2&3\end{bmatrix}$ <strong>不是</strong>对称矩阵（$1\neq 2$），所以 $\mathbf{v}_1$ 和 $\mathbf{v}_2$ 不垂直。</p>
 
-$$\mathbf{q}_1 = \frac{1}{\sqrt{2}}\begin{bmatrix}1\\1\end{bmatrix} = \begin{bmatrix}1/\sqrt{2} \\ 1/\sqrt{2}\end{bmatrix}, \qquad
-\mathbf{q}_2 = \frac{1}{\sqrt{2}}\begin{bmatrix}1\\-1\end{bmatrix} = \begin{bmatrix}1/\sqrt{2} \\ -1/\sqrt{2}\end{bmatrix}$$
+<p><strong>例子：</strong> $A = \begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix}$。沿对角线翻过去——$\begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix} = A^T = A$ ✓。对角线上下的 1 和 1 相等。</p>
 
-<p>并排放成矩阵 $Q$：</p>
+<p><strong>对称矩阵的黄金性质：</strong> 实对称矩阵的特征向量<strong>天生互相垂直</strong>。以上面 $A=\begin{bmatrix}2&1\\1&2\end{bmatrix}$ 为例：特征值 3 和 1，特征向量 $[1,1]$ 和 $[1,-1]$，点乘 = $1-1=0$，恰好垂直。这是线性代数里的重要定理——不需要额外条件，只要 $A=A^T$，它的特征向量就必然可以选成正交的。</p>
 
-$$Q = \begin{bmatrix} 1/\sqrt{2} & 1/\sqrt{2} \\ 1/\sqrt{2} & -1/\sqrt{2} \end{bmatrix}$$
+<h4>两者结合——最佳情况</h4>
 
-<p><strong>验证 $Q^T Q = I$：</strong> 实际乘一遍——</p>
-
-$$\begin{aligned}
-Q^T Q &= \begin{bmatrix} 1/\sqrt{2} & 1/\sqrt{2} \\ 1/\sqrt{2} & -1/\sqrt{2} \end{bmatrix}
-       \begin{bmatrix} 1/\sqrt{2} & 1/\sqrt{2} \\ 1/\sqrt{2} & -1/\sqrt{2} \end{bmatrix} \\[4pt]
-      &= \begin{bmatrix}
-         \frac{1}{2}+\frac{1}{2} & \frac{1}{2}-\frac{1}{2} \\
-         \frac{1}{2}-\frac{1}{2} & \frac{1}{2}+\frac{1}{2}
-         \end{bmatrix}
-       = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} = I
-\end{aligned}$$
-
-<p>$Q$ 的<strong>两列互相垂直且长度都是 1</strong>——这就是正交矩阵。</p>
-
-<p><strong>几何含义：</strong> $Q$ 把空间做了个<strong>纯旋转</strong>（45° 旋转 + 翻转）——只转方向，不拉伸、不压扁。正因为是纯旋转，逆操作很简单：往回转同样的角度就行——恰好等于转置。所以 $Q^{-1} = Q^T$。</p>
-
-<div class="callout callout-info">
-<strong>$Q^{-1} = Q^T$ 免算！</strong> 不用高斯消元、不用算行列式——矩阵翻一下行列就是逆矩阵。这叫<strong>正交矩阵</strong>：列向量互相垂直（点乘 = 0）且长度都是 1。
-</div>
-
-<h4>两者结合——$A = Q\Lambda Q^T$</h4>
-
-<p>对称 $A$ → 垂直的特征向量 → 归一化后 $Q$ 正交（$Q^{-1}=Q^T$）→ 特征值分解简化为：</p>
+<p>如果 $A$ 是对称矩阵 → 特征向量互相垂直 → 缩成单位长度 → $Q$ 变成正交矩阵 → $Q^{-1}=Q^T$ → 特征值分解简化为：</p>
 
 $$\boxed{A = Q\Lambda Q^T}$$
 
-<p><strong>验证——实际乘一遍：</strong></p>
-
-$$\begin{aligned}
-Q\Lambda Q^T &= \begin{bmatrix} 1/\sqrt{2} & 1/\sqrt{2} \\ 1/\sqrt{2} & -1/\sqrt{2} \end{bmatrix}
-               \begin{bmatrix} 3 & 0 \\ 0 & 1 \end{bmatrix}
-               \begin{bmatrix} 1/\sqrt{2} & 1/\sqrt{2} \\ 1/\sqrt{2} & -1/\sqrt{2} \end{bmatrix} \\[4pt]
-             &= \begin{bmatrix} 3/\sqrt{2} & 1/\sqrt{2} \\ 3/\sqrt{2} & -1/\sqrt{2} \end{bmatrix}
-                \begin{bmatrix} 1/\sqrt{2} & 1/\sqrt{2} \\ 1/\sqrt{2} & -1/\sqrt{2} \end{bmatrix} \\[4pt]
-             &= \begin{bmatrix}
-                3/2+1/2 & 3/2-1/2 \\
-                3/2-1/2 & 3/2+1/2
-                \end{bmatrix}
-              = \begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix} = A \;\checkmark
-\end{aligned}$$
-
-<h4>对比——对称 vs 不对称</h4>
-
-<table>
-<tr><th></th><th>非对称（本课主例）</th><th>对称（本节例）</th></tr>
-<tr><td>$A$</td><td>$\begin{bmatrix}4&1\\2&3\end{bmatrix}$（$1\neq 2$）</td><td>$\begin{bmatrix}2&1\\1&2\end{bmatrix}$（$A=A^T$）</td></tr>
-<tr><td>特征向量</td><td>$[1,1]$ 和 $[1,-2]$ → 不垂直</td><td>$[1,1]$ 和 $[1,-1]$ → 垂直 ✓</td></tr>
-<tr><td>$Q^{-1}$</td><td>$\begin{bmatrix}0.667&0.333\\0.333&-0.333\end{bmatrix}$，辛苦算</td><td>$Q^T$，翻一下行列就行</td></tr>
-<tr><td>分解</td><td>$A = Q\Lambda Q^{-1}$</td><td>$A = Q\Lambda Q^T$ </td></tr>
-</table>
+<p>比 $A = Q\Lambda Q^{-1}$ 简洁多了——不用算逆矩阵！而且这个结构和下一课 SVD 的 $A = U\Sigma V^T$ 一脉相承。对称矩阵是对角化的「最佳情况」。</p>
 
 <div class="callout callout-info">
-<strong>串联到 SVD：</strong> 对称矩阵 → 垂直的特征向量 → 正交 $Q$ → $Q^{-1}=Q^T$ → $A=Q\Lambda Q^T$。这和下一课 SVD 的 $A=U\Sigma V^T$ 精神完全一致——都是「换基 → 缩放 → 换回来」。对称矩阵是对角化的「最佳情况」，SVD 把这个精神推广到任意矩形矩阵。
+<strong>串联：</strong> 对称矩阵 → 垂直的特征向量 → 正交 $Q$ → $Q^{-1}=Q^T$ → $A=Q\Lambda Q^T$ → 和 SVD 的 $U\Sigma V^T$ 精神一致（都是「旋转→缩放→旋转回来」）。
 </div>
 
 <p><strong>推导链完整：</strong> 特征方程 → 二次方程求 λ → 代入 $(A-\lambda I)\mathbf{v}=0$ → 解线性方程组 → 得到 v → <strong>打包成 $A = Q\Lambda Q^{-1}$</strong>。下面用代码验证全过程：</p>
