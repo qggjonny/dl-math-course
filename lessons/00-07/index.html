@@ -253,7 +253,7 @@ $$\Sigma = \begin{bmatrix} 9.53 & 0 \\ 0 & 0.51 \\ 0 & 0 \end{bmatrix} \quad\lef
 因为 $I$ 乘任何矩阵都不变，所以<strong>省略不写</strong>。但理解的时候要知道：$V^T$ 作用在标准基上，不是凭空旋转。这和你之前学的特征值分解 $A = Q \Lambda Q^{-1}$ 结构类似——$Q^{-1}$ 把向量转到特征基、$\Lambda$ 缩放、$Q$ 转回来。
 </div>
 
-<p>用代码验证：</p>
+<p>用代码验证。numpy 的 <code>linalg.svd</code> 一次返回三个值：<code>U</code>（左奇异向量矩阵）、<code>s</code>（奇异值的一维数组，按从大到小排）、<code>VT</code>（右奇异向量矩阵的转置）。<code>s</code> 里的每个数就是 $\Sigma$ 对角线上的 $\sigma_1,\sigma_2,\dots$。</p>
 
 <pre><code><span class="hl-comment"># 00-06 第三步：用 numpy 的 SVD 函数，把 A 拆成 U Σ V^T 三步</span>
 <span class="hl-comment"># 导入numpy</span>
@@ -334,31 +334,41 @@ Sigma[:<span class="hl-number">2</span>, :<span class="hl-number">2</span>] = np
 
 <h2>六、奇异值和 $A^T A$ 特征值的关系</h2>
 
-<p>前面算了 $A = \begin{bmatrix}3&1\\1&3\end{bmatrix}$ 的奇异值：$\sigma_1=4,\;\sigma_2=2$。有没有办法用之前学过的工具来算？有——绕一下 $A^T A$。</p>
+<p>前面用 numpy 的 <code>linalg.svd</code> 直接算出了奇异值。但奇异值不是凭空来的——它和之前学的特征值有紧密关系。<strong>这不是在重新推导 SVD，而是告诉你：如果你只会算特征值（00-05 学的），也能算出奇异值。</strong></p>
 
-<p><strong>第一步：$A^T A$ 是什么？</strong> </p>
+<p>用课文里的 $A = \begin{bmatrix}3&1\\1&3\end{bmatrix}$ 来走一遍。前面 numpy 给出的奇异值是 $\sigma_1=4,\;\sigma_2=2$。</p>
+
+<p><strong>第一步：构造 $A^T A$。</strong></p>
 
 $$A^T A = \begin{bmatrix}3&1\\1&3\end{bmatrix}\begin{bmatrix}3&1\\1&3\end{bmatrix} = \begin{bmatrix}10&6\\6&10\end{bmatrix}$$
 
-<p>$A^T A$ 是一个<strong>全新的矩阵</strong>，和 $A$ 不一样。但它有一个好性质：<strong>永远是对称方阵</strong>（$(A^T A)^T = A^T A$），这意味着它可以做特征值分解——回 00-05 的黄金性质。</p>
+<p>$A^T A$ 是一个<strong>全新的矩阵</strong>，和 $A$ 不一样。但它永远是对称方阵（$(A^T A)^T = A^T A$），所以可以做特征值分解。</p>
 
-<p><strong>第二步：$A^T A$ 的特征值。</strong> $A^T A$ 有自己的特征值，用 00-05 的方法算——迹 = 20，行列式 = 100−36 = 64，代入求根公式：</p>
+<p><strong>第二步：算 $A^T A$ 的特征值。</strong> 用 00-05 的方法——迹 = 20，行列式 = 100−36 = 64，代入求根公式：</p>
 
 $$\lambda = \frac{20 \pm \sqrt{400-256}}{2} = \frac{20 \pm 12}{2} \;\Longrightarrow\; \lambda_1 = 16,\; \lambda_2 = 4$$
 
-<p><strong>注意：这 16 和 4 是 $A^T A$ 的特征值，不是 $A$ 的特征值。</strong> $A$ 的特征值是 4 和 2（00-05 对称矩阵例子里算过），$A^T A$ 的特征值是 16 和 4——和 $A$ 的特征值恰好是平方关系。</p>
+<p><strong>注意：16 和 4 是 $A^T A$ 的特征值，不是 $A$ 的特征值。</strong> $A$ 的特征值是 2 和 4（00-05 的对称矩阵例子里算过）。</p>
 
-<p><strong>第三步：奇异值 = √($A^T A$ 的特征值)。</strong> </p>
+<p><strong>第三步：开平方就是奇异值。</strong></p>
 
 $$\sigma_1 = \sqrt{16} = 4, \qquad \sigma_2 = \sqrt{4} = 2$$
 
-<p>和前面 SVD 直接算出的结果一模一样！这不是巧合——是普遍规律。用记号来表示：</p>
+<p>和 numpy 的 SVD 结果一致。写成通式：</p>
 
 $$\boxed{\sigma_i = \sqrt{\lambda_i(A^T A)}}$$
 
-<p><strong>读法：</strong> $\lambda_i(A^T A)$ 的意思是「把 $A^T A$ 当成参数喂给特征值函数，取第 $i$ 大的那个」。$\lambda$ 还是特征值，只是后面括号里写的是<strong>哪个矩阵</strong>的特征值——$\lambda(A^T A)$ 是 $A^T A$ 的，$\lambda(A)$ 才是 $A$ 的，它们是不同矩阵的特征值。</p>
+<p><strong>读法：</strong> $\lambda_i(A^T A)$ =「把 $A^T A$ 的特征值从大到小排，取第 $i$ 个」。括号里写的是<strong>哪个矩阵</strong>——$\lambda(A^T A)$ 是 $A^T A$ 的特征值，$\lambda(A)$ 才是 $A$ 的，别搞混。</p>
 
-<p><strong>为什么刚好是平方关系？</strong> 看 $A^T A$ 在做什么：先用 $A$ 变换，再用 $A^T$ 拉回来。如果一个向量被 $A$ 拉伸了 $\sigma$ 倍，接着 $A^T$ 又在同一个方向上拉伸 $\sigma$ 倍——两轮下来总共拉伸了 $\sigma^2$ 倍。而 $A^T A$ 的特征值衡量的正是「总共拉伸了多少」，所以 $\lambda = \sigma^2$，反过来 $\sigma = \sqrt{\lambda}$。</p>
+<p><strong>为什么刚好是平方关系？</strong> 把 $A$ 作用在一个右奇异向量 $\mathbf{v}$ 上：$A\mathbf{v} = \mathbf{w}$（$\mathbf{w}$ 是输出空间里的某个向量）。那么：</p>
+
+$$\|\mathbf{w}\|^2 = \mathbf{w}^T\mathbf{w} = (A\mathbf{v})^T(A\mathbf{v}) = \mathbf{v}^T A^T A \mathbf{v}$$
+
+<p>如果 $\mathbf{v}$ 恰好是 $A^T A$ 的特征向量（对应特征值 $\lambda$），则 $A^T A\mathbf{v} = \lambda\mathbf{v}$，代入：</p>
+
+$$\|\mathbf{w}\|^2 = \mathbf{v}^T(\lambda\mathbf{v}) = \lambda\|\mathbf{v}\|^2 \;\Longrightarrow\; \lambda = \frac{\|\mathbf{w}\|^2}{\|\mathbf{v}\|^2} = \left(\frac{\|A\mathbf{v}\|}{\|\mathbf{v}\|}\right)^2$$
+
+<p>$\frac{\|A\mathbf{v}\|}{\|\mathbf{v}\|}$ 就是 $A$ 把向量 $\mathbf{v}$ 拉长了几倍——这正是奇异值 $\sigma$ 的定义。所以 $\sigma = \sqrt{\lambda}$。推导只用了特征向量的定义和向量长度的平方展开，没有「$A^T$ 在同一个方向拉伸」这种不严谨的说法。</p>
 
 <p>用代码验证：</p>
 
