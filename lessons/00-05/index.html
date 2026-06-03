@@ -275,7 +275,9 @@ $$A = \begin{bmatrix} a & b \\ b & c \end{bmatrix}, \qquad A^T = \begin{bmatrix}
 
 <p><strong>例子：</strong> $A = \begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix}$。沿对角线翻过去——$\begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix} = A^T = A$ ✓。对角线上下的 1 和 1 相等。</p>
 
-<p><strong>对称矩阵的黄金性质：</strong> 实对称矩阵的特征向量<strong>天生互相垂直</strong>。以上面 $A=\begin{bmatrix}2&1\\1&2\end{bmatrix}$ 为例：特征值 3 和 1，特征向量 $[1,1]$ 和 $[1,-1]$，点乘 = $1-1=0$，恰好垂直。这是线性代数里的重要定理——不需要额外条件，只要 $A=A^T$，它的特征向量就必然可以选成正交的。</p>
+<p><strong>对称矩阵的黄金性质：</strong> 实对称矩阵的特征向量<strong>天生互相垂直</strong>。以上面 $A=\begin{bmatrix}2&1\\1&2\end{bmatrix}$ 为例：特征值 3 和 1，特征向量 $[1,1]$ 和 $[1,-1]$，点乘 = $1-1=0$，恰好垂直。</p>
+
+<p><strong>为什么专门说「实」对称？</strong> 「实」= 矩阵里所有数都是实数。这个黄金定理<strong>只对实数对称矩阵成立</strong>。如果矩阵含复数（虚数），光满足 $A=A^T$ 不够——特征向量不再保证垂直，得升级成「厄米特矩阵」（$A = \bar{A}^T$，转置后再取共轭）才行。好在深度学习里的矩阵全是实数，所以「对称」默认就是「实对称」，定理直接用。</p>
 
 <h4>两者结合——$A$ 对称 ⟺ $Q$ 正交</h4>
 
