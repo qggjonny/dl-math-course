@@ -384,6 +384,36 @@ _, s, _ = np.linalg.svd(A)
 <strong>为什么 $A^T A$ 能用来算奇异值？</strong> 直觉：$A^T A$ 相当于「先用 $A$ 变换，再用 $A^T$ 拉回来」。被拉伸最多的方向（奇异向量）在 $A^T A$ 下也是拉伸最多的方向（特征向量），但拉伸倍数是原来的平方——所以奇异值 = sqrt(特征值)。
 </div>
 
+<h2>七、为什么 $U$ 和 $V$ 是正交的——回到 00-05 的黄金性质</h2>
+
+<p>SVD 的 $U$ 和 $V$ 都是正交矩阵，这不是巧合。秘密藏在两个「造出来」的对称矩阵里：</p>
+
+<p><strong>① $V$ 为什么正交？</strong> $V$ 的列是 $A^T A$ 的特征向量。$A^T A$ 天生对称：</p>
+
+$$(A^T A)^T = A^T (A^T)^T = A^T A$$
+
+<p>$A^T A$ 是实对称矩阵 → 回 00-05 的黄金性质：实对称矩阵的特征向量互相垂直 → 归一化后 $V$ 是正交矩阵（$V^T V = I$）。</p>
+
+<p><strong>② $U$ 为什么正交？</strong> 同理，$U$ 的列是 $A A^T$ 的特征向量。$A A^T$ 也天生对称：$(A A^T)^T = A A^T$ → 特征向量垂直 → $U$ 正交。</p>
+
+<div class="callout callout-info">
+<strong>🔗 对称矩阵 ⟹ SVD 的精神脉络：</strong><br><br>
+00-05 学的特征值分解 $A = Q\Lambda Q^T$（对称矩阵的最佳情况）是 SVD 的<strong>直系祖先</strong>。任何一个 $A$（哪怕是长方形），只要乘上自己的转置 $A^T A$ 和 $A A^T$，就造出了两个对称矩阵——而对称矩阵的特征向量天生垂直，这就保证了 $U$ 和 $V$ 必然是正交的。<br><br>
+<strong>对比：</strong>
+</div>
+
+<table>
+<tr><th></th><th>对称 $A$ 的特征值分解</th><th>任意 $A$ 的 SVD</th></tr>
+<tr><td>条件</td><td>$A$ 本身对称</td><td>$A$ 可以是任意矩形矩阵</td></tr>
+<tr><td>输入基</td><td>$Q$（$A$ 的特征向量）</td><td>$V$（$A^T A$ 的特征向量）</td></tr>
+<tr><td>输出基</td><td>同一个 $Q$</td><td>$U$（$A A^T$ 的特征向量）</td></tr>
+<tr><td>缩放</td><td>$\Lambda$（特征值）</td><td>$\Sigma$（奇异值 = $\sqrt{\lambda(A^T A)}$）</td></tr>
+<tr><td>正交性来源</td><td>$A$ 对称 → 特征向量垂直</td><td>$A^T A$ 和 $A A^T$ 对称 → 各自特征向量垂直</td></tr>
+<tr><td>公式</td><td>$A = Q\Lambda Q^T$</td><td>$A = U\Sigma V^T$</td></tr>
+</table>
+
+<p>核心逻辑完全一样：<strong>都是「换基 → 缩放 → 换回来」。</strong>对称 $A$ 是输入和输出空间重合的特例（$U=V=Q$），SVD 把它推广到了输入和输出空间不同的情况。</p>
+
 <h2>💭 概念题</h2>
 
 <div class="exercise">

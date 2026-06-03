@@ -295,7 +295,7 @@ $$A^T = (Q\Lambda Q^T)^T = (Q^T)^T \Lambda^T Q^T = Q\Lambda Q^T = A$$
 
 <p>转置把 $Q\Lambda Q^T$ 整串翻了个个，但因为 $\Lambda$ 是对角阵（$\Lambda^T = \Lambda$），翻完一模一样。所以 $A = Q\Lambda Q^T$ 和 $A = A^T$ 是<strong>同一个意思</strong>。</p>
 
-<p>比 $A = Q\Lambda Q^{-1}$ 简洁多了——不用算逆矩阵！而且这个结构和下一课 SVD 的 $A = U\Sigma V^T$ 一脉相承。对称矩阵是对角化的「最佳情况」。</p>
+<p>比 $A = Q\Lambda Q^{-1}$ 简洁多了——不用算逆矩阵！对称矩阵是对角化的「最佳情况」。</p>
 
 <p><strong>⚠️ 注意：</strong> 正交矩阵和对称矩阵是不同的概念，<strong>同时满足两者的矩阵很少</strong>。正交 = 列互相垂直且长度 1，对称 = 沿对角线翻转等于自己。同时满足 → $Q^T = Q$ 且 $Q^T Q = I$ → $Q^2 = I$。几何上这些矩阵是<strong>镜面反射</strong>——关于某条线做镜像翻转。2D 的例子：</p>
 
@@ -303,10 +303,6 @@ $$I = \begin{bmatrix}1&0\\0&1\end{bmatrix},\; -I = \begin{bmatrix}-1&0\\0&-1\end
 \begin{bmatrix}0&1\\1&0\end{bmatrix},\; \begin{bmatrix}1&0\\0&-1\end{bmatrix}$$
 
 <p>本课的 45° 旋转矩阵是正交的，但<strong>不是</strong>对称的——旋转不等于反射。对称+正交是少数特例，大多数正交矩阵（旋转）不对称，大多数对称矩阵不正交。</p>
-
-<div class="callout callout-info">
-<strong>串联到 SVD：</strong> 对称 $A$ ⟺ 垂直的特征向量 ⟺ 正交 $Q$ ⟺ $Q^{-1}=Q^T$ ⟺ $A=Q\Lambda Q^T$。这和 SVD 的 $A=U\Sigma V^T$ 精神一致（换基 → 缩放 → 换回来），SVD 把这个精神推广到任意矩形矩阵。
-</div>
 
 <p><strong>推导链完整：</strong> 特征方程 → 二次方程求 λ → 代入 $(A-\lambda I)\mathbf{v}=0$ → 解线性方程组 → 得到 v → <strong>打包成 $A = Q\Lambda Q^{-1}$</strong>。下面用代码验证全过程：</p>
 <pre><code><span class="hl-comment"># 00-05 第二步：用 np.linalg.eig 验证——特征值就是"不扭方向"的拉伸倍数</span>
