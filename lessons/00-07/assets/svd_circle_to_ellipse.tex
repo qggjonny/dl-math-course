@@ -1,0 +1,69 @@
+\documentclass[tikz,border=20pt]{standalone}
+\usepackage{ctex}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\begin{document}
+\begin{tikzpicture}[scale=1.6]
+
+% ── 左边：单位圆 ──
+\begin{scope}
+  % 坐标轴
+  \draw[->,gray] (-1.5,0) -- (1.5,0) node[right] {$x$};
+  \draw[->,gray] (0,-1.5) -- (0,1.5) node[above] {$y$};
+
+  % 单位圆
+  \draw[thick,blue!60] (0,0) circle (1);
+
+  % v₁ 方向（45°，被拉长的方向）
+  \draw[->,very thick,red] (0,0) -- (0.707,0.707) node[above right] {$\mathbf{v}_1$};
+  % v₂ 方向（135°，被拉短的方向）
+  \draw[->,very thick,red] (0,0) -- (-0.707,0.707) node[above left] {$\mathbf{v}_2$};
+
+  % 几个采样向量（浅灰，示意圆上的点）
+  \foreach \a in {0,45,90,135,180,225,270,315} {
+    \fill[gray!40] ({cos(\a)}, {sin(\a)}) circle (0.03);
+  }
+
+  \node at (0,-1.8) {单位圆 $\|\mathbf{x}\|=1$};
+\end{scope}
+
+% ── 中间：箭头 + A ──
+\node at (2.3,0) {\Large $\xrightarrow{\quad A\quad}$};
+
+% ── 右边：椭圆 ──
+\begin{scope}[xshift=5cm]
+  % 坐标轴
+  \draw[->,gray] (-4.5,0) -- (4.5,0) node[right] {$x$};
+  \draw[->,gray] (0,-4.5) -- (0,4.5) node[above] {$y$};
+
+  % 椭圆：半轴 σ₁=4 沿 45°, σ₂=2 沿 135°
+  % 参数方程：X = σ₁cosθ·cos45° - σ₂sinθ·sin45° = (4cosθ-2sinθ)/√2
+  %           Y = σ₁cosθ·sin45° + σ₂sinθ·cos45° = (4cosθ+2sinθ)/√2
+  \draw[very thick,blue!60,samples=100,domain=0:360,variable=\t]
+    plot ({4*cos(\t)*0.7071 - 2*sin(\t)*0.7071},
+          {4*cos(\t)*0.7071 + 2*sin(\t)*0.7071});
+
+  % 长轴 σ₁u₁
+  \draw[->,very thick,red] (0,0) -- (2.828,2.828)
+    node[above right] {$\sigma_1\mathbf{u}_1$};
+  % 短轴 σ₂u₂
+  \draw[->,very thick,red] (0,0) -- (-1.414,1.414)
+    node[above left] {$\sigma_2\mathbf{u}_2$};
+
+  % 长轴标注
+  \node[red] at (1.4,1.8) {\small $\sigma_1=4$};
+  % 短轴标注
+  \node[red] at (-1.5,0.6) {\small $\sigma_2=2$};
+
+  % 采样点（和左边一一对应，展示拉伸效果）
+  \foreach \a in {0,45,90,135,180,225,270,315} {
+    \pgfmathsetmacro{\px}{3*cos(\a) + 1*sin(\a)}
+    \pgfmathsetmacro{\py}{1*cos(\a) + 3*sin(\a)}
+    \fill[gray!40] (\px,\py) circle (0.04);
+  }
+
+  \node at (0,-4.8) {椭圆 $\{A\mathbf{x} \mid \|\mathbf{x}\|=1\}$};
+\end{scope}
+
+\end{tikzpicture}
+\end{document}

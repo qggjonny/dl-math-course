@@ -108,6 +108,11 @@ min_idx = np.argmin(stretches)
 
 <p>用矩阵 $A$ 去乘圆上的每一个点，得到的点连起来就是<strong>一个椭圆</strong>。</p>
 
+<figure>
+  <img src="assets/svd_circle_to_ellipse.png" alt="圆变椭圆：左边单位圆，右边A变换后的椭圆" style="max-width:100%;height:auto">
+  <figcaption>图：单位圆（左）经过 $A$ 变换后变成椭圆（右）。红箭头 $\mathbf{v}_1,\mathbf{v}_2$ 是被拉伸的方向，拉伸后变成 $\sigma_1\mathbf{u}_1$（长轴，4倍）和 $\sigma_2\mathbf{u}_2$（短轴，2倍）。8 个灰点一一对应，看得见拉伸效果。</figcaption>
+</figure>
+
 <div class="callout callout-info">
 <strong>"矩阵变换一个圆"到底是什么意思？</strong><br><br>
 不是矩阵「吃掉了」一个圆。而是：<br>
