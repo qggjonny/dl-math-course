@@ -88,6 +88,22 @@ $$A\mathbf{x} = \begin{bmatrix} 2 & 3 \\ 1 & -1 \end{bmatrix} \begin{bmatrix} x 
 
 <p>回忆 00-04：行列式为 0 意味着矩阵把空间压扁了。压扁之后就回不去了（不可逆）——所以不能用「乘逆矩阵」的办法求解。只有 $\det(A) \neq 0$（矩阵没有压扁空间）时，$A\mathbf{x} = \mathbf{b}$ 才有唯一解。</p>
 
+<h3>矩阵角度：列空间</h3>
+
+<p>$A\mathbf{x} = \mathbf{b}$ 换个读法。把 $A$ 按列拆开：</p>
+
+$$A\mathbf{x} = \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = x\begin{bmatrix} a_{11} \\ a_{21} \end{bmatrix} + y\begin{bmatrix} a_{12} \\ a_{22} \end{bmatrix}$$
+
+<p><strong>$A\mathbf{x}$ 就是 $A$ 的两列按 $x$ 和 $y$ 的比例混合。</strong> $x$ 和 $y$ 是配方——你取 $x$ 份第一列 + $y$ 份第二列，搅在一起，得到 $\mathbf{b}$。</p>
+
+<p>那么所有可能的 $\mathbf{b}$（把 $x$ 和 $y$ 取遍所有实数）构成的集合，就叫 $A$ 的<strong>列空间</strong>——$A$ 的列「能到达的所有地方」。</p>
+
+$$A = \begin{bmatrix} 2 & 3 \\ 1 & -1 \end{bmatrix} 的列空间：两列 \begin{bmatrix}2\\1\end{bmatrix} 和 \begin{bmatrix}3\\-1\end{bmatrix} 不共线 → 能张成整个平面 → \mathbf{b} 无论在哪，都能配出来。$$
+
+$$A = \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix} 的列空间：两列都是 \begin{bmatrix}1\\1\end{bmatrix}，共线 → 只能张成 y=x 这条直线 → \mathbf{b}=[3,5] 不在线上 → 无解。$$
+
+<p><strong>一句话：</strong> $\det(A) \neq 0$ → 列空间 = 整个平面 → 永远有唯一解。$\det(A) = 0$ → 列空间被压成一条线 → $\mathbf{b}$ 必须恰好落在这条线上才有解，否则无解。</p>
+
 <h3>和特征向量的关系</h3>
 
 <p>第五课我们解 $(A-\lambda I)\mathbf{v} = \mathbf{0}$ 来求特征向量。注意这个方程右边是 $\mathbf{0}$（零向量），不是一般的 $\mathbf{b}$。</p>
