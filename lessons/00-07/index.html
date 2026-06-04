@@ -471,13 +471,43 @@ _, s, _ = np.linalg.svd(A)
 
 <p>SVD 的 $U$ 和 $V$ 都是正交矩阵，这不是巧合。秘密藏在两个「造出来」的对称矩阵里：</p>
 
-<p><strong>① $V$ 为什么正交？</strong> $V$ 的列是 $A^T A$ 的特征向量。$A^T A$ 天生对称：</p>
+<p><strong>① $V$ 为什么是 $A^T A$ 的特征向量？</strong> 这不是巧合——从 SVD 公式本身就能推出来。已知 $A = U\Sigma V^T$，两边左乘 $A^T$：</p>
+
+$$A^T A = (U\Sigma V^T)^T (U\Sigma V^T)$$
+
+<p>拆转置（$(XYZ)^T = Z^T Y^T X^T$）：</p>
+
+$$(U\Sigma V^T)^T = (V^T)^T \Sigma^T U^T = V\Sigma^T U^T$$
+
+<p>注意 $\Sigma$ 是对角矩阵，转置等于自己（$\Sigma^T = \Sigma$）。代回去：</p>
+
+$$A^T A = V\Sigma U^T U\Sigma V^T$$
+
+<p>$U$ 是正交矩阵 → $U^T U = I$。消掉：</p>
+
+$$A^T A = V\Sigma^2 V^T$$
+
+<p>其中 $\Sigma^2$ 是对角矩阵，对角线上是 $\sigma_1^2, \sigma_2^2, \dots$。</p>
+
+<p><strong>这就是 $A^T A$ 的特征值分解！</strong> 和 00-05 学的 $A = Q\Lambda Q^T$ 格式一模一样——$V$ 就是那个 $Q$（特征向量矩阵），$\Sigma^2$ 就是那个 $\Lambda$（特征值对角阵）。</p>
+
+<p>$A^T A$ 天生对称：</p>
 
 $$(A^T A)^T = A^T (A^T)^T = A^T A$$
 
 <p>$A^T A$ 是实对称矩阵 → 回 00-05 的黄金性质：实对称矩阵的特征向量互相垂直 → 归一化后 $V$ 是正交矩阵（$V^T V = I$）。</p>
 
-<p><strong>② $U$ 为什么正交？</strong> 同理，$U$ 的列是 $A A^T$ 的特征向量。$A A^T$ 也天生对称：$(A A^T)^T = A A^T$ → 特征向量垂直 → $U$ 正交。</p>
+<p><strong>② $U$ 同理——是 $A A^T$ 的特征向量。</strong> 这次两边<strong>右</strong>乘 $A^T$：</p>
+
+$$A A^T = (U\Sigma V^T)(U\Sigma V^T)^T = U\Sigma V^T V\Sigma^T U^T$$
+
+<p>$V$ 正交 → $V^T V = I$，$\Sigma^T = \Sigma$：</p>
+
+$$A A^T = U\Sigma^2 U^T$$
+
+<p>又是特征值分解——$U$ 是 $A A^T$ 的特征向量矩阵，特征值也是 $\sigma_1^2, \sigma_2^2, \dots$。</p>
+
+<p><strong>所以 $A^T A$ 和 $A A^T$ 有完全相同的非零特征值！</strong> 都是 $\sigma_i^2$。唯一区别：$A^T A$ 的特征向量是 $V$（输入空间），$A A^T$ 的特征向量是 $U$（输出空间）。</p>
 
 <div class="callout callout-info">
 <strong>🔗 对称矩阵 ⟹ SVD 的精神脉络：</strong><br><br>
