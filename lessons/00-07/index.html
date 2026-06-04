@@ -365,15 +365,61 @@ $$\boxed{\sigma_i = \sqrt{\lambda_i(A^T A)}}$$
 
 <p><strong>读法：</strong> $\lambda_i(A^T A)$ =「把 $A^T A$ 的特征值从大到小排，取第 $i$ 个」。括号里写的是<strong>哪个矩阵</strong>——$\lambda(A^T A)$ 是 $A^T A$ 的特征值，$\lambda(A)$ 才是 $A$ 的，别搞混。</p>
 
-<p><strong>为什么刚好是平方关系？</strong> 把 $A$ 作用在一个右奇异向量 $\mathbf{v}$ 上：$A\mathbf{v} = \mathbf{w}$（$\mathbf{w}$ 是输出空间里的某个向量）。那么：</p>
+<p><strong>为什么刚好是平方关系？</strong> 下面一步步拆开。</p>
 
-$$\|\mathbf{w}\|^2 = \mathbf{w}^T\mathbf{w} = (A\mathbf{v})^T(A\mathbf{v}) = \mathbf{v}^T A^T A \mathbf{v}$$
+<p><strong>出发点：</strong> 取一个右奇异向量 $\mathbf{v}$。它有两重身份——① 被 $A$ 拉伸的方向，② 同时也是 $A^T A$ 的特征向量（00-05 学过，$A^T A$ 是对称矩阵，特征向量天生垂直）。记它对应的特征值为 $\lambda$：</p>
 
-<p>如果 $\mathbf{v}$ 恰好是 $A^T A$ 的特征向量（对应特征值 $\lambda$），则 $A^T A\mathbf{v} = \lambda\mathbf{v}$，代入：</p>
+$$A^T A \mathbf{v} = \lambda \mathbf{v}$$
 
-$$\|\mathbf{w}\|^2 = \mathbf{v}^T(\lambda\mathbf{v}) = \lambda\|\mathbf{v}\|^2 \;\Longrightarrow\; \lambda = \frac{\|\mathbf{w}\|^2}{\|\mathbf{v}\|^2} = \left(\frac{\|A\mathbf{v}\|}{\|\mathbf{v}\|}\right)^2$$
+<p>用 $A$ 作用 $\mathbf{v}$，得到输出空间的向量 $\mathbf{w}$：</p>
 
-<p>$\frac{\|A\mathbf{v}\|}{\|\mathbf{v}\|}$ 就是 $A$ 把向量 $\mathbf{v}$ 拉长了几倍——这正是奇异值 $\sigma$ 的定义。所以 $\sigma = \sqrt{\lambda}$。推导只用了特征向量的定义和向量长度的平方展开，没有「$A^T$ 在同一个方向拉伸」这种不严谨的说法。</p>
+$$A\mathbf{v} = \mathbf{w}$$
+
+<p><strong>第 1 步：算 $\mathbf{w}$ 的长度的平方。</strong> 向量长度平方 = 自己和自己的点乘：</p>
+
+$$\|\mathbf{w}\|^2 = \mathbf{w}^T \mathbf{w}$$
+
+<p><strong>第 2 步：把 $\mathbf{w}$ 换成 $A\mathbf{v}$。</strong></p>
+
+$$\|\mathbf{w}\|^2 = (A\mathbf{v})^T (A\mathbf{v})$$
+
+<p><strong>第 3 步：拆开转置括号。</strong> 乘积的转置 = 顺序倒过来各自转置（00-02 学的 $(AB)^T = B^T A^T$）：</p>
+
+$$(A\mathbf{v})^T = \mathbf{v}^T A^T$$
+
+<p>所以：</p>
+
+$$\|\mathbf{w}\|^2 = \mathbf{v}^T A^T A \mathbf{v}$$
+
+<p><strong>这里出现了 $A^T A$！</strong> 不是巧合——算向量长度时自然带出了转置，转置一拆，$A^T$ 和 $A$ 就夹在一起了。</p>
+
+<p><strong>第 4 步：关键替换。</strong> $\mathbf{v}$ 是 $A^T A$ 的特征向量，所以 $A^T A \mathbf{v} = \lambda \mathbf{v}$。把这一整坨换成 $\lambda \mathbf{v}$：</p>
+
+$$\|\mathbf{w}\|^2 = \mathbf{v}^T (\lambda \mathbf{v})$$
+
+<p><strong>第 5 步：把 $\lambda$ 提出来。</strong> $\lambda$ 是一个数，可以提到点乘外面：</p>
+
+$$\mathbf{v}^T (\lambda \mathbf{v}) = \lambda (\mathbf{v}^T \mathbf{v}) = \lambda \|\mathbf{v}\|^2$$
+
+<p>所以：</p>
+
+$$\|\mathbf{w}\|^2 = \lambda \|\mathbf{v}\|^2$$
+
+<p><strong>第 6 步：解出 $\lambda$。</strong></p>
+
+$$\lambda = \frac{\|\mathbf{w}\|^2}{\|\mathbf{v}\|^2} = \left(\frac{\|\mathbf{w}\|}{\|\mathbf{v}\|}\right)^2 = \left(\frac{\|A\mathbf{v}\|}{\|\mathbf{v}\|}\right)^2$$
+
+<p><strong>第 7 步：认出奇异值。</strong> $\dfrac{\|A\mathbf{v}\|}{\|\mathbf{v}\|}$ 就是 $A$ 把 $\mathbf{v}$ 拉长了几倍——这正是<strong>奇异值 $\sigma$ 的定义</strong>。所以：</p>
+
+$$\sigma = \frac{\|A\mathbf{v}\|}{\|\mathbf{v}\|} = \sqrt{\lambda}$$
+
+<p><strong>为什么是平方——一句话：</strong> 因为 $\|\mathbf{w}\|^2 = \lambda\|\mathbf{v}\|^2$，$\lambda$ 是 <strong>长度平方的比例</strong>。奇异值是<strong>长度的比例</strong>（一次方），所以要开平方。</p>
+
+<div class=\"callout callout-info\">
+<strong>整条链：</strong><br>
+$A\mathbf{v} = \mathbf{w}$（作用）→ $\|\mathbf{w}\|^2 = (A\mathbf{v})^T(A\mathbf{v})$（算长度）→ $\mathbf{v}^T A^T A \mathbf{v}$（拆转置，$A^T A$ 登场）→ $\lambda \|\mathbf{v}\|^2$（特征向量代入）→ $\sigma = \sqrt{\lambda}$（认出拉伸倍数）。<br><br>
+每一步只做一件事：代入定义 → 拆括号 → 替换 → 提常数 → 解方程。没有跳跃。
+</div>
 
 <p>用代码验证：</p>
 
