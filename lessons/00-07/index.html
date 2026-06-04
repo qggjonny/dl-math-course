@@ -365,17 +365,41 @@ $$\boxed{\sigma_i = \sqrt{\lambda_i(A^T A)}}$$
 
 <p><strong>读法：</strong> $\lambda_i(A^T A)$ =「把 $A^T A$ 的特征值从大到小排，取第 $i$ 个」。括号里写的是<strong>哪个矩阵</strong>——$\lambda(A^T A)$ 是 $A^T A$ 的特征值，$\lambda(A)$ 才是 $A$ 的，别搞混。</p>
 
-<p><strong>为什么刚好是平方关系？</strong> 下面一步步拆开。</p>
+<p><strong>为什么刚好是平方关系？</strong></p>
 
-<p><strong>出发点：</strong> 取一个右奇异向量 $\mathbf{v}$。它有两重身份——① 被 $A$ 拉伸的方向，② 同时也是 $A^T A$ 的特征向量（00-05 学过，$A^T A$ 是对称矩阵，特征向量天生垂直）。记它对应的特征值为 $\lambda$：</p>
+<p><strong>先确认一件事：右奇异向量 $\mathbf{v}$ 确实是 $A^T A$ 的特征向量。</strong> 这不是猜的——从 SVD 公式直接推。</p>
 
-$$A^T A \mathbf{v} = \lambda \mathbf{v}$$
+<p>SVD 说 $A = U\Sigma V^T$。两边左乘 $A^T$：</p>
 
-<p>用 $A$ 作用 $\mathbf{v}$，得到输出空间的向量 $\mathbf{w}$：</p>
+$$A^T A = (U\Sigma V^T)^T (U\Sigma V^T)$$
+
+<p>拆转置。00-02 学过：乘积的转置 = 顺序倒过来各自转置。$(XYZ)^T = Z^T Y^T X^T$：</p>
+
+$$(U\Sigma V^T)^T = (V^T)^T \Sigma^T U^T = V\Sigma U^T$$
+
+<p>$\Sigma$ 是对角矩阵，转置等于自己（$\Sigma^T = \Sigma$）。代回去：</p>
+
+$$A^T A = V\Sigma U^T U\Sigma V^T$$
+
+<p>$U$ 是正交矩阵，$U^T U = I$（单位矩阵，相当于数字 1，乘谁都等于自己）。消掉：</p>
+
+$$\boxed{A^T A = V\Sigma^2 V^T}$$
+
+<p>这和 00-05 学的特征值分解 $A = Q\Lambda Q^T$ 格式一模一样——<strong>$V$ 就是特征向量矩阵，$\Sigma^2$ 对角线上是特征值 $\sigma_1^2, \sigma_2^2, \dots$。</strong></p>
+
+<p>所以 $V$ 的每一列 $\mathbf{v}_i$ 都满足特征向量的定义：</p>
+
+$$A^T A \mathbf{v}_i = \sigma_i^2 \mathbf{v}_i$$
+
+<p>记 $\lambda = \sigma^2$（特征值），$\mathbf{v}$ 为任意一个右奇异向量。即 $A^T A\mathbf{v} = \lambda\mathbf{v}$。</p>
+
+<p><strong>现在从这条等式出发，推导 $\sigma = \sqrt{\lambda}$。</strong></p>
+
+<p>用 $A$ 作用 $\mathbf{v}$，记结果为 $\mathbf{w}$：</p>
 
 $$A\mathbf{v} = \mathbf{w}$$
 
-<p><strong>第 1 步：算 $\mathbf{w}$ 的长度的平方。</strong> 向量长度平方 = 自己和自己的点乘：</p>
+<p><strong>第 1 步：算 $\mathbf{w}$ 的长度的平方。</strong> 00-01 学过，向量 $\mathbf{x}$ 的模长 = $\sqrt{x_1^2 + x_2^2 + \dots}$。平方一下：$\|\mathbf{x}\|^2 = x_1^2 + x_2^2 + \dots$。用矩阵写法（00-02 学过点乘 = 行向量 × 列向量）：</p>
 
 $$\|\mathbf{w}\|^2 = \mathbf{w}^T \mathbf{w}$$
 
@@ -383,21 +407,21 @@ $$\|\mathbf{w}\|^2 = \mathbf{w}^T \mathbf{w}$$
 
 $$\|\mathbf{w}\|^2 = (A\mathbf{v})^T (A\mathbf{v})$$
 
-<p><strong>第 3 步：拆开转置括号。</strong> 乘积的转置 = 顺序倒过来各自转置（00-02 学的 $(AB)^T = B^T A^T$）：</p>
+<p><strong>第 3 步：拆开转置括号。</strong> 00-02 学过规则 $(AB)^T = B^T A^T$。把 $A$ 看成第一个矩阵，$\mathbf{v}$ 看成第二个（列向量是 $n\times 1$ 矩阵，规则照样适用）：</p>
 
 $$(A\mathbf{v})^T = \mathbf{v}^T A^T$$
 
-<p>所以：</p>
+<p>代入：</p>
 
 $$\|\mathbf{w}\|^2 = \mathbf{v}^T A^T A \mathbf{v}$$
 
-<p><strong>这里出现了 $A^T A$！</strong> 不是巧合——算向量长度时自然带出了转置，转置一拆，$A^T$ 和 $A$ 就夹在一起了。</p>
+<p><strong>不是巧合。</strong> 算向量长度 → 自然带出转置 → 转置一拆 → $A^T$ 和 $A$ 夹在一起。</p>
 
-<p><strong>第 4 步：关键替换。</strong> $\mathbf{v}$ 是 $A^T A$ 的特征向量，所以 $A^T A \mathbf{v} = \lambda \mathbf{v}$。把这一整坨换成 $\lambda \mathbf{v}$：</p>
+<p><strong>第 4 步：关键替换。</strong> 前面刚证明了 $A^T A\mathbf{v} = \lambda\mathbf{v}$。把 $A^T A\mathbf{v}$ 这一整坨换成 $\lambda\mathbf{v}$：</p>
 
 $$\|\mathbf{w}\|^2 = \mathbf{v}^T (\lambda \mathbf{v})$$
 
-<p><strong>第 5 步：把 $\lambda$ 提出来。</strong> $\lambda$ 是一个数，可以提到点乘外面：</p>
+<p><strong>第 5 步：把 $\lambda$ 提出来。</strong> 点乘的线性性质：$\mathbf{a}\cdot(c\mathbf{b}) = c(\mathbf{a}\cdot\mathbf{b})$。一个向量放大了 $c$ 倍再参与点乘，等价于先点乘再把结果放大 $c$ 倍。$\lambda$ 是一个数，提到外面：</p>
 
 $$\mathbf{v}^T (\lambda \mathbf{v}) = \lambda (\mathbf{v}^T \mathbf{v}) = \lambda \|\mathbf{v}\|^2$$
 
@@ -409,16 +433,21 @@ $$\|\mathbf{w}\|^2 = \lambda \|\mathbf{v}\|^2$$
 
 $$\lambda = \frac{\|\mathbf{w}\|^2}{\|\mathbf{v}\|^2} = \left(\frac{\|\mathbf{w}\|}{\|\mathbf{v}\|}\right)^2 = \left(\frac{\|A\mathbf{v}\|}{\|\mathbf{v}\|}\right)^2$$
 
-<p><strong>第 7 步：认出奇异值。</strong> $\dfrac{\|A\mathbf{v}\|}{\|\mathbf{v}\|}$ 就是 $A$ 把 $\mathbf{v}$ 拉长了几倍——这正是<strong>奇异值 $\sigma$ 的定义</strong>。所以：</p>
+<p><strong>第 7 步：认出奇异值。</strong> $\dfrac{\|A\mathbf{v}\|}{\|\mathbf{v}\|}$ 就是 $A$ 把 $\mathbf{v}$ 拉长了几倍——课文第二节跑代码时算的「拉伸倍数」就是这个数。这就是<strong>奇异值 $\sigma$</strong>。所以：</p>
 
 $$\sigma = \frac{\|A\mathbf{v}\|}{\|\mathbf{v}\|} = \sqrt{\lambda}$$
 
-<p><strong>为什么是平方——一句话：</strong> 因为 $\|\mathbf{w}\|^2 = \lambda\|\mathbf{v}\|^2$，$\lambda$ 是 <strong>长度平方的比例</strong>。奇异值是<strong>长度的比例</strong>（一次方），所以要开平方。</p>
+<p><strong>为什么是平方——一句话：</strong> $\|\mathbf{w}\|^2 = \lambda\|\mathbf{v}\|^2$ 中，$\lambda$ 是<strong>长度平方的比例</strong>。奇异值是<strong>长度的比例</strong>（一次方），所以要开平方。</p>
 
-<div class=\"callout callout-info\">
-<strong>整条链：</strong><br>
-$A\mathbf{v} = \mathbf{w}$（作用）→ $\|\mathbf{w}\|^2 = (A\mathbf{v})^T(A\mathbf{v})$（算长度）→ $\mathbf{v}^T A^T A \mathbf{v}$（拆转置，$A^T A$ 登场）→ $\lambda \|\mathbf{v}\|^2$（特征向量代入）→ $\sigma = \sqrt{\lambda}$（认出拉伸倍数）。<br><br>
-每一步只做一件事：代入定义 → 拆括号 → 替换 → 提常数 → 解方程。没有跳跃。
+<div class="callout callout-info">
+<strong>整条链（每个等号都有出处）：</strong><br>
+$A\mathbf{v} = \mathbf{w}$（定义 $\mathbf{w}$）<br>
+→ $\|\mathbf{w}\|^2 = (A\mathbf{v})^T(A\mathbf{v})$（代入 + 长度定义）<br>
+→ $\mathbf{v}^T A^T A \mathbf{v}$（拆转置：$(AB)^T = B^T A^T$，00-02）<br>
+→ $\mathbf{v}^T(\lambda\mathbf{v})$（特征向量替换：$A^T A\mathbf{v} = \lambda\mathbf{v}$，上面刚证）<br>
+→ $\lambda\|\mathbf{v}\|^2$（$\lambda$ 提到点乘外，线性性质）<br>
+→ $\sigma = \sqrt{\lambda}$（认出 $\sigma = \|A\mathbf{v}\|/\|\mathbf{v}\|$，即拉伸倍数 = 奇异值）<br><br>
+每一步只做一件事：展开定义 → 代数变形 → 代入已知 → 提取常数 → 认出结果。没有跳跃。
 </div>
 
 <p>用代码验证：</p>
