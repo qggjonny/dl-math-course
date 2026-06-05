@@ -391,9 +391,13 @@ $$\boxed{A^T A = V(\Sigma^T \Sigma) V^T}$$
 
 $$A^T A \mathbf{v}_i = \sigma_i^2 \mathbf{v}_i$$
 
-<p>记 $\lambda = \sigma^2$（特征值），$\mathbf{v}$ 为任意一个右奇异向量。即 $A^T A\mathbf{v} = \lambda\mathbf{v}$。</p>
+<p><strong>以上是代数路线：</strong>从 SVD 公式出发，纯矩阵乘法，推出 $A^T A = V(\Sigma^T \Sigma)V^T$，所以 $\sigma_i^2$ 写在特征值的位置上。</p>
 
-<p><strong>现在从这条等式出发，推导 $\sigma = \sqrt{\lambda}$。</strong></p>
+<p><strong>换个角度——几何路线。</strong> 不依赖 SVD 公式。假设你已经知道 $A^T A$ 的特征分解——记 $\lambda$ 是 $A^T A$ 的某个特征值，$\mathbf{v}$ 是对应的特征向量：</p>
+
+$$A^T A\mathbf{v} = \lambda\mathbf{v}$$
+
+<p><strong>现在从这条等式出发，看 $\lambda$ 和拉伸倍数（奇异值）是什么关系。</strong></p>
 
 <p>用 $A$ 作用 $\mathbf{v}$，记结果为 $\mathbf{w}$：</p>
 
@@ -495,123 +499,3 @@ _, s, _ = np.linalg.svd(A)
 <div class="callout callout-info">
 <strong>为什么 $A^T A$ 能用来算奇异值？</strong> 直觉：$A^T A$ 相当于「先用 $A$ 变换，再用 $A^T$ 拉回来」。被拉伸最多的方向（奇异向量）在 $A^T A$ 下也是拉伸最多的方向（特征向量），但拉伸倍数是原来的平方——所以奇异值 = sqrt(特征值)。
 </div>
-
-<h2>七、为什么 $U$ 和 $V$ 是正交的——回到 00-05 的黄金性质</h2>
-
-<p>第六节证明了 $V$ 的列是 $A^T A$ 的特征向量，$U$ 的列是 $A A^T$ 的特征向量。但为什么它们<strong>互相垂直</strong>？</p>
-
-<p><strong>注意因果链——不是「椭圆轴互相垂直 → U 和 V 正交」。</strong> 顺序反了：</p>
-
-<div class="callout callout-info">
-<strong>正确的因果链：</strong><br><br>
-$A^T A$ 和 $A A^T$ 天生对称（00-02 学过 $(M^T M)^T = M^T M$）<br>
- ↓<br>
-对称矩阵的特征向量互相垂直（00-05 黄金性质）<br>
- ↓<br>
-$V$（$A^T A$ 的特征向量）→ 列互相垂直 → $V$ 是正交矩阵<br>
-$U$（$A A^T$ 的特征向量）→ 列互相垂直 → $U$ 是正交矩阵<br>
- ↓<br>
-于是椭圆的长轴短轴也互相垂直——这是<strong>验证</strong>，不是<strong>原因</strong>。
-</div>
-
-$$V^T V = I, \qquad U^T U = I$$
-
-<p>这是 SVD 比 00-05 普通特征值分解强的地方——<strong>不管 $A$ 长什么样，$U$ 和 $V$ 永远是正交的。</strong></p>
-
-<h3>为什么 SVD 写成 $A = U\Sigma V^T$，右边是 $V^T$ 而不是 $V$？</h3>
-
-<p>SVD 和 00-05 特征值分解结构完全一样——都是「换基 → 缩放 → 换回来」：</p>
-
-<table>
-<tr><th></th><th>特征值分解（对称矩阵）</th><th>SVD（任意矩阵）</th></tr>
-<tr><td>公式</td><td>$A = Q\Lambda Q^{-1}$</td><td>$A = U\Sigma V^T$</td></tr>
-<tr><td>第一步（换基）</td><td>$Q^{-1}\mathbf{x}$：换到特征基</td><td>$V^T\mathbf{x}$：转到拉伸方向</td></tr>
-<tr><td>第二步（缩放）</td><td>$\Lambda$：各方向独立缩放</td><td>$\Sigma$：各方向独立拉伸</td></tr>
-<tr><td>第三步（换回）</td><td>$Q$：换回原坐标系</td><td>$U$：转到最终方位</td></tr>
-</table>
-
-<p>$V^T$ 在 SVD 里扮演的就是 $Q^{-1}$ 的角色——<strong>逆矩阵</strong>。但因为 $V$ 是正交矩阵，它的逆恰好等于转置：$V^{-1} = V^T$。</p>
-
-<p><strong>写成 $V^T$ 是一个声明——它在说：「$V$ 是正交的，我不用费劲算逆矩阵，翻一下就行。」</strong></p>
-
-<div class="callout callout-info">
-<strong>🔗 对称矩阵 ⟹ SVD 的精神脉络：</strong><br><br>
-00-05 学的特征值分解 $A = Q\Lambda Q^T$（对称矩阵的最佳情况）是 SVD 的<strong>直系祖先</strong>。任何一个 $A$（哪怕是长方形），只要乘上自己的转置 $A^T A$ 和 $A A^T$，就造出了两个对称矩阵——而对称矩阵的特征向量天生垂直，这就保证了 $U$ 和 $V$ 必然是正交的。<br><br>
-<strong>对比：</strong>
-</div>
-
-<table>
-<tr><th></th><th>对称 $A$ 的特征值分解</th><th>任意 $A$ 的 SVD</th></tr>
-<tr><td>条件</td><td>$A$ 本身对称</td><td>$A$ 可以是任意矩形矩阵</td></tr>
-<tr><td>输入基</td><td>$Q$（$A$ 的特征向量）</td><td>$V$（$A^T A$ 的特征向量）</td></tr>
-<tr><td>输出基</td><td>同一个 $Q$</td><td>$U$（$A A^T$ 的特征向量）</td></tr>
-<tr><td>缩放</td><td>$\Lambda$（特征值）</td><td>$\Sigma$（奇异值 = $\sqrt{\lambda(A^T A)}$）</td></tr>
-<tr><td>正交性来源</td><td>$A$ 对称 → 特征向量垂直</td><td>$A^T A$ 和 $A A^T$ 对称 → 各自特征向量垂直</td></tr>
-<tr><td>公式</td><td>$A = Q\Lambda Q^T$</td><td>$A = U\Sigma V^T$</td></tr>
-</table>
-
-<p>核心逻辑完全一样：<strong>都是「换基 → 缩放 → 换回来」。</strong>对称 $A$ 是输入和输出空间重合的特例（$U=V=Q$），SVD 把它推广到了输入和输出空间不同的情况。</p>
-
-<h2>💭 概念题</h2>
-
-<div class="exercise">
-<h3>1. 猜拉伸倍数</h3>
-<p>不用计算，凭直觉判断：$B = \begin{bmatrix} 5 & 0 \\ 0 & 0.1 \end{bmatrix}$ 对一个单位圆变换后，椭圆的长轴指向哪？长度是多少？短轴呢？</p>
-<p>——考察：对角矩阵的奇异值就是对角线元素本身</p>
-</div>
-
-<div class="exercise">
-<h3>2. SVD vs 特征值</h3>
-<p>特征值分解 $A = Q\Lambda Q^{-1}$ 和 SVD $A = U\Sigma V^T$ 最大的两个区别是什么？（提示：形状限制 + 正交性）</p>
-<p>——考察：SVD 对任意形状有效、U 和 V 都是正交的</p>
-</div>
-
-<div class="exercise">
-<h3>3. $A^T A$ 总是方阵</h3>
-<p>$A$ 是 $100\times 5$ 矩阵（100 个样本，5 个特征）。$A^T A$ 的形状是多少？有几个特征值？所以 $A$ 最多有几个奇异值？</p>
-<p>——考察：奇异值个数 = min(m, n)</p>
-</div>
-
-<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-06/">← 00-06</a><a href="../../">📖 目录</a><a href="../00-08/">00-08 →</a></nav>
-</div>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: "$$", right: "$$", display: true},
-        {left: "$", right: "$", display: false}
-      ]
-    });
-  });
-</script>
-
-<script>
-(function(){
-  document.querySelectorAll('pre code').forEach(function(block){
-    var wrapper = document.createElement('div');
-    wrapper.className = 'code-block-wrapper';
-    var btn = document.createElement('button');
-    btn.className = 'copy-btn';
-    btn.textContent = '📋 复制';
-    btn.onclick = function(){
-      var text = block.innerText;
-      navigator.clipboard.writeText(text).then(function(){
-        btn.textContent = '✅ 已复制';
-        btn.classList.add('copied');
-        setTimeout(function(){
-          btn.textContent = '📋 复制';
-          btn.classList.remove('copied');
-        }, 2000);
-      });
-    };
-    block.parentNode.insertBefore(wrapper, block);
-    wrapper.appendChild(btn);
-    wrapper.appendChild(block);
-  });
-})();
-</script>
-
-</body>
-</html>
-
