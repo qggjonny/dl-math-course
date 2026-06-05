@@ -375,17 +375,17 @@ $$A^T A = (U\Sigma V^T)^T (U\Sigma V^T)$$
 
 <p>拆转置。00-02 学过：乘积的转置 = 顺序倒过来各自转置。$(XYZ)^T = Z^T Y^T X^T$：</p>
 
-$$(U\Sigma V^T)^T = (V^T)^T \Sigma^T U^T = V\Sigma U^T$$
+$$(U\Sigma V^T)^T = (V^T)^T \Sigma^T U^T = V\Sigma^T U^T$$
 
-<p>$\Sigma$ 是对角矩阵，转置等于自己（$\Sigma^T = \Sigma$）。代回去：</p>
+<p>代回去：</p>
 
-$$A^T A = V\Sigma U^T U\Sigma V^T$$
+$$A^T A = V\Sigma^T U^T U\Sigma V^T$$
 
 <p>$U$ 是正交矩阵，$U^T U = I$（单位矩阵，相当于数字 1，乘谁都等于自己）。消掉：</p>
 
-$$\boxed{A^T A = V\Sigma^2 V^T}$$
+$$\boxed{A^T A = V(\Sigma^T \Sigma) V^T}$$
 
-<p>这和 00-05 学的特征值分解 $A = Q\Lambda Q^T$ 格式一模一样——<strong>$V$ 就是特征向量矩阵，$\Sigma^2$ 对角线上是特征值 $\sigma_1^2, \sigma_2^2, \dots$。</strong></p>
+<p>这和 00-05 学的特征值分解 $A = Q\Lambda Q^T$ 格式一模一样——<strong>$V$ 就是特征向量矩阵，$\Sigma^T \Sigma$ 对角线上是特征值 $\sigma_1^2, \sigma_2^2, \dots$。</strong></p>
 
 <p>所以 $V$ 的每一列 $\mathbf{v}_i$ 都满足特征向量的定义：</p>
 
