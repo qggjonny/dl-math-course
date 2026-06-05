@@ -368,7 +368,14 @@ $$\boxed{\sigma_i = \sqrt{\lambda_i(A^T A)}}$$
 <div class="callout callout-info">
 <strong>⚠️ 小心归属——谁的奇异值？谁的特征值？</strong><br><br>
 上面算的 16 和 4 是 $A^T A$ 的<strong>特征值</strong>。开平方得到的 4 和 2 是<strong>$A$ 的奇异值</strong>。<br><br>
-那 $A^T A$ 自己的奇异值是多少？$A^T A$ 是对称矩阵，而且它的特征值永远不会是负数（因为 $\mathbf{x}^T A^T A \mathbf{x} = \lVert A\mathbf{x} \rVert^2 \ge 0$，这叫<strong>半正定</strong>）。所以 $A^T A$ 的奇异值 = 特征值 = 16 和 4（不用像普通对称矩阵那样取绝对值）。
+那 $A^T A$ 自己的奇异值是多少？$A^T A$ 是<strong>半正定</strong>矩阵——它的特征值永远不会是负数。推导只要两步：<br><br>
+<strong>① 对任意向量 $\mathbf{x}$：</strong><br>
+$\mathbf{x}^T A^T A \mathbf{x} = (A\mathbf{x})^T (A\mathbf{x}) = \|A\mathbf{x}\|^2 \ge 0$<br>
+（拆转置 → 点乘自己 → 长度平方，天然 ≥ 0）<br><br>
+<strong>② 当 $\mathbf{x}$ 取特征向量 $\mathbf{v}$ 时（$A^T A\mathbf{v} = \lambda\mathbf{v}$）：</strong><br>
+$\mathbf{v}^T A^T A \mathbf{v} = \mathbf{v}^T(\lambda\mathbf{v}) = \lambda\|\mathbf{v}\|^2 \ge 0 \;\Longrightarrow\; \lambda \ge 0$<br>
+（特征向量代进去 → $\lambda$ 提出来 → 长度正数 → $\lambda$ 必 ≥ 0）<br><br>
+所以 $A^T A$ 的奇异值 = 特征值 = 16 和 4（半正定不用取绝对值）。<br><br>
 同理，$A A^T$ 的特征值也是 $\sigma_i^2$（非零部分），$A A^T$ 的奇异值也等于它的特征值。<br><br>
 <strong>一句话：$A^T A$ 和 $A A^T$ 的非零特征值相同（都是 $\sigma_i^2$），而 $A$ 的奇异值是 $\sigma_i$。</strong>差一个平方，差在「谁的」上面。
 </div>
