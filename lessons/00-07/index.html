@@ -368,7 +368,7 @@ $$\boxed{\sigma_i = \sqrt{\lambda_i(A^T A)}}$$
 <div class="callout callout-info">
 <strong>⚠️ 小心归属——谁的奇异值？谁的特征值？</strong><br><br>
 上面算的 16 和 4 是 $A^T A$ 的<strong>特征值</strong>。开平方得到的 4 和 2 是<strong>$A$ 的奇异值</strong>。<br><br>
-那 $A^T A$ 自己的奇异值是多少？$A^T A$ 是对称半正定矩阵，它的奇异值 = 它的特征值 = 16 和 4。<br><br>
+那 $A^T A$ 自己的奇异值是多少？$A^T A$ 是对称矩阵，而且它的特征值永远不会是负数（因为 $\\mathbf{x}^T A^T A \\mathbf{x} = \\|A\\mathbf{x}\\|^2 \\ge 0$，这叫<strong>半正定</strong>）。所以 $A^T A$ 的奇异值 = 特征值 = 16 和 4（不用像普通对称矩阵那样取绝对值）。<br><br>
 同理，$A A^T$ 的特征值也是 $\sigma_i^2$（非零部分），$A A^T$ 的奇异值也等于它的特征值。<br><br>
 <strong>一句话：$A^T A$ 和 $A A^T$ 的非零特征值相同（都是 $\sigma_i^2$），而 $A$ 的奇异值是 $\sigma_i$。</strong>差一个平方，差在「谁的」上面。
 </div>
