@@ -29,48 +29,7 @@ $$A = U \Sigma V^T$$
 
 $$A = \sigma_1 \cdot \mathbf{u}_1 \mathbf{v}_1^T \;+\; \sigma_2 \cdot \mathbf{u}_2 \mathbf{v}_2^T$$
 
-<p>下面用课文里的实际数字一步步走，看清楚这个展开是怎么来的。</p>
-
-<div class="callout callout-info">
-<strong>第一步：$\Sigma$ 乘 $V^T$——把每一行分别缩放</strong><br><br>
-$\Sigma$ 是对角矩阵，$\Sigma V^T$ 就是把 $V^T$ 的第 $i$ 行乘以 $\sigma_i$：<br><br>
-$$\Sigma V^T = \begin{bmatrix}4&0\\0&2\end{bmatrix}
-\begin{bmatrix} -0.707 & -0.707 \\ -0.707 & 0.707 \end{bmatrix}
-= \begin{bmatrix} -2.828 & -2.828 \\ -1.414 & 1.414 \end{bmatrix}$$
-</div>
-
-<div class="callout callout-info">
-<strong>第二步：$U$ 乘 $(\Sigma V^T)$——拆成"列 × 行"的和</strong><br><br>
-矩阵乘法可以按列 × 行拆开：$U$ 的第 $i$ 列 $\mathbf{u}_i$ 去乘 $(\Sigma V^T)$ 的第 $i$ 行 $\sigma_i\mathbf{v}_i^T$，得到一张"图层"，所有图层加起来就是结果：<br><br>
-$$U(\Sigma V^T) = \mathbf{u}_1(\sigma_1\mathbf{v}_1^T) + \mathbf{u}_2(\sigma_2\mathbf{v}_2^T) = \sigma_1\mathbf{u}_1\mathbf{v}_1^T + \sigma_2\mathbf{u}_2\mathbf{v}_2^T$$<br>
-$\mathbf{u}_i$ 是 $2\times 1$ 列向量，$\mathbf{v}_i^T$ 是 $1\times 2$ 行向量，外积 $\mathbf{u}_i\mathbf{v}_i^T$ 得 $2\times 2$ 矩阵。
-</div>
-
-<div class="callout callout-info">
-<strong>第三步：代入实际数字</strong><br><br>
-从 00-07 的 SVD 结果：$U=\begin{bmatrix}-0.707&-0.707\\-0.707&0.707\end{bmatrix}$，$V^T=\begin{bmatrix}-0.707&-0.707\\-0.707&0.707\end{bmatrix}$，$\sigma_1=4,\;\sigma_2=2$。<br><br>
-<strong>第一层（$\sigma_1=4$）：</strong><br>
-$$\sigma_1\mathbf{u}_1\mathbf{v}_1^T = 4\cdot\begin{bmatrix}-0.707\\-0.707\end{bmatrix}
-\begin{bmatrix}-0.707&-0.707\end{bmatrix}
-= 4\cdot\begin{bmatrix}0.5&0.5\\0.5&0.5\end{bmatrix}
-= \begin{bmatrix}2&2\\2&2\end{bmatrix}$$<br>
-<strong>第二层（$\sigma_2=2$）：</strong><br>
-$$\sigma_2\mathbf{u}_2\mathbf{v}_2^T = 2\cdot\begin{bmatrix}-0.707\\0.707\end{bmatrix}
-\begin{bmatrix}-0.707&0.707\end{bmatrix}
-= 2\cdot\begin{bmatrix}0.5&-0.5\\-0.5&0.5\end{bmatrix}
-= \begin{bmatrix}1&-1\\-1&1\end{bmatrix}$$<br>
-<strong>两层相加：</strong><br>
-$$\begin{bmatrix}2&2\\2&2\end{bmatrix} + \begin{bmatrix}1&-1\\-1&1\end{bmatrix}
-= \begin{bmatrix}3&1\\1&3\end{bmatrix} = A \;\checkmark$$
-</div>
-
-<p>$\mathbf{u}_i\mathbf{v}_i^T$ 是一个 $2\times 2$ 矩阵——可以理解为一张<strong>"图层"</strong>。$\sigma_i$ 越大，这层贡献越大。</p>
-
-<div class="callout callout-info">
-<strong>为什么右边变成了行向量？</strong><br><br>
-你习惯的 $A = U\Sigma V^T$ 中 $V^T$ 是一个矩阵。逐项展开只是换了种读法：<br><br>
-$V$ 的列 $\mathbf{v}_i$ 是右奇异向量（列向量），转置后 $V^T$ 的行 $\mathbf{v}_i^T$ 就是同一个向量的行版本。展开式里的 $\mathbf{v}_i^T$ 本来就是行向量——它一直是，只是你以前看 $V^T$ 这个整体符号时没拆开。每一"层"中 $\mathbf{u}_i$（列）贡献列模式，$\mathbf{v}_i^T$（行）贡献行模式，外积把它们编成完整矩阵。
-</div>
+<p>每一项 $\sigma_i \mathbf{u}_i \mathbf{v}_i^T$ 是一个 $2\times 2$ 矩阵（$\mathbf{u}_i$ 是 $2\times 1$ 列向量，$\mathbf{v}_i^T$ 是 $1\times 2$ 行向量，外积得到 $2\times 2$）。可以理解为一张<strong>"图层"</strong>——$\sigma_i$ 越大，这层贡献越大。</p>
 
 <pre><code><span class="hl-comment"># 00-07 第一步：把 SVD 展开，看每一项（每一层）长什么样</span>
 <span class="hl-comment"># 导入numpy，别名np，提供线性代数运算</span>
