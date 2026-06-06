@@ -420,43 +420,115 @@ x = A_plus_np @ b
 
 <p>伪逆的本质是：<strong>把非零奇异值取倒数</strong>——因为 SVD 告诉我们 $A$ 在这些方向上拉伸了 $\sigma$ 倍，要"撤销"这个拉伸，就除以 $\sigma$。</p>
 
-<h3>最小二乘：为什么 $A^+ b$ 是"最好的近似解"？</h3>
+<h2>五、最小二乘法——方程无解时怎么办？</h2>
 
-<p><strong>问题：</strong>$A\mathbf{x} = \mathbf{b}$，$A$ 是 3×2（3 个方程，2 个未知数）。在平面上，三条直线一般不会交于同一点——无解。</p>
+<h3>5.1 从最简单的例子讲起</h3>
 
-<p><strong>画面：</strong>你有一条 3 维向量 $\mathbf{b}$，但你只能在 $A$ 的列空间（一个 3 维空间里的 2 维平面）里找答案。你找不到正好等于 $\mathbf{b}$ 的点，但可以找<strong>离 $\mathbf{b}$ 最近的那个</strong>——就像在墙上找一个离灯泡最近的点。</p>
+<p>给你三个点：$(0, 0)$、$(1, 2)$、$(2, 1)$。你想找一条<strong>过原点的直线</strong> $y = w x$，让它同时穿过这三个点。</p>
 
-<p><strong>数学上：</strong>最小化误差的平方——</p>
+<p>对每个点写方程：</p>
 
-$$\min_{\mathbf{x}} \|A\mathbf{x} - \mathbf{b}\|_2^2$$
+<ul>
+  <li>点 $(0,0)$：$w \cdot 0 = 0$ → $0 = 0$（自动满足）</li>
+  <li>点 $(1,2)$：$w \cdot 1 = 2$ → $w = 2$</li>
+  <li>点 $(2,1)$：$w \cdot 2 = 1$ → $w = 0.5$</li>
+</ul>
 
-<p>这个名字「最小二乘」里的<strong>「二」就是平方</strong>，「乘」指误差。让误差的平方和最小。</p>
+<p><strong>$w$ 不能同时等于 2 和 0.5。</strong>三个点不在同一条过原点的直线上——这个方程组<strong>无解</strong>。</p>
 
-<p><strong>为什么 $A^+ \mathbf{b}$ 是这个最小值点？</strong> 代入 SVD 看——</p>
+<div class="callout callout-idea">
+<strong>💡 这就是「超定方程组」：</strong>方程个数（3 个）> 未知数个数（1 个 $w$）。一般无精确解。
+</div>
+
+<h3>5.2 退而求其次：找「最好的近似」</h3>
+
+<p>精确解不存在，但我们<strong>可以找一个 $w$，让预测值和真实值之间的差距尽可能小</strong>。</p>
+
+<p>对于任意 $w$，三个点的误差分别是：</p>
+
+$$\begin{aligned}
+\text{点1}(0,0)&:\; w \cdot 0 - 0 = 0 \\
+\text{点2}(1,2)&:\; w \cdot 1 - 2 = w - 2 \\
+\text{点3}(2,1)&:\; w \cdot 2 - 1 = 2w - 1
+\end{aligned}$$
+
+<p><strong>误差不能直接加起来</strong>——正的负的会抵消。所以把每个误差<strong>平方</strong>再求和：</p>
+
+$$\text{总误差} = 0^2 + (w-2)^2 + (2w-1)^2$$
+
+<p>展开：$= w^2 - 4w + 4 + 4w^2 - 4w + 1 = 5w^2 - 8w + 5$</p>
+
+<p>这是一个开口向上的抛物线。最小值在哪？<strong>求导，令导数为 0：</strong></p>
+
+$$\frac{d}{dw}(5w^2 - 8w + 5) = 10w - 8 = 0 \quad\Rightarrow\quad w = 0.8$$
+
+<p><strong>最佳直线是 $y = 0.8x$。</strong>它不是「正确」的（点不在上面），但它是「最好的」——所有可能直线里误差平方和最小的那一条。</p>
+
+<p>这就是<strong>最小二乘法</strong>：<strong>「二」是平方，「乘」是误差</strong>。让误差的<strong>平方和</strong>最小。</p>
+
+<h3>5.3 写成矩阵——就和伪逆接上了</h3>
+
+<p>上面的三个方程可以写成矩阵形式 $A\mathbf{x} = \mathbf{b}$：</p>
+
+$$\underbrace{\begin{bmatrix} 0 \\ 1 \\ 2 \end{bmatrix}}_{A_{3\times 1}}
+\underbrace{\vphantom{\begin{bmatrix}0\\1\\2\end{bmatrix}} w}_{\mathbf{x}_{1\times 1}}
+= \underbrace{\begin{bmatrix} 0 \\ 2 \\ 1 \end{bmatrix}}_{\mathbf{b}_{3\times 1}}$$
+
+<p>$A$ 是 3×1 列向量，$w$ 是标量。$A w = \mathbf{b}$ 无精确解。最小二乘就是要找 $w$ 让 $\|A w - \mathbf{b}\|^2$ 最小。</p>
+
+<p>上面用微积分求出来 $w = 0.8$。用伪逆行不行？$A$ 的伪逆 $A^+$ 是 1×3：</p>
+
+$$w = A^+ \mathbf{b} = \frac{A^T \mathbf{b}}{A^T A} = \frac{0\cdot 0 + 1\cdot 2 + 2\cdot 1}{0^2 + 1^2 + 2^2} = \frac{4}{5} = 0.8 \;\checkmark$$
+
+<p><strong>和求导的结果完全一样。</strong>伪逆 $A^+$ 给出的就是最小二乘解。</p>
+
+<h3>5.4 几何画面：投影</h3>
+
+<p>$\mathbf{b} = [0,2,1]^T$ 是三维空间里的一个点。$A\mathbf{x} = w \cdot [0,1,2]^T$ 只能落在过原点的、方向为 $[0,1,2]^T$ 的<strong>直线上</strong>（$A$ 的列空间是一条直线，因为 $A$ 只有一列）。</p>
+
+<p>$\mathbf{b}$ 不在那条直线上。最小二乘做的事就是：<strong>把 $\mathbf{b}$ 垂直投影到那条直线上</strong>，投影点就是 $A\hat{\mathbf{x}}$（最优预测），垂线长度就是最小残差。</p>
+
+<figure>
+  <img src="assets/least_squares_geometry.svg" alt="最小二乘的几何意义：b 投影到列空间" style="max-width:100%;border-radius:8px">
+  <figcaption>图：$\mathbf{b}$ 不在 $A$ 的列空间里，最小二乘找的是列空间里离 $\mathbf{b}$ 最近的点 $A\mathbf{x}$——残差 $\mathbf{r} = \mathbf{b} - A\mathbf{x}$ 垂直于列空间。</figcaption>
+</figure>
+
+<h3>5.5 用 SVD 推导：为什么伪逆是最小二乘解？</h3>
+
+<p>回到一般情况：$A$ 是 $m \times n$（$m > n$，行比列多），$A\mathbf{x} = \mathbf{b}$ 无精确解。目标是 $\min_{\mathbf{x}} \|A\mathbf{x} - \mathbf{b}\|^2$。</p>
+
+<p>代入 SVD $A = U\Sigma V^T$：</p>
 
 $$
 \begin{aligned}
 \|A\mathbf{x} - \mathbf{b}\|^2
-&= \|U\Sigma V^T\mathbf{x} - \mathbf{b}\|^2 \
-&= \|\Sigma V^T\mathbf{x} - U^T\mathbf{b}\|^2 \quad (\text{$U$ 是正交矩阵，不改变长度})
+&= \|U\Sigma V^T\mathbf{x} - \mathbf{b}\|^2 \\
+&= \|\Sigma V^T\mathbf{x} - U^T\mathbf{b}\|^2 \quad (\text{$U$ 是正交矩阵，乘它不改变长度})
 \end{aligned}
 $$
 
 <p>令 $\mathbf{z} = V^T\mathbf{x}$，$\mathbf{c} = U^T\mathbf{b}$。问题变成：找 $\mathbf{z}$ 让 $\|\Sigma\mathbf{z} - \mathbf{c}\|^2$ 最小。</p>
 
-<p>$\Sigma$ 是对角矩阵：$\Sigma\mathbf{z}$ 把 $z_1$ 拉伸 $\sigma_1$ 倍，$z_2$ 拉伸 $\sigma_2$ 倍，第三个分量永远是 0（因为 $\Sigma$ 只有两列）。所以要最小化：</p>
+<p>$\Sigma$ 是对角矩阵（$m\times n$）。$\Sigma\mathbf{z}$ 把 $z_1$ 拉伸 $\sigma_1$ 倍，$z_2$ 拉伸 $\sigma_2$ 倍，…，第 $n+1$ 到第 $m$ 个分量永远是 0（因为 $\Sigma$ 只有 $n$ 列）。所以要最小化：</p>
 
-$$(\sigma_1 z_1 - c_1)^2 + (\sigma_2 z_2 - c_2)^2 + (0 - c_3)^2$$
+$$(\sigma_1 z_1 - c_1)^2 + (\sigma_2 z_2 - c_2)^2 + \cdots + (\sigma_n z_n - c_n)^2 + \underbrace{(0 - c_{n+1})^2 + \cdots + (0 - c_m)^2}_{\text{管不了}}$$
 
-<p>想让 $\sigma_i z_i - c_i$ 尽可能小 → 令 $z_i = c_i / \sigma_i$。第三个分量 $(0-c_3)^2$ 管不了——因为 $A$ 的列空间根本覆盖不到 $\mathbf{b}$ 在第三个方向上的分量。</p>
+<p>前 $n$ 项：令 $z_i = c_i / \sigma_i$ 可以把每一项都归零——因为 $z_i$ 是自由的，我们可以选择让 $\sigma_i z_i$ 恰好等于 $c_i$。</p>
 
-<p><strong>结果：</strong>$z_i = c_i / \sigma_i$ → $\mathbf{z} = \Sigma^+ \mathbf{c}$ → 代回去得 $\mathbf{x} = V\Sigma^+ U^T \mathbf{b} = A^+ \mathbf{b}$。$\checkmark$</p>
+<p>后面 $m-n$ 项：$\Sigma$ 在这些方向上输出永远是 0。$c_{n+1}, \dots, c_m$ 是 $\mathbf{b}$ 在 $A$ 的列空间<strong>之外</strong>的分量——无论怎么调 $\mathbf{x}$ 都影响不了它们。</p>
+
+<p><strong>这就解释了残差为什么不可避免：</strong>$\mathbf{b}$ 在列空间之外的部分，最小二乘也管不了。但管不了不等于不尽力——前 $n$ 项归零已经是在列空间内做到了最好。</p>
+
+<p><strong>结果：</strong>$z_i = c_i / \sigma_i$ → $\mathbf{z} = \Sigma^+ \mathbf{c}$ → 代回去：</p>
+
+$$\mathbf{x} = V\Sigma^+ U^T \mathbf{b} = A^+ \mathbf{b}$$
 
 <div class="callout callout-info">
-<strong>🎯 最小二乘三句话：</strong><br>
-① 超定方程一般无解 → 退而求其次，找让误差 $\|A\mathbf{x} - \mathbf{b}\|^2$ 最小的 $\mathbf{x}$<br>
-② 答案就是 $\mathbf{x} = A^+ \mathbf{b}$ ——伪逆乘右边<br>
-③ 线性回归就是在做这件事：$X\mathbf{w} = \mathbf{y}$ 无解，用 $X^+ \mathbf{y}$ 找最优权重
+<strong>🎯 最小二乘小结：</strong><br>
+① 超定方程（方程 > 未知数）一般无解 → 找让 $\|A\mathbf{x} - \mathbf{b}\|^2$ 最小的 $\mathbf{x}$<br>
+② 答案就是 $\mathbf{x} = A^+ \mathbf{b}$ ——伪逆给出最小二乘解<br>
+③ 几何意义：把 $\mathbf{b}$ 垂直投影到 $A$ 的列空间上<br>
+④ 线性回归、曲线拟合、信号处理——全都在做同一件事
 </div>
 
 <h2>💭 概念题</h2>

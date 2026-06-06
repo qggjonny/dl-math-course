@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" width="100%" style="max-width:640px">
+  <defs>
+    <linearGradient id="planeGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#667eea" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#764ba2" stop-opacity="0.10"/>
+    </linearGradient>
+    <marker id="arrowHead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0,0 10,3.5 0,7" fill="#aaa"/>
+    </marker>
+    <marker id="arrowHeadRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0,0 10,3.5 0,7" fill="#f5576c"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="640" height="380" fill="#1a1a2e" rx="12"/>
+
+  <!-- Axes -->
+  <line x1="80" y1="310" x2="580" y2="310" stroke="#444" stroke-width="1"/>
+  <line x1="80" y1="310" x2="80" y2="40" stroke="#444" stroke-width="1"/>
+  <text x="590" y="315" fill="#666" font-size="11" font-family="sans-serif">x₁</text>
+  <text x="72" y="35" fill="#666" font-size="11" font-family="sans-serif">x₂</text>
+
+  <!-- Column space plane: rendered as a gradient parallelogram -->
+  <!-- Plane corners: (80,310) origin → right-forward-down, up-back -->
+  <polygon points="80,310 460,310 560,160 180,160" fill="url(#planeGrad)" stroke="#667eea" stroke-width="1.5" stroke-dasharray="6,3"/>
+
+  <!-- Grid lines on plane (perspective) -->
+  <line x1="80" y1="310" x2="305" y2="235" stroke="#667eea" stroke-width="0.5" stroke-dasharray="4,4" opacity="0.3"/>
+  <line x1="180" y1="160" x2="560" y2="160" stroke="#667eea" stroke-width="0.5" stroke-dasharray="4,4" opacity="0.3"/>
+  <line x1="460" y1="310" x2="305" y2="235" stroke="#667eea" stroke-width="0.5" stroke-dasharray="4,4" opacity="0.3"/>
+
+  <!-- Column space label -->
+  <text x="560" y="145" fill="#667eea" font-size="13" font-family="sans-serif" font-weight="bold">列空间 Col(A)</text>
+  <text x="560" y="163" fill="#667eea" font-size="10" font-family="sans-serif" opacity="0.7">（所有 Ax 的集合）</text>
+
+  <!-- Vector b (above the plane) -->
+  <line x1="80" y1="310" x2="280" y2="80" stroke="#f5576c" stroke-width="2.5" marker-end="url(#arrowHeadRed)"/>
+  <text x="288" y="72" fill="#f5576c" font-size="14" font-family="serif" font-weight="bold" font-style="italic">b</text>
+
+  <!-- Projection: Ax (closest point on plane to b) -->
+  <!-- Projection is point where perpendicular from b meets the plane -->
+  <!-- Plane eq approx: y = 310 - 0.5*(x-80) (flatish, tilted)  -->
+  <!-- b is at (280,80), projection is roughly (320, 190) -->
+  <line x1="80" y1="310" x2="320" y2="190" stroke="#4facfe" stroke-width="3" marker-end="url(#arrowHead)"/>
+  <text x="328" y="205" fill="#4facfe" font-size="14" font-family="serif" font-weight="bold" font-style="italic">A<b>x</b></text>
+
+  <!-- Projection point on plane -->
+  <circle cx="320" cy="190" r="4" fill="#4facfe"/>
+
+  <!-- Error vector: dashed from Ax to b (perpendicular to plane) -->
+  <line x1="320" y1="190" x2="280" y2="80" stroke="#ffd700" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="272" y="135" fill="#ffd700" font-size="12" font-family="serif" font-weight="bold" font-style="italic">r = b − A<b>x</b></text>
+
+  <!-- Right angle marker at projection point -->
+  <polyline points="328,190 328,198 320,198" fill="none" stroke="#ffd700" stroke-width="1"/>
+
+  <!-- Origin -->
+  <circle cx="80" cy="310" r="3" fill="#aaa"/>
+  <text x="60" y="328" fill="#aaa" font-size="11" font-family="serif">O</text>
+
+  <!-- Legend -->
+  <rect x="20" y="20" width="220" height="95" rx="6" fill="#ffffff08" stroke="#333" stroke-width="1"/>
+  <text x="34" y="42" fill="#ccc" font-size="12" font-family="sans-serif" font-weight="bold">最小二乘的几何意义</text>
+  <line x1="30" y1="58" x2="55" y2="58" stroke="#f5576c" stroke-width="2.5"/>
+  <text x="62" y="62" fill="#aaa" font-size="11" font-family="sans-serif">b — 目标向量（在列空间外）</text>
+  <line x1="30" y1="76" x2="55" y2="76" stroke="#4facfe" stroke-width="2.5"/>
+  <text x="62" y="80" fill="#aaa" font-size="11" font-family="sans-serif">Ax — 列空间里离 b 最近的点</text>
+  <line x1="30" y1="94" x2="55" y2="94" stroke="#ffd700" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="62" y="98" fill="#aaa" font-size="11" font-family="sans-serif">r = b−Ax — 残差（垂直于平面）</text>
+</svg>
