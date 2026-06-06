@@ -415,11 +415,43 @@ x = A_plus_np @ b
 
 <p>伪逆的本质是：<strong>把非零奇异值取倒数</strong>——因为 SVD 告诉我们 $A$ 在这些方向上拉伸了 $\sigma$ 倍，要"撤销"这个拉伸，就除以 $\sigma$。</p>
 
+<h3>最小二乘：为什么 $A^+ b$ 是"最好的近似解"？</h3>
+
+<p><strong>问题：</strong>$A\mathbf{x} = \mathbf{b}$，$A$ 是 3×2（3 个方程，2 个未知数）。在平面上，三条直线一般不会交于同一点——无解。</p>
+
+<p><strong>画面：</strong>你有一条 3 维向量 $\mathbf{b}$，但你只能在 $A$ 的列空间（一个 3 维空间里的 2 维平面）里找答案。你找不到正好等于 $\mathbf{b}$ 的点，但可以找<strong>离 $\mathbf{b}$ 最近的那个</strong>——就像在墙上找一个离灯泡最近的点。</p>
+
+<p><strong>数学上：</strong>最小化误差的平方——</p>
+
+$$\min_{\mathbf{x}} \|A\mathbf{x} - \mathbf{b}\|_2^2$$
+
+<p>这个名字「最小二乘」里的<strong>「二」就是平方</strong>，「乘」指误差。让误差的平方和最小。</p>
+
+<p><strong>为什么 $A^+ \mathbf{b}$ 是这个最小值点？</strong> 代入 SVD 看——</p>
+
+$$
+\begin{aligned}
+\|A\mathbf{x} - \mathbf{b}\|^2
+&= \|U\Sigma V^T\mathbf{x} - \mathbf{b}\|^2 \\
+&= \|\Sigma V^T\mathbf{x} - U^T\mathbf{b}\|^2 \quad (\text{$U$ 是正交矩阵，不改变长度})
+\end{aligned}
+$$
+
+<p>令 $\mathbf{z} = V^T\mathbf{x}$，$\mathbf{c} = U^T\mathbf{b}$。问题变成：找 $\mathbf{z}$ 让 $\|\Sigma\mathbf{z} - \mathbf{c}\|^2$ 最小。</p>
+
+<p>$\Sigma$ 是对角矩阵：$\Sigma\mathbf{z}$ 把 $z_1$ 拉伸 $\sigma_1$ 倍，$z_2$ 拉伸 $\sigma_2$ 倍，第三个分量永远是 0（因为 $\Sigma$ 只有两列）。所以要最小化：</p>
+
+$$(\sigma_1 z_1 - c_1)^2 + (\sigma_2 z_2 - c_2)^2 + (0 - c_3)^2$$
+
+<p>想让 $\sigma_i z_i - c_i$ 尽可能小 → 令 $z_i = c_i / \sigma_i$。第三个分量 $(0-c_3)^2$ 管不了——因为 $A$ 的列空间根本覆盖不到 $\mathbf{b}$ 在第三个方向上的分量。</p>
+
+<p><strong>结果：</strong>$z_i = c_i / \sigma_i$ → $\mathbf{z} = \Sigma^+ \mathbf{c}$ → 代回去得 $\mathbf{x} = V\Sigma^+ U^T \mathbf{b} = A^+ \mathbf{b}$。$\checkmark$</p>
+
 <div class="callout callout-info">
-<strong>伪逆和最小二乘：</strong><br>
-方程 $A\mathbf{x} = \mathbf{b}$（$A$ 是 $3\times 2$，3 个方程 2 个未知数）一般无解。<br>
-$\mathbf{x} = A^+ \mathbf{b}$ 给出的是<strong>最接近的近似解</strong>——让 $\|A\mathbf{x} - \mathbf{b}\|$ 最小。<br>
-这就是<strong>最小二乘</strong>。线性回归本质上就是在做这件事。
+<strong>🎯 最小二乘三句话：</strong><br>
+① 超定方程一般无解 → 退而求其次，找让误差 $\|A\mathbf{x} - \mathbf{b}\|^2$ 最小的 $\mathbf{x}$<br>
+② 答案就是 $\mathbf{x} = A^+ \mathbf{b}$ ——伪逆乘右边<br>
+③ 线性回归就是在做这件事：$X\mathbf{w} = \mathbf{y}$ 无解，用 $X^+ \mathbf{y}$ 找最优权重
 </div>
 
 <h2>💭 概念题</h2>
