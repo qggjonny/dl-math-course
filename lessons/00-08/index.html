@@ -186,7 +186,6 @@ U, s, VT = np.linalg.svd(A)
 <span class="hl-comment"># s[1]*outer(U[:,1], VT[1,:])：第二层（σ₂,u₂,v₂）</span>
 <span class="hl-comment"># \ 是Python行连接符，用于把长语句分成两行写</span>
 reconstructed = s[<span class="hl-number">0</span>]*np.outer(U[:,<span class="hl-number">0</span>], VT[<span class="hl-number">0</span>,:]) + \
-<span class="hl-comment"># σ₂ · u₂ · v₂^T = 第二层</span>
                s[<span class="hl-number">1</span>]*np.outer(U[:,<span class="hl-number">1</span>], VT[<span class="hl-number">1</span>,:])
 <span class="hl-comment"># 验证重建结果，应和原始A一样</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"\n两层之和:\n{reconstructed}"</span>)
