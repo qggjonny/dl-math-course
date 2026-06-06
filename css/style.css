@@ -196,6 +196,10 @@ th {
   background: #eaf7ee;
   border-left: 3px solid var(--green);
 }
+.callout-idea {
+  background: #f0e6f6;
+  border-left: 3px solid #8e44ad;
+}
 
 /* === 练习区 === */
 .exercise {

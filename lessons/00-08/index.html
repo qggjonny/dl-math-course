@@ -29,7 +29,54 @@ $$A = U \Sigma V^T$$
 
 $$A = \sigma_1 \mathbf{u}_1 \mathbf{v}_1^T + \sigma_2 \mathbf{u}_2 \mathbf{v}_2^T + \cdots$$
 
-<p>下面从 $A=U\Sigma V^T$ 出发，用公式一步步推出来。</p>
+<p>下面从 $A=U\Sigma V^T$ 出发，用公式一步步推出来。动手之前先搞清楚两个新概念。</p>
+
+<div class="callout callout-idea">
+<strong>🔧 新概念 ①：外积（outer product）——列 × 行 = 矩阵</strong><br><br>
+你熟悉的是<strong>内积</strong>：行向量 × 列向量 → 一个数（$\mathbf{a}^T\mathbf{b} = a_1b_1 + a_2b_2 + \cdots$）。<br>
+<strong>外积反过来：列向量 × 行向量 → 矩阵。</strong><br><br>
+
+拿课件里的 $\mathbf{u}_1$ 举例：<br><br>
+
+$$\underbrace{\begin{bmatrix}-0.707 \\ -0.707\end{bmatrix}}_{2\times 1 \text{ 列}}
+\times
+\underbrace{\begin{bmatrix}-0.707 & -0.707\end{bmatrix}}_{1\times 2 \text{ 行}}
+=
+\underbrace{\begin{bmatrix}0.5 & 0.5 \\ 0.5 & 0.5\end{bmatrix}}_{2\times 2 \text{ 矩阵}}$$
+
+每个元素：<strong>第 $i$ 行第 $j$ 列 = $u_i \times v_j$</strong>。第一列的两个数是 $(-0.707)\times(-0.707)=0.5$ 和 $(-0.707)\times(-0.707)=0.5$。<br><br>
+
+$$\mathbf{u}_1 \mathbf{v}_1^T = \begin{bmatrix}u_1 \\ u_2\end{bmatrix}\begin{bmatrix}v_1 & v_2\end{bmatrix}
+= \begin{bmatrix} u_1v_1 & u_1v_2 \\ u_2v_1 & u_2v_2 \end{bmatrix}$$
+
+<strong>命名逻辑：</strong>内积 = 两个向量「对在一起」缩成一个数；外积 = 两个向量「撑开」成一个矩阵。内外对称。<br><br>
+
+<strong>几何直觉：</strong>$\mathbf{u}_1$ 控制列的相对比例（行之间的比例），$\mathbf{v}_1^T$ 控制行的相对比例（列之间的比例）。外积把两个一维方向编织成一个二维的「模式」——这个模式里，所有行互相平行，所有列也互相平行，秩 = 1（见下）。
+</div>
+
+<div class="callout callout-idea">
+<strong>🔧 新概念 ②：秩（rank）——矩阵有几个「真正独立」的方向</strong><br><br>
+
+<strong>定义：</strong>矩阵列向量中「线性无关」的个数。也可以换成行——行秩永远等于列秩。<br><br>
+
+<strong>检验方法：</strong>看能不能把某一列写成其他列的线性组合。<br><br>
+
+拿课件里的 $A = \begin{bmatrix}3&1\\1&3\end{bmatrix}$：两列 $\begin{bmatrix}3\\1\end{bmatrix}$ 和 $\begin{bmatrix}1\\3\end{bmatrix}$ 不共线——没有哪个数 $k$ 能让 $k\!\cdot\!\begin{bmatrix}3\\1\end{bmatrix} = \begin{bmatrix}1\\3\end{bmatrix}$。两列互相独立 → <strong>秩 = 2</strong>。<br><br>
+
+对比 $B = \begin{bmatrix}2&4\\3&6\end{bmatrix}$：第二列 $=2\!\cdot\!$第一列。共线，只有一个独立方向 → <strong>秩 = 1</strong>。<br><br>
+
+<strong>几何画面：</strong>秩 = 矩阵列向量能「张成」的空间维数。<br>
+• 秩 2：两列不共线 → 张成一个完整的平面<br>
+• 秩 1：两列共线 → 只张成一条直线<br>
+• 秩 0：全是零向量 → 一个点<br><br>
+
+<strong>🔗 秩与奇异值的关系（SVD 最漂亮的结论）：</strong><br>
+$$ \text{非零奇异值的个数} = \text{矩阵的秩} $$
+$A$ 的奇异值是 $[4, 2]$，两个都非零 → 秩 = 2。<br>
+如果某个矩阵的奇异值是 $[5, 3, 0, 0]$，那秩 = 2——只有两个独立方向，另外两个方向被压缩到了零。<br><br>
+
+在展开式 $A = \sigma_1\mathbf{u}_1\mathbf{v}_1^T + \sigma_2\mathbf{u}_2\mathbf{v}_2^T + \cdots$ 中，每个非零 $\sigma_i$ 对应一个独立方向。所以 $r$（非零奇异值的个数）恰好就是秩。
+</div>
 
 <div class="callout callout-info">
 <strong>推导 ①：先算 $\Sigma V^T$</strong><br><br>
@@ -43,12 +90,12 @@ $$\Sigma V^T = \begin{bmatrix} \sigma_1 \mathbf{v}_1^T \\ \sigma_2 \mathbf{v}_2^
 
 <div class="callout callout-info">
 <strong>推导 ②：再算 $U(\Sigma V^T)$——按"列 × 行"拆开</strong><br><br>
-$$U = \begin{bmatrix} \mathbf{u}_1 & \mathbf{u}_2 & \cdots \end{bmatrix}$$<br>
+$$U = \begin{bmatrix} \mathbf{u}_1 & \mathbf{u}_2 & \cdots \end{bmatrix}$$
 矩阵乘法有一条规则：$U$ 的第 $i$ 列去乘 $(\Sigma V^T)$ 的第 $i$ 行，所有结果相加：<br><br>
-$$A = U(\Sigma V^T) = \mathbf{u}_1(\sigma_1\mathbf{v}_1^T) + \mathbf{u}_2(\sigma_2\mathbf{v}_2^T) + \cdots$$<br>
+$$A = U(\Sigma V^T) = \mathbf{u}_1(\sigma_1\mathbf{v}_1^T) + \mathbf{u}_2(\sigma_2\mathbf{v}_2^T) + \cdots$$
 把 $\sigma_i$ 提到前面：<br><br>
-$$\boxed{A = \sigma_1\mathbf{u}_1\mathbf{v}_1^T + \sigma_2\mathbf{u}_2\mathbf{v}_2^T + \cdots}$$<br>
-每一项 $\sigma_i\mathbf{u}_i\mathbf{v}_i^T$ 中，$\mathbf{u}_i$ 是 $m\times 1$ 列向量，$\mathbf{v}_i^T$ 是 $1\times n$ 行向量，外积得 $m\times n$ 矩阵。总共 $r$ 个非零奇异值，$r$ 就是矩阵的<strong>秩</strong>（$\operatorname{rank}$）——独立列（或行）的个数。比如这个 $A$ 两列不共线，秩 = 2，所以有两个非零奇异值。后面练习题会细讲。
+$$ \boxed{A = \sigma_1\mathbf{u}_1\mathbf{v}_1^T + \sigma_2\mathbf{u}_2\mathbf{v}_2^T + \cdots} $$
+每一项 $\sigma_i\mathbf{u}_i\mathbf{v}_i^T$ 就是上面讲的外积——$\mathbf{u}_i$（$m\times 1$ 列）乘 $\mathbf{v}_i^T$（$1\times n$ 行）得到一个 $m\times n$ 矩阵。$r$ 个非零奇异值恰好就是矩阵的秩，每个贡献一个独立方向。
 </div>
 
 <div class="callout callout-info">
