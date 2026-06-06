@@ -242,33 +242,27 @@ error = np.linalg.norm(A - A_1, <span class="hl-string">'fro'</span>)
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 
-<p>只用 1 个奇异值（丢掉了一半信息），误差约 40%。不算小——但这个思路在<strong>更大的矩阵</strong>上威力巨大。如果一个矩阵有 100 个奇异值、只有前 5 个比较大，丢掉后 95 个可能只损失 1%。</p>
+<p>只用 1 个奇异值（丢掉 2/3 的信息），误差约 54%。但这个思路在<strong>更大的矩阵</strong>上威力巨大。如果一个矩阵有 100 个奇异值、只有前 5 个比较大，丢掉后 95 个可能只损失 1%。</p>
 
-<h2>三、更大的例子：5×3 矩阵</h2>
+<h2>三、更大的例子：5×3 满秩矩阵</h2>
 
-<pre><code><span class="hl-comment"># 00-07 第三步：5×3 矩阵，用前 k 个奇异值重建</span>
+<pre><code><span class="hl-comment"># 00-08 第三步：5×3 满秩矩阵，用前 k 个奇异值重建</span>
 <span class="hl-comment"># 导入numpy，别名np</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
-<span class="hl-comment"># 固定随机种子=42，保证每次运行生成的"随机"数相同（可复现）</span>
-np.random.seed(<span class="hl-number">42</span>)
+<span class="hl-comment"># 固定随机种子=0，保证每次运行生成的"随机"数相同（可复现）</span>
+np.random.seed(<span class="hl-number">0</span>)
 
-<span class="hl-comment"># 生成一个"接近低秩"的 5×3 矩阵：第3列是前两列的线性组合</span>
+<span class="hl-comment"># 生成一个 5×3 的随机矩阵——自然满秩（秩=3，三个奇异值都非零）</span>
 <span class="hl-comment"># randn(5,3)：从标准正态分布N(0,1)中抽取 → 5行3列随机矩阵</span>
 A = np.random.randn(<span class="hl-number">5</span>, <span class="hl-number">3</span>)
-<span class="hl-comment"># A[:,0]：取A的第0列（所有行）→ 5个元素的列向量</span>
-<span class="hl-comment"># A[:,1]：取A的第1列 → 5个元素的列向量</span>
-<span class="hl-comment"># A[:,2] = 0.5*A[:,0] + 0.3*A[:,1]：第3列由前两列线性组合而成</span>
-<span class="hl-comment"># 广播：标量×列向量 = 每个元素乘标量，再加起来</span>
-A[:, <span class="hl-number">2</span>] = A[:, <span class="hl-number">0</span>] * <span class="hl-number">0.5</span> + A[:, <span class="hl-number">1</span>] * <span class="hl-number">0.3</span>
-<span class="hl-comment"># 后果：第3个奇异值会非常小（列线性相关）</span>
 
 <span class="hl-comment"># SVD分解：U(5×5), s(3个奇异值), VT(3×3)</span>
 U, s, VT = np.linalg.svd(A)
 
 <span class="hl-comment"># A.shape → (5, 3)，即5行3列</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"A 形状: {A.shape}"</span>)
-<span class="hl-comment"># :.3f=保留3位，σ₃应远小于前两个</span>
+<span class="hl-comment"># 三个奇异值都明显非零 → 矩阵满秩（秩=3），和2×2例子一样所有奇异值都有贡献</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"奇异值: σ₁={s[0]:.3f}, σ₂={s[1]:.3f}, σ₃={s[2]:.3f}"</span>)
 <span class="hl-comment"># 空行，让输出更好看</span>
 <span class="hl-builtin">print</span>()
@@ -279,9 +273,8 @@ U, s, VT = np.linalg.svd(A)
 
 <span class="hl-comment"># 分别试验：只用1个奇异值 vs 用前2个奇异值</span>
 <span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>]:
-<span class="hl-comment"># A_k = Σ_{i=0}^{k-1} σᵢ uᵢ vᵢ^T —— 用前k个奇异值重建</span>
-<span class="hl-comment"># 生成器表达式：for i in range(k) 依次取i=0,...,k-1</span>
 <span class="hl-comment"># 用前k个奇异值重建：∑_{i=0}^{k-1} σᵢ uᵢ vᵢ^T</span>
+<span class="hl-comment"># 生成器表达式：for i in range(k) 依次取i=0,...,k-1</span>
     A_k = <span class="hl-builtin">sum</span>(s[i] * np.outer(U[:, i], VT[i, :])
 <span class="hl-comment"># sum()对生成器产生的k个矩阵逐元素求和</span>
               <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(k))
@@ -297,7 +290,7 @@ U, s, VT = np.linalg.svd(A)
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 
-<p>第三个奇异值很小（因为我们故意让第三列 ≈ 前两列的线性组合）。只用前 2 个奇异值重建，误差可能不到 1%——<strong>15 个数字的矩阵，用 10 个数字的"压缩版"几乎无损恢复。</strong></p>
+<p>三个奇异值分别是 3.538、2.149、0.769——都非零，矩阵是满秩的（秩=3）。只用 1 个奇异值误差 54%，加上第二个降到 18%。如果加第三个（k=3），误差归零——因为 3 个非零奇异值完全重建了矩阵的 3 个独立方向。</p>
 
 <h2>四、伪逆——长方形矩阵的"逆"</h2>
 
