@@ -294,13 +294,65 @@ U, s, VT = np.linalg.svd(A)
 
 <h2>四、伪逆——长方形矩阵的"逆"</h2>
 
-<p>$A$ 是 $m \times n$ 长方形矩阵时，不能求 $A^{-1}$（只有方阵才有逆）。但 SVD 可以构造一个<strong>"最接近逆的东西"</strong>——伪逆 $A^+$：</p>
+<p>$A$ 是 $m \\times n$ 长方形矩阵时，不能求 $A^{-1}$（只有方阵才有逆）。但 SVD 可以构造一个<strong>"最接近逆的东西"</strong>——伪逆 $A^+$。</p>
 
-$$A^+ = V \Sigma^+ U^T$$
+<h3>推导：从 SVD 的「换基→拉伸→换回」结构倒推</h3>
 
-<p>其中 $\Sigma^+$ 是<strong>把非零奇异值取倒数然后转置</strong>。</p>
+<p>SVD 的展开式告诉我们 $A$ 在做什么：</p>
 
-<p>举个例子立即就清楚了：</p>
+$$A = U \\Sigma V^T$$
+
+<p>即：$V^T$ 把输入换到奇异向量基 → $\\Sigma$ 沿各方向拉伸 → $U$ 换回原坐标系。</p>
+
+<p><strong>逆应该反过来做：</strong>把输出换到 $U$ 的基 → 沿各方向<strong>压缩</strong>（取倒数）→ 换回 $V$ 的基。</p>
+
+$$A^+ = V \\Sigma^+ U^T$$
+
+<p>其中 $\\Sigma^+$ 是 $\\Sigma$ 的伪逆——<strong>非零奇异值取倒数，然后转置</strong>。</p>
+
+<h3>拿具体矩阵看</h3>
+
+<p>用下面代码里的 $A = \\begin{bmatrix}1&2\\\\3&4\\\\5&6\\end{bmatrix}$（3×2），SVD 给出：</p>
+
+$$\\Sigma = \\begin{bmatrix} \\sigma_1 & 0 \\\\ 0 & \\sigma_2 \\\\ 0 & 0 \\end{bmatrix}_{3\\times 2}$$
+
+<p>$\\Sigma$ 是 3×2，和 $A$ 形状一样。它的伪逆 $\\Sigma^+$ 是 2×3：</p>
+
+$$\\Sigma^+ = \\begin{bmatrix} 1/\\sigma_1 & 0 & 0 \\\\ 0 & 1/\\sigma_2 & 0 \\end{bmatrix}_{2\\times 3}$$
+
+<p><strong>两步操作：</strong>① 每个非零 $\\sigma_i$ 取倒数 → $1/\\sigma_i$ ② 转置（3×2 变成 2×3）。零行零列互换了位置，不影响非零部分。</p>
+
+<h3>验证：$A^+$ 是不是真的"像逆"？</h3>
+
+<p>代入 SVD 展开算 $A^+ A$ 和 $A A^+$：</p>
+
+$$
+\\begin{aligned}
+A^+ A &= V \\Sigma^+ \\underbrace{U^T U}_{=I} \\Sigma V^T
+      = V \\Sigma^+ \\Sigma V^T \\\\
+      &= V \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix} V^T
+      = V V^T = I_{2\\times 2}
+\\end{aligned}
+$$
+
+<p>$\\Sigma^+ \\Sigma$：2×3 乘 3×2 = 2×2，对角线上是 $1/\\sigma_i \\cdot \\sigma_i = 1$，恰好得到单位矩阵！所以 $A^+ A = I$——<strong>左伪逆完美成立。</strong></p>
+
+$$
+\\begin{aligned}
+A A^+ &= U \\Sigma \\underbrace{V^T V}_{=I} \\Sigma^+ U^T
+      = U \\Sigma \\Sigma^+ U^T \\\\
+      &= U \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 0 \\end{bmatrix} U^T
+      \\neq I_{3\\times 3}
+\\end{aligned}
+$$
+
+<p>$\\Sigma \\Sigma^+$：3×2 乘 2×3 = 3×3，对角线上是 $[1, 1, 0]$——前两个是 1，第三个是 0。所以 $A A^+ \\neq I$——<strong>右伪逆不完美</strong>，但它是能让 $\\|A A^+ - I\\|$ 最小的那个矩阵。</p>
+
+<div class="callout callout-info">
+<strong>🧠 一句话：</strong>伪逆 = 把 SVD 的拉伸方向反过来（$\\sigma_i$ → $1/\\sigma_i$），零方向不碰（0 还是 0）。
+</div>
+
+<p>下面用代码验证上面的推导：</p>
 
 <pre><code><span class="hl-comment"># 00-07 第四步：伪逆 — 手搓 vs 内置 —— 长方矩阵的"逆"</span>
 <span class="hl-comment"># 导入numpy，别名np</span>
