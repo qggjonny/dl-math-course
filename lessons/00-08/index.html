@@ -141,6 +141,11 @@ $$\begin{bmatrix}2&2\\2&2\end{bmatrix} + \begin{bmatrix}1&-1\\-1&1\end{bmatrix}
 
 <p>每一项 $\sigma_i\mathbf{u}_i\mathbf{v}_i^T$ 是一张<strong>"图层"</strong>——$\sigma_i$ 越大，这层贡献越大。这就是后面「低秩近似」的基础：扔掉小 $\sigma_i$ 对应的图层，近似原矩阵。</p>
 
+<figure>
+  <img src="assets/layer_decomposition.svg" alt="SVD 图层分解：A = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ" style="max-width:100%;border-radius:8px">
+  <figcaption>图：$A$ 拆成两个秩-1 矩阵的和——第 1 层贡献大（σ₁=4，占主导），第 2 层添加细节（σ₂=2）。外积 σᵢ·uᵢ·vᵢᵀ 的每一层都是秩 1。</figcaption>
+</figure>
+
 <div class="callout callout-info">
 <strong>直觉：为什么右边变成了行向量？</strong><br><br>
 你习惯 $A=U\Sigma V^T$ 时 $V^T$ 是一个整体矩阵。逐项展开只改变<strong>读法</strong>，不改变运算：<br><br>
