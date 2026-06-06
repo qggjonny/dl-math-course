@@ -38,15 +38,21 @@ $$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \frac{f'''(a)}{3!}(x-a)^
 <pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 <span class="hl-comment"># ===== 数值微分：用代码算坡度 =====</span>
 <span class="hl-keyword">def</span> <span class="hl-func">num_grad</span>(f, x, eps=<span class="hl-number">1e-5</span>):
-<span class="hl-string">"""中央差分：往前走一丁点，往后退一丁点，算平均坡度
+<span class="hl-string">    pass
+    """中央差分：往前走一丁点，往后退一丁点，算平均坡度
 (f(x+eps)-f(x-eps)) / (2*eps) 
 精度比单边高：单边只看"往前"，中央看了"前后"然后取平均，误差抵消了一部分
 """</span>
-<span class="hl-keyword">return</span> (f(x + eps) - f(x - eps)) / (<span class="hl-number">2</span> * eps)
+    <span class="hl-keyword">return</span> (f(x + eps) - f(x - eps)) / (<span class="hl-number">2</span> * eps)
 <span class="hl-comment"># 测试 f(x)=x²，理论导数 = 2x</span>
 <span class="hl-keyword">def</span> <span class="hl-func">sq</span>(x):
-<span class="hl-keyword">return</span> x ** <span class="hl-number">2</span>
+    <span class="hl-keyword">return</span> x ** <span class="hl-number">2</span>
 <span class="hl-keyword">for</span> x <span class="hl-keyword">in</span> [<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>]:
+    <span class="hl-comment"># 数值近似</span>
+    n = num_grad(sq, x)
+    <span class="hl-comment"># 理论：f'(x)=2x</span>
+    t = <span class="hl-number">2</span> * x
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"数值={n:.6f} 理论={t:.0f}"</span>)
 <span class="hl-comment"># 数值近似</span>
 n = num_grad(sq, x)
 <span class="hl-comment"># 理论：f'(x)=2x</span>
@@ -60,13 +66,13 @@ x = <span class="hl-number">0.0</span>
 lr = <span class="hl-number">0.1</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"\n从 x=0 出发，目标 x=2"</span>)
 <span class="hl-keyword">for</span> step <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">30</span>):
-<span class="hl-comment"># 当前位置的坡度</span>
-grad = <span class="hl-number">2</span>*x - <span class="hl-number">4</span>
-<span class="hl-comment"># 沿着坡度反方向走一步</span>
-x = x - lr * grad
-<span class="hl-keyword">if</span> step % <span class="hl-number">5</span> == <span class="hl-number">0</span>:
-<span class="hl-builtin">print</span>(<span class="hl-string">f"  第{step:2d}步: x={x:.4f}  坡度={grad:+.4f}"</span>)
-<span class="hl-comment"># 坡度从 -4 逐渐变成 0，x 从 0 逐渐滑到 2</span></code></pre>
+    <span class="hl-comment"># 当前位置的坡度</span>
+    grad = <span class="hl-number">2</span>*x - <span class="hl-number">4</span>
+    <span class="hl-comment"># 沿着坡度反方向走一步</span>
+    x = x - lr * grad
+    <span class="hl-keyword">if</span> step % <span class="hl-number">5</span> == <span class="hl-number">0</span>:
+        <span class="hl-builtin">print</span>(<span class="hl-string">f"  第{step:2d}步: x={x:.4f}  坡度={grad:+.4f}"</span>)
+    <span class="hl-comment"># 坡度从 -4 逐渐变成 0，x 从 0 逐渐滑到 2</span></code></pre>
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行</a></p>
 <div class="callout callout-info">
 <h3>为什么中央差分比单边更精确？——泰勒展开揭密</h3>

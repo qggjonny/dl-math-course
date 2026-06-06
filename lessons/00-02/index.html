@@ -182,7 +182,9 @@ $$C\mathbf{x} = \begin{bmatrix}2&1\\8&10\end{bmatrix}\begin{bmatrix}5\\6\end{bma
 = \begin{bmatrix}16\\100\end{bmatrix} \;\checkmark$$
 <p>两步走和一步走结果一样。所以「行×列」不是硬记的公式——它是 $B$ 和 $A$ 作为变换<strong>接力</strong>时自然出现的计算方式。$B$ 的第 $i$ 行决定「中间结果（$A\mathbf{x}$）的各分量怎样组合成第 $i$ 个输出」，$A$ 的第 $j$ 列决定「输入的第 $j$ 个分量如何分配到各中间结果」，两者的点乘恰好就是 $c_{ij}$——也就是「不做中间产物、直接一步到位」的规则。</p>
 <p><strong>铁律：内维咬合。</strong> $(m, \cancel{n}) \times (\cancel{n}, p) = (m, p)$。$A$ 的列数 = $B$ 的行数，否则接口对不上。</p>
-<pre><code><span class="hl-comment"># np.array(嵌套列表) → 创建2×3矩阵，2行3列</span>
+<pre><code>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-comment"># np.array(嵌套列表) → 创建2×3矩阵，2行3列</span>
 A = np.array([[<span class="hl-number">1</span>,<span class="hl-number">2</span>,<span class="hl-number">3</span>], [<span class="hl-number">4</span>,<span class="hl-number">5</span>,<span class="hl-number">6</span>]])
 <span class="hl-comment"># 创建3×2矩阵——B的行数3 = A的列数3 ✓ 内维咬合</span>
 B = np.array([[<span class="hl-number">7</span>,<span class="hl-number">8</span>], [<span class="hl-number">9</span>,<span class="hl-number">10</span>], [<span class="hl-number">11</span>,<span class="hl-number">12</span>]])
@@ -307,7 +309,9 @@ $$\prod_{i=1}^{n} x_i = x_1 \times x_2 \times \cdots \times x_n$$
 <li><strong>逐维比较</strong>：每一维必须<strong>相等</strong>或其中一个是 <strong>1</strong></li>
 </ol>
 <h3>示例 1：成功 (3,1) + (1,4) → (3,4)</h3>
-<pre><code><span class="hl-comment"># np.array(嵌套列表) → shape=(3,1)，3行1列的列向量</span>
+<pre><code>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-comment"># np.array(嵌套列表) → shape=(3,1)，3行1列的列向量</span>
 x = np.array([[1], [2], [3]])
 <span class="hl-comment">                                      # 每一行是一个独立子列表，如 [1] → 一列</span>
 <span class="hl-comment"># np.array([[...]]) → shape=(1,4)，1行4列的行向量</span>
@@ -330,7 +334,9 @@ z = x + y
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <h3>示例 2：成功 — 不同 rank (3,2) + (2,) → (3,2)</h3>
 <p>一个矩阵加一个向量，能不能广播？</p>
-<pre><code><span class="hl-comment"># np.array(嵌套列表) → shape=(3,2)，3行2列矩阵</span>
+<pre><code>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-comment"># np.array(嵌套列表) → shape=(3,2)，3行2列矩阵</span>
 A = np.array([[1,2],[3,4],[5,6]])
 <span class="hl-comment"># np.array(列表) → shape=(2,)，一维向量，rank=1</span>
 v = np.array([10, 20])
@@ -349,7 +355,9 @@ v = np.array([10, 20])
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 <h3>示例 3：失败 — (3,2) + (3,) ❌</h3>
 <p>为什么这个会报错？过一遍三步：</p>
-<pre><code><span class="hl-comment"># np.array(嵌套列表) → shape=(3,2)，3行2列矩阵</span>
+<pre><code>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-comment"># np.array(嵌套列表) → shape=(3,2)，3行2列矩阵</span>
 A = np.array([[1,2],[3,4],[5,6]])
 <span class="hl-comment"># np.array(列表) → shape=(3,)，一维向量，长度=3</span>
 w = np.array([10, 20, 30])

@@ -83,14 +83,14 @@ $$\frac{dz}{dx} = \frac{\partial z}{\partial y_1} \cdot \frac{dy_1}{dx} + \frac{
 <pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 <span class="hl-comment"># ===== sin(x²) 验证链式法则 =====</span>
 <span class="hl-keyword">def</span> <span class="hl-func">h</span>(x):
-<span class="hl-comment"># 复合函数</span>
-<span class="hl-keyword">return</span> np.sin(x ** <span class="hl-number">2</span>)
+    <span class="hl-comment"># 复合函数</span>
+    <span class="hl-keyword">return</span> np.sin(x ** <span class="hl-number">2</span>)
 <span class="hl-keyword">def</span> <span class="hl-func">h_grad</span>(x):
-<span class="hl-comment"># 链式：cos(x²)·2x</span>
-<span class="hl-keyword">return</span> np.cos(x ** <span class="hl-number">2</span>) * <span class="hl-number">2</span> * x
+    <span class="hl-comment"># 链式：cos(x²)·2x</span>
+    <span class="hl-keyword">return</span> np.cos(x ** <span class="hl-number">2</span>) * <span class="hl-number">2</span> * x
 <span class="hl-comment"># 数值验证（中央差分）</span>
 <span class="hl-keyword">def</span> <span class="hl-func">num_grad</span>(f, x, eps=<span class="hl-number">1e-5</span>):
-<span class="hl-keyword">return</span> (f(x+eps) - f(x-eps)) / (<span class="hl-number">2</span>*eps)
+    <span class="hl-keyword">return</span> (f(x+eps) - f(x-eps)) / (<span class="hl-number">2</span>*eps)
 x = <span class="hl-number">1.5</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"h'(1.5) 数值={num_grad(h,x):.6f}  解析={h_grad(x):.6f}"</span>)
 <span class="hl-comment"># 两个值应该几乎相同</span>

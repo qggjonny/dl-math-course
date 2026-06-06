@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+<!DOCTYPE 
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -56,7 +58,8 @@ $$f(tx_1 + (1-t)x_2) \le t f(x_1) + (1-t) f(x_2)$$
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
 <span class="hl-keyword">def</span> <span class="hl-func">is_convex_1d</span>(f, xs):
-<span class="hl-comment">"""对一维函数采样，检查弦在曲线上方（数值验证凸性）</span>
+<span class="hl-comment">    pass
+    """对一维函数采样，检查弦在曲线上方（数值验证凸性）</span>
 <span class="hl-comment">    f: 待检查的函数</span>
 <span class="hl-comment">    xs: 采样点数组</span>
 <span class="hl-comment">    返回: True 表示在这些采样点上看起来是凸的</span>
@@ -97,9 +100,11 @@ $$f''(x) \ge 0 \text{ 对所有 } x \quad\Longleftrightarrow\quad f \text{ 是�
 
 $$f''(x) < 0 \quad\Longrightarrow\quad \text{上凸，凹的（像倒扣的碗）}$$
 
-<pre><code><span class="hl-comment"># 二阶导验证凸性</span>
+<pre><code>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-comment"># 二阶导验证凸性</span>
 <span class="hl-keyword">def</span> <span class="hl-func">check_convexity_2nd</span>(f, f_dd, xs):
-<span class="hl-comment">"""给定函数的解析二阶导数，验证凸性</span>
+    <span class="hl-comment">"""给定函数的解析二阶导数，验证凸性</span>
 <span class="hl-comment">    f: 原函数</span>
 <span class="hl-comment">    f_dd: 二阶导函数</span>
 <span class="hl-comment">    xs: 检查点</span>
@@ -107,8 +112,8 @@ $$f''(x) < 0 \quad\Longrightarrow\quad \text{上凸，凹的（像倒扣的碗�
     <span class="hl-keyword">for</span> x <span class="hl-keyword">in</span> xs:
         dd = f_dd(x)                     <span class="hl-comment"># 二阶导数值</span>
 <span class="hl-comment"># 如果有个点的二阶导 < 0</span>
-        <span class="hl-keyword">if</span> dd < -<span class="hl-number">1e-10</span>:
-            <span class="hl-builtin">print</span>(<span class="hl-string">f"  x={x:.1f}: f''={dd:.2f} < 0 → 非凸"</span>)
+        <span class="hl-keyword">if</span> dd &lt; -<span class="hl-number">1e-10</span>:
+            <span class="hl-builtin">print</span>(<span class="hl-string">f"  x={x:.1f}: f''={dd:.2f} &lt; 0 → 非凸"</span>)
             <span class="hl-keyword">return</span> <span class="hl-builtin">False</span>
     <span class="hl-keyword">return</span> <span class="hl-builtin">True</span>
 
@@ -139,16 +144,20 @@ $$H_{ij} = \frac{\partial^2 f}{\partial x_i \partial x_j}$$
 
 <p>回到 00-05 特征值的直觉：半正定 = 所有特征值 ≥ 0。等价于沿任何方向 $\mathbf{v}$，都有 $\mathbf{v}^T H \mathbf{v} \ge 0$（二阶方向导数非负）。</p>
 
-<pre><code><span class="hl-comment"># 多元凸函数：f(x,y) = x² + y²（抛物面）</span>
+<pre><code>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-comment"># 多元凸函数：f(x,y) = x² + y²（抛物面）</span>
 <span class="hl-keyword">def</span> <span class="hl-func">f</span>(X):
-<span class="hl-comment">"""f(x,y) = x² + y²，X 是 2 维向量 [x, y]</span>
+<span class="hl-comment">    pass
+    """f(x,y) = x² + y²，X 是 2 维向量 [x, y]</span>
 <span class="hl-comment">    二阶导矩阵（Hessian）= [[2, 0], [0, 2]]</span>
 <span class="hl-comment">    特征值 = 2, 2 → 都 ≥ 0 → 凸 ✅</span>
 <span class="hl-comment">    """</span>
     <span class="hl-keyword">return</span> X[<span class="hl-number">0</span>]**<span class="hl-number">2</span> + X[<span class="hl-number">1</span>]**<span class="hl-number">2</span>
 
 <span class="hl-keyword">def</span> <span class="hl-func">f2</span>(X):
-<span class="hl-comment">"""f(x,y) = x² − y²（马鞍面）</span>
+<span class="hl-comment">    pass
+    """f(x,y) = x² − y²（马鞍面）</span>
 <span class="hl-comment">    Hessian = [[2, 0], [0, -2]]</span>
 <span class="hl-comment">    特征值 = 2, −2 → 有负的 → 非凸 ❌</span>
 <span class="hl-comment">    """</span>

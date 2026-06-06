@@ -102,7 +102,7 @@ flips = np.random.random(N)
 
 <span class="hl-comment"># flips < 0.5 → 布尔数组，True=正面(1), False=反面(0)</span>
 <span class="hl-comment"># .astype(int) 将 True→1, False→0，得到整数数组</span>
-heads = (flips < <span class="hl-number">0.5</span>).astype(<span class="hl-builtin">int</span>)
+heads = (flips &lt; <span class="hl-number">0.5</span>).astype(<span class="hl-builtin">int</span>)
 
 <span class="hl-comment"># np.cumsum() → 累积和：第i个元素 = 前i+1个元素之和</span>
 <span class="hl-comment"># 即前k次抛掷中正面出现的总次数</span>
@@ -126,7 +126,7 @@ freq = cum_heads / np.arange(<span class="hl-number">1</span>, N+<span class="hl
 <span class="hl-comment"># np.random.random(100000) → 生成十万个随机数</span>
 big_flips = np.random.random(<span class="hl-number">100000</span>)
 <span class="hl-comment"># 正面 = 随机数 < 0.5，.mean()直接算频率（True=1, False=0）</span>
-big_freq = (big_flips < <span class="hl-number">0.5</span>).mean()
+big_freq = (big_flips &lt; <span class="hl-number">0.5</span>).mean()
 <span class="hl-comment"># 输出十万次频率 → 非常接近 0.5</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"\\n十万次抛硬币频率: {big_freq:.5f}"</span>)
 </code></pre>

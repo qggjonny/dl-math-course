@@ -148,7 +148,7 @@ np.random.seed(<span class="hl-number">42</span>)
 <span class="hl-comment"># uniform(a,b,size)：生成10万个[0,1)均匀随机数</span>
 samples = np.random.uniform(a, b, <span class="hl-number">100000</span>)
 <span class="hl-comment"># 逻辑与(&)：统计落在子区间内的样本数</span>
-in_int = np.<span class="hl-builtin">sum</span>((samples>=c) & (samples<=d))
+in_int = np.<span class="hl-builtin">sum</span>((samples>=c) & (samples&lt;=d))
 <span class="hl-comment"># sum()对布尔数组：True=1，直接计数</span>
 <span class="hl-comment"># :.4f = 保留4位小数，应≈0.3000</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"模拟 P = {in_int/100000:.4f}"</span>)
@@ -173,7 +173,7 @@ in_int = np.<span class="hl-builtin">sum</span>((samples>=c) & (samples<=d))
 sn = np.random.normal(<span class="hl-number">0</span>,<span class="hl-number">1</span>,<span class="hl-number">100000</span>)
 <span class="hl-comment"># k=1,2,3 → ±1σ, ±2σ, ±3σ</span>
 <span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> [<span class="hl-number">1</span>,<span class="hl-number">2</span>,<span class="hl-number">3</span>]:
-    r = np.mean((sn>=-k)&(sn<=k))         <span class="hl-comment"># mean()：落在[-k,k]内的样本比例（频率≈概率）</span>
+    r = np.mean((sn>=-k)&(sn&lt;=k))         <span class="hl-comment"># mean()：落在[-k,k]内的样本比例（频率≈概率）</span>
     <span class="hl-comment"># 字典取理论值：±1σ→68.27%, ±2σ→95.45%, ±3σ→99.73%</span>
     t = {<span class="hl-number">1</span>:<span class="hl-number">0.6827</span>,<span class="hl-number">2</span>:<span class="hl-number">0.9545</span>,<span class="hl-number">3</span>:<span class="hl-number">0.9973</span>}[k]
     <span class="hl-comment"># 模拟值 vs 理论值，高度吻合</span>
