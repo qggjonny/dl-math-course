@@ -58,6 +58,27 @@ l2 = np.linalg.norm(v)
 <p><strong>这就是 L1 比 L2 更容易产生零分量的几何原因。</strong> 菱形有尖角，圆没有。以后当你需要「挑出最重要的几个分量，把不重要的清零」时，就会想起 L1 这个特性。</p>
 </div>
 <hr>
+<h2>从向量到矩阵——Frobenius 范数</h2>
+<p>前面 L1 和 L2 都是算<strong>向量</strong>的长度。但矩阵呢？矩阵是一堆数字的方阵，怎么量它的大小？</p>
+<p><strong>最自然的方法：</strong>把矩阵当成一个长向量，直接算 L2。</p>
+<p>把 m×n 矩阵的所有 m×n 个元素拉直排成一列，然后逐个平方、求和、开方：</p>
+$$\|A\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n |a_{ij}|^2}$$
+<p>这就是 <strong>Frobenius 范数</strong>。名字听着唬人，本质就是<strong>矩阵版 L2</strong>——把一个 m×n 的矩阵当成一个 mn 维的向量来量长度。</p>
+<div class="callout callout-info">
+<strong>🧠 记住一句话：</strong> Frobenius 范数 = 把矩阵所有元素当向量，算 L2 范数。写法不同，算法完全一样。
+</div>
+<p><strong>用在哪里？</strong> 在 SVD（00-08）里你会看到它用来衡量「重建的矩阵跟原矩阵差多少」——差矩阵的 Frobenius 范数越小，重建越准。</p>
+<pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-comment"># 一个2×2矩阵</span>
+A = np.array([[<span class="hl-number">3</span>, <span class="hl-number">1</span>],
+              [<span class="hl-number">1</span>, <span class="hl-number">3</span>]])
+<span class="hl-comment"># 逐元素 L2：√(3²+1²+1²+3²) = √(9+1+1+9) = √20 ≈ 4.472</span>
+<span class="hl-comment"># np.linalg.norm(A, 'fro') 或直接 np.linalg.norm(A) 默认也是Frobenius</span>
+fnorm = np.linalg.norm(A, <span class="hl-string">'fro'</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"Frobenius范数 = {fnorm:.3f}"</span>)
+</code></pre>
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<hr>
 <h2>💭 概念题</h2>
 <ol>
 <li>L1 和 L2 都用 v=[3,-4] 算过了。如果换成 v=[5,0]，L1 和 L2 各是多少？它们相等吗？什么时候 L1 和 L2 相等？——考察：L1/L2 的区别与特殊情况</li>

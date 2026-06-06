@@ -221,7 +221,8 @@ A_1 = <span class="hl-builtin">sum</span>(s[i] * np.outer(U[:, i], VT[i, :])
           <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(k))
 
 <span class="hl-comment"># 计算重建误差——用Frobenius范数衡量矩阵间"距离"</span>
-<span class="hl-comment"># norm(..., 'fro')：Frobenius范数 = √(Σ所有元素平方)</span>
+<span class="hl-comment"># Frobenius范数 = 矩阵版L2：把所有元素当向量，平方求和再开方（00-03讲过）</span>
+<span class="hl-comment"># norm(..., 'fro') = √(Σ|Aᵢⱼ−A₁ᵢⱼ|²)，即逐元素算L2距离</span>
 error = np.linalg.norm(A - A_1, <span class="hl-string">'fro'</span>)
 <span class="hl-comment"># 即把矩阵展平成一维，算欧几里得距离</span>
 
@@ -284,7 +285,7 @@ U, s, VT = np.linalg.svd(A)
     A_k = <span class="hl-builtin">sum</span>(s[i] * np.outer(U[:, i], VT[i, :])
 <span class="hl-comment"># sum()对生成器产生的k个矩阵逐元素求和</span>
               <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(k))
-<span class="hl-comment"># Frobenius范数 = √(Σ|Aᵢⱼ−A_kᵢⱼ|²)</span>
+<span class="hl-comment"># Frobenius范数 = 矩阵版L2（见00-03）：√(Σ|Aᵢⱼ−A_kᵢⱼ|²)</span>
     error = np.linalg.norm(A - A_k, <span class="hl-string">'fro'</span>)
 <span class="hl-comment"># 相对误差 = 绝对误差÷原矩阵大小×100%</span>
     rel_err = error / np.linalg.norm(A, <span class="hl-string">'fro'</span>) * <span class="hl-number">100</span>
