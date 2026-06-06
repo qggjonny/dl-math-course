@@ -36,22 +36,33 @@ $$A = \sigma_1 \mathbf{u}_1 \mathbf{v}_1^T + \sigma_2 \mathbf{u}_2 \mathbf{v}_2^
 你熟悉的是<strong>内积</strong>：行向量 × 列向量 → 一个数（$\mathbf{a}^T\mathbf{b} = a_1b_1 + a_2b_2 + \cdots$）。<br>
 <strong>外积反过来：列向量 × 行向量 → 矩阵。</strong><br><br>
 
-拿课件里的 $\mathbf{u}_1$ 举例：<br><br>
+拿两个简单数字演示（不用课件里的 $A$，因为它的 $\mathbf{u}_1,\mathbf{v}_1$ 每个分量都相等，看不清楚）：<br><br>
 
-$$\underbrace{\begin{bmatrix}-0.707 \\ -0.707\end{bmatrix}}_{2\times 1 \text{ 列}}
-\times
-\underbrace{\begin{bmatrix}-0.707 & -0.707\end{bmatrix}}_{1\times 2 \text{ 行}}
-=
-\underbrace{\begin{bmatrix}0.5 & 0.5 \\ 0.5 & 0.5\end{bmatrix}}_{2\times 2 \text{ 矩阵}}$$
+取 $\mathbf{u} = \begin{bmatrix}1 \\ 3\end{bmatrix}$，$\mathbf{v}^T = \begin{bmatrix}2 & 4\end{bmatrix}$：<br><br>
 
-每个元素：<strong>第 $i$ 行第 $j$ 列 = $u_i \times v_j$</strong>。第一列的两个数是 $(-0.707)\times(-0.707)=0.5$ 和 $(-0.707)\times(-0.707)=0.5$。<br><br>
+$$\mathbf{u}\mathbf{v}^T
+= \begin{bmatrix}1 \\ 3\end{bmatrix}\begin{bmatrix}2 & 4\end{bmatrix}
+= \begin{bmatrix} 1\times 2 & 1\times 4 \\ 3\times 2 & 3\times 4 \end{bmatrix}
+= \begin{bmatrix} 2 & 4 \\ 6 & 12 \end{bmatrix}$$
 
-$$\mathbf{u}_1 \mathbf{v}_1^T = \begin{bmatrix}u_1 \\ u_2\end{bmatrix}\begin{bmatrix}v_1 & v_2\end{bmatrix}
+<strong>运算规则：第 $i$ 行第 $j$ 列 = $u_i \times v_j$。</strong>逐个算：<br>
+• (1,1) = $1\times2=2$ (1,2) = $1\times4=4$<br>
+• (2,1) = $3\times2=6$ (2,2) = $3\times4=12$<br><br>
+
+<strong>看规律——谁在控制什么？</strong><br><br>
+<strong>$\mathbf{u}$ 控制行与行之间的比例：</strong><br>
+第一行 [2, 4]，第二行 [6, 12]。每个对应位置，第二行都是第一行的 <strong>3 倍</strong>——因为 $u_2/u_1 = 3/1 = 3$。<br><br>
+<strong>$\mathbf{v}^T$ 控制列与列之间的比例：</strong><br>
+第一列 [2, 6]$^T$，第二列 [4, 12]$^T$。每个对应位置，第二列都是第一列的 <strong>2 倍</strong>——因为 $v_2/v_1 = 4/2 = 2$。<br><br>
+
+用任意符号写：<br>
+$$\mathbf{u}\mathbf{v}^T = \begin{bmatrix}u_1 \\ u_2\end{bmatrix}\begin{bmatrix}v_1 & v_2\end{bmatrix}
 = \begin{bmatrix} u_1v_1 & u_1v_2 \\ u_2v_1 & u_2v_2 \end{bmatrix}$$
+行比例：$u_2/u_1$ 列比例：$v_2/v_1$<br><br>
 
 <strong>命名逻辑：</strong>内积 = 两个向量「对在一起」缩成一个数；外积 = 两个向量「撑开」成一个矩阵。内外对称。<br><br>
 
-<strong>几何直觉：</strong>$\mathbf{u}_1$ 控制列的相对比例（行之间的比例），$\mathbf{v}_1^T$ 控制行的相对比例（列之间的比例）。外积把两个一维方向编织成一个二维的「模式」——这个模式里，所有行互相平行，所有列也互相平行，秩 = 1（见下）。
+<strong>核心结论：</strong>任何一个外积矩阵，所有行互相平行，所有列互相平行——它的秩永远是 1（见下一条）。
 </div>
 
 <div class="callout callout-idea">
