@@ -479,11 +479,19 @@ $$\underbrace{\begin{bmatrix} 0 \\ 1 \\ 2 \end{bmatrix}}_{A_{3\times 1}}
 <p>上面用微积分求出来 $w = 0.8$。用伪逆行不行？</p>
 
 <div class="callout callout-info">
-<strong>🔑 关键简化：列向量 $A$ 的伪逆公式</strong><br><br>
-上一节讲伪逆 $A^+ = V\Sigma^+ U^T$。当 $A$ 只有一列时（$m\times 1$），这个公式大幅简化：<br><br>
-$$A^+ = \frac{A^T}{A^T A}$$<br>
-<strong>推导（一步到位）：</strong>$A$ 的 SVD 中，$\Sigma$ 只有一个非零奇异值 $\sigma$，$U$ 的第一列就是 $\frac{A}{\|A\|}$，$V = [1]$。代入 $A^+ = V\Sigma^+ U^T$ 化简即得上式。直观理解：$A^+$ 就是「转置除以长度的平方」。<br><br>
-$1\times 3$ 除 $1\times 1$ 标量 → 结果仍是 $1\times 3$ 行向量。
+<strong>🔑 伪逆公式：法方程推导（不用 SVD）</strong><br><br>
+目标是最小化误差平方：$\min_w \|A w - \mathbf{b}\|^2$。<br><br>
+展开：$\|A w - \mathbf{b}\|^2 = (A w - \mathbf{b})^T (A w - \mathbf{b})$<br>
+$= w^T A^T A w - 2 w^T A^T \mathbf{b} + \mathbf{b}^T \mathbf{b}$<br><br>
+对 $w$ 求导，令其为 $0$：<br>
+$$2 A^T A w - 2 A^T \mathbf{b} = 0$$<br>
+整理得<strong>法方程</strong>：<br>
+$$A^T A \, w = A^T \mathbf{b}$$<br>
+$A$ 是 3×1 列向量，所以 $A^T A$ 是 $1\times 1$ 标量，直接除过去：<br>
+$$w = \frac{A^T \mathbf{b}}{A^T A}$$<br>
+前面的系数 $\frac{A^T}{A^T A}$ 恰好就是 $A$ 的伪逆 $A^+$。<br><br>
+<strong>所以 $A^+$ 不是凭空定义的——它就是从「最小化误差平方」这个目标推出来的最优解公式。</strong><br><br>
+$1\times 3$ 除以 $1\times 1$ 标量 → 结果仍是 $1\times 3$ 行向量。
 </div>
 
 <p><strong>第一步：写下 $A$ 和 $\mathbf{b}$。</strong></p>
@@ -555,6 +563,8 @@ $$(\sigma_1 z_1 - c_1)^2 + (\sigma_2 z_2 - c_2)^2 + \cdots + (\sigma_n z_n - c_n
 <p><strong>结果：</strong>$z_i = c_i / \sigma_i$ → $\mathbf{z} = \Sigma^+ \mathbf{c}$ → 代回去：</p>
 
 $$\mathbf{x} = V\Sigma^+ U^T \mathbf{b} = A^+ \mathbf{b}$$
+
+<p><strong>关于 $U$、$V$ 的手算：</strong>这个推导用了 SVD，但没有手算 $U$ 和 $V$——所有数都是符号（$U$、$\Sigma$、$V^T$）在推导中被消掉，最后只留下 $A^+ \mathbf{b}$。实际中，$U$、$V$ 的具体数值由 `np.linalg.svd()` 完成——背后是解 $A^T A$ 的特征值问题，不值得手算。知道它们存在、知道它们的性质（正交、对角化 $A$），就足以驾驭 SVD 了。</p>
 
 <div class="callout callout-info">
 <strong>🎯 最小二乘小结：</strong><br>
