@@ -606,23 +606,69 @@ $$A^T \mathbf{r}
 
 <h3>5.5 用 SVD 推导：为什么伪逆是最小二乘解？</h3>
 
-<p>回到一般情况：$A$ 是 $m \times n$（$m > n$，行比列多），$A\mathbf{x} = \mathbf{b}$ 无精确解。目标是 $\min_{\mathbf{x}} \|A\mathbf{x} - \mathbf{b}\|^2$。</p>
+<p>5.3 节用求导推出了单列矩阵的伪逆公式。现在推广到一般情况：$A$ 是 $m \times n$（$m > n$），目标是 $\min_{\mathbf{x}} \|A\mathbf{x} - \mathbf{b}\|^2$。</p>
 
-<p>代入 SVD $A = U\Sigma V^T$：</p>
+<p><strong>第 1 步：代入 SVD。</strong> 把 $A = U\Sigma V^T$ 代入目标函数：</p>
 
-$$
-\begin{aligned}
-\|A\mathbf{x} - \mathbf{b}\|^2
-&= \|U\Sigma V^T\mathbf{x} - \mathbf{b}\|^2 \\
-&= \|\Sigma V^T\mathbf{x} - U^T\mathbf{b}\|^2 \quad (\text{$U$ 是正交矩阵，乘它不改变长度})
-\end{aligned}
-$$
+$$\|A\mathbf{x} - \mathbf{b}\|^2 = \|U\Sigma V^T\mathbf{x} - \mathbf{b}\|^2$$
 
-<p>令 $\mathbf{z} = V^T\mathbf{x}$，$\mathbf{c} = U^T\mathbf{b}$。问题变成：找 $\mathbf{z}$ 让 $\|\Sigma\mathbf{z} - \mathbf{c}\|^2$ 最小。</p>
+<p>这看起来更复杂了——多了 $U$、$\Sigma$、$V^T$。但 SVD 的美妙之处就在于：<strong>$U$ 和 $V$ 都是正交矩阵，它们只「旋转」不「拉伸」，不会改变向量的长度。</strong></p>
 
-<p>$\Sigma$ 是对角矩阵（$m\times n$）。$\Sigma\mathbf{z}$ 把 $z_1$ 拉伸 $\sigma_1$ 倍，$z_2$ 拉伸 $\sigma_2$ 倍，…，第 $n+1$ 到第 $m$ 个分量永远是 0（因为 $\Sigma$ 只有 $n$ 列）。所以要最小化：</p>
+<p><strong>第 2 步：消掉 $U$——正交矩阵不改变长度。</strong> 先把括号里的东西写成 $U$ 乘某个向量减 $\mathbf{b}$ 的形式：</p>
 
-$$(\sigma_1 z_1 - c_1)^2 + (\sigma_2 z_2 - c_2)^2 + \cdots + (\sigma_n z_n - c_n)^2 + \underbrace{(0 - c_{n+1})^2 + \cdots + (0 - c_m)^2}_{\text{管不了}}$$
+$$\|U\underbrace{(\Sigma V^T\mathbf{x})}_{\text{记作 }\mathbf{v}} - \mathbf{b}\|^2
+= \|U\mathbf{v} - \mathbf{b}\|^2$$
+
+<p>现在展开模平方（和 5.3 节完全一样的操作）：</p>
+
+$$\begin{aligned}
+\|U\mathbf{v} - \mathbf{b}\|^2
+&= (U\mathbf{v} - \mathbf{b})^T (U\mathbf{v} - \mathbf{b}) \\
+&= \mathbf{v}^T U^T U \mathbf{v} - \mathbf{v}^T U^T \mathbf{b} - \mathbf{b}^T U \mathbf{v} + \mathbf{b}^T \mathbf{b}
+\end{aligned}$$
+
+<p>$U$ 是正交矩阵，所以 $U^T U = I$（这是正交的定义，00-07 讲过）。第一项 $\mathbf{v}^T U^T U \mathbf{v} = \mathbf{v}^T \mathbf{v}$。</p>
+
+<p>交叉项：$\mathbf{b}^T U \mathbf{v}$ 是一个标量，标量的转置等于自身，所以 $\mathbf{b}^T U \mathbf{v} = (\mathbf{b}^T U \mathbf{v})^T = \mathbf{v}^T U^T \mathbf{b}$。两个交叉项相等：</p>
+
+$$\mathbf{v}^T U^T \mathbf{b} + \mathbf{b}^T U \mathbf{v} = 2\,\mathbf{v}^T U^T \mathbf{b}$$
+
+<p>代入：</p>
+
+$$\begin{aligned}
+\|U\mathbf{v} - \mathbf{b}\|^2
+&= \mathbf{v}^T \mathbf{v} - 2\,\mathbf{v}^T U^T \mathbf{b} + \mathbf{b}^T \mathbf{b} \\
+&= \|\mathbf{v} - U^T \mathbf{b}\|^2
+\end{aligned}$$
+
+<p>最后一步是反向展开——$\|\mathbf{v} - U^T\mathbf{b}\|^2 = (\mathbf{v} - U^T\mathbf{b})^T(\mathbf{v} - U^T\mathbf{b}) = \mathbf{v}^T\mathbf{v} - 2\mathbf{v}^T U^T\mathbf{b} + \mathbf{b}^T U U^T \mathbf{b}$，其中 $U U^T = I$（$U$ 是方阵时），所以 $\mathbf{b}^T U U^T \mathbf{b} = \mathbf{b}^T\mathbf{b}$，结果完全一致。</p>
+
+<div class="callout callout-idea">
+<strong>💡 一句话口诀：</strong>正交矩阵 $U$ 乘在左边，可以「搬」到右边变成 $U^T$——$\|U\mathbf{v} - \mathbf{b}\|^2 = \|\mathbf{v} - U^T\mathbf{b}\|^2$。<strong>这不是随便搬的，而是展开后利用 $U^T U = I$ 推导出来的恒等式。</strong>
+</div>
+
+<p>把 $\mathbf{v} = \Sigma V^T \mathbf{x}$ 代回：</p>
+
+$$\boxed{\|U\Sigma V^T\mathbf{x} - \mathbf{b}\|^2 = \|\Sigma V^T\mathbf{x} - U^T\mathbf{b}\|^2}$$
+
+<p><strong>第 3 步：换元——用 SVD 的「自然坐标」。</strong></p>
+
+<p>令 $\mathbf{z} = V^T\mathbf{x}$，$\mathbf{c} = U^T\mathbf{b}$。这两个换元有明确的几何含义：</p>
+
+<ul>
+  <li>$\mathbf{z} = V^T\mathbf{x}$：把 $\mathbf{x}$ 从标准基「旋转」到右奇异向量基。$\mathbf{z}$ 的分量 $z_1, z_2, \dots, z_n$ 分别是 $\mathbf{x}$ 在 $\mathbf{v}_1, \mathbf{v}_2, \dots, \mathbf{v}_n$ 方向上的坐标。</li>
+  <li>$\mathbf{c} = U^T\mathbf{b}$：把 $\mathbf{b}$ 从标准基「旋转」到左奇异向量基。$\mathbf{c}$ 的分量 $c_1, c_2, \dots, c_m$ 分别是 $\mathbf{b}$ 在 $\mathbf{u}_1, \mathbf{u}_2, \dots, \mathbf{u}_m$ 方向上的坐标。</li>
+</ul>
+
+<p>问题变成：<strong>找 $\mathbf{z}$ 让 $\|\Sigma\mathbf{z} - \mathbf{c}\|^2$ 最小。</strong></p>
+
+<p><strong>为什么变简单了？</strong>因为 $\Sigma$ 是对角矩阵。$\Sigma\mathbf{z}$ 就是把 $z_1$ 乘 $\sigma_1$、$z_2$ 乘 $\sigma_2$……纯逐分量拉伸，<strong>没有交叉项</strong>。所以模平方可以直接逐分量拆开：</p>
+
+$$\|\Sigma\mathbf{z} - \mathbf{c}\|^2
+= (\sigma_1 z_1 - c_1)^2 + (\sigma_2 z_2 - c_2)^2 + \cdots + (\sigma_n z_n - c_n)^2
++ \underbrace{(0 - c_{n+1})^2 + \cdots + (0 - c_m)^2}_{\text{$\Sigma$ 在这些方向上输出永远是 0}}$$
+
+<p>SVD 把原来搅在一起的 $\|A\mathbf{x} - \mathbf{b}\|^2$，拆成了 <strong>$m$ 个互不干扰的独立平方项</strong>。这就是 SVD 推导最小二乘的核心威力。</p>
 
 <p>前 $n$ 项：令 $z_i = c_i / \sigma_i$ 可以把每一项都归零——因为 $z_i$ 是自由的，我们可以选择让 $\sigma_i z_i$ 恰好等于 $c_i$。</p>
 
