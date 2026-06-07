@@ -22,6 +22,7 @@
   <text x="72" y="35" fill="#666" font-size="11" font-family="sans-serif">x₂</text>
 
   <!-- Column space plane: rendered as a gradient parallelogram -->
+  <!-- Plane corners: (80,310) origin → right-forward-down, up-back -->
   <polygon points="80,310 460,310 560,160 180,160" fill="url(#planeGrad)" stroke="#667eea" stroke-width="1.5" stroke-dasharray="6,3"/>
 
   <!-- Grid lines on plane (perspective) -->
@@ -33,25 +34,23 @@
   <text x="560" y="145" fill="#667eea" font-size="13" font-family="sans-serif" font-weight="bold">列空间 Col(A)</text>
   <text x="560" y="163" fill="#667eea" font-size="10" font-family="sans-serif" opacity="0.7">（所有 Ax 的集合）</text>
 
-  <!-- Vector b (above the plane) — tip at (340, 80) -->
-  <line x1="80" y1="310" x2="340" y2="80" stroke="#f5576c" stroke-width="2.5" marker-end="url(#arrowHeadRed)"/>
-  <text x="348" y="72" fill="#f5576c" font-size="14" font-family="serif" font-weight="bold" font-style="italic">b</text>
+  <!-- Vector b (above the plane) — tip at same x as Ax to show perpendicular clearly -->
+  <line x1="80" y1="310" x2="320" y2="70" stroke="#f5576c" stroke-width="2.5" marker-end="url(#arrowHeadRed)"/>
+  <text x="328" y="65" fill="#f5576c" font-size="14" font-family="serif" font-weight="bold" font-style="italic">b</text>
 
-  <!-- Projection: Ax — tip at (340, 210), directly below b in 2D projection -->
-  <!-- This makes the residual r a pure vertical line, clearly perpendicular -->
-  <line x1="80" y1="310" x2="340" y2="210" stroke="#4facfe" stroke-width="3" marker-end="url(#arrowHead)"/>
-  <text x="348" y="218" fill="#4facfe" font-size="14" font-family="serif" font-weight="bold" font-style="italic">A<b>x</b></text>
+  <!-- Projection: Ax (closest point on plane to b) -->
+  <line x1="80" y1="310" x2="320" y2="190" stroke="#4facfe" stroke-width="3" marker-end="url(#arrowHead)"/>
+  <text x="328" y="205" fill="#4facfe" font-size="14" font-family="serif" font-weight="bold" font-style="italic">A<b>x</b></text>
 
   <!-- Projection point on plane -->
-  <circle cx="340" cy="210" r="4" fill="#4facfe"/>
+  <circle cx="320" cy="190" r="4" fill="#4facfe"/>
 
-  <!-- Error vector r: vertical drop from Ax tip to b tip -->
-  <line x1="340" y1="210" x2="340" y2="80" stroke="#ffd700" stroke-width="2.5" stroke-dasharray="8,5"/>
-  <text x="348" y="148" fill="#ffd700" font-size="12" font-family="serif" font-weight="bold" font-style="italic">r = b − A<b>x</b></text>
+  <!-- Error vector r: vertical drop from Ax tip to b tip — clearly perpendicular -->
+  <line x1="320" y1="190" x2="320" y2="70" stroke="#ffd700" stroke-width="2.5" stroke-dasharray="8,5"/>
+  <text x="330" y="135" fill="#ffd700" font-size="12" font-family="serif" font-weight="bold" font-style="italic">r = b − A<b>x</b></text>
 
-  <!-- Prominent right angle marker at (340, 210) -->
-  <!-- Vertical arm (along r): 20px up, horizontal arm (along plane): 16px right -->
-  <polyline points="340,210 340,190 356,190" fill="none" stroke="#ffd700" stroke-width="2"/>
+  <!-- Right angle marker at projection point — larger and clearer -->
+  <polyline points="320,190 320,174 336,174" fill="none" stroke="#ffd700" stroke-width="2"/>
 
   <!-- Origin -->
   <circle cx="80" cy="310" r="3" fill="#aaa"/>
