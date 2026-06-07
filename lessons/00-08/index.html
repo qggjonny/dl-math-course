@@ -476,25 +476,60 @@ $$\underbrace{\begin{bmatrix} 0 \\ 1 \\ 2 \end{bmatrix}}_{A_{3\times 1}}
 
 <p>$A$ 是 3×1 列向量，$w$ 是标量。$A w = \mathbf{b}$ 无精确解。最小二乘就是要找 $w$ 让 $\|A w - \mathbf{b}\|^2$ 最小。</p>
 
-<p>上面用微积分求出来 $w = 0.8$。用伪逆行不行？</p>
+<p>上面用微积分求出来 $w = 0.8$。用伪逆行不行？下面<strong>不靠 SVD</strong>，直接从「最小化误差」这个目标把伪逆公式推出来。</p>
 
-<div class="callout callout-info">
-<strong>🔑 伪逆公式：法方程推导（不用 SVD）</strong><br><br>
-目标是最小化误差平方：$\min_w \|A w - \mathbf{b}\|^2$。<br><br>
-$w$ 是标量，所以可以直接展开（和 5.2 节做的完全一样，只是用矩阵符号写）：<br><br>
-$\|A w - \mathbf{b}\|^2 = (A w - \mathbf{b}) \cdot (A w - \mathbf{b})$ ← 向量的点积<br>
-$= (A w)^T (A w) - 2 (A w)^T \mathbf{b} + \mathbf{b}^T \mathbf{b}$ ← 二项式展开<br>
-$= w^2 A^T A - 2 w A^T \mathbf{b} + \mathbf{b}^T \mathbf{b}$ ← $w$ 是标量，提到前面<br><br>
-对 $w$ 求导，令其为 $0$：<br>
-$$2 A^T A \, w - 2 A^T \mathbf{b} = 0$$<br>
-整理得<strong>法方程</strong>：<br>
-$$A^T A \, w = A^T \mathbf{b}$$<br>
-$A$ 是 3×1 列向量，所以 $A^T A$ 是 $1\times 1$ 标量，直接除过去：<br>
-$$w = \frac{A^T \mathbf{b}}{A^T A}$$<br>
-前面的系数 $\frac{A^T}{A^T A}$ 恰好就是 $A$ 的伪逆 $A^+$。<br><br>
-<strong>所以 $A^+$ 不是凭空定义的——它就是从「最小化误差平方」这个目标推出来的最优解公式。</strong><br><br>
-$1\times 3$ 除以 $1\times 1$ 标量 → 结果仍是 $1\times 3$ 行向量。
-</div>
+<p><strong>① 目标函数：为什么写 $\|A w - \mathbf{b}\|^2$ 而不是 $\|A w - \mathbf{b}\|$？</strong></p>
+
+<p>向量 $\mathbf{v}$ 的模（长度）：$\|\mathbf{v}\| = \sqrt{v_1^2 + v_2^2 + \cdots}$——里面平方求和，外面开方。再加一个平方：$\|\mathbf{v}\|^2 = v_1^2 + v_2^2 + \cdots$——<strong>根号消掉了</strong>，回到纯粹的平方和。</p>
+
+<p>$\|A w - \mathbf{b}\|$ 和 $\|A w - \mathbf{b}\|^2$ 在同一个 $w$ 处取最小值（开方是单调的），但平方和没有根号，求导干净。而且「最小二乘」的「二乘」就是<strong>误差的平方和</strong>——$\|\cdot\|^2$ 正是这件事的矩阵写法。</p>
+
+<p><strong>② 展开：把模平方写成可求导的形式</strong></p>
+
+<p>$\|A w - \mathbf{b}\|^2$ 是一个向量的模平方。向量模平方 = 向量点乘自己：$\|\mathbf{v}\|^2 = \mathbf{v} \cdot \mathbf{v}$。点乘写成矩阵形式就是 $\mathbf{v}^T \mathbf{v}$。所以：</p>
+
+$$\|A w - \mathbf{b}\|^2 = (A w - \mathbf{b})^T (A w - \mathbf{b})$$
+
+<p>这是 $(a-b)^2$ 的向量版本。展开和普通二项式完全一样——<strong>注意 $w$ 是标量</strong>，可以从转置里提出来：</p>
+
+$$\begin{aligned}
+(A w - \mathbf{b})^T (A w - \mathbf{b})
+&= \underbrace{(A w)^T (A w)}_{\text{第一项}} \;-\; \underbrace{(A w)^T \mathbf{b}}_{\text{交叉项①}} \;-\; \underbrace{\mathbf{b}^T (A w)}_{\text{交叉项②}} \;+\; \underbrace{\mathbf{b}^T \mathbf{b}}_{\text{常数项}} \\[4pt]
+&= (w A^T)(A w) \;-\; w A^T \mathbf{b} \;-\; w \mathbf{b}^T A \;+\; \mathbf{b}^T \mathbf{b} \qquad (\text{$w$ 是标量，提出去})\\[4pt]
+&= w^2 A^T A \;-\; 2 w A^T \mathbf{b} \;+\; \mathbf{b}^T \mathbf{b} \qquad (\text{两个交叉项相等：} \mathbf{b}^T A = A^T \mathbf{b} \text{，都是标量})
+\end{aligned}$$
+
+<p><strong>③ 求导，令其为 0</strong></p>
+
+<p>这是一个关于标量 $w$ 的二次函数。$A^T A$、$A^T \mathbf{b}$、$\mathbf{b}^T \mathbf{b}$ 都是常数（具体数字，和 $w$ 无关）。对 $w$ 求导：</p>
+
+$$\frac{d}{dw}\bigl(w^2 A^T A - 2 w A^T \mathbf{b} + \mathbf{b}^T \mathbf{b}\bigr) = 2 A^T A \, w - 2 A^T \mathbf{b}$$
+
+<p>令导数为 0（二次函数开口向上，极值点就是最小值点）：</p>
+
+$$2 A^T A \, w - 2 A^T \mathbf{b} = 0 \quad\Rightarrow\quad \boxed{A^T A \, w = A^T \mathbf{b}}$$
+
+<p>这个方程叫<strong>法方程（normal equation）</strong>——最小二乘问题的核心。</p>
+
+<p><strong>④ 解出 $w$，认出伪逆</strong></p>
+
+<p>$A$ 是 $3 \times 1$ 列向量，所以 $A^T A$ 是 $1 \times 1$——一个标量。直接除：</p>
+
+$$w = \frac{A^T \mathbf{b}}{A^T A}$$
+
+<p>把分数拆开看：$w = \left(\dfrac{A^T}{A^T A}\right) \mathbf{b}$。括号里的东西是 $1 \times 3$ 行向量除以 $1 \times 1$ 标量 → 还是 $1 \times 3$。它把 $\mathbf{b}$（$3 \times 1$）变成 $w$（$1 \times 1$）——恰好是 $A$（$3 \times 1$）的「逆」操作。</p>
+
+<p><strong>验一下：</strong>把这个东西乘到 $A$ 前面：</p>
+
+$$\frac{A^T}{A^T A} \cdot A = \frac{A^T A}{A^T A} = 1$$
+
+<p>$1$ 就是 $1 \times 1$ 的「单位矩阵」。所以 $\dfrac{A^T}{A^T A}$ 满足「左乘 $A$ 得单位阵」——这正是<strong>伪逆</strong> $A^+$ 的定义之一。因此：</p>
+
+$$\boxed{A^+ = \frac{A^T}{A^T A}}$$
+
+<p><strong>⑤ 一句话总结：</strong>伪逆不是凭空定义的——它就是「让 $\|A w - \mathbf{b}\|^2$ 最小的那个 $w$ 的求解公式」里 $\mathbf{b}$ 前面的系数。</p>
+
+<p>下面代入具体数字，验证和求导结果一致：</p>
 
 <p><strong>第一步：写下 $A$ 和 $\mathbf{b}$。</strong></p>
 
