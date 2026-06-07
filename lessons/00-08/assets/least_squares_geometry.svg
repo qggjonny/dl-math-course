@@ -1,78 +1,69 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" style="max-width:600px">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" width="100%" style="max-width:640px">
   <defs>
+    <linearGradient id="planeGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#667eea" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#764ba2" stop-opacity="0.10"/>
+    </linearGradient>
     <marker id="arrowHead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
       <polygon points="0,0 10,3.5 0,7" fill="#aaa"/>
     </marker>
-    <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <marker id="arrowHeadRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
       <polygon points="0,0 10,3.5 0,7" fill="#f5576c"/>
-    </marker>
-    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0,0 10,3.5 0,7" fill="#4facfe"/>
     </marker>
   </defs>
 
   <!-- Background -->
-  <rect width="600" height="400" fill="#1a1a2e" rx="12"/>
+  <rect width="640" height="380" fill="#1a1a2e" rx="12"/>
 
-  <!-- Coordinate axes (thin, subtle) -->
-  <line x1="60" y1="340" x2="550" y2="340" stroke="#333" stroke-width="0.8"/>
-  <line x1="60" y1="340" x2="60" y2="30" stroke="#333" stroke-width="0.8"/>
-  <text x="558" y="344" fill="#555" font-size="10" font-family="sans-serif">x₁</text>
-  <text x="52" y="26" fill="#555" font-size="10" font-family="sans-serif">x₂</text>
+  <!-- Axes -->
+  <line x1="80" y1="310" x2="580" y2="310" stroke="#444" stroke-width="1"/>
+  <line x1="80" y1="310" x2="80" y2="40" stroke="#444" stroke-width="1"/>
+  <text x="590" y="315" fill="#666" font-size="11" font-family="sans-serif">x₁</text>
+  <text x="72" y="35" fill="#666" font-size="11" font-family="sans-serif">x₂</text>
 
-  <!-- Column space: a LINE (not a plane!) through origin -->
-  <!-- Direction: [0,1,2]^T → in perspective, this goes right and up -->
-  <!-- Origin at (60, 340), line goes to about (200, 120) -->
-  <line x1="60" y1="340" x2="520" y2="60" stroke="#667eea" stroke-width="2.5" stroke-dasharray="12,6" opacity="0.7"/>
-  <line x1="60" y1="340" x2="520" y2="60" stroke="#667eea" stroke-width="2.5" opacity="0.4"/>
-  <!-- Extend beyond -->
-  <line x1="520" y1="60" x2="560" y2="35" stroke="#667eea" stroke-width="1.5" opacity="0.3"/>
+  <!-- Column space plane: rendered as a gradient parallelogram -->
+  <polygon points="80,310 460,310 560,160 180,160" fill="url(#planeGrad)" stroke="#667eea" stroke-width="1.5" stroke-dasharray="6,3"/>
 
-  <!-- Label for the line -->
-  <text x="528" y="52" fill="#667eea" font-size="12" font-family="sans-serif" font-weight="bold">Col(A)</text>
-  <text x="528" y="67" fill="#667eea" font-size="9" font-family="sans-serif" opacity="0.6">方向 [0,1,2]ᵀ</text>
+  <!-- Grid lines on plane (perspective) -->
+  <line x1="80" y1="310" x2="305" y2="235" stroke="#667eea" stroke-width="0.5" stroke-dasharray="4,4" opacity="0.3"/>
+  <line x1="180" y1="160" x2="560" y2="160" stroke="#667eea" stroke-width="0.5" stroke-dasharray="4,4" opacity="0.3"/>
+  <line x1="460" y1="310" x2="305" y2="235" stroke="#667eea" stroke-width="0.5" stroke-dasharray="4,4" opacity="0.3"/>
 
-  <!-- Vector A = [0,1,2]^T (direction indicator, shorter) -->
-  <!-- Aŵ = [0, 0.8, 1.6]^T → roughly 0.8 × the full direction -->
-  <!-- The full direction at length ~3 → need to scale for the diagram -->
-  <!-- Let's use: origin (60,340), projection point at (280, 180) -->
-  <line x1="60" y1="340" x2="280" y2="180" stroke="#4facfe" stroke-width="3.5" marker-end="url(#arrowBlue)"/>
+  <!-- Column space label -->
+  <text x="560" y="145" fill="#667eea" font-size="13" font-family="sans-serif" font-weight="bold">列空间 Col(A)</text>
+  <text x="560" y="163" fill="#667eea" font-size="10" font-family="sans-serif" opacity="0.7">（所有 Ax 的集合）</text>
 
-  <!-- Aŵ label (on the line) -->
-  <circle cx="280" cy="180" r="5" fill="#4facfe"/>
-  <text x="292" y="176" fill="#4facfe" font-size="13" font-family="serif" font-weight="bold">Aŵ = [0, 0.8, 1.6]ᵀ</text>
+  <!-- Vector b (above the plane) — tip at (340, 80) -->
+  <line x1="80" y1="310" x2="340" y2="80" stroke="#f5576c" stroke-width="2.5" marker-end="url(#arrowHeadRed)"/>
+  <text x="348" y="72" fill="#f5576c" font-size="14" font-family="serif" font-weight="bold" font-style="italic">b</text>
 
-  <!-- b vector: from origin to a point OFF the line -->
-  <!-- b = [0, 2, 1]^T → different direction from A -->
-  <line x1="60" y1="340" x2="220" y2="100" stroke="#f5576c" stroke-width="3" marker-end="url(#arrowRed)"/>
+  <!-- Projection: Ax — tip at (340, 210), directly below b in 2D projection -->
+  <!-- This makes the residual r a pure vertical line, clearly perpendicular -->
+  <line x1="80" y1="310" x2="340" y2="210" stroke="#4facfe" stroke-width="3" marker-end="url(#arrowHead)"/>
+  <text x="348" y="218" fill="#4facfe" font-size="14" font-family="serif" font-weight="bold" font-style="italic">A<b>x</b></text>
 
-  <!-- b label -->
-  <text x="205" y="88" fill="#f5576c" font-size="14" font-family="serif" font-weight="bold" font-style="italic">b</text>
-  <text x="205" y="103" fill="#f5576c" font-size="9" font-family="sans-serif">[0,2,1]ᵀ</text>
+  <!-- Projection point on plane -->
+  <circle cx="340" cy="210" r="4" fill="#4facfe"/>
 
-  <!-- Residual: r = b - Aŵ, from projection point to b's tip -->
-  <!-- This should be PERPENDICULAR to the line -->
-  <!-- Projection: (280,180), b tip: (220,100) -->
-  <line x1="280" y1="180" x2="220" y2="100" stroke="#ffd700" stroke-width="2.5" stroke-dasharray="8,5"/>
-  <text x="232" y="142" fill="#ffd700" font-size="12" font-family="serif" font-weight="bold" font-style="italic">r</text>
-  <text x="232" y="156" fill="#ffd700" font-size="9" font-family="sans-serif">[0, 1.2, -0.6]ᵀ</text>
+  <!-- Error vector r: vertical drop from Ax tip to b tip -->
+  <line x1="340" y1="210" x2="340" y2="80" stroke="#ffd700" stroke-width="2.5" stroke-dasharray="8,5"/>
+  <text x="348" y="148" fill="#ffd700" font-size="12" font-family="serif" font-weight="bold" font-style="italic">r = b − A<b>x</b></text>
 
-  <!-- Right angle marker at the projection point -->
-  <!-- The line goes from b tip (220,100) to projection (280,180), so the angle is at (280,180) -->
-  <!-- Direction of A from projection: (60,340) to (280,180) = (-220, 160) → normalize -->
-  <!-- Direction of r from projection: (280,180) to (220,100) = (-60, -80) → normalize -->
-  <!-- Draw a small square at the intersection -->
-  <polyline points="280,180 268,190 258,178" fill="none" stroke="#ffd700" stroke-width="1.8"/>
+  <!-- Prominent right angle marker at (340, 210) -->
+  <!-- Vertical arm (along r): 20px up, horizontal arm (along plane): 16px right -->
+  <polyline points="340,210 340,190 356,190" fill="none" stroke="#ffd700" stroke-width="2"/>
 
-  <!-- Origin point -->
-  <circle cx="60" cy="340" r="4" fill="#aaa"/>
-  <text x="42" y="358" fill="#aaa" font-size="11" font-family="serif">O</text>
+  <!-- Origin -->
+  <circle cx="80" cy="310" r="3" fill="#aaa"/>
+  <text x="60" y="328" fill="#aaa" font-size="11" font-family="serif">O</text>
 
-  <!-- Perpendicular verification note -->
-  <rect x="18" y="18" width="280" height="36" rx="6" fill="#ffffff08" stroke="#333" stroke-width="1"/>
-  <text x="30" y="35" fill="#ffd700" font-size="11" font-family="monospace">Aᵀr = 0·0 + 1·1.2 + 2·(-0.6) = 0  ✓  r ⊥ A</text>
-
-  <!-- Dotted guide: perpendicular drop -->
-  <!-- b tip (220,100) to point on line directly below -->
-  <!-- But the residual IS the perpendicular drop, so no extra guide needed -->
+  <!-- Legend -->
+  <rect x="20" y="20" width="220" height="95" rx="6" fill="#ffffff08" stroke="#333" stroke-width="1"/>
+  <text x="34" y="42" fill="#ccc" font-size="12" font-family="sans-serif" font-weight="bold">最小二乘的几何意义</text>
+  <line x1="30" y1="58" x2="55" y2="58" stroke="#f5576c" stroke-width="2.5"/>
+  <text x="62" y="62" fill="#aaa" font-size="11" font-family="sans-serif">b — 目标向量（在列空间外）</text>
+  <line x1="30" y1="76" x2="55" y2="76" stroke="#4facfe" stroke-width="2.5"/>
+  <text x="62" y="80" fill="#aaa" font-size="11" font-family="sans-serif">Ax — 列空间里离 b 最近的点</text>
+  <line x1="30" y1="94" x2="55" y2="94" stroke="#ffd700" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="62" y="98" fill="#aaa" font-size="11" font-family="sans-serif">r = b−Ax — 残差（垂直于平面）</text>
 </svg>
