@@ -481,10 +481,12 @@ $$\underbrace{\begin{bmatrix} 0 \\ 1 \\ 2 \end{bmatrix}}_{A_{3\times 1}}
 <div class="callout callout-info">
 <strong>🔑 伪逆公式：法方程推导（不用 SVD）</strong><br><br>
 目标是最小化误差平方：$\min_w \|A w - \mathbf{b}\|^2$。<br><br>
-展开：$\|A w - \mathbf{b}\|^2 = (A w - \mathbf{b})^T (A w - \mathbf{b})$<br>
-$= w^T A^T A w - 2 w^T A^T \mathbf{b} + \mathbf{b}^T \mathbf{b}$<br><br>
+$w$ 是标量，所以可以直接展开（和 5.2 节做的完全一样，只是用矩阵符号写）：<br><br>
+$\|A w - \mathbf{b}\|^2 = (A w - \mathbf{b}) \cdot (A w - \mathbf{b})$ ← 向量的点积<br>
+$= (A w)^T (A w) - 2 (A w)^T \mathbf{b} + \mathbf{b}^T \mathbf{b}$ ← 二项式展开<br>
+$= w^2 A^T A - 2 w A^T \mathbf{b} + \mathbf{b}^T \mathbf{b}$ ← $w$ 是标量，提到前面<br><br>
 对 $w$ 求导，令其为 $0$：<br>
-$$2 A^T A w - 2 A^T \mathbf{b} = 0$$<br>
+$$2 A^T A \, w - 2 A^T \mathbf{b} = 0$$<br>
 整理得<strong>法方程</strong>：<br>
 $$A^T A \, w = A^T \mathbf{b}$$<br>
 $A$ 是 3×1 列向量，所以 $A^T A$ 是 $1\times 1$ 标量，直接除过去：<br>
