@@ -600,8 +600,8 @@ $$A^T \mathbf{r}
 </ul>
 
 <figure>
-  <img src="assets/least_squares_geometry.svg" alt="最小二乘的几何意义：b 投影到 A 的列空间" style="max-width:100%;border-radius:8px">
-  <figcaption>图：$\mathbf{b} = [0,2,1]^T$ 投影到方向 $[0,1,2]^T$ 的直线上，垂足 $A\hat{w} = [0,0.8,1.6]^T$。残差 $\mathbf{r} = [0,1.2,-0.6]^T$ 垂直于 $A$（$A^T\mathbf{r}=0$），这正是距离最短的条件。</figcaption>
+  <img src="assets/least_squares_geometry.svg" alt="最小二乘几何：b=[0,2,1]ᵀ投影到方向[0,1,2]ᵀ的直线上，垂足Aŵ=[0,0.8,1.6]ᵀ，残差r⊥A" style="max-width:100%;border-radius:8px">
+  <figcaption>图：$A$ 只有一列，列空间是一条过原点的直线（方向 $[0,1,2]^T$）。$\mathbf{b}=[0,2,1]^T$ 不在线上，最小二乘把 $\mathbf{b}$ 垂直投影到直线上——垂足 $A\hat{w}=[0,0.8,1.6]^T$。残差 $\mathbf{r}=\mathbf{b}-A\hat{w}$（黄色虚线）垂直于直线（$A^T\mathbf{r}=0$），右下角有验证计算。</figcaption>
 </figure>
 
 <h3>5.5 用 SVD 推导：为什么伪逆是最小二乘解？</h3>
