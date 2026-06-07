@@ -562,13 +562,46 @@ $$w = A^+ \mathbf{b} = \frac{A^T \mathbf{b}}{A^T A}
 
 <h3>5.4 几何画面：投影</h3>
 
-<p>$\mathbf{b} = [0,2,1]^T$ 是三维空间里的一个点。$A\mathbf{x} = w \cdot [0,1,2]^T$ 只能落在过原点的、方向为 $[0,1,2]^T$ 的<strong>直线上</strong>（$A$ 的列空间是一条直线，因为 $A$ 只有一列）。</p>
+<p>上面算出了最优权重：$\hat{w} = 0.8$（加个帽子表示「估计值」）。把这个 $\hat{w}$ 代回 $A w$，就得到<strong>最优预测向量</strong>：</p>
 
-<p>$\mathbf{b}$ 不在那条直线上。最小二乘做的事就是：<strong>把 $\mathbf{b}$ 垂直投影到那条直线上</strong>，投影点就是 $A\hat{\mathbf{x}}$（最优预测），垂线长度就是最小残差。</p>
+$$A\hat{w} = 0.8 \cdot \begin{bmatrix}0 \\ 1 \\ 2\end{bmatrix}
+= \begin{bmatrix}0 \\ 0.8 \\ 1.6\end{bmatrix}$$
+
+<p>$\mathbf{b} = [0, 2, 1]^T$ 是真实目标。预测和真实之间的差距——<strong>残差</strong>——是：</p>
+
+$$\mathbf{r} = \mathbf{b} - A\hat{w}
+= \begin{bmatrix}0 \\ 2 \\ 1\end{bmatrix} - \begin{bmatrix}0 \\ 0.8 \\ 1.6\end{bmatrix}
+= \begin{bmatrix}0 \\ 1.2 \\ -0.6\end{bmatrix}$$
+
+<p><strong>关键验证——残差垂直于 $A$：</strong></p>
+
+$$A^T \mathbf{r}
+= \begin{bmatrix}0 & 1 & 2\end{bmatrix} \begin{bmatrix}0 \\ 1.2 \\ -0.6\end{bmatrix}
+= 0 \cdot 0 + 1 \cdot 1.2 + 2 \cdot (-0.6)
+= 1.2 - 1.2
+= 0 \;\checkmark$$
+
+<p>$A^T \mathbf{r} = 0$ 就是内积 $A \cdot \mathbf{r} = 0$——$A$ 和 $\mathbf{r}$ <strong>垂直</strong>。这不是巧合。法方程 $A^T A \hat{w} = A^T \mathbf{b}$ 移项就是 $A^T(\mathbf{b} - A\hat{w}) = 0$，即 $A^T \mathbf{r} = 0$。</p>
+
+<div class="callout callout-idea">
+<strong>💡 垂直于列空间 = 距离最短</strong><br><br>
+列空间是过原点、方向为 $A$ 的一条直线。$\mathbf{b}$ 不在直线上。从 $\mathbf{b}$ 到直线上任一点 $A w$ 的距离是 $\|\mathbf{b} - A w\|$。<br><br>
+<strong>什么时候这段距离最短？</strong>连接线 $\mathbf{b} - A w$ 垂直于直线的时候。直角三角形斜边 > 直角边，任何不垂直的连线都可以通过挪到垂足变短。<br><br>
+这就是为什么最小二乘解 $\hat{w} = 0.8$ 对应的 $A\hat{w}$ 恰好让残差垂直于 $A$——它找的就是垂足。
+</div>
+
+<p><strong>总结构画面：</strong></p>
+<ul>
+  <li>$A$ 的列空间 = 过原点的直线，方向 $\begin{bmatrix}0\\1\\2\end{bmatrix}$</li>
+  <li>$\mathbf{b} = \begin{bmatrix}0\\2\\1\end{bmatrix}$ 在这条直线<strong>外面</strong></li>
+  <li>$A\hat{w} = \begin{bmatrix}0\\0.8\\1.6\end{bmatrix}$ 是直线上离 $\mathbf{b}$ 最近的点——<strong>垂足</strong></li>
+  <li>$\mathbf{r} = \begin{bmatrix}0\\1.2\\-0.6\end{bmatrix}$ 是连接线，<strong>垂直于</strong> $A$</li>
+  <li>残差长度 $\|\mathbf{r}\| = \sqrt{0^2 + 1.2^2 + (-0.6)^2} = \sqrt{1.8} \approx 1.34$，是所有可能 $w$ 中最小的</li>
+</ul>
 
 <figure>
-  <img src="assets/least_squares_geometry.svg" alt="最小二乘的几何意义：b 投影到列空间" style="max-width:100%;border-radius:8px">
-  <figcaption>图：$\mathbf{b}$ 不在 $A$ 的列空间里，最小二乘找的是列空间里离 $\mathbf{b}$ 最近的点 $A\mathbf{x}$——残差 $\mathbf{r} = \mathbf{b} - A\mathbf{x}$ 垂直于列空间。</figcaption>
+  <img src="assets/least_squares_geometry.svg" alt="最小二乘的几何意义：b 投影到 A 的列空间" style="max-width:100%;border-radius:8px">
+  <figcaption>图：$\mathbf{b} = [0,2,1]^T$ 投影到方向 $[0,1,2]^T$ 的直线上，垂足 $A\hat{w} = [0,0.8,1.6]^T$。残差 $\mathbf{r} = [0,1.2,-0.6]^T$ 垂直于 $A$（$A^T\mathbf{r}=0$），这正是距离最短的条件。</figcaption>
 </figure>
 
 <h3>5.5 用 SVD 推导：为什么伪逆是最小二乘解？</h3>
