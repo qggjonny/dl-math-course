@@ -476,11 +476,44 @@ $$\underbrace{\begin{bmatrix} 0 \\ 1 \\ 2 \end{bmatrix}}_{A_{3\times 1}}
 
 <p>$A$ 是 3×1 列向量，$w$ 是标量。$A w = \mathbf{b}$ 无精确解。最小二乘就是要找 $w$ 让 $\|A w - \mathbf{b}\|^2$ 最小。</p>
 
-<p>上面用微积分求出来 $w = 0.8$。用伪逆行不行？$A$ 的伪逆 $A^+$ 是 1×3：</p>
+<p>上面用微积分求出来 $w = 0.8$。用伪逆行不行？</p>
 
-$$w = A^+ \mathbf{b} = \frac{A^T \mathbf{b}}{A^T A} = \frac{0\cdot 0 + 1\cdot 2 + 2\cdot 1}{0^2 + 1^2 + 2^2} = \frac{4}{5} = 0.8 \;\checkmark$$
+<div class="callout callout-info">
+<strong>🔑 关键简化：列向量 $A$ 的伪逆公式</strong><br><br>
+上一节讲伪逆 $A^+ = V\Sigma^+ U^T$。当 $A$ 只有一列时（$m\times 1$），这个公式大幅简化：<br><br>
+$$A^+ = \frac{A^T}{A^T A}$$<br>
+<strong>推导（一步到位）：</strong>$A$ 的 SVD 中，$\Sigma$ 只有一个非零奇异值 $\sigma$，$U$ 的第一列就是 $\frac{A}{\|A\|}$，$V = [1]$。代入 $A^+ = V\Sigma^+ U^T$ 化简即得上式。直观理解：$A^+$ 就是「转置除以长度的平方」。<br><br>
+$1\times 3$ 除 $1\times 1$ 标量 → 结果仍是 $1\times 3$ 行向量。
+</div>
 
-<p><strong>和求导的结果完全一样。</strong>伪逆 $A^+$ 给出的就是最小二乘解。</p>
+<p><strong>第一步：写下 $A$ 和 $\mathbf{b}$。</strong></p>
+
+$$A = \begin{bmatrix} 0 \\ 1 \\ 2 \end{bmatrix},\qquad
+\mathbf{b} = \begin{bmatrix} 0 \\ 2 \\ 1 \end{bmatrix}$$
+
+<p><strong>第二步：算 $A^T \mathbf{b}$（分子）。</strong> $A^T$ 是 $1\times 3$ 行向量 $\begin{bmatrix}0 & 1 & 2\end{bmatrix}$。$A^T$ 乘 $\mathbf{b}$（$3\times 1$）→ $1\times 1$ 标量，就是<strong>内积</strong>：</p>
+
+$$A^T \mathbf{b} = \begin{bmatrix}0 & 1 & 2\end{bmatrix} \begin{bmatrix}0 \\ 2 \\ 1\end{bmatrix}
+= 0 \cdot 0 + 1 \cdot 2 + 2 \cdot 1
+= 0 + 2 + 2
+= 4$$
+
+<p>几何含义：4 是 $\mathbf{b}$ 在 $A$ 方向上的「投影坐标」乘以 $A$ 的长度。</p>
+
+<p><strong>第三步：算 $A^T A$（分母）。</strong> $A^T A$ 是 $A$ 和自己的内积——就是 $A$ 的<strong>长度平方</strong>：</p>
+
+$$A^T A = \begin{bmatrix}0 & 1 & 2\end{bmatrix} \begin{bmatrix}0 \\ 1 \\ 2\end{bmatrix}
+= 0^2 + 1^2 + 2^2
+= 0 + 1 + 4
+= 5$$
+
+<p><strong>第四步：$A^+ \mathbf{b}$ = 分子 ÷ 分母。</strong></p>
+
+$$w = A^+ \mathbf{b} = \frac{A^T \mathbf{b}}{A^T A}
+= \frac{4}{5}
+= 0.8 \;\checkmark$$
+
+<p><strong>和求导的结果完全一样。</strong>伪积公式给的就是最小二乘解。这正好验证：$A^+ \mathbf{b}$ 就是让 $\|A w - \mathbf{b}\|^2$ 最小的那个 $w$。</p>
 
 <h3>5.4 几何画面：投影</h3>
 
