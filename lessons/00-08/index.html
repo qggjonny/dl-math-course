@@ -566,7 +566,9 @@ $$w = A^+ \mathbf{b} = \frac{A^T \mathbf{b}}{A^T A}
 
 <p>现在要找直线上离 $\mathbf{b}$ 最近的点。设直线上任一点为 $A w$，距离是 $\|\mathbf{b} - A w\|$。</p>
 
-<p><strong>什么时候距离最短？</strong>连接线 $\mathbf{r} = \mathbf{b} - A w$ 垂直于直线的时候。为什么？直角三角形的斜边永远大于直角边——只要 $\mathbf{r}$ 不垂直于直线，就可以沿着直线挪动到垂足位置，距离一定更短。</p>
+<p><strong>什么时候距离最短？</strong>先看 $\mathbf{r} = \mathbf{b} - A w$ 这个向量：它的起点是 $A w$（直线上的点），终点是 $\mathbf{b}$（目标点）。所以 $\mathbf{r}$ 就是在两点之间牵的一条<strong>连接线</strong>——它的长度 $\|\mathbf{r}\|$ 恰好就是 $\mathbf{b}$ 到 $A w$ 的距离。</p>
+
+<p>什么时候这条连接线最短？答案是<strong>垂直于直线的时候</strong>。为什么？直角三角形的斜边永远大于直角边——只要 $\mathbf{r}$ 不垂直于直线，就可以沿着直线挪动到垂足位置，距离一定更短。</p>
 
 <p>所以垂足的条件是：<strong>残差 $\mathbf{r}$ 垂直于 $A$</strong>，即内积为零：</p>
 
