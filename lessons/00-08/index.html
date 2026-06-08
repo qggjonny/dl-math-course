@@ -606,7 +606,13 @@ $$A^T \mathbf{r}
 
 <h3>5.5 用 SVD 推导：为什么伪逆是最小二乘解？</h3>
 
-<p>5.3 节用求导推出了单列矩阵的伪逆公式。现在推广到一般情况：$A$ 是 $m \times n$（$m > n$），目标是 $\min_{\mathbf{x}} \|A\mathbf{x} - \mathbf{b}\|^2$。</p>
+<p>5.3 节用求导推出了单列矩阵的伪逆公式。现在推广到一般情况：</p>
+
+$$\underbrace{A}_{m \times n} \cdot \underbrace{\mathbf{x}}_{n \times 1} = \underbrace{A\mathbf{x}}_{m \times 1} \approx \underbrace{\mathbf{b}}_{m \times 1}$$
+
+<p>注意：<strong>$A$ 是矩阵，但 $\mathbf{x}$ 和 $\mathbf{b}$ 始终是列向量</strong>——$\mathbf{x} \in \mathbb{R}^n$，$\mathbf{b} \in \mathbb{R}^m$。它们不是多维矩阵，只是 $n$ 维和 $m$ 维的向量。</p>
+
+<p>$m > n$ 意味着方程比未知数多（超定），目标是 $\min_{\mathbf{x}} \|A\mathbf{x} - \mathbf{b}\|^2$。</p>
 
 <p><strong>第 1 步：代入 SVD。</strong> 把 $A = U\Sigma V^T$ 代入目标函数：</p>
 
@@ -629,7 +635,13 @@ $$\begin{aligned}
 
 <p>$U$ 是正交矩阵，所以 $U^T U = I$（这是正交的定义，00-07 讲过）。第一项 $\mathbf{v}^T U^T U \mathbf{v} = \mathbf{v}^T \mathbf{v}$。</p>
 
-<p>交叉项：$\mathbf{b}^T U \mathbf{v}$ 是一个标量，标量的转置等于自身，所以 $\mathbf{b}^T U \mathbf{v} = (\mathbf{b}^T U \mathbf{v})^T = \mathbf{v}^T U^T \mathbf{b}$。两个交叉项相等：</p>
+<p>交叉项：$\mathbf{b}^T U \mathbf{v}$ 是一个标量。为什么？看维度对齐：</p>
+
+$$\underbrace{\mathbf{b}^T}_{1 \times m} \cdot \underbrace{U}_{m \times m} \cdot \underbrace{\mathbf{v}}_{m \times 1} = 1 \times 1 \;\text{（标量）}$$
+
+<p>因为 $\mathbf{b}$ 是 $m$ 维列向量，转置后变成 $1 \times m$ 行向量，一路消掉 $m$ 维，最后剩 $1 \times 1$。同理 $\mathbf{v}^T U^T \mathbf{b}$ 也是标量（$1 \times m \cdot m \times m \cdot m \times 1 = 1 \times 1$）。</p>
+
+<p>既然是标量，转置等于自身，所以 $\mathbf{b}^T U \mathbf{v} = (\mathbf{b}^T U \mathbf{v})^T = \mathbf{v}^T U^T \mathbf{b}$。两个交叉项相等：</p>
 
 $$\mathbf{v}^T U^T \mathbf{b} + \mathbf{b}^T U \mathbf{v} = 2\,\mathbf{v}^T U^T \mathbf{b}$$
 
