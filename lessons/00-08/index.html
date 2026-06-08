@@ -560,9 +560,33 @@ $$w = A^+ \mathbf{b} = \frac{A^T \mathbf{b}}{A^T A}
 
 <p><strong>和求导的结果完全一样。</strong>伪积公式给的就是最小二乘解。这正好验证：$A^+ \mathbf{b}$ 就是让 $\|A w - \mathbf{b}\|^2$ 最小的那个 $w$。</p>
 
-<h3>5.4 几何画面：投影</h3>
+<h3>5.4 几何画面：投影——为什么 $A\hat{w}$ 是垂足？</h3>
 
-<p>上面算出了最优权重：$\hat{w} = 0.8$（加个帽子表示「估计值」）。把这个 $\hat{w}$ 代回 $A w$，就得到<strong>最优预测向量</strong>：</p>
+<p>$A$ 的列空间是过原点、方向为 $\begin{bmatrix}0\\1\\2\end{bmatrix}$ 的一条直线。$\mathbf{b} = \begin{bmatrix}0\\2\\1\end{bmatrix}$ 在这条直线<strong>外面</strong>。</p>
+
+<p>现在要找直线上离 $\mathbf{b}$ 最近的点。设直线上任一点为 $A w$，距离是 $\|\mathbf{b} - A w\|$。</p>
+
+<p><strong>什么时候距离最短？</strong>连接线 $\mathbf{r} = \mathbf{b} - A w$ 垂直于直线的时候。为什么？直角三角形的斜边永远大于直角边——只要 $\mathbf{r}$ 不垂直于直线，就可以沿着直线挪动到垂足位置，距离一定更短。</p>
+
+<p>所以垂足的条件是：<strong>残差 $\mathbf{r}$ 垂直于 $A$</strong>，即内积为零：</p>
+
+$$A^T \mathbf{r} = 0 \quad\Rightarrow\quad A^T(\mathbf{b} - A\hat{w}) = 0$$
+
+<p>这里的 $\hat{w}$ 加帽子表示「这就是满足垂直条件的那个特殊 $w$」——垂足对应的权重。</p>
+
+<p>展开：</p>
+
+$$A^T \mathbf{b} - A^T A \hat{w} = 0 \quad\Rightarrow\quad A^T A \hat{w} = A^T \mathbf{b}$$
+
+<p>这就是<strong>法方程</strong>。$A^T A$ 是标量（$A$ 只有一列，$A^T A$ 是 $1 \times 3 \cdot 3 \times 1 = 1 \times 1$），所以直接除过去：</p>
+
+$$\hat{w} = \frac{A^T \mathbf{b}}{A^T A}$$
+
+<p>这就是伪逆公式在单列情况下的形式。代入数字：</p>
+
+$$\hat{w} = \frac{A^T \mathbf{b}}{A^T A} = \frac{4}{5} = 0.8$$
+
+<p>现在把 $\hat{w} = 0.8$ 代回 $A w$，得到<strong>直线上离 $\mathbf{b}$ 最近的点——垂足</strong>：</p>
 
 $$A\hat{w} = 0.8 \cdot \begin{bmatrix}0 \\ 1 \\ 2\end{bmatrix}
 = \begin{bmatrix}0 \\ 0.8 \\ 1.6\end{bmatrix}$$
@@ -573,7 +597,7 @@ $$\mathbf{r} = \mathbf{b} - A\hat{w}
 = \begin{bmatrix}0 \\ 2 \\ 1\end{bmatrix} - \begin{bmatrix}0 \\ 0.8 \\ 1.6\end{bmatrix}
 = \begin{bmatrix}0 \\ 1.2 \\ -0.6\end{bmatrix}$$
 
-<p><strong>关键验证——残差垂直于 $A$：</strong></p>
+<p><strong>反向验证——残差的确垂直于 $A$：</strong></p>
 
 $$A^T \mathbf{r}
 = \begin{bmatrix}0 & 1 & 2\end{bmatrix} \begin{bmatrix}0 \\ 1.2 \\ -0.6\end{bmatrix}
@@ -581,13 +605,13 @@ $$A^T \mathbf{r}
 = 1.2 - 1.2
 = 0 \;\checkmark$$
 
-<p>$A^T \mathbf{r} = 0$ 就是内积 $A \cdot \mathbf{r} = 0$——$A$ 和 $\mathbf{r}$ <strong>垂直</strong>。这不是巧合。法方程 $A^T A \hat{w} = A^T \mathbf{b}$ 移项就是 $A^T(\mathbf{b} - A\hat{w}) = 0$，即 $A^T \mathbf{r} = 0$。</p>
+<p>$A^T \mathbf{r} = 0$ 就是内积 $A \cdot \mathbf{r} = 0$——$A$ 和 $\mathbf{r}$ <strong>垂直</strong>。不是巧合，我们就是从 $A^T\mathbf{r}=0$ 出发推出来的 $\hat{w}$。</p>
 
 <div class="callout callout-idea">
-<strong>💡 垂直于列空间 = 距离最短</strong><br><br>
-列空间是过原点、方向为 $A$ 的一条直线。$\mathbf{b}$ 不在直线上。从 $\mathbf{b}$ 到直线上任一点 $A w$ 的距离是 $\|\mathbf{b} - A w\|$。<br><br>
-<strong>什么时候这段距离最短？</strong>连接线 $\mathbf{b} - A w$ 垂直于直线的时候。直角三角形斜边 > 直角边，任何不垂直的连线都可以通过挪到垂足变短。<br><br>
-这就是为什么最小二乘解 $\hat{w} = 0.8$ 对应的 $A\hat{w}$ 恰好让残差垂直于 $A$——它找的就是垂足。
+<strong>💡 三点一线：</strong><br>
+① 垂条件 $A^T(\mathbf{b} - A\hat{w}) = 0$<br>
+② 解法方程得 $\hat{w} = \frac{A^T\mathbf{b}}{A^T A} = 0.8$<br>
+③ $A\hat{w} = \begin{bmatrix}0\\0.8\\1.6\end{bmatrix}$ 就是垂足——直线上离 $\mathbf{b}$ 最近的点
 </div>
 
 <p><strong>总结构画面：</strong></p>
@@ -601,7 +625,7 @@ $$A^T \mathbf{r}
 
 <figure>
   <img src="assets/least_squares_geometry.svg" alt="最小二乘的几何意义：b 投影到 A 的列空间" style="max-width:100%;border-radius:8px">
-  <figcaption>图：$\mathbf{b}$ 不在 $A$ 的列空间里，最小二乘找的是列空间里离 $\mathbf{b}$ 最近的点 $A\mathbf{x}$——残差 $\mathbf{r} = \mathbf{b} - A\mathbf{x}$ 垂直于列空间（图上黄色直角标记）。</figcaption>
+  <figcaption>图：$\mathbf{b}$ 不在 $A$ 的列空间里，最小二乘找的是列空间里离 $\mathbf{b}$ 最近的点 $A\hat{w}$——残差 $\mathbf{r} = \mathbf{b} - A\hat{w}$ 垂直于列空间（图上黄色直角标记）。</figcaption>
 </figure>
 
 <h3>5.5 用 SVD 推导：为什么伪逆是最小二乘解？</h3>
