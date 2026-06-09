@@ -712,13 +712,116 @@ $$\boxed{\|U\Sigma V^T\mathbf{x} - \mathbf{b}\|^2 = \|\Sigma V^T\mathbf{x} - U^T
 
 <p>问题变成：<strong>找 $\mathbf{z}$ 让 $\|\Sigma\mathbf{z} - \mathbf{c}\|^2$ 最小。</strong></p>
 
-<p><strong>为什么变简单了？</strong>因为 $\Sigma$ 是对角矩阵。$\Sigma\mathbf{z}$ 就是把 $z_1$ 乘 $\sigma_1$、$z_2$ 乘 $\sigma_2$……纯逐分量拉伸，<strong>没有交叉项</strong>。所以模平方可以直接逐分量拆开：</p>
+<p><strong>为什么变简单了？</strong>因为 $\Sigma$ 是对角矩阵——</p>
 
-$$\|\Sigma\mathbf{z} - \mathbf{c}\|^2
-= (\sigma_1 z_1 - c_1)^2 + (\sigma_2 z_2 - c_2)^2 + \cdots + (\sigma_n z_n - c_n)^2
-+ \underbrace{(0 - c_{n+1})^2 + \cdots + (0 - c_m)^2}_{\text{$\Sigma$ 在这些方向上输出永远是 0}}$$
+<p><strong>先看清 $\Sigma$ 的形状：</strong></p>
 
-<p>SVD 把原来搅在一起的 $\|A\mathbf{x} - \mathbf{b}\|^2$，拆成了 <strong>$m$ 个互不干扰的独立平方项</strong>。这就是 SVD 推导最小二乘的核心威力。</p>
+$$\underbrace{\Sigma}_{m \times n} =
+\begin{bmatrix}
+\sigma_1 & 0 & \cdots & 0 \\
+0 & \sigma_2 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & \sigma_n \\
+\hline
+0 & 0 & \cdots & 0 \\
+\vdots & \vdots & & \vdots \\
+0 & 0 & \cdots & 0
+\end{bmatrix}
+\quad
+\begin{aligned}
+&\left.\begin{matrix}\\ \\ \\ \\ \end{matrix}\right\} n \text{ 行——对角线上的 }\sigma_i \\
+&\left.\begin{matrix}\\ \\ \\ \end{matrix}\right\} m-n \text{ 行——全是 }0
+\end{aligned}$$
+
+
+<p><strong>$\Sigma\mathbf{z}$ 逐分量写出来：</strong></p>
+
+$$\underbrace{\Sigma}_{m \times n} \cdot
+\underbrace{\mathbf{z}}_{n \times 1} =
+\underbrace{\begin{bmatrix}
+\sigma_1 z_1 \\
+\sigma_2 z_2 \\
+\vdots \\
+\sigma_n z_n \\
+\hline
+0 \\
+\vdots \\
+0
+\end{bmatrix}}_{m \times 1}
+\quad
+\begin{aligned}
+&\left.\begin{matrix}\\ \\ \\ \\ \end{matrix}\right\} \text{前 }n\text{ 个分量：}\sigma_i z_i \\
+&\left.\begin{matrix}\\ \\ \\ \end{matrix}\right\} \text{后 }m-n\text{ 个分量全是 }0
+\end{aligned}$$
+
+
+<p><strong>解释：</strong>$z_1$ 只被 $\sigma_1$ 拉伸（位置(1,1)的 $\sigma_1$ 乘 $z_1$），$z_2$ 只被 $\sigma_2$ 拉伸……$z_n$ 只被 $\sigma_n$ 拉伸。后 $m-n$ 行全是 0——$\mathbf{z}$ 只有 $n$ 个分量，但 $\Sigma$ 有 $m$ 行，多的行没有对应的 $z$ 可乘，输出 0。</p>
+
+<p><strong>$\mathbf{c} = U^T\mathbf{b}$ 也逐分量写出来：</strong></p>
+
+$$\underbrace{\mathbf{c}}_{m \times 1} =
+\begin{bmatrix}
+c_1 \\
+c_2 \\
+\vdots \\
+c_n \\
+\hline
+c_{n+1} \\
+\vdots \\
+c_m
+\end{bmatrix}
+\quad
+\begin{aligned}
+&\left.\begin{matrix}\\ \\ \\ \\ \end{matrix}\right\} \text{前 }n\text{ 个分量} \\
+&\left.\begin{matrix}\\ \\ \\ \end{matrix}\right\} \text{后 }m-n\text{ 个分量}
+\end{aligned}$$
+
+
+<p><strong>现在做减法 $\Sigma\mathbf{z} - \mathbf{c}$：</strong></p>
+
+$$\Sigma\mathbf{z} - \mathbf{c} =
+\begin{bmatrix}
+\sigma_1 z_1 \\
+\sigma_2 z_2 \\
+\vdots \\
+\sigma_n z_n \\
+0 \\
+\vdots \\
+0
+\end{bmatrix} -
+\begin{bmatrix}
+c_1 \\
+c_2 \\
+\vdots \\
+c_n \\
+c_{n+1} \\
+\vdots \\
+c_m
+\end{bmatrix} =
+\underbrace{\begin{bmatrix}
+\sigma_1 z_1 - c_1 \\
+\sigma_2 z_2 - c_2 \\
+\vdots \\
+\sigma_n z_n - c_n \\
+\hline
+0 - c_{n+1} \\
+\vdots \\
+0 - c_m
+\end{bmatrix}}_{m \times 1}$$
+
+
+<p><strong>关键观察：</strong>前 $n$ 个分量是 $\sigma_i z_i - c_i$——里面都有 $z_i$，可以通过选 $z_i$ 来调整。后 $m-n$ 个分量是 $0 - c_j$——<strong>$z$ 根本不出现</strong>，不管 $z$ 怎么选，这一块永远是 $-c_j$，完全动不了。</p>
+
+<p><strong>最后算模平方</strong>——模平方的定义就是每个分量平方再求和（00-01，$\|\mathbf{v}\|^2 = v_1^2 + v_2^2 + \cdots$）：</p>
+
+$$\boxed{\begin{aligned}
+\|\Sigma\mathbf{z} - \mathbf{c}\|^2
+&= (\sigma_1 z_1 - c_1)^2 + (\sigma_2 z_2 - c_2)^2 + \cdots + (\sigma_n z_n - c_n)^2 \\
+&\quad + \underbrace{(0 - c_{n+1})^2 + \cdots + (0 - c_m)^2}_{\text{$\Sigma$ 在这些方向上输出永远是 0，$z$ 影响不了}}
+\end{aligned}}$$
+
+
+<p><strong>SVD 的威力就在这里：</strong>原来 $\|A\mathbf{x} - \mathbf{b}\|^2$ 里，$A$ 是满的——每个 $\mathbf{x}$ 分量都搅进每一个输出分量。SVD 一通旋转（$V^T$ 和 $U^T$）之后，$\Sigma$ 是对角的——$z_i$ 各管各的，互不干扰。$m$ 维的优化问题崩解成 $n$ 个独立的单变量平方项 + $m-n$ 个无法优化的常数项。</p>
 
 <p>前 $n$ 项：令 $z_i = c_i / \sigma_i$ 可以把每一项都归零——因为 $z_i$ 是自由的，我们可以选择让 $\sigma_i z_i$ 恰好等于 $c_i$。</p>
 
