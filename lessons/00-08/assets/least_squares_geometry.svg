@@ -27,10 +27,10 @@
   <text x="560" y="145" fill="#667eea" font-size="13" font-family="sans-serif" font-weight="bold">列空间 Col(A)</text>
   <text x="560" y="163" fill="#667eea" font-size="10" font-family="sans-serif" opacity="0.7">（所有 Ax 的集合）</text>
 
-  <!-- Ax: extends past the projection point -->
+  <!-- Aŵ: extends past the projection point -->
   <!-- Origin (80,310), tip (480,110), foot (320,190) -->
   <line x1="80" y1="310" x2="480" y2="110" stroke="#4facfe" stroke-width="3" marker-end="url(#arrowHead)"/>
-  <text x="488" y="118" fill="#4facfe" font-size="14" font-family="serif" font-weight="bold" font-style="italic">A<b>x</b></text>
+  <text x="488" y="118" fill="#4facfe" font-size="14" font-family="serif" font-weight="bold" font-style="italic">A<b>ŵ</b></text>
 
   <!-- Projection foot — on Ax line, not at tip -->
   <circle cx="320" cy="190" r="4.5" fill="#4facfe" stroke="#fff" stroke-width="1"/>
@@ -41,7 +41,7 @@
 
   <!-- Residual r: vertical drop to foot -->
   <line x1="320" y1="190" x2="320" y2="70" stroke="#ffd700" stroke-width="2.5" stroke-dasharray="8,5"/>
-  <text x="330" y="135" fill="#ffd700" font-size="12" font-family="serif" font-weight="bold" font-style="italic">r = b − A<b>x</b></text>
+  <text x="330" y="135" fill="#ffd700" font-size="12" font-family="serif" font-weight="bold" font-style="italic">r = b − A<b>ŵ</b></text>
 
   <!-- RIGHT ANGLE MARKER: a square at the corner P, centered at midpoint M -->
   <!-- P = (320, 190) — intersection -->
@@ -59,7 +59,7 @@
   <line x1="30" y1="58" x2="55" y2="58" stroke="#f5576c" stroke-width="2.5"/>
   <text x="62" y="62" fill="#aaa" font-size="11" font-family="sans-serif">b — 目标向量（在列空间外）</text>
   <line x1="30" y1="76" x2="55" y2="76" stroke="#4facfe" stroke-width="2.5"/>
-  <text x="62" y="80" fill="#aaa" font-size="11" font-family="sans-serif">Ax — 列空间里离 b 最近的点</text>
+  <text x="62" y="80" fill="#aaa" font-size="11" font-family="sans-serif">Aŵ — 列空间里离 b 最近的点</text>
   <line x1="30" y1="94" x2="55" y2="94" stroke="#ffd700" stroke-width="2" stroke-dasharray="4,3"/>
-  <text x="62" y="98" fill="#aaa" font-size="11" font-family="sans-serif">r = b−Ax — 残差（垂直于平面）</text>
+  <text x="62" y="98" fill="#aaa" font-size="11" font-family="sans-serif">r = b−Aŵ — 残差（垂直于列空间）</text>
 </svg>
