@@ -543,7 +543,19 @@ $$A^T \mathbf{b} = \begin{bmatrix}0 & 1 & 2\end{bmatrix} \begin{bmatrix}0 \\ 2 \
 = 0 + 2 + 2
 = 4$$
 
-<p>几何含义：4 是 $\mathbf{b}$ 在 $A$ 方向上的「投影坐标」乘以 $A$ 的长度。</p>
+<p><strong>为什么 $A^T \mathbf{b}$ 就是内积？</strong> 列向量 $A$ 放在左边是做矩阵乘法，但两个列向量不能直接乘——所以把 $A$ <strong>转置</strong>成行向量 $A^T$，这是实现内积的语法手段：</p>
+
+$$A^T \mathbf{b} = A \cdot \mathbf{b} = \|A\|\,\|\mathbf{b}\|\,\cos\theta$$
+
+<p>我们在 <strong>00-05 特征值</strong> 那节课学过：两个向量的内积 = <strong>「一个向量在另一个方向上的投影长度 × 另一个向量的长度」</strong>。套到这里：</p>
+
+<div class="callout callout-info">
+<strong>🔍 $A^T \mathbf{b} = 4$ 的几何含义拆解：</strong><br>
+① $\|\mathbf{b}\|\cos\theta$ = $\mathbf{b}$ <strong>投影到 $A$ 那条直线上</strong>的影子长度<br>
+② 再乘 $\|A\|$ = $A$ 自己的长度<br>
+③ 所以 4 = ($\mathbf{b}$ 在 $A$ 上的投影长度) × ($A$ 的长度)<br>
+结论：<strong>「在 $A$ 方向上」指的不是 $A^T$，而是列向量 $A$</strong>——$A^T$ 只是做内积的语法工具，几何主语永远是列向量。
+</div>
 
 <p><strong>第三步：算 $A^T A$（分母）。</strong> $A^T A$ 是 $A$ 和自己的内积——就是 $A$ 的<strong>长度平方</strong>：</p>
 
