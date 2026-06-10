@@ -823,15 +823,90 @@ $$\boxed{\begin{aligned}
 
 <p><strong>SVD 的威力就在这里：</strong>原来 $\|A\mathbf{x} - \mathbf{b}\|^2$ 里，$A$ 是满的——每个 $\mathbf{x}$ 分量都搅进每一个输出分量。SVD 一通旋转（$V^T$ 和 $U^T$）之后，$\Sigma$ 是对角的——$z_i$ 各管各的，互不干扰。$m$ 维的优化问题崩解成 $n$ 个独立的单变量平方项 + $m-n$ 个无法优化的常数项。</p>
 
-<p>前 $n$ 项：令 $z_i = c_i / \sigma_i$ 可以把每一项都归零——因为 $z_i$ 是自由的，我们可以选择让 $\sigma_i z_i$ 恰好等于 $c_i$。</p>
+<p><strong>第 4 步：逐项归零。</strong></p>
 
-<p>后面 $m-n$ 项：$\Sigma$ 在这些方向上输出永远是 0。$c_{n+1}, \dots, c_m$ 是 $\mathbf{b}$ 在 $A$ 的列空间<strong>之外</strong>的分量——无论怎么调 $\mathbf{x}$ 都影响不了它们。</p>
+<p>现在要把 $\|\Sigma\mathbf{z} - \mathbf{c}\|^2$ 变小。前 $n$ 项 $(\sigma_i z_i - c_i)^2$ 都是平方——最小是 0，取到 0 的条件是：</p>
 
-<p><strong>这就解释了残差为什么不可避免：</strong>$\mathbf{b}$ 在列空间之外的部分，最小二乘也管不了。但管不了不等于不尽力——前 $n$ 项归零已经是在列空间内做到了最好。</p>
+$$\sigma_i z_i - c_i = 0 \quad\Rightarrow\quad z_i = \frac{c_i}{\sigma_i} \qquad (i = 1, 2, \dots, n)$$
 
-<p><strong>结果：</strong>$z_i = c_i / \sigma_i$ → $\mathbf{z} = \Sigma^+ \mathbf{c}$ → 代回去：</p>
+<p>后 $m-n$ 项 $(0 - c_j)^2 = c_j^2$ ——$z$ 根本不出现，无法优化。</p>
 
-$$\mathbf{x} = V\Sigma^+ U^T \mathbf{b} = A^+ \mathbf{b}$$
+<p><strong>这就解释了残差为什么不可避免：</strong>$\mathbf{b}$ 在列空间之外的部分（$c_{n+1}, \dots, c_m$），最小二乘也管不了。但管不了不等于不尽力——前 $n$ 项归零已经是在列空间内做到了最好。</p>
+
+<p><strong>第 5 步：把 $z_i = c_i/\sigma_i$ 写成矩阵形式。</strong></p>
+
+<p>00-07 学过，$\Sigma$ 的伪逆 $\Sigma^+$ 是 $n \times m$ 矩阵，对角线放 $1/\sigma_i$：</p>
+
+$$\underbrace{\Sigma^+}_{n \times m} =
+\begin{bmatrix}
+1/\sigma_1 & 0 & \cdots & 0 & | & 0 & \cdots & 0 \\
+0 & 1/\sigma_2 & \cdots & 0 & | & 0 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots & | & \vdots & & \vdots \\
+0 & 0 & \cdots & 1/\sigma_n & | & 0 & \cdots & 0
+\end{bmatrix}$$
+
+
+<p>用 $\Sigma^+$ 乘 $\mathbf{c}$：</p>
+
+$$\Sigma^+ \mathbf{c} =
+\begin{bmatrix}
+1/\sigma_1 & \cdots & 0 & 0 & \cdots & 0 \\
+\vdots & \ddots & \vdots & \vdots & & \vdots \\
+0 & \cdots & 1/\sigma_n & 0 & \cdots & 0
+\end{bmatrix}
+\begin{bmatrix}
+c_1 \\ \vdots \\ c_n \\ \hline c_{n+1} \\ \vdots \\ c_m
+\end{bmatrix} =
+\underbrace{\begin{bmatrix}
+c_1/\sigma_1 \\
+c_2/\sigma_2 \\
+\vdots \\
+c_n/\sigma_n
+\end{bmatrix}}_{n \times 1}
+= \begin{bmatrix}
+z_1 \\ z_2 \\ \vdots \\ z_n
+\end{bmatrix}
+= \mathbf{z}$$
+
+
+<p>注意 $\Sigma^+$ 右半全是 0——$c_{n+1}, \dots, c_m$ 被 $\Sigma^+$ 直接「吞掉」了，不进入 $\mathbf{z}$。所以 $\mathbf{z} = \Sigma^+ \mathbf{c}$ 就是 $z_i = c_i / \sigma_i$ 的矩阵写法。</p>
+
+<p><strong>第 6 步：从 $\mathbf{z}$ 回到 $\mathbf{x}$。</strong></p>
+
+<p>我们做了一串换元，现在沿着来的路一步一步走回去：</p>
+
+$$\boxed{\begin{aligned}
+\mathbf{z} &= V^T \mathbf{x}
+    &&\text{（第 3 步的定义：把 }\mathbf{x}\text{ 旋转到右奇异向量基）} \\[4pt]
+\mathbf{c} &= U^T \mathbf{b}
+    &&\text{（第 3 步的定义：把 }\mathbf{b}\text{ 旋转到左奇异向量基）} \\[4pt]
+\mathbf{z} &= \Sigma^+ \mathbf{c}
+    &&\text{（第 5 步：在自然坐标下的最优解）}
+\end{aligned}}$$
+
+
+<p>从 $\mathbf{z} = V^T \mathbf{x}$ 解出 $\mathbf{x}$——两边左乘 $V$，利用 $V V^T = I$（$V$ 正交，00-07）：</p>
+
+$$V \mathbf{z} = V V^T \mathbf{x} = \mathbf{x}
+\quad\Rightarrow\quad \mathbf{x} = V \mathbf{z}$$
+
+
+<p>把 $\mathbf{z} = \Sigma^+ \mathbf{c}$ 和 $\mathbf{c} = U^T \mathbf{b}$ 一层层代入：</p>
+
+$$\begin{aligned}
+\mathbf{x} &= V \mathbf{z}
+            &&\text{（$\mathbf{z}$ 回到 $\mathbf{x}$）} \\
+           &= V (\Sigma^+ \mathbf{c})
+            &&\text{（代入最优 $\mathbf{z}$）} \\
+           &= V \Sigma^+ (U^T \mathbf{b})
+            &&\text{（代入 $\mathbf{c}$ 的定义）} \\
+           &= \underbrace{V \Sigma^+ U^T}_{A^+} \, \mathbf{b}
+            &&\text{（00-07：$A^+ = V\Sigma^+ U^T$ 就是伪逆的定义）} \\[4pt]
+           &= A^+ \mathbf{b}
+\end{aligned}$$
+
+
+<p><strong>完整链条：</strong>把 $\mathbf{x}$ 换元到 $\mathbf{z}$ → 在自然坐标下优化（各管各，互不干扰） → 解得 $\mathbf{z} = \Sigma^+ \mathbf{c}$ → 沿原路走回去 → $\mathbf{x} = V\Sigma^+ U^T \mathbf{b} = A^+ \mathbf{b}$。</p>
 
 <p><strong>关于 $U$、$V$ 的手算：</strong>这个推导用了 SVD，但没有手算 $U$ 和 $V$——所有数都是符号（$U$、$\Sigma$、$V^T$）在推导中被消掉，最后只留下 $A^+ \mathbf{b}$。实际中，$U$、$V$ 的具体数值由 `np.linalg.svd()` 完成——背后是解 $A^T A$ 的特征值问题，不值得手算。知道它们存在、知道它们的性质（正交、对角化 $A$），就足以驾驭 SVD 了。</p>
 
