@@ -2,14 +2,14 @@
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>00-10 导数与偏导数 · 深度学习数学</title>
-<link rel="stylesheet" href="../../css/style.css?v=20260601">
+<link rel="stylesheet" href="../../css/style.css?v=20260602">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
 onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 </head><body>
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-10</span>
-<span><a href="../00-05/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-08/">下一课 →</a></span></nav>
+<span><a href="../00-09/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-11/">下一课 →</a></span></nav>
 <div class="container">
 <h1>00-10 导数与偏导数</h1>
 <hr>
@@ -58,7 +58,7 @@ $$\boxed{(x^n)' = n \cdot x^{n-1}}$$
 </div>
 <h3>代码验证：数值微分</h3>
 <p>定义里的 $\lim_{\epsilon \to 0}$ 在计算机上没法真正做到——但取一个很小的 $\epsilon$（比如 $10^{-5}$），差商 $\frac{f(x+\epsilon)-f(x)}{\epsilon}$ 会非常接近真实导数。这叫<strong>数值微分</strong>。</p>
-<pre><code><span class="hl-comment"># 00-08 第一步：数值微分——用定义验证 f(x)=x² 的导数 f'(x)=2x</span>
+<pre><code><span class="hl-comment"># 00-10 第一步：数值微分——用定义验证 f(x)=x² 的导数 f'(x)=2x</span>
 <span class="hl-comment"># 导入numpy，别名np（本例主要用于规范，实际未用numpy功能）</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
@@ -100,7 +100,7 @@ $$\boxed{(x^n)' = n \cdot x^{n-1}}$$
 <li>对 $y$ 求偏导：$\frac{\partial f}{\partial y} = 0 + 3x + 3y^2$。$x^2$ 看成常数 → 导数 = 0</li>
 </ul>
 <h3>代码验证：偏导数数值计算</h3>
-<pre><code><span class="hl-comment"># 00-08 第二步：偏导数数值计算——验证 ∂f/∂x 和 ∂f/∂y</span>
+<pre><code><span class="hl-comment"># 00-10 第二步：偏导数数值计算——验证 ∂f/∂x 和 ∂f/∂y</span>
 <span class="hl-comment"># 导入numpy，别名np</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
@@ -146,17 +146,17 @@ py_num = partial_y(g, x0, y0)             <span class="hl-comment"># 数值计�
 $$\nabla f = \begin{bmatrix} \frac{\partial f}{\partial x} \\[4pt] \frac{\partial f}{\partial y} \end{bmatrix}$$
 <p>对 $f(x,y) = x^2 + 3xy + y^3$，梯度 = $\begin{bmatrix} 2x+3y \\ 3x+3y^2 \end{bmatrix}$。</p>
 <p>在点 $(2,3)$ 处，梯度 = $\begin{bmatrix} 13 \\ 33 \end{bmatrix}$。</p>
-<p>梯度的几何含义是下一课（00-07）的主题——这里先知道它就是把所有偏导打包成一个向量。</p>
+<p>梯度的几何含义是下一课（00-11）的主题——这里先知道它就是把所有偏导打包成一个向量。</p>
 <hr>
 <h2>💭 概念题</h2>
 <ol>
 <li>导数 $f'(3) = -2$ 意味着什么？在 $x=3$ 附近，$x$ 增大一点，$f(x)$ 会怎样变化？——考察：导数的符号含义</li>
 <li>$f(x) = 7$（常数函数）的导数是多少？从「坡度」的角度解释——考察：常数的导数为零的直觉</li>
-<li>对 $f(x,y) = x^2y + \sin(x)$，分别求 $\frac{\partial f}{\partial x}$ 和 $\frac{\partial f}{\partial y}$——考察：偏导数把另一变量当常数</li>
+<li>对 $f(x,y) = x^2y + xy^2$，分别求 $\frac{\partial f}{\partial x}$ 和 $\frac{\partial f}{\partial y}$——考察：偏导数把另一变量当常数</li>
 </ol>
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-08/">← 00-07</a><a href="../../">📖 目录</a><a href="../00-11/">00-09 →</a></nav>
+<a href="../00-09/">← 00-09</a><a href="../../">📖 目录</a><a href="../00-11/">00-11 →</a></nav>
 </div>
 <script>
 (function(){
