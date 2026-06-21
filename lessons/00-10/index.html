@@ -35,19 +35,56 @@ f'(x) &= \lim_{\epsilon \to 0} \frac{(x+\epsilon)^2 - x^2}{\epsilon} \\[4pt]
 &= \lim_{\epsilon \to 0} \frac{2x\epsilon + \epsilon^2}{\epsilon} = \lim_{\epsilon \to 0} (2x + \epsilon) = 2x
 \end{aligned}$$
 <p>所以 $(x^2)' = 2x$。每步做了什么：① 展开平方 ② 消掉 $x^2$ ③ 提出 $\epsilon$ 消掉 ④ $\epsilon \to 0$ 时 $\epsilon$ 项消失。</p>
-<p><strong>$f(x) = x^n$ 的通式（幂函数求导）：</strong> 还是走定义，三步拆开：</p>
+<p><strong>$f(x) = x^n$ 的通式（幂函数求导）：</strong> 还是走定义，但这次 $n$ 可以是任意正整数。关键一步是把 $(x+\epsilon)^n$ 展开——这叫<strong>二项式展开</strong>。别被名字吓到，直接从 $n=3$ 走一遍，再推广。</p>
 
-<p><strong>① 二项式展开：</strong></p>
-$$(x+\epsilon)^n = x^n + n x^{n-1}\epsilon + \binom{n}{2} x^{n-2}\epsilon^2 + \dots + \epsilon^n$$
-<p>第一项是 $x^n$，后面每一项都带着 $\epsilon$ 或更高次幂。</p>
+<h3>先看 $n=3$：完全展开，逐项看清楚</h3>
+<p>$(x+\epsilon)^3 = (x+\epsilon)(x+\epsilon)(x+\epsilon)$。老老实实乘开：</p>
+$$\begin{aligned}
+(x+\epsilon)^3 &= (x+\epsilon)(x+\epsilon)(x+\epsilon) \\[4pt]
+&= (x^2 + 2x\epsilon + \epsilon^2)(x+\epsilon) \\[4pt]
+&= x^3 + x^2\epsilon + 2x^2\epsilon + 2x\epsilon^2 + x\epsilon^2 + \epsilon^3 \\[4pt]
+&= x^3 + 3x^2\epsilon + 3x\epsilon^2 + \epsilon^3
+\end{aligned}$$
+
+<p>整理后四个项：</p>
+<table>
+<tr><th>项</th><th>系数</th><th>$\epsilon$ 的次方</th></tr>
+<tr><td>$x^3$</td><td>1</td><td>$\epsilon^0$（没有 $\epsilon$）</td></tr>
+<tr><td>$3x^2\epsilon$</td><td>3</td><td>$\epsilon^1$</td></tr>
+<tr><td>$3x\epsilon^2$</td><td>3</td><td>$\epsilon^2$</td></tr>
+<tr><td>$\epsilon^3$</td><td>1</td><td>$\epsilon^3$</td></tr>
+</table>
+<p>系数 1, 3, 3, 1——正好是<strong>杨辉三角</strong>第 3 行。这不是巧合。</p>
+
+<h3>推广到一般的 $n$</h3>
+<p>对于任意正整数 $n$，$(x+\epsilon)^n$ 展开后也是类似的模式：</p>
+$$(x+\epsilon)^n = x^n + n x^{n-1}\epsilon + (\text{某个数})\, x^{n-2}\epsilon^2 + \cdots + \epsilon^n$$
+
+<p>我们不需要知道每个系数具体是多少——只需要看清三件事：</p>
+<ul>
+<li><strong>第一项永远是 $x^n$。</strong> 所有 $n$ 次都选了 $x$，一个 $\epsilon$ 都没选——只有 1 种选法，系数 = 1。</li>
+<li><strong>第二项的系数永远是 $n$。</strong> 从 $n$ 个 $(x+\epsilon)$ 中选 1 个 $\epsilon$（其余选 $x$），有 $n$ 种选法。所以这一项是 $n x^{n-1}\epsilon$。</li>
+<li><strong>后面的项都带着 $\epsilon^2$ 或更高次方。</strong> 选了 2 个或更多 $\epsilon$。</li>
+</ul>
+
+<h3>回到导数——走三步</h3>
+<p><strong>① 展开：</strong> $(x+\epsilon)^n = x^n + n x^{n-1}\epsilon + (\text{带 }\epsilon^2\text{ 及更高次的项})$</p>
 
 <p><strong>② 代入差商：</strong></p>
-$$\frac{f(x+\epsilon) - f(x)}{\epsilon} = \frac{(x^n + n x^{n-1}\epsilon + \epsilon^2\cdot(\cdots)) - x^n}{\epsilon} = n x^{n-1} + \epsilon \cdot (\cdots)$$
-<p>$x^n$ 被减掉消了；剩下的每一项都除以 $\epsilon$，$n x^{n-1}\epsilon / \epsilon = n x^{n-1}$，其余项除完后还有 $\epsilon$ 因子。</p>
+$$\begin{aligned}
+\frac{f(x+\epsilon) - f(x)}{\epsilon}
+&= \frac{(x+\epsilon)^n - x^n}{\epsilon} \\[4pt]
+&= \frac{(x^n + n x^{n-1}\epsilon + \epsilon^2\!\cdot\!(\cdots)) - x^n}{\epsilon} \\[4pt]
+&= \frac{n x^{n-1}\epsilon + \epsilon^2\!\cdot\!(\cdots)}{\epsilon} \\[4pt]
+&= n x^{n-1} + \epsilon \!\cdot\! (\cdots)
+\end{aligned}$$
 
-<p><strong>③ 取极限 $\epsilon \to 0$：</strong> 带 $\epsilon$ 的项全部归零——只留下 $n x^{n-1}$。结果是：</p>
+<p>每步做了什么：$x^n$ 和 $-x^n$ 抵消；第一项 $n x^{n-1}\epsilon$ 除以 $\epsilon$ 得到 $n x^{n-1}$（干净！）；后面所有带 $\epsilon^2$ 及更高次的项，除以 $\epsilon$ 后还剩至少一个 $\epsilon$ 因子。</p>
+
+<p><strong>③ 取极限 $\epsilon \to 0$：</strong> 所有还带着 $\epsilon$ 的项全部归零——只留下<strong>干干净净的 $n x^{n-1}$</strong>。</p>
 $$\boxed{(x^n)' = n \cdot x^{n-1}}$$
-<p>例子：$(x^3)' = 3x^2$，$(x)' = 1 \cdot x^0 = 1$，$(5)' = 0$（常数斜率永远是 0——一条水平线没有坡度）。</p>
+
+<p>用 $n=3$ 验证：$(x^3)' = 3x^2$。用 $n=2$ 验证：$(x^2)' = 2x$——和前面一步步手算的结果一致 ✓。$(x)' = 1 \cdot x^0 = 1$，$(5)' = 0$（常数相当于 $x^0$，导数是 $0 \cdot x^{-1} = 0$——水平线没有坡度）。</p>
 <div class="callout callout-info">
 <strong>🔗 求和与常数倍的规则：</strong> 求导是线性运算。
 <ul>
