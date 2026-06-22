@@ -1,217 +1,123 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>00-22 最大似然估计 MLE · 深度学习数学</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-  <link rel="stylesheet" href="../../css/style.css?v=20260601">
-</head>
-<body>
-
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>00-22 条件概率与贝叶斯 · 深度学习数学</title>
+<link rel="stylesheet" href="../../css/style.css?v=20260601">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head><body>
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-22</span>
-<span><a href="../00-21/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-23/">下一课 →</a></span></nav>
-
+<span><a href="../00-15/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-19/">下一课 →</a></span></nav>
 <div class="container">
-
-<p style="color:var(--text-light);font-size:0.9em">🌱 阶段 0 · 第 18 课</p>
-<h1>最大似然估计 MLE</h1>
-
-<h2>一、反问题：看到结果，猜原因</h2>
-
-<p><strong>画面：</strong> 你走进一间屋子，发现地上有几根头发、一杯没喝完的咖啡。你想知道：刚才在这里的人更喜欢喝咖啡还是喝茶？</p>
-
-<p>你没法直接知道，但可以<strong>反推</strong>：如果这个人喝咖啡，地上出现这些现象的概率有多大？如果喝茶呢？比较这两个概率——哪个更高，哪个解释更合理。</p>
-
-<p>这就是<strong>似然</strong>的直觉：</p>
-
-$$P(\text{观察到这些} \mid \text{假设这个参数})$$
-
-<p>数据是固定的，参数是变量。<strong>在所有可能的参数值中，选那个"让观测数据出现概率最大"的参数。</strong></p>
-
-<h2>二、抛硬币的例子</h2>
-
-<p>抛一枚硬币 10 次，7 次正面。硬币正面概率 $\theta$ 是多少？</p>
-
-<p>如果 $\theta = 0.5$（公平硬币），出现"10 次中 7 次正面"的概率：</p>
-
-$$P(7\text{正} \mid \theta=0.5) = \binom{10}{7} (0.5)^7 (0.5)^3 \approx 0.117$$
-
-<p>如果 $\theta = 0.7$：</p>
-
-$$P(7\text{正} \mid \theta=0.7) = \binom{10}{7} (0.7)^7 (0.3)^3 \approx 0.267$$
-
-<p>$0.267 > 0.117$——$\theta=0.7$ 比 $\theta=0.5$ 更有可能产生这个结果。<strong>那最可能的是哪个？</strong></p>
-
-<h2>三、似然函数</h2>
-
-<p>把概率写成 $\theta$ 的函数——这就是<strong>似然函数</strong>：</p>
-
-$$L(\theta) = P(\text{数据} \mid \theta) = \binom{10}{7} \theta^7 (1-\theta)^3$$
-
-<p>$\binom{10}{7}$ 是常数，不影响最大化。所以最大化 $L(\theta)$ 等价于最大化：</p>
-
-$$\theta^7 (1-\theta)^3$$
-
-<pre><code><span class="hl-comment"># 00-18 似然函数 — 抛硬币 10 次 7 正，猜 θ</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-
-<span class="hl-comment"># 100 个候选 θ 值</span>
-thetas = np.linspace(<span class="hl-number">0.01</span>, <span class="hl-number">0.99</span>, <span class="hl-number">100</span>)
-<span class="hl-comment"># L(θ) = θ⁷(1-θ)³</span>
-likelihood = thetas**<span class="hl-number">7</span> * (<span class="hl-number">1</span> - thetas)**<span class="hl-number">3</span>
-best_idx = np.argmax(likelihood)              <span class="hl-comment"># 似然最大的 θ 的下标</span>
-
-<span class="hl-builtin">print</span>(<span class="hl-string">f"最大似然估计 θ̂ = {thetas[best_idx]:.3f}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"直觉：7/10 = {7/10}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"一致！MLE = 样本比例"</span>)
-</code></pre>
-
-<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-
-<p>结果 $\hat{\theta}_{\text{MLE}} = 0.7$。直觉正确：抛 10 次 7 正，正面率最可能是 0.7。</p>
-
-<h2>四、对数似然——把乘变加</h2>
-
-<p>实际问题中数据量很大，$\theta_1 \times \theta_2 \times \cdots \times \theta_N$ 会溢出或下溢。对策：<strong>取对数</strong>。</p>
-
-<p>$\ln$ 是单调增函数，所以最大化 $L(\theta)$ 和最大化 $\ln L(\theta)$ 等价：</p>
-
-$$\ell(\theta) = \ln L(\theta) = 7\ln\theta + 3\ln(1-\theta) + \text{常数}$$
-
-<p>乘法变成加法——好算了。然后对 $\theta$ 求导：</p>
-
-$$\frac{d\ell}{d\theta} = \frac{7}{\theta} - \frac{3}{1-\theta} = 0 \quad\Longrightarrow\quad \hat{\theta} = \frac{7}{10}$$
-
-<p>一般情况：$n$ 次试验 $k$ 次成功 → $\hat{\theta}_{\text{MLE}} = k/n$。</p>
-
-<h2>五、MLE 通向损失函数</h2>
-
-<p>这是 MLE 最核心的用途——<strong>它解释了为什么交叉熵是分类的损失函数、MSE 是回归的损失函数。</strong></p>
-
-<p><strong>回归：假设误差服从高斯分布。</strong></p>
-
-<p>模型预测 $\hat{y}$，真实值 $y$。假设 $y = \hat{y} + \varepsilon$，$\varepsilon \sim \mathcal{N}(0, \sigma^2)$：</p>
-
-$$P(y \mid \hat{y}) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y - \hat{y})^2}{2\sigma^2}\right)$$
-
-<p>$N$ 个独立样本的似然：</p>
-
-$$L = \prod_{i=1}^N \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right)$$
-
-<p>取对数——把连乘变成连加：</p>
-
-$$\begin{aligned}
-\ell &= \ln L = \ln\prod_{i=1}^N \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right) \\[4pt]
-&= \sum_{i=1}^N \ln\left[\frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right)\right] \\[4pt]
-&= \underbrace{N \ln\frac{1}{\sqrt{2\pi\sigma^2}}}_{\text{常数，不依赖 }\hat{y}_i} \;+\; \sum_{i=1}^N \left(-\frac{(y_i - \hat{y}_i)^2}{2\sigma^2}\right)
-\end{aligned}$$
-
-<p>常数项 $N\ln(1/\sqrt{2\pi\sigma^2})$ 不含模型参数 $\hat{y}_i$，不影响优化——最大化 $\ell$ 时可以丢掉。因子 $1/(2\sigma^2) > 0$ 是正常数，最小化时也可省略。所以：</p>
-
-$$\text{最大化 }\ell \;\Longleftrightarrow\; \text{最小化 } \sum_{i=1}^N (y_i - \hat{y}_i)^2$$
-
-<p><strong>最大化 $\ell$ = 最小化 $\sum (y_i - \hat{y}_i)^2$ → MSE！</strong></p>
-
-<p><strong>分类：假设标签服从伯努利/类别分布。</strong></p>
-
-<p>二分类，模型预测概率 $\hat{p}$，真实标签 $y \in \{0,1\}$：</p>
-
-$$P(y \mid \hat{p}) = \hat{p}^y (1-\hat{p})^{1-y}$$
-
-<p>取负对数：</p>
-
-$$-\ln L = -\sum_{i=1}^N \big[y_i \ln \hat{p}_i + (1-y_i) \ln(1-\hat{p}_i)\big]$$
-
-<p><strong>这就是交叉熵损失！</strong></p>
-
-<pre><code><span class="hl-comment"># 00-18 用 MLE 拟合高斯分布 — 从数据反推均值和方差</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-
-<span class="hl-comment"># 生成真实分布为 N(5, 2²) 的 1000 个样本</span>
-np.random.seed(<span class="hl-number">42</span>)
-true_mu, true_sigma = <span class="hl-number">5.0</span>, <span class="hl-number">2.0</span>
-data = np.random.normal(true_mu, true_sigma, <span class="hl-number">1000</span>)
-
-<span class="hl-comment"># MLE 估计：高斯分布的 MLE 就是样本均值和样本标准差</span>
-mu_hat = np.mean(data)                       <span class="hl-comment"># μ̂ = (1/N) Σ xᵢ</span>
-sigma_hat = np.std(data)                     <span class="hl-comment"># σ̂ = sqrt((1/N) Σ (xᵢ-μ)²)</span>
-
-<span class="hl-builtin">print</span>(<span class="hl-string">f"真实参数: μ={true_mu}, σ={true_sigma}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"MLE 估计: μ̂={mu_hat:.3f}, σ̂={sigma_hat:.3f}"</span>)
-
-<span class="hl-comment"># 验证：算对数似然</span>
-<span class="hl-keyword">def</span> <span class="hl-func">log_likelihood</span>(mu, sigma, data):
-<span class="hl-comment">    pass
-    """高斯分布的对数似然</span>
-<span class="hl-comment">    mu: 均值</span>
-<span class="hl-comment">    sigma: 标准差</span>
-<span class="hl-comment">    data: 观测数据</span>
-<span class="hl-comment">    """</span>
-    n = <span class="hl-builtin">len</span>(data)
-<span class="hl-comment"># log L = -n/2·log(2πσ²) - 1/(2σ²)·Σ(xᵢ-μ)²</span>
-    <span class="hl-keyword">return</span> -n/<span class="hl-number">2</span>*np.log(<span class="hl-number">2</span>*np.pi*sigma**<span class="hl-number">2</span>) - np.<span class="hl-builtin">sum</span>((data-mu)**<span class="hl-number">2</span>)/(<span class="hl-number">2</span>*sigma**<span class="hl-number">2</span>)
-
-ll_mle = log_likelihood(mu_hat, sigma_hat, data)
-<span class="hl-comment"># 故意用错误参数</span>
-ll_off = log_likelihood(<span class="hl-number">4.0</span>, <span class="hl-number">2.5</span>, data)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\nMLE 对数似然: {ll_mle:.1f}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"错误参数对数似然: {ll_off:.1f}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"MLE 更高 ✓"</span>)
-</code></pre>
-
-<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-
-<h2>六、MLE 和贝叶斯的区别</h2>
-
-<p>00-17 学了贝叶斯定理：$P(\theta \mid \text{数据}) \propto P(\text{数据} \mid \theta) \cdot P(\theta)$。</p>
-
+<h1>00-22 条件概率与贝叶斯</h1>
+<hr>
+<h2>一、条件概率：知道了点什么，概率就变了</h2>
+<p><strong>画面：</strong> 你在街上随机抓一个人。他是左撇子的概率大约是 10%。但如果我告诉你<strong>「这个人在用左手写字」</strong>——那他是左撇子的概率瞬间变成接近 100%。</p>
+<p>「知道了新信息之后」的概率，就是<strong>条件概率</strong>。</p>
+$$P(A \mid B) = \frac{P(A \cap B)}{P(B)}$$
+<p><strong>逐符号拆开：</strong></p>
 <ul>
-  <li><strong>MLE：</strong>只看 $P(\text{数据} \mid \theta)$，最大化它——不管 $\theta$ 本身有多大概率出现</li>
-  <li><strong>贝叶斯：</strong>还要乘先验 $P(\theta)$——如果 $\theta=0.99$ 按理说很罕见，贝叶斯会惩罚它</li>
-  <li><strong>MAP（最大后验）：</strong>贝叶斯中最大化 $P(\theta \mid \text{数据})$ 而非 $P(\text{数据} \mid \theta)$</li>
+<li>$P(A \mid B)$：读作「在 B 发生的条件下，A 发生的概率」</li>
+<li>$P(A \cap B)$：A 和 B <strong>同时</strong>发生的概率</li>
+<li>$P(B)$：B 发生的概率（不管 A 发不发生）</li>
+<li>整体含义：在所有 B 发生的情况里，A 也发生的比例。相当于把 B 当成<strong>新的全集</strong>，看 A 在里面占多少</li>
 </ul>
+<p><strong>直观理解：</strong> 原来是「全世界里 A 有多少」，条件概率是「<strong>只看 B 的世界里</strong> A 有多少」。分母 $P(B)$ 就是把这个新世界归一化到 1。</p>
+<h3>乘法公式：倒过来用</h3>
+<p>把条件概率公式两边乘 $P(B)$：</p>
+$$P(A \cap B) = P(A \mid B) \cdot P(B)$$
+<p>这看起来平凡，但非常有用——它把「同时发生」拆成两步：<strong>先发生 B，再在 B 发生的条件下发生 A</strong>。</p>
+<hr>
+<h2>二、全概率公式：拆开来看</h2>
+<p><strong>画面：</strong> 工厂有三台机器 A、B、C，分别生产 50%、30%、20% 的产品。A 的次品率 1%，B 的次品率 2%，C 的次品率 5%。随机抽一件，它是次品的概率是多少？</p>
+<p>直接想有点乱——但可以<strong>按机器拆开</strong>：次品可能来自 A、B、或 C。把每种情况加起来：</p>
+$$\begin{aligned}
+P(\text{次品}) &= P(\text{次品} \mid A) \cdot P(A) + P(\text{次品} \mid B) \cdot P(B) + P(\text{次品} \mid C) \cdot P(C) \\
+&= 0.01 \times 0.5 + 0.02 \times 0.3 + 0.05 \times 0.2 \\
+&= 0.005 + 0.006 + 0.01 = 0.021
+\end{aligned}$$
+<p>这就是<strong>全概率公式</strong>：把一个复杂事件拆成互斥的几种情况，分别算再加起来。</p>
+$$P(A) = \sum_i P(A \mid B_i) \cdot P(B_i)$$
+<p>前提：$B_1, B_2, \dots$ 是<strong>互斥且穷尽的</strong>——把所有可能的情况全覆盖，且彼此不重叠。三台机器恰好满足这点。</p>
+<hr>
+<h2>三、贝叶斯公式：把因果倒过来</h2>
+<p>刚才工厂问题是「知因求果」：知道是哪台机器 → 算次品率。</p>
+<p>贝叶斯公式是<strong>知果求因</strong>：拿到了一个次品 → 它最可能是哪台机器生产的？</p>
+<p>从条件概率定义出发：</p>
+$$P(B \mid A) = \frac{P(A \cap B)}{P(A)} = \frac{P(A \mid B) \cdot P(B)}{P(A)}$$
+<p>分子用了乘法公式 $P(A \cap B) = P(A \mid B) \cdot P(B)$。把分母用全概率展开：</p>
+$$\boxed{P(B_i \mid A) = \frac{P(A \mid B_i) \cdot P(B_i)}{\sum_j P(A \mid B_j) \cdot P(B_j)}}$$
+<p><strong>这个公式的灵魂：</strong> 把因果关系翻转了。$P(A \mid B_i)$ 是「B 导致 A 的概率」（因→果），而 $P(B_i \mid A)$ 是「看到 A 后反推 B 的概率」（果→因）。</p>
+<p><strong>逐零件命名：</strong></p>
+<ul>
+<li>$P(B_i)$：<strong>先验概率</strong>（prior）——看到证据之前，对 $B_i$ 的信念。机器 C 只产 20%，先天就不太可能是它</li>
+<li>$P(A \mid B_i)$：<strong>似然</strong>（likelihood）——如果 $B_i$ 是真的，看到证据 A 的可能性。C 的次品率 5%，比较高</li>
+<li>$P(B_i \mid A)$：<strong>后验概率</strong>（posterior）——看到证据之后，修正过的信念。尽管 C 先天概率低，但它的次品率高，后验概率可能反超</li>
+</ul>
+<h3>经典例子：体检阳性，我真的有病吗？</h3>
+<p>一种病发病率 1%。检测准确率 99%（有病的人 99% 测出阳性，没病的人 99% 测出阴性）。你测出阳性——你有病的概率是多少？</p>
+<p>直觉说 ~99%。<strong>错。答案是 ~50%。</strong> 来算：</p>
+<p><strong>已知条件：</strong></p>
+<ul>
+<li>$P(病) = 0.01$（先验——发病率）</li>
+<li>$P(阳性 \mid 病) = 0.99$（有病被检出的概率——灵敏度）</li>
+<li>$P(阴性 \mid 没病) = 0.99$，所以 $P(阳性 \mid 没病) = 0.01$（假阳性率）</li>
+</ul>
+<p><strong>算 $P(病 \mid 阳性)$：</strong> 贝叶斯公式：</p>
+$$\begin{aligned}
+P(病 \mid 阳性) &= \frac{P(阳性 \mid 病) \cdot P(病)}{P(阳性 \mid 病) \cdot P(病) + P(阳性 \mid 没病) \cdot P(没病)} \\[8pt]
+&= \frac{0.99 \times 0.01}{0.99 \times 0.01 + 0.01 \times 0.99} \\[8pt]
+&= \frac{0.0099}{0.0099 + 0.0099} = \frac{0.0099}{0.0198} = 0.5
+\end{aligned}$$
+<p><strong>为什么只有 50%？</strong> 因为发病率太低了（1%）。10000 个人里，有 100 个真病人（99 个测出阳性）和 9900 个好人（99 个假阳性）。阳性总共 99+99=198 人，其中只有 99 个真有病——恰好一半。</p>
+<figure><img src="assets/bayes_area.png" alt="贝叶斯体检阳性树状图"><figcaption>10000 人：有病 100 人（99 阳性），没病 9900 人（99 假阳性）。阳性共 198 人，真阳性只有一半。</figcaption></figure>
+<p>假阳性虽然比例低（1%），但<strong>没病的人基数太大</strong>（9900），假阳性的绝对人数（99）和真阳性（99）一样多。这就是<strong>基础率忽略</strong>——直觉只盯住了 99% 的准确率，忘了发病率 1% 这个先验。</p>
+<pre><code><span class="hl-comment"># 00-17 贝叶斯公式：模拟体检阳性问题（发病率1%，检测准确率99%）</span>
+<span class="hl-comment"># 导入numpy，别名np</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+<span class="hl-comment"># 模拟 100000 人的体检数据</span>
+<span class="hl-comment"># 总模拟人数：10万</span>
+N = <span class="hl-number">100000</span>
+<span class="hl-comment"># default_rng(seed)：新版随机数生成器，seed保证可复现</span>
+rng = np.random.default_rng(<span class="hl-number">42</span>)
+<span class="hl-comment"># 1% 的人真有病 → 生成10万个布尔值，True概率=0.01</span>
+<span class="hl-comment"># random(N)：生成N个[0,1)均匀随机数，<0.01→True(有病)</span>
+has_disease = rng.random(N) &lt; <span class="hl-number">0.01</span>
+<span class="hl-comment"># np.where(条件, 真时取值, 假时取值)：按条件二选一</span>
+<span class="hl-comment"># 有病的人：99% 测出阳性（灵敏度）；没病的人：1% 假阳性</span>
+test_positive = np.where(
+    has_disease,                          <span class="hl-comment"># 条件：是否有病（布尔数组）</span>
+    <span class="hl-comment"># 真有病 → 99%概率测出阳性（灵敏度）</span>
+    rng.random(N) &lt; <span class="hl-number">0.99</span>,
+    <span class="hl-comment"># 没病的 → 1%概率假阳性</span>
+    rng.random(N) &lt; <span class="hl-number">0.01</span>
+)
+<span class="hl-comment"># 在测出阳性的人里，有多少真有病？→ P(病|阳性)</span>
+positives = test_positive.sum()           <span class="hl-comment"># .sum()对布尔数组：True=1 → 阳性总人数</span>
+true_positives = (test_positive & has_disease).sum()  <span class="hl-comment"># & 逻辑与：阳性且真有病 → 真阳性人数</span>
+<span class="hl-comment"># 阳性人数 ≈ 198人(99真阳性+99假阳性)</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"阳性总人数: {positives}"</span>)
+<span class="hl-comment"># 真有病且阳性 ≈ 99人</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"真阳性(真有病): {true_positives}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"P(病|阳性) = {true_positives}/{positives} = {true_positives/positives:.3f}"</span>)
+<span class="hl-comment"># :.3f = 保留3位小数，大约 0.500——和贝叶斯公式算的一样</span>
+</code></pre>
 
-<div class="callout callout-tip">
-<strong>为什么深度学习都选 MLE：</strong> 数据量大的时候，似然主导，先验的影响很小。MLE 和 MAP 差别不大。所以等价于：做回归就最小化 MSE，做分类就最小化交叉熵——不需要显式计算先验。
-</div>
-
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+<p>贝叶斯公式不是在玩符号——它纠正了一个真实的思维错误。</p>
+<hr>
 <h2>💭 概念题</h2>
-
-<div class="exercise">
-<h3>1. MLE 为什么不总是对的</h3>
-<p>抛 3 次硬币，3 次全是正面。MLE 估计 $\hat{\theta} = 1.0$。这个估计合理吗？有什么问题？贝叶斯方法会怎么修正？</p>
-<p>——考察：小样本下 MLE 的过拟合、先验的修正作用</p>
-</div>
-
-<div class="exercise">
-<h3>2. MSE 和交叉熵的来源</h3>
-<p>为什么回归用 MSE 而不交叉熵？分类用交叉熵而不用 MSE？从"假设数据服从什么分布"的角度解释。</p>
-<p>——考察：MLE → 损失函数的推导链条</p>
-</div>
-
-<div class="exercise">
-<h3>3. 对数似然为什么方便</h3>
-<p>有 1000 个独立样本，似然是 1000 个小概率的乘积。直接用 $L = \prod p_i$ 会有什么问题？取对数解决了什么？</p>
-<p>——考察：数值稳定性和求导便利性</p>
-</div>
-
+<ol>
+<li>为什么阳性率 99%、发病率 1% 的情况下，$P(病 \mid 阳性)$ 只有 ~50%？用「假阳性人数 vs 真阳性人数」解释。——考察：基础率忽略</li>
+<li>如果发病率从 1% 变成 10%，$P(病 \mid 阳性)$ 大约是多少？先估算再算。——考察：先验对后验的影响</li>
+<li>工厂例子：拿到一个次品，它来自机器 C 的概率是多少？——考察：贝叶斯公式完整计算</li>
+</ol>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-21/">← 00-17</a><a href="../../">📖 目录</a><a href="../00-23/">00-19 →</a></nav>
+<a href="../00-21/">← 00-16</a><a href="../../">📖 目录</a><a href="../00-23/">00-18 →</a></nav>
 </div>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: "$$", right: "$$", display: true},
-        {left: "$", right: "$", display: false}
-      ]
-    });
-  });
-</script>
-
 <script>
 (function(){
   document.querySelectorAll('pre code').forEach(function(block){
@@ -238,6 +144,4 @@ ll_off = log_likelihood(<span class="hl-number">4.0</span>, <span class="hl-numb
 })();
 </script>
 
-</body>
-</html>
-
+</body></html>

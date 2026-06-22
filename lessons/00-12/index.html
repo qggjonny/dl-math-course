@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>00-12 梯度下降 · 深度学习数学</title>
+<title>00-12 梯度与方向导数 · 深度学习数学</title>
 <link rel="stylesheet" href="../../css/style.css?v=20260601">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
@@ -11,141 +11,136 @@ onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',dis
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-12</span>
 <span><a href="../00-11/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-13/">下一课 →</a></span></nav>
 <div class="container">
-<h1>00-12 梯度下降</h1>
+<h1>00-12 梯度与方向导数</h1>
 <hr>
-<h2>一、从梯度到梯度下降</h2>
-<p>00-11 学到了：梯度指向函数值<strong>上升最快</strong>的方向。现在反过来——如果我想找<strong>最小值</strong>（谷底），每一步往梯度的<strong>反方向</strong>走。</p>
+<h2>一、梯度：最陡的方向</h2>
+<p>把所有偏导数拼成一个向量——这就是梯度。</p>
+<p>$$\nabla f = \left[\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n}\right]$$</p>
+<p><strong>核心直觉：梯度向量指向函数值上升<em>最快</em>的方向。</strong></p>
+<p><strong>画面：</strong> 你站在山谷里，四周都是坡。你原地转一圈，总有一个方向是<strong>最陡的上坡</strong>——那就是梯度指的方向。梯度的大小 = 那个方向的坡度有多陡。梯度的反方向 = 最陡的下坡路。</p>
+<figure><img src="assets/gradient_contour.png" alt="梯度方向垂直于等高线"><figcaption>等高线越密坡越陡。梯度方向（红色箭头）始终<strong>垂直于等高线</strong>——这就是最陡上坡方向。沿等高线走（蓝色箭头）高度不变。</figcaption></figure>
+<div class="callout callout-info">
+<h3>为什么梯度方向最快？——方向导数完整推导</h3>
+<p><strong>第一步：方向导数的定义。</strong></p>
+<p>你站在 $(x, y)$ 点，选一个方向 $\mathbf{u} = (u_x, u_y)$（单位向量，模=1）。往前走 $\epsilon$ 步——也就是 $x$ 变到 $x + \epsilon u_x$，$y$ 变到 $y + \epsilon u_y$。函数值变了多少？</p>
+$$D_{\mathbf{u}} f = \lim_{\epsilon \to 0} \frac{f(x + \epsilon u_x,\; y + \epsilon u_y) - f(x, y)}{\epsilon}$$
+<p>这就是方向导数的<strong>定义</strong>。注意：如果你选的方向是 $(1, 0)$（沿 $x$ 轴走），方向导数就退化成普通偏导数 $\partial f / \partial x$。</p>
+<p><strong>第二步：把方向导数拆成偏导数的组合，推出公式。</strong></p>
+<p>关键技巧——把「沿斜线走一步」拆成「先沿 $x$ 走一步，再沿 $y$ 走一步」：</p>
+$$
+\begin{aligned}
+f(x + \epsilon u_x, y + \epsilon u_y) - f(x, y)
+&= \underbrace{[f(x + \epsilon u_x, y + \epsilon u_y) - f(x, y + \epsilon u_y)]}_{\text{纯 x-变化量}}
++ \underbrace{[f(x, y + \epsilon u_y) - f(x, y)]}_{\text{纯 y-变化量}}
+\end{aligned}
+$$
+<p>当 $\epsilon \to 0$ 时：</p>
+<ul>
+<li>纯 x-变化量 $\approx \epsilon u_x \cdot \frac{\partial f}{\partial x}$（走了 $\epsilon u_x$ 这么多，乘上 $x$ 方向的坡度）</li>
+<li>纯 y-变化量 $\approx \epsilon u_y \cdot \frac{\partial f}{\partial y}$（同理）</li>
+</ul>
+<p>全部代入方向导数的定义：</p>
+$$D_{\mathbf{u}} f = \lim_{\epsilon \to 0} \frac{\epsilon u_x \frac{\partial f}{\partial x} + \epsilon u_y \frac{\partial f}{\partial y}}{\epsilon}
+= u_x \frac{\partial f}{\partial x} + u_y \frac{\partial f}{\partial y}
+= \nabla f \cdot \mathbf{u}$$
+<p><strong>结论：方向导数 = 梯度 · 方向向量。</strong>这不是直接甩公式——是从定义出发，拆成偏导数组合，一步步推出来的。到这里还没有用到任何「最快」的说法，只是推导出了一个<strong>计算任意方向变化率的公式</strong>。</p>
+<p><strong>第三步：用点乘的几何意义回答「哪个方向最快」。</strong></p>
+<p>有了 $D_{\mathbf{u}}f = \nabla f \cdot \mathbf{u}$ 之后，看它的几何含义：</p>
+$$\nabla f \cdot \mathbf{u} = \|\nabla f\| \cdot \|\mathbf{u}\| \cdot \cos\theta = \|\nabla f\| \cdot \cos\theta$$
+<p>（$\|\mathbf{u}\|=1$ 因为 $\mathbf{u}$ 是单位向量。$\theta$ 是梯度和你的方向 $\mathbf{u}$ 之间的夹角。）</p>
+<ul>
+<li>$\theta = 0°$（和梯度<strong>同向</strong>）→ $\cos 0° = 1$ → $D_{\mathbf{u}}f = \|\nabla f\|$ → <strong>最大</strong></li>
+<li>$\theta = 90°$（和梯度<strong>垂直</strong>）→ $\cos 90° = 0$ → $D_{\mathbf{u}}f = 0$ → 高度不变（沿等高线走）</li>
+<li>$\theta = 180°$（和梯度<strong>反向</strong>）→ $\cos 180° = -1$ → $D_{\mathbf{u}}f = -\|\nabla f\|$ → <strong>下降最快</strong>（这就是梯度下降！）</li>
+</ul>
+<p><strong>推导链完整：</strong>定义 → 拆成偏导数组合 → 推出 $\nabla f \cdot \mathbf{u}$ → 点乘在 $\theta=0°$ 最大 → 所以梯度方向最快。每一步都有出处，没有循环。</p>
+</div>
+
+<h2>二、代码验证——亲手验证梯度确实最快</h2>
+<p>用 $f(x,y) = x^2 + 3xy + y^3$，在点 $(2, 3)$ 处：</p>
+<ul>
+<li>理论上：$\nabla f = [2x+3y,\; 3x+3y^2] = [13,\; 33]$</li>
+<li>梯度方向是单位向量 $\frac{[13, 33]}{\sqrt{13^2+33^2}}$</li>
+<li>走梯度方向时方向导数应最大 = $\|\nabla f\| = \sqrt{13^2+33^2}$</li>
+</ul>
+
+<pre><code><span class="hl-comment"># 00-11 代码验证：方向导数 = ∇f·u，在梯度方向取最大值</span>
+<span class="hl-comment"># 导入numpy——用于向量运算（范数、点乘、单位化）</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 定义二元函数 f(x,y)=x²+3xy+y³</span>
+<span class="hl-keyword">def</span> <span class="hl-funcdef">f</span>(x, y):
+    <span class="hl-string">"""f(x,y) = x² + 3xy + y³"""</span>
+    <span class="hl-keyword">return</span> x**<span class="hl-number">2</span> + <span class="hl-number">3</span>*x*y + y**<span class="hl-number">3</span>
+
+<span class="hl-comment"># 梯度函数——返回 [∂f/∂x, ∂f/∂y]（从 00-10 偏导数规则）</span>
+<span class="hl-comment"># ∂f/∂x = 2x + 3y（y当常数），∂f/∂y = 3x + 3y²（x当常数）</span>
+<span class="hl-keyword">def</span> <span class="hl-funcdef">grad_f</span>(x, y):
+    <span class="hl-string">"""返回梯度向量 ∇f = [∂f/∂x, ∂f/∂y]"""</span>
+    <span class="hl-keyword">return</span> np.array([<span class="hl-number">2</span>*x + <span class="hl-number">3</span>*y, <span class="hl-number">3</span>*x + <span class="hl-number">3</span>*y**<span class="hl-number">2</span>])
+
+<span class="hl-comment"># 测试点 (x₀, y₀) = (2, 3)——代入梯度：∂f/∂x=4+9=13, ∂f/∂y=6+27=33</span>
+x0, y0 = <span class="hl-number">2.0</span>, <span class="hl-number">3.0</span>
+<span class="hl-comment"># grad：梯度向量 [13, 33]——指向上升最快的方向</span>
+grad = grad_f(x0, y0)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"梯度 ∇f = [{grad[0]}, {grad[1]}]"</span>)
+
+<span class="hl-comment"># 梯度方向——把梯度向量单位化（方向不变，长度缩到 1）</span>
+<span class="hl-comment"># np.linalg.norm(grad)：梯度的模 = √(13²+33²)</span>
+u_grad = grad / np.linalg.norm(grad)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"梯度方向 u_grad = [{u_grad[0]:.4f}, {u_grad[1]:.4f}]"</span>)
+
+<span class="hl-comment"># 方向导数 = ∇f · u（点乘）</span>
+<span class="hl-comment"># 沿梯度方向：cosθ=1 → D_u f = ‖∇f‖</span>
+D_grad = np.dot(grad, u_grad)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"沿梯度方向的方向导数 = {D_grad:.4f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"梯度模 ‖∇f‖ = {np.linalg.norm(grad):.4f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"两者相等吗？{np.isclose(D_grad, np.linalg.norm(grad))}"</span>)
+
+<span class="hl-comment"># 随机测试 5 个方向——看看哪个方向导数最大</span>
+<span class="hl-comment"># np.random.seed：固定随机种子，每次运行结果一致</span>
+np.random.seed(<span class="hl-number">42</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n{'方向':>12s}  {'D_u f':>10s}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">"-"</span> * <span class="hl-number">24</span>)
+<span class="hl-comment"># 记录最大值，看是否被梯度方向拿下</span>
+max_D = <span class="hl-number">0</span>
+<span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">5</span>):
+    <span class="hl-comment"># 生成随机 2D 向量，然后单位化——得到一个随机方向</span>
+    v = np.random.randn(<span class="hl-number">2</span>)
+    u = v / np.linalg.norm(v)
+    <span class="hl-comment"># 方向导数 = ∇f 在该方向上的投影 = ∇f·u</span>
+    D = np.dot(grad, u)
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"[{u[0]:6.3f},{u[1]:6.3f}]  {D:10.4f}"</span>)
+    <span class="hl-comment"># max()：跟踪最大值——最终应该是梯度方向的值最大</span>
+    max_D = <span class="hl-builtin">max</span>(max_D, <span class="hl-builtin">abs</span>(D))
+
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n梯度方向的值 = {D_grad:.4f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"5个随机方向的最大值 = {max_D:.4f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"梯度方向 ≥ 所有随机方向？{D_grad >= max_D}"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<p>输出证实：梯度方向的方向导数等于梯度的模，且大于等于任意随机方向的方向导数——梯度确实是「最陡」的方向。这不是空话，是能在代码里跑通的数学事实。</p>
 
 <div class="callout callout-tip">
-<strong>梯度下降 = 闭着眼睛，每一步都往最陡的下坡方向踩一脚。</strong>
+<strong>梯度下降预览：</strong>
 $$\theta_{t+1} = \theta_t - \eta \cdot \nabla f(\theta_t)$$
 <ul>
 <li>$\theta_t$：你现在站的位置</li>
 <li>$\nabla f(\theta_t)$：这个位置的最陡上坡方向</li>
 <li><strong>负号</strong>：因为我们想<strong>下降</strong>，所以反着走</li>
-<li>$\eta$（学习率）：走多大步。太大→可能跨过山谷冲到对面山上去了；太小→半天走不到底</li>
+<li>$\eta$（学习率）：走多大步</li>
 </ul>
+<p>详细展开见下一课 00-12 梯度下降。</p>
 </div>
-
-<h2>二、代码演示——亲眼看着小球滚下山</h2>
-<p>拿最简单的二次函数 $f(x) = x^2$ 来跑梯度下降。最小值显然在 $x=0$。我们故意从 $x=3$ 出发，看它能不能滚回去。</p>
-
-<pre><code><span class="hl-comment"># 00-12 第一步：梯度下降——亲眼看着小球从 x=3 滚到 x≈0</span>
-<span class="hl-comment"># 导入numpy，别名np</span>
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-
-<span class="hl-comment"># 定义函数 f(x)=x² 和它的导数 f'(x)=2x</span>
-<span class="hl-comment"># 导数 f'(x) 告诉我们每一步该往哪走——梯度方向</span>
-<span class="hl-keyword">def</span> <span class="hl-funcdef">f</span>(x):
-    <span class="hl-string">"""f(x) = x²——最简单的抛物线，谷底在 x=0"""</span>
-    <span class="hl-keyword">return</span> x**<span class="hl-number">2</span>
-
-<span class="hl-keyword">def</span> <span class="hl-funcdef">df</span>(x):
-    <span class="hl-string">"""f'(x) = 2x——导数，指向上升最快的方向"""</span>
-    <span class="hl-keyword">return</span> <span class="hl-number">2</span> * x
-
-<span class="hl-comment"># 初始位置——从 x=3 出发（函数值=9，离谷底 x=0 还有 3 个单位）</span>
-<span class="hl-comment"># 学习率 η=0.3（相当于每次往谷底走 30% 的当前偏移）</span>
-x = <span class="hl-number">3.0</span>
-<span class="hl-comment"># 学习率：步长参数，控制每步走多远</span>
-eta = <span class="hl-number">0.3</span>
-
-<span class="hl-comment"># 迭代 15 次——每一步打印：第几步、位置 x、函数值 f(x)、梯度 df(x)</span>
-<span class="hl-comment"># f"{i:2d}"：第几步，占 2 位右对齐，方便对齐阅读</span>
-<span class="hl-comment"># f"{x:8.4f}"：x 值，占 8 位保留 4 位小数</span>
-<span class="hl-comment"># f"{f(x):8.4f}"：函数值，格式同上</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"{'步':>3s}  {'x':>8s}  {'f(x)':>8s}  {'梯度':>8s}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">"-"</span> * <span class="hl-number">35</span>)
-<span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">15</span>):
-    <span class="hl-comment"># 保存更新前的位置用于打印</span>
-    x_old = x
-    <span class="hl-comment"># 梯度下降核心：x_new = x_old - η × f'(x_old)</span>
-    <span class="hl-comment"># 负号表示往梯度的反方向走——下坡</span>
-    x = x - eta * df(x)
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"{i:3d}  {x_old:8.4f}  {f(x_old):8.4f}  {df(x_old):8.4f}"</span>)
-
-<span class="hl-comment"># 最终位置——如果收敛，x 应该非常接近 0</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\n最终: x={x:.6f}, f(x)={f(x):.10f}"</span>)
-</code></pre>
-
-<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-
-<p><strong>看输出：</strong>x 从 3.0 → 1.2 → 0.48 → 0.192 → 0.077 → ... → 趋近于 0。每一步的梯度（2x）越来越小——坡度越来越缓，步幅也越来越小。这是在「自刹车」——越靠近谷底，自然就走得越慢。</p>
-
-<div class="callout callout-info">
-<strong>为什么步幅自动缩小？</strong>
-<p>$f(x)=x^2$ 的导数是 $2x$。梯度下降的更新是 $x_{t+1} = x_t - \eta \cdot 2x_t = (1-2\eta)x_t$。</p>
-<p>当 $\eta=0.3$ 时：$x_{t+1} = (1-0.6)x_t = 0.4x_t$。每一步位置缩为原来的 40%——<strong>呈指数衰减。</strong></p>
-<p>本质原因：$f'(x)=2x$ 在谷底（x=0）为零，越靠近谷底导数越小，更新量自然变小——这是梯度下降「自刹车」的根源。</p>
-</div>
-
-<h2>三、学习率多大算太大？——发散条件</h2>
-<p>不是说「学习率太大了会跨过山谷」——要多<strong>大</strong>才会跨过去？用二次函数来精确算。</p>
-<p>拿 $f(x) = x^2 - 4x + 4$（配成 $(x-2)^2$），谷底在 $x=2$，导数 $f'(x) = 2x - 4$。</p>
-
-<p>梯度下降更新：</p>
-$$x_{t+1} = x_t - \eta \cdot (2x_t - 4) = (1 - 2\eta) x_t + 4\eta$$
-
-<p>关心的是<strong>离谷底还有多远</strong>——定义误差 $e_t = x_t - 2$：</p>
-$$e_{t+1} = x_{t+1} - 2 = (1-2\eta)x_t + 4\eta - 2 = (1-2\eta)(x_t - 2) = (1-2\eta) \cdot e_t$$
-
-<p>每一步误差乘以 $(1-2\eta)$：</p>
-<ul>
-<li>$|1-2\eta| < 1$ → 误差越来越小 → <strong>收敛</strong>。解：$-1 < 1-2\eta < 1$ → $0 < \eta < 1$</li>
-<li>$|1-2\eta| = 1$ → 误差不变 → 来回跳但不缩小（$\eta=1$ 时原地振荡）</li>
-<li>$|1-2\eta| > 1$ → 误差越来越大 → <strong>发散！</strong></li>
-</ul>
-
-<p><strong>验证 $\eta = 1.5$：</strong> $1-2\eta = 1-3 = -2$，$|{-2}| = 2 > 1$ → 发散。从 $x_0 = 1$ 出发：误差 $e_0 = 1-2 = -1$（谷底在右边，人在左边）。$e_1 = (-2) \times (-1) = 2$，$|e_1| = 2 > |e_0| = 1$——越走越远。直接算：$x_1 = 1 - 1.5 \times (-2) = 1 + 3 = 4$，从谷底左边直接跳到右边更远的地方——发散无疑。</p>
-
-<p><strong>一般结论：</strong> 对二次函数 $f(x) = ax^2 + bx + c$（$a>0$），收敛条件是 $0 < \eta < 1/a$。$f''(x) = 2a$ 越大（弯越急），允许的学习率越小。</p>
-
-<h2>四、代码验证——亲眼看到发散</h2>
-<p>把第三节的 $\eta=1.5$ 跑一遍，看发散长什么样：</p>
-
-<pre><code><span class="hl-comment"># 00-12 第二步：学习率太大导致发散——亲自跑一遍</span>
-<span class="hl-comment"># 函数 f(x) = x² - 4x + 4，谷底在 x=2</span>
-<span class="hl-keyword">def</span> <span class="hl-funcdef">f2</span>(x):
-    <span class="hl-string">"""f(x)=x²-4x+4=(x-2)²，谷底 x=2, f(2)=0"""</span>
-    <span class="hl-keyword">return</span> x**<span class="hl-number">2</span> - <span class="hl-number">4</span>*x + <span class="hl-number">4</span>
-
-<span class="hl-keyword">def</span> <span class="hl-funcdef">df2</span>(x):
-    <span class="hl-string">"""f'(x) = 2x - 4"""</span>
-    <span class="hl-keyword">return</span> <span class="hl-number">2</span>*x - <span class="hl-number">4</span>
-
-<span class="hl-comment"># 学习率 η=1.5——超过收敛条件 η<1，应该发散</span>
-<span class="hl-comment"># 从 x=1 出发，离谷底 x=2 差 1 个单位</span>
-x = <span class="hl-number">1.0</span>
-<span class="hl-comment"># 学习率达 1.5——太大，误差会指数爆炸</span>
-eta = <span class="hl-number">1.5</span>
-
-<span class="hl-builtin">print</span>(<span class="hl-string">f"{'步':>3s}  {'x':>10s}  {'|误差|':>10s}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">"-"</span> * <span class="hl-number">28</span>)
-<span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">8</span>):
-    <span class="hl-comment"># 误差 = 当前位置离谷底 (x=2) 的距离的绝对值</span>
-    <span class="hl-comment"># 如果发散，这个值应该越来越大</span>
-    error = <span class="hl-builtin">abs</span>(x - <span class="hl-number">2</span>)
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"{i:3d}  {x:10.4f}  {error:10.4f}"</span>)
-    <span class="hl-comment"># 梯度下降更新——同一条公式，但 η 太大导致误差翻转放大</span>
-    x = x - eta * df2(x)
-
-<span class="hl-comment"># 最后一次更新后的位置——应该比起点离 x=2 更远</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"\n8步后: x={x:.4f}, |误差|={abs(x-2):.4f}"</span>)
-<span class="hl-builtin">print</span>(<span class="hl-string">f"误差从 1.0 变成了 {abs(x-2):.1f}——越走越远，发散！"</span>)
-</code></pre>
-
-<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-
-<p>输出中误差从 1.0 开始，每一步翻倍——这就是发散。小球没有被「吸」向谷底，而是被「弹」向远方。</p>
-
-<figure><img src="assets/gradient_descent.png" alt="梯度下降"><figcaption>小球从起点沿最陡下坡方向逐步滚到谷底。每一步的坡度越来越缓——步子也越来越小</figcaption></figure>
 
 <hr>
 <h2>💭 概念题</h2>
 <ol>
-<li>学习率太大的后果：画面上你站在山谷一边，步子太大跨到对面山上去了，再一步又跨回来，来回振荡——永远到不了谷底。试算一下 lr=1.5 在 x=1 处（$f(x)=x^2-4x+4$）会发生什么。梯度是 $f'(1)=2\times1-4=-2$，更新后 x 变成多少？——考察：梯度下降的发散条件</li>
-<li>对于 $f(x)=x^2$，用 $\eta=0.3$ 时每步位置缩为原来的 $1-2\eta=0.4$ 倍。如果 $\eta=0.1$，每步位置缩为原来的多少倍？哪个收敛更快？为什么不是 $\eta$ 越大越好？（提示：想想 $\eta=0.9$ 会怎样）——考察：收敛速度与学习率的关系</li>
-<li>梯度下降的「自刹车」——为什么越靠近谷底步子越小？从 $f(x)=x^2$ 的导数 $f'(x)=2x$ 在 $x\to 0$ 时的行为解释。——考察：导数在极值点为零的几何后果</li>
+<li>梯度指向上升最快方向。为什么是「最快」？用方向导数 = 梯度与方向向量的点乘来解释。提示：$\cos\theta$ 在 $\theta=0°$（同向）时最大。——考察：方向导数的几何直觉</li>
+<li>沿等高线方向走，方向导数是多少？为什么？从 $\nabla f$ 和等高线方向的空间关系来解释。——考察：梯度垂直于等高线的几何含义</li>
+<li>对 $f(x,y) = x^2 + y^2$，在点 (3, 4) 处的梯度是什么？梯度指向什么方向？（提示：画个图——从原点出发的射线）——考察：径向函数的梯度方向</li>
 </ol>
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">

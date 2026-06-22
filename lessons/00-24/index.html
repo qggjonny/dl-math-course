@@ -1,186 +1,190 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>00-24 信息论：熵、交叉熵、KL 散度 · 深度学习数学</title>
-<link rel="stylesheet" href="../../css/style.css?v=20260601">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
-</head><body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>00-23 多元高斯分布 · 深度学习数学</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../css/style.css?v=20260601">
+</head>
+<body>
+
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-24</span>
-<span><a href="../00-18/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../01-01/">下一课 →</a></span></nav>
+<span><a href="../00-23/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-25/">下一课 →</a></span></nav>
+
 <div class="container">
-<h1>00-24 信息论：熵、交叉熵、KL 散度</h1>
-<hr>
-<h2>一、信息量：越不可能的事，信息越大</h2>
-<p><strong>画面：</strong> 有人告诉你两件事——</p>
-<blockquote>
-「明天太阳会升起来。」→ 你心想：废话。<br>
-「明天会下雪。」（你在三亚）→ 你震惊：怎么可能！
-</blockquote>
-<p>第一条信息量几乎为零——你早就知道。第二条信息量巨大——概率极低的事件真的发生了。</p>
-<p><strong>信息量与概率成反比。</strong> 数学上定义为：</p>
-$$I(x) = -\log P(x)$$
-<p>概率越小 → $-\log P$ 越大 → 信息量越大。对数底取 2 时单位是<strong>比特</strong>（bit），取 $e$ 时单位是<strong>奈特</strong>（nat）。深度学习里通常用 $e$。</p>
-<p>例子：公平硬币正面概率 $P=0.5$，信息量 $-\ln(0.5) = 0.693$ nat。如果 $P=0.99$（几乎确定），信息量 $-\ln(0.99) \approx 0.01$ nat——几乎没信息。</p>
-<hr>
-<h2>二、熵：平均来看，有多不确定？</h2>
-<p>信息量是一件事的。如果你想描述<strong>整个概率分布</strong>的不确定性——把所有可能结果的信息量按概率加权平均：</p>
-$$\boxed{H(P) = -\sum_x P(x) \ln P(x)}$$
-<p>这就是<strong>熵</strong>。它衡量的是：从这个分布里随机抽一个结果，<strong>平均会得到多少 surprise</strong>。</p>
-<p><strong>极值情况：</strong></p>
+
+<p style="color:var(--text-light);font-size:0.9em">🌱 阶段 0 · 第 19 课</p>
+<h1>00-24 多元高斯分布</h1>
+
+<h2>一、从钟形曲线到山丘</h2>
+
+<p>00-15 学了一维高斯分布——一个钟形曲线：</p>
+
+$$f(x) = \frac{1}{\sigma\sqrt{2\pi}} \exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)$$
+
+<p><strong>画面：</strong> 现在把一维的钟形曲线<strong>绕竖轴旋转一圈</strong>——得到一个二维的山丘。山丘的顶在 $(\mu_1, \mu_2)$，越远离山顶越低。这就是<strong>二元高斯分布</strong>。</p>
+
+<p>推广到 $d$ 维——<strong>多元高斯分布</strong> $\mathcal{N}(\boldsymbol{\mu}, \Sigma)$：</p>
+
+$$f(\mathbf{x}) = \frac{1}{(2\pi)^{d/2} |\Sigma|^{1/2}}
+   \exp\left(-\frac{1}{2} (\mathbf{x} - \boldsymbol{\mu})^T \Sigma^{-1} (\mathbf{x} - \boldsymbol{\mu})\right)$$
+
+<p>两个参数：</p>
 <ul>
-<li>确定性分布 $P=[1, 0, 0]$（只有一个选项，概率 100%）：$H = -1\ln1 - 0 - 0 = 0$。零不确定性。</li>
-<li>均匀分布 $P=[\frac13, \frac13, \frac13]$：$H = -3 \times \frac13 \ln\frac13 = \ln 3 \approx 1.099$。最大化——你完全不知道会抽到哪个。</li>
+  <li>$\boldsymbol{\mu}$：$d$ 维<strong>均值向量</strong>——山丘的顶点位置</li>
+  <li>$\Sigma$：$d \times d$ <strong>协方差矩阵</strong>——山丘的形状（圆的？椭圆的？往哪个方向拉长的？）</li>
 </ul>
-<p>在分类问题里：如果模型的预测分布熵很高（接近均匀）→ 模型很不确定。熵很低（接近 one-hot）→ 模型很自信。</p>
-<pre><code><span class="hl-comment"># 00-20 熵：衡量一个概率分布的不确定性</span>
-<span class="hl-comment"># 导入numpy，别名np</span>
+
+<h2>二、协方差矩阵——山丘的形状</h2>
+
+<p>一维时 $\sigma^2$ 是一个数——钟形曲线的胖瘦。多维时 $\Sigma$ 是一个矩阵：</p>
+
+$$\Sigma = \begin{bmatrix}
+\sigma_1^2 & \rho\sigma_1\sigma_2 \\
+\rho\sigma_1\sigma_2 & \sigma_2^2
+\end{bmatrix}$$
+
+<ul>
+  <li><strong>对角线</strong> $\sigma_1^2, \sigma_2^2$：每个维度的方差（各方向的山坡陡不陡）</li>
+  <li><strong>反对角线</strong> $\rho\sigma_1\sigma_2$：两个维度之间的<strong>协方差</strong>（$\rho$ 是相关系数）</li>
+</ul>
+
+<p>$\rho > 0$ → $x_1$ 大的时候 $x_2$ 也大概率大（<strong>正相关</strong>）→ 椭圆斜着拉长。</p>
+<p>$\rho = 0$ → 两个维度独立 → 椭圆轴和坐标轴对齐。</p>
+
+<h2>三、等高线是椭圆</h2>
+
+<p>固定 $(\mathbf{x}-\boldsymbol{\mu})^T \Sigma^{-1} (\mathbf{x}-\boldsymbol{\mu}) = c$（常数），这个方程描述一个<strong>椭圆</strong>。不同的 $c$ 给出不同大小的椭圆——就像地图上的<strong>等高线</strong>。</p>
+
+<p>椭圆的<strong>长轴方向</strong> = $\Sigma$ 的最大特征值对应的特征向量（学过 00-05！）</p>
+<p>椭圆的<strong>轴长比</strong> = $\sqrt{\lambda_1} : \sqrt{\lambda_2}$（特征值的平方根比）</p>
+
+<pre><code><span class="hl-comment"># 00-19 多元高斯 — 不同协方差矩阵产生不同形状的山丘</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-<span class="hl-comment"># probs：概率数组，如 [0.95, 0.03, 0.02]</span>
-<span class="hl-keyword">def</span> <span class="hl-func">entropy</span>(probs):
-    <span class="hl-string">"""H(P) = -Σ p_i ln(p_i)"""</span>
-<span class="hl-comment"># 只算 p > 0 的项（ln(0) 数学上无定义，也会产生-inf）</span>
-    <span class="hl-comment"># H = -Σ pᵢ log(pᵢ)，只对 pᵢ>0 的项求和（log0无定义）</span>
-    <span class="hl-keyword">return</span> -np.sum(probs[probs > <span class="hl-number">0</span>] * np.log(probs[probs > <span class="hl-number">0</span>]))
-<span class="hl-comment">#        np.log()：自然对数ln（底e→单位nat）</span>
-<span class="hl-comment">#        probs[probs>0]：布尔索引，只取概率>0的元素</span>
-<span class="hl-comment">#        -sum(p_i * ln(p_i)) → 非负值，熵越小越确定</span>
-<span class="hl-comment"># 三个猫狗鸟分类——展示不同确定程度对应的熵值</span>
-<span class="hl-comment"># 模型：95%确定是猫，熵应≈0.2（很确定）</span>
-confident = np.array([<span class="hl-number">0.95</span>, <span class="hl-number">0.03</span>, <span class="hl-number">0.02</span>])
-<span class="hl-comment"># 模型：不太确定，熵应≈1.1（中等）</span>
-uncertain = np.array([<span class="hl-number">0.40</span>, <span class="hl-number">0.35</span>, <span class="hl-number">0.25</span>])
-<span class="hl-comment"># 完全均匀分布，熵应=ln(3)≈1.099（最大）</span>
-uniform   = np.array([<span class="hl-number">1</span>/<span class="hl-number">3</span>, <span class="hl-number">1</span>/<span class="hl-number">3</span>, <span class="hl-number">1</span>/<span class="hl-number">3</span>])
-<span class="hl-comment"># ~0.2 —— 几乎确定</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"熵(确定)  = {entropy(confident):.4f}"</span>)
-<span class="hl-comment"># ~1.1 —— 比较混乱</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"熵(不确定)= {entropy(uncertain):.4f}"</span>)
-<span class="hl-comment"># ~1.099 = ln(3) —— 完全不确定的最大熵</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"熵(均匀)  = {entropy(uniform):.4f}"</span>)
+
+<span class="hl-keyword">def</span> <span class="hl-func">plot_gaussian_contour</span>(mu, Sigma, label):
+<span class="hl-comment">    pass
+    """打印高斯分布的关键信息</span>
+<span class="hl-comment">    mu: 均值向量 [μ₁, μ₂]</span>
+<span class="hl-comment">    Sigma: 协方差矩阵 2×2</span>
+<span class="hl-comment">    """</span>
+    eigs = np.linalg.eigvals(Sigma)          <span class="hl-comment"># 协方差矩阵的特征值</span>
+    stds = np.sqrt(eigs)                     <span class="hl-comment"># 标准差 = sqrt(特征值) = 轴长</span>
+    corr = Sigma[<span class="hl-number">0</span>, <span class="hl-number">1</span>] / np.sqrt(Sigma[<span class="hl-number">0</span>,<span class="hl-number">0</span>]*Sigma[<span class="hl-number">1</span>,<span class="hl-number">1</span>])
+<span class="hl-comment"># ρ = σ₁₂ / (σ₁·σ₂)</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"{label}:"</span>)
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"  μ = {mu}"</span>)
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"  Σ = {Sigma}"</span>)
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"  轴长 std₁={stds[0]:.2f}, std₂={stds[1]:.2f}"</span>)
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"  相关系数 ρ = {corr:.2f}"</span>)
+
+<span class="hl-comment"># 情况1: 各向同性（圆）— 两个维度独立且方差相同</span>
+Sigma_iso = np.array([[<span class="hl-number">1</span>, <span class="hl-number">0</span>], [<span class="hl-number">0</span>, <span class="hl-number">1</span>]])
+plot_gaussian_contour([<span class="hl-number">0</span>,<span class="hl-number">0</span>], Sigma_iso, <span class="hl-string">"各向同性（圆）"</span>)
+
+<span class="hl-comment"># 情况2: 轴对齐椭圆 — 两个维度方差不同但独立</span>
+Sigma_axis = np.array([[<span class="hl-number">4</span>, <span class="hl-number">0</span>], [<span class="hl-number">0</span>, <span class="hl-number">1</span>]])
+plot_gaussian_contour([<span class="hl-number">0</span>,<span class="hl-number">0</span>], Sigma_axis, <span class="hl-string">"\n轴对齐椭圆"</span>)
+
+<span class="hl-comment"># 情况3: 斜椭圆 — 两个维度正相关（ρ > 0）</span>
+Sigma_corr = np.array([[<span class="hl-number">1</span>, <span class="hl-number">0.7</span>], [<span class="hl-number">0.7</span>, <span class="hl-number">1</span>]])
+plot_gaussian_contour([<span class="hl-number">0</span>,<span class="hl-number">0</span>], Sigma_corr, <span class="hl-string">"\n斜椭圆（正相关）"</span>)
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-<hr>
-<h2>三、交叉熵：我的模型和真相差多远？</h2>
-<p>真实分布是 $P$（比如图片的真标签：100% 是猫）。模型的预测是 $Q$（输出 [0.7, 0.2, 0.1]）。怎么量化模型错得有多离谱？</p>
-<p>用<strong>交叉熵</strong>：</p>
-$$\boxed{H(P, Q) = -\sum_x P(x) \ln Q(x)}$$
-<p>和熵公式对比——唯一的区别：<strong>对数里是 $Q$ 而不是 $P$</strong>。也就是：真实的分布 $P$ 来决定「哪个结果重要」，但用模型预测的概率 $Q$ 来算信息量。</p>
-<p><strong>画面：</strong> 真实标签说「这就是猫」（$P = [1, 0, 0]$）。如果模型也输出 $Q = [0.99, 0.01, 0]$，交叉熵 = $-\ln(0.99) \approx 0.01$——很小，模型几乎没错。如果模型瞎猜 $Q = [0.01, 0.5, 0.49]$，交叉熵 = $-\ln(0.01) \approx 4.6$——巨大，模型被狠狠打脸。</p>
-<p><strong>分类任务里交叉熵为什么当损失函数？</strong> 交叉熵最小 = 模型的预测分布 $Q$ 最接近真实分布 $P$。梯度下降让交叉熵越来越小 → 模型的预测越来越准。</p>
+
+<h2>四、马氏距离——"考虑相关性的距离"</h2>
+
+<p>普通欧氏距离：$d = \sqrt{(x_1 - \mu_1)^2 + (x_2 - \mu_2)^2}$。所有方向一视同仁。</p>
+
+<p><strong>画面：</strong> 但高斯山丘的等高线是椭圆——沿长轴方向走很远概率也只降一点，沿短轴方向走一点概率就猛降。如果两个维度高度相关（$\rho \approx 1$），点 $(100, 101)$ 实际上和 $(0, 0)$ 离得很近——因为 $x_1$ 和 $x_2$ 几乎同步变化。</p>
+
+<p>欧氏距离看不到这种相关性，<strong>马氏距离</strong>可以：</p>
+
+$$D_M(\mathbf{x}) = \sqrt{(\mathbf{x} - \boldsymbol{\mu})^T \Sigma^{-1} (\mathbf{x} - \boldsymbol{\mu})}$$
+
+<p>这就是多元高斯指数里那个二次型。$\Sigma^{-1}$ 把椭圆"拉回"圆，然后算距离。</p>
+
 <pre><code>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-<span class="hl-comment"># 00-20 交叉熵：衡量模型预测与真实标签的差距</span>
-<span class="hl-comment"># p_true=真实分布(one-hot)，q_pred=模型预测</span>
-<span class="hl-keyword">def</span> <span class="hl-func">cross_entropy</span>(p_true, q_pred):
-    <span class="hl-string">"""H(P,Q) = -Σ p_i ln(q_i)"""</span>
-<span class="hl-comment"># 只算 p > 0 的项（真实概率为0的类别不参与损失计算）</span>
-    <span class="hl-comment"># mask：布尔数组，标记哪些位置p_i>0</span>
-    mask = p_true > <span class="hl-number">0</span>
-    <span class="hl-comment"># H(P,Q) = -Σ pᵢ log(qᵢ)，用真实分布p算、模型预测q做log</span>
-    <span class="hl-keyword">return</span> -np.sum(p_true[mask] * np.log(q_pred[mask]))
-<span class="hl-comment">#        p_true[mask]：真实概率>0的项（one-hot时只有一个1.0）</span>
-<span class="hl-comment">#        np.log(q_pred[mask])：模型对"真类别"预测概率的ln</span>
-<span class="hl-comment">#        叉熵越小 → 模型预测越接近真实分布</span>
-<span class="hl-comment"># 真标签：猫（one-hot编码：[猫=1, 狗=0, 鸟=0]）</span>
-<span class="hl-comment"># 真实标签：100%是猫</span>
-y_true = np.array([<span class="hl-number">1.0</span>, <span class="hl-number">0.0</span>, <span class="hl-number">0.0</span>])
-<span class="hl-comment"># 三个模型的预测——展示不同程度的偏差</span>
-<span class="hl-comment"># 好：90%确定是猫 → 交叉熵 =-ln(0.90)≈0.105</span>
-good  = np.array([<span class="hl-number">0.90</span>, <span class="hl-number">0.05</span>, <span class="hl-number">0.05</span>])
-<span class="hl-comment"># 一般：一半确定是猫 → 交叉熵 =-ln(0.50)≈0.693</span>
-ok    = np.array([<span class="hl-number">0.50</span>, <span class="hl-number">0.30</span>, <span class="hl-number">0.20</span>])
-<span class="hl-comment"># 差：认为很可能是狗 → 交叉熵 =-ln(0.10)≈2.303</span>
-bad   = np.array([<span class="hl-number">0.10</span>, <span class="hl-number">0.60</span>, <span class="hl-number">0.30</span>])
-<span class="hl-comment"># ~0.105 — 模型几乎没错</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"交叉熵(好) = {cross_entropy(y_true, good):.4f}"</span>)
-<span class="hl-comment"># ~0.693 — 有偏差</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"交叉熵(一般)= {cross_entropy(y_true, ok):.4f}"</span>)
-<span class="hl-comment"># ~2.303 — 错得离谱</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"交叉熵(差) = {cross_entropy(y_true, bad):.4f}"</span>)
+<span class="hl-comment"># 马氏距离 vs 欧氏距离</span>
+<span class="hl-keyword">def</span> <span class="hl-func">mahalanobis</span>(x, mu, Sigma):
+<span class="hl-comment">    pass
+    """计算马氏距离</span>
+<span class="hl-comment">    x: 待测点 [x₁, x₂]</span>
+<span class="hl-comment">    mu: 均值 [μ₁, μ₂]</span>
+<span class="hl-comment">    Sigma: 协方差矩阵 2×2</span>
+<span class="hl-comment">    """</span>
+    diff = x - mu                            <span class="hl-comment"># x - μ</span>
+    <span class="hl-keyword">return</span> np.sqrt(diff @ np.linalg.inv(Sigma) @ diff)
+<span class="hl-comment"># sqrt((x-μ)^T Σ⁻¹ (x-μ))</span>
+
+mu = np.array([<span class="hl-number">0</span>, <span class="hl-number">0</span>])
+<span class="hl-comment"># 高度相关 ρ=0.9</span>
+Sigma = np.array([[<span class="hl-number">1</span>, <span class="hl-number">0.9</span>], [<span class="hl-number">0.9</span>, <span class="hl-number">1</span>]])
+
+<span class="hl-comment"># (1, 1): 沿 "x₁=x₂" 方向——相关方向，距离应该小</span>
+p1 = np.array([<span class="hl-number">1</span>, <span class="hl-number">1</span>])
+<span class="hl-builtin">print</span>(<span class="hl-string">f"(1,1): 欧氏={np.linalg.norm(p1):.2f}, 马氏={mahalanobis(p1, mu, Sigma):.2f}"</span>)
+
+<span class="hl-comment"># (1, -1): 逆相关方向——不相关方向，距离应该大</span>
+p2 = np.array([<span class="hl-number">1</span>, -<span class="hl-number">1</span>])
+<span class="hl-builtin">print</span>(<span class="hl-string">f"(1,-1): 欧氏={np.linalg.norm(p2):.2f}, 马氏={mahalanobis(p2, mu, Sigma):.2f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n欧氏距离：(1,1) 和 (1,-1) 一样远"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"马氏距离：(1,1) 近得多——因为它沿着相关方向"</span>)
 </code></pre>
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-<p>模型越好 → 交叉熵越小。这就是训练分类模型时最小化的那个数。</p>
-<hr>
-<h2>四、KL 散度：两个分布"形状"差多少？</h2>
-<p>交叉熵 = 熵 + <strong>KL 散度</strong>。推导只差一行——把 $D_{KL}$ 的定义展开再拆分：</p>
 
-$$\begin{aligned}
-D_{\mathrm{KL}}(P \parallel Q) &= \sum_x P(x) \ln\frac{P(x)}{Q(x)} \\
-&= \sum_x P(x) \big[\ln P(x) - \ln Q(x)\big] \\
-&= \underbrace{\sum_x P(x) \ln P(x)}_{-H(P)} \;-\; \underbrace{\sum_x P(x) \ln Q(x)}_{-H(P,Q)} \\
-&= -H(P) + H(P, Q)
-\end{aligned}$$
+<h2>五、深度学习中的多元高斯</h2>
 
-<p>移项即得：$H(P,Q) = H(P) + D_{\mathrm{KL}}(P \parallel Q)$。</p>
-
-<p><strong>KL 散度的定义公式：</strong></p>
-$$\boxed{D_{\mathrm{KL}}(P \parallel Q) = \sum_x P(x) \ln\frac{P(x)}{Q(x)}}$$
-<p><strong>KL 散度衡量的是：</strong> 用 $Q$ 来近似 $P$，比直接用 $P$ 多浪费了多少信息。熵 $H(P)$ 是「最低消费」——数据本身的不确定性。KL 散度是「超额消费」——模型不好带来的额外成本。</p>
-<p><strong>关键性质：</strong></p>
+<div class="callout callout-tip">
+<strong>多元高斯在深度学习中无处不在：</strong>
 <ul>
-<li>$D_{\mathrm{KL}}(P \parallel Q) \ge 0$，当且仅当 $P=Q$ 时等于 0（两个分布完全一样）</li>
-<li>不对称：$D_{\mathrm{KL}}(P \parallel Q) \neq D_{\mathrm{KL}}(Q \parallel P)$。不是真正的「距离」</li>
+  <li><strong>VAE（变分自编码器）</strong>：编码器输出 $\boldsymbol{\mu}$ 和 $\Sigma$ 参数，解码器从 $\mathcal{N}(\boldsymbol{\mu}, \Sigma)$ 采样生成新数据</li>
+  <li><strong>扩散模型</strong>：正向加噪是往多元高斯走，每一步噪声都是各向同性的多元高斯（$\Sigma = \sigma^2 I$）</li>
+  <li><strong>贝叶斯神经网络</strong>：把权重本身看作多元高斯随机变量，而不只是一个数</li>
+  <li><strong>异常检测</strong>：对正常数据拟合一个多元高斯，马氏距离太大的判定为异常</li>
 </ul>
-<p><strong>为什么训练时用交叉熵而不是 KL 散度？</strong> 因为 $H(P)$（真实标签的熵）是常数——训练数据固定了就不变。最小化交叉熵 = 最小化 KL 散度，所以交叉熵就够了。</p>
-<pre><code>
-<span class="hl-comment"># 熵函数和交叉熵（来自前面代码块的定义）</span>
-<span class="hl-keyword">def</span> <span class="hl-func">entropy</span>(probs):
-    <span class="hl-string">"""H(P) = -Σ p_i ln(p_i)"""</span>
-    <span class="hl-keyword">return</span> -np.<span class="hl-builtin">sum</span>(probs[probs &gt; <span class="hl-number">0</span>] * np.log(probs[probs &gt; <span class="hl-number">0</span>]))
-
-<span class="hl-keyword">def</span> <span class="hl-func">cross_entropy</span>(p_true, q_pred):
-    <span class="hl-string">"""H(P,Q) = -Σ p_i ln(q_i)，只算真实概率>0的项"""</span>
-    mask = p_true &gt; <span class="hl-number">0</span>
-    <span class="hl-keyword">return</span> -np.<span class="hl-builtin">sum</span>(p_true[mask] * np.log(q_pred[mask]))
-
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-<span class="hl-comment"># 00-20 KL 散度：验证 H(P,Q) = H(P) + D_KL(P||Q)</span>
-<span class="hl-comment"># p=真实分布，q=模型预测分布</span>
-<span class="hl-keyword">def</span> <span class="hl-func">kl_divergence</span>(p, q):
-    <span class="hl-string">"""D_KL(P||Q) = Σ p_i ln(p_i/q_i)"""</span>
-    <span class="hl-comment"># 只算真实概率>0的项（避免ln(0)）</span>
-    mask = p > <span class="hl-number">0</span>
-    <span class="hl-comment"># D_KL = Σ pᵢ log(pᵢ/qᵢ)，衡量q偏离p的程度</span>
-    <span class="hl-keyword">return</span> np.sum(p[mask] * np.log(p[mask] / q[mask]))
-<span class="hl-comment">#        ln(p_i/q_i)：比值越大 → 模型预测偏离越大 → KL散度越大</span>
-<span class="hl-comment">#        D_KL≥0恒成立（吉布斯不等式），P=Q时D_KL=0</span>
-<span class="hl-comment"># 真实标签：one-hot（猫）</span>
-y_true = np.array([<span class="hl-number">1.0</span>, <span class="hl-number">0.0</span>, <span class="hl-number">0.0</span>])
-<span class="hl-comment"># 模型预测：90%猫，5%狗，5%鸟</span>
-pred   = np.array([<span class="hl-number">0.90</span>, <span class="hl-number">0.05</span>, <span class="hl-number">0.05</span>])
-H_P = entropy(y_true)                     <span class="hl-comment"># 真实标签的熵：one-hot的熵恒为0</span>
-H_PQ = cross_entropy(y_true, pred)        <span class="hl-comment"># 交叉熵：-ln(0.90) ≈ 0.105</span>
-D_KL = kl_divergence(y_true, pred)        <span class="hl-comment"># KL散度：计算"额外成本"</span>
-<span class="hl-comment"># 0.0000 —— one-hot没有不确定性</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"H(P)    = {H_P:.4f}"</span>)
-<span class="hl-comment"># 0.1054 —— 交叉熵≈KL散度（因为H(P)=0）</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"H(P,Q)  = {H_PQ:.4f}"</span>)
-<span class="hl-comment"># 0.1054 —— 模型不好带来的额外成本</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"D_KL    = {D_KL:.4f}"</span>)
-<span class="hl-comment"># 验证恒等式：H(P,Q) = H(P) + D_KL(P||Q)</span>
-<span class="hl-comment"># 验证恒等式：交叉熵 = 熵 + KL散度</span>
-<span class="hl-builtin">print</span>(<span class="hl-string">f"H(P,Q) = H(P) + D_KL? {abs(H_PQ - (H_P + D_KL)) &lt; 1e-10}"</span>)
-<span class="hl-comment"># abs(差值) < 1e-10 → True，浮点误差范围内相等 ✓</span>
-<span class="hl-comment"># 结论：训练时最小化交叉熵 = 最小化KL散度（H(P)是常数无影响）</span>
-</code></pre>
-
-<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
-<hr>
-<h2>💭 概念题</h2>
-<ol>
-<li>抛一枚公平硬币，熵是多少？抛一枚永远出正面的硬币，熵是多少？哪个更大，为什么？——考察：熵与确定性的关系</li>
-<li>真标签是 $P=[1,0,0]$，模型预测 $Q=[0.3,0.4,0.3]$。交叉熵是多少？如果 $Q$ 变成 $[0.6,0.2,0.2]$，交叉熵变大还是变小？——考察：交叉熵反映预测准确度</li>
-<li>$H(P,Q) \ge H(P)$ 这个不等式为什么恒成立？从 KL 散度的非负性解释。——考察：交叉熵、熵、KL 散度三者的关系</li>
-</ol>
-<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
-<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-23/">← 00-19</a><a href="../../">📖 目录</a><a href="../01-01/">01-01 →</a></nav>
 </div>
+
+<h2>💭 概念题</h2>
+
+<div class="exercise">
+<h3>1. 协方差矩阵和特征值</h3>
+<p>$\Sigma = \begin{bmatrix} 4 & 0 \\ 0 & 1 \end{bmatrix}$。等高线椭圆的形状是怎样的？长轴沿哪个方向？长轴是短轴的几倍？</p>
+<p>——考察：协方差矩阵特征值 = 轴长的平方</p>
+</div>
+
+<div class="exercise">
+<h3>2. 马氏距离的直觉</h3>
+<p>身高 $x_1$ 和体重 $x_2$ 正相关。一个人 $(185\text{cm}, 60\text{kg})$ 和 $(185\text{cm}, 85\text{kg})$，哪个的欧氏距离与均值 $(170, 70)$ 差不多？哪个的马氏距离更小？为什么？</p>
+<p>——考察：正相关时马氏距离修正方向</p>
+</div>
+
+<div class="exercise">
+<h3>3. 独立性的条件</h3>
+<p>如果协方差矩阵是对角矩阵（$\Sigma = \text{diag}(\sigma_1^2, \sigma_2^2)$），两个维度是否独立？从多元高斯公式出发，把联合 PDF 拆成两个一维 PDF 的乘积来验证。</p>
+<p>——考察：对角协方差矩阵 → 独立</p>
+</div>
+
+<nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
+<a href="../00-23/">← 00-18</a><a href="../../">📖 目录</a><a href="../00-25/">00-20 →</a></nav>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  });
+</script>
+
 <script>
 (function(){
   document.querySelectorAll('pre code').forEach(function(block){
@@ -207,4 +211,6 @@ D_KL = kl_divergence(y_true, pred)        <span class="hl-comment"># KL散度：
 })();
 </script>
 
-</body></html>
+</body>
+</html>
+
