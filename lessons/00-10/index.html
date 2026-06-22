@@ -56,16 +56,58 @@ $$\begin{aligned}
 </table>
 <p>系数 1, 3, 3, 1——正好是<strong>杨辉三角</strong>第 3 行。这不是巧合。</p>
 
-<h3>推广到一般的 $n$</h3>
-<p>对于任意正整数 $n$，$(x+\epsilon)^n$ 展开后也是类似的模式：</p>
-$$(x+\epsilon)^n = x^n + n x^{n-1}\epsilon + (\text{某个数})\, x^{n-2}\epsilon^2 + \cdots + \epsilon^n$$
+<h3>推广到一般的 $n$——「选盒子」的直觉</h3>
+<p>先回到 $n=3$，但这次不走代数展开，而是用<strong>组合视角</strong>——看系数 1, 3, 3, 1 到底从哪来。</p>
 
-<p>我们不需要知道每个系数具体是多少——只需要看清三件事：</p>
+<p>把 $(x+\epsilon)^3 = (x+\epsilon)(x+\epsilon)(x+\epsilon)$ 想象成<strong>三个并排的盒子</strong>：</p>
+
+<div style="text-align:center;margin:1.2em 0">
+$(x+\epsilon)$ &nbsp; $(x+\epsilon)$ &nbsp; $(x+\epsilon)$<br>
+<span style="font-size:0.85em;color:#666">盒子1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 盒子2 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 盒子3</span>
+</div>
+
+<p>展开这个乘积，就是要<strong>从每个盒子里选一样东西</strong>（要么选 $x$，要么选 $\epsilon$），然后把选出来的三个东西乘起来。所有可能的选法：</p>
+
+<table>
+<tr><th>选法</th><th>盒子1</th><th>盒子2</th><th>盒子3</th><th>乘积</th><th>几个 ε</th></tr>
+<tr><td>1</td><td>$x$</td><td>$x$</td><td>$x$</td><td>$x^3$</td><td>0</td></tr>
+<tr><td>2</td><td>$\epsilon$</td><td>$x$</td><td>$x$</td><td>$x^2\epsilon$</td><td>1</td></tr>
+<tr><td>3</td><td>$x$</td><td>$\epsilon$</td><td>$x$</td><td>$x^2\epsilon$</td><td>1</td></tr>
+<tr><td>4</td><td>$x$</td><td>$x$</td><td>$\epsilon$</td><td>$x^2\epsilon$</td><td>1</td></tr>
+<tr><td>5</td><td>$\epsilon$</td><td>$\epsilon$</td><td>$x$</td><td>$x\epsilon^2$</td><td>2</td></tr>
+<tr><td>6</td><td>$\epsilon$</td><td>$x$</td><td>$\epsilon$</td><td>$x\epsilon^2$</td><td>2</td></tr>
+<tr><td>7</td><td>$x$</td><td>$\epsilon$</td><td>$\epsilon$</td><td>$x\epsilon^2$</td><td>2</td></tr>
+<tr><td>8</td><td>$\epsilon$</td><td>$\epsilon$</td><td>$\epsilon$</td><td>$\epsilon^3$</td><td>3</td></tr>
+</table>
+
+<p><strong>合并同类项：</strong></p>
 <ul>
-<li><strong>第一项永远是 $x^n$。</strong> 所有 $n$ 次都选了 $x$，一个 $\epsilon$ 都没选——只有 1 种选法，系数 = 1。</li>
-<li><strong>第二项的系数永远是 $n$。</strong> 从 $n$ 个 $(x+\epsilon)$ 中选 1 个 $\epsilon$（其余选 $x$），有 $n$ 种选法。所以这一项是 $n x^{n-1}\epsilon$。</li>
-<li><strong>后面的项都带着 $\epsilon^2$ 或更高次方。</strong> 选了 2 个或更多 $\epsilon$。</li>
+<li>$x^3$：只有选法 1（三个盒子都选 $x$）→ <strong>1 种选法，系数 = 1</strong></li>
+<li>$x^2\epsilon$：选法 2、3、4（ε 可以来自盒子1、盒子2、或盒子3）→ <strong>3 种选法，系数 = 3</strong></li>
+<li>$x\epsilon^2$：选法 5、6、7（挑两个盒子选 ε）→ <strong>3 种选法，系数 = 3</strong></li>
+<li>$\epsilon^3$：只有选法 8（三个盒子都选 ε）→ <strong>1 种选法，系数 = 1</strong></li>
 </ul>
+
+<p>杨辉三角第 3 行的 1, 3, 3, 1，本质就是<strong>「从 3 个盒子里挑 0、1、2、3 个选 ε」的选法数</strong>。</p>
+
+<p>推广到 $n$ 个盒子——$(x+\epsilon)^n$ 是 $n$ 个 $(x+\epsilon)$ 连乘：</p>
+
+<div style="text-align:center;margin:1.2em 0">
+$(x+\epsilon)$ &nbsp; $(x+\epsilon)$ &nbsp; $(x+\epsilon)$ &nbsp; $\cdots$ &nbsp; $(x+\epsilon)$<br>
+<span style="font-size:0.85em;color:#666">盒子1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 盒子2 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 盒子3 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; … &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 盒子n</span>
+</div>
+
+<p>每个盒子选 $x$ 或 $\epsilon$，乘起来。按「选了几个 ε」分类：</p>
+
+<ul>
+<li><strong>0 个 ε（全选 $x$）：</strong> 只有 1 种选法 → 系数 = 1，这一项是 $x^n$</li>
+<li><strong>1 个 ε：</strong> 从 $n$ 个盒子里挑 1 个选 ε，有 $n$ 种挑法 → 系数 = $n$，这一项是 $n x^{n-1}\epsilon$</li>
+<li><strong>2 个 ε：</strong> 从 $n$ 个盒子里挑 2 个选 ε → 系数是某个数，但这一项带 $\epsilon^2$</li>
+<li>$\vdots$</li>
+<li><strong>$n$ 个 ε（全选 $\epsilon$）：</strong> 只有 1 种选法 → 系数 = 1，这一项是 $\epsilon^n$</li>
+</ul>
+
+<p>我们<strong>不需要知道挑 2 个、3 个……的系数具体是多少</strong>——只需知道它们都带着 $\epsilon^2$ 或更高次方。这在下一步导数计算中会自动消掉。</p>
 
 <h3>回到导数——走三步</h3>
 <p><strong>① 展开：</strong> $(x+\epsilon)^n = x^n + n x^{n-1}\epsilon + (\text{带 }\epsilon^2\text{ 及更高次的项})$</p>
