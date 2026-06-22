@@ -109,6 +109,45 @@ $(x+\epsilon)$ &nbsp; $(x+\epsilon)$ &nbsp; $(x+\epsilon)$ &nbsp; $\cdots$ &nbsp
 
 <p>我们<strong>不需要知道挑 2 个、3 个……的系数具体是多少</strong>——只需知道它们都带着 $\epsilon^2$ 或更高次方。这在下一步导数计算中会自动消掉。</p>
 
+<h3>补充：排列组合与杨辉三角</h3>
+<p>从 $n$ 个盒子里挑 $k$ 个选 $\epsilon$（其余选 $x$），有几种挑法？这个数记作 $C(n,k)$——读作「n 选 k」。也叫<strong>组合数</strong>。</p>
+
+<p><strong>杨辉三角</strong>就是把所有 $C(n,k)$ 排成三角形——第 $n$ 行第 $k$ 个数就是 $C(n,k)$（行和列都从 0 开始数）：</p>
+
+<div style="text-align:center;margin:1.2em 0;font-family:monospace;line-height:1.6">
+n=0:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1<br>
+n=1:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;1<br>
+n=2:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;2&nbsp;&nbsp;1<br>
+n=3:&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;3&nbsp;&nbsp;3&nbsp;&nbsp;1<br>
+n=4:&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;4&nbsp;&nbsp;6&nbsp;&nbsp;4&nbsp;&nbsp;1<br>
+n=5:&nbsp;&nbsp;1&nbsp;&nbsp;5&nbsp;10&nbsp;10&nbsp;&nbsp;5&nbsp;&nbsp;1
+</div>
+
+<p>每行的数 = 上一行相邻两数之和（$1+2=3$，$3+3=6$……）。第 3 行的 1, 3, 3, 1 正好和 $(x+\epsilon)^3$ 展开的系数一致——不是巧合。杨辉三角就是二项式系数的几何版。</p>
+
+<p><strong>二项式定理</strong>用组合数写出来就是：</p>
+$$(a+b)^n = C(n,0)a^n + C(n,1)a^{n-1}b + C(n,2)a^{n-2}b^2 + \cdots + C(n,n)b^n = \sum_{k=0}^n C(n,k)\\, a^{n-k} b^k$$
+
+<p>把 $a=x$，$b=\epsilon$ 代入，就是 $(x+\epsilon)^n = \sum_{k=0}^n C(n,k)\\, x^{n-k} \\epsilon^k$。所以：$C(n,0)=1$（一个 $\epsilon$ 都不选），$C(n,1)=n$（选 1 个 $\epsilon$），$C(n,2)=\frac{n(n-1)}{2}$（选 2 个 $\epsilon$），以此类推。</p>
+
+<p>一行代码验证杨辉三角前三行的系数和上面手算的结果一致：</p>
+<pre><code><span class="hl-comment"># 用 Python 的 math.comb 算组合数，验证杨辉三角</span>
+<span class="hl-comment"># 导入 math 模块——comb(n,k) 就是 C(n,k) = n选k</span>
+<span class="hl-keyword">import</span> math
+
+<span class="hl-comment"># n=3 的展开系数：C(3,0), C(3,1), C(3,2), C(3,3)</span>
+<span class="hl-comment"># 应该等于 [1, 3, 3, 1]——和前面手算的结果一致</span>
+coeffs = [math.comb(<span class="hl-number">3</span>, k) <span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">4</span>)]
+<span class="hl-builtin">print</span>(<span class="hl-string">f"n=3 的系数: {coeffs}"</span>)           <span class="hl-comment"># → [1, 3, 3, 1]</span>
+
+<span class="hl-comment"># n=4 的展开系数——杨辉三角第 4 行</span>
+coeffs4 = [math.comb(<span class="hl-number">4</span>, k) <span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">5</span>)]
+<span class="hl-builtin">print</span>(<span class="hl-string">f"n=4 的系数: {coeffs4}"</span>)           <span class="hl-comment"># → [1, 4, 6, 4, 1]</span>
+</code></pre>
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<p>组合数后面会在概率课（二项分布、$C(n,k)p^k(1-p)^{n-k}$）里反复用到——这里的「选盒子」直觉到时候直接复用。</p>
+
 <h3>回到导数——走三步</h3>
 <p><strong>① 展开：</strong> $(x+\epsilon)^n = x^n + n x^{n-1}\epsilon + (\text{带 }\epsilon^2\text{ 及更高次的项})$</p>
 

@@ -9,11 +9,13 @@
 onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 </head><body>
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-12</span>
-<span><a href="../00-08/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-11/">下一课 →</a></span></nav>
+<span><a href="../00-11/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-13/">下一课 →</a></span></nav>
 <div class="container">
 <h1>00-12 梯度下降</h1>
 <hr>
-<h2>一、复习：梯度下降核心公式</h2>
+<h2>一、从梯度到梯度下降</h2>
+<p>00-11 学到了：梯度指向函数值<strong>上升最快</strong>的方向。现在反过来——如果我想找<strong>最小值</strong>（谷底），每一步往梯度的<strong>反方向</strong>走。</p>
+
 <div class="callout callout-tip">
 <strong>梯度下降 = 闭着眼睛，每一步都往最陡的下坡方向踩一脚。</strong>
 $$\theta_{t+1} = \theta_t - \eta \cdot \nabla f(\theta_t)$$
@@ -24,32 +26,155 @@ $$\theta_{t+1} = \theta_t - \eta \cdot \nabla f(\theta_t)$$
 <li>$\eta$（学习率）：走多大步。太大→可能跨过山谷冲到对面山上去了；太小→半天走不到底</li>
 </ul>
 </div>
-<hr>
-<h2>二、学习率多大算太大？——发散条件推导</h2>
-<div class="callout callout-warning">
-<h3>推导：从「会跨过山谷」到具体数值条件</h3>
-<p>不是说「学习率大了就会跨过山谷」——要多<strong>大</strong>才会跨过去？用二次函数来算。</p>
-<p><strong>拿一个具体例子：</strong>$f(x) = x^2 - 4x + 4$，导数 $f'(x) = 2x - 4$（斜率是一条直线），最小值在 $x=2$（因为 $f'(2)=0$）。</p>
+
+<h2>二、代码演示——亲眼看着小球滚下山</h2>
+<p>拿最简单的二次函数 $f(x) = x^2$ 来跑梯度下降。最小值显然在 $x=0$。我们故意从 $x=3$ 出发，看它能不能滚回去。</p>
+
+<pre><code><span class="hl-comment"># 00-12 第一步：梯度下降——亲眼看着小球从 x=3 滚到 x≈0</span>
+<span class="hl-comment"># 导入numpy，别名np</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 定义函数 f(x)=x² 和它的导数 f'(x)=2x</span>
+<span class="hl-comment"># 导数 f'(x) 告诉我们每一步该往哪走——梯度方向</span>
+<span class="hl-keyword">def</span> <span class="hl-funcdef">f</span>(x):
+    <span class="hl-string">"""f(x) = x²——最简单的抛物线，谷底在 x=0"""</span>
+    <span class="hl-keyword">return</span> x**<span class="hl-number">2</span>
+
+<span class="hl-keyword">def</span> <span class="hl-funcdef">df</span>(x):
+    <span class="hl-string">"""f'(x) = 2x——导数，指向上升最快的方向"""</span>
+    <span class="hl-keyword">return</span> <span class="hl-number">2</span> * x
+
+<span class="hl-comment"># 初始位置——从 x=3 出发（函数值=9，离谷底 x=0 还有 3 个单位）</span>
+<span class="hl-comment"># 学习率 η=0.3（相当于每次往谷底走 30% 的当前偏移）</span>
+x = <span class="hl-number">3.0</span>
+<span class="hl-comment"># 学习率：步长参数，控制每步走多远</span>
+eta = <span class="hl-number">0.3</span>
+
+<span class="hl-comment"># 迭代 15 次——每一步打印：第几步、位置 x、函数值 f(x)、梯度 df(x)</span>
+<span class="hl-comment"># f"{i:2d}"：第几步，占 2 位右对齐，方便对齐阅读</span>
+<span class="hl-comment"># f"{x:8.4f}"：x 值，占 8 位保留 4 位小数</span>
+<span class="hl-comment"># f"{f(x):8.4f}"：函数值，格式同上</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"{'步':>3s}  {'x':>8s}  {'f(x)':>8s}  {'梯度':>8s}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">"-"</span> * <span class="hl-number">35</span>)
+<span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">15</span>):
+    <span class="hl-comment"># 保存更新前的位置用于打印</span>
+    x_old = x
+    <span class="hl-comment"># 梯度下降核心：x_new = x_old - η × f'(x_old)</span>
+    <span class="hl-comment"># 负号表示往梯度的反方向走——下坡</span>
+    x = x - eta * df(x)
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"{i:3d}  {x_old:8.4f}  {f(x_old):8.4f}  {df(x_old):8.4f}"</span>)
+
+<span class="hl-comment"># 最终位置——如果收敛，x 应该非常接近 0</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n最终: x={x:.6f}, f(x)={f(x):.10f}"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<p><strong>看输出：</strong>x 从 3.0 → 1.2 → 0.48 → 0.192 → 0.077 → ... → 趋近于 0。每一步的梯度（2x）越来越小——坡度越来越缓，步幅也越来越小。这是在「自刹车」——越靠近谷底，自然就走得越慢。</p>
+
+<div class="callout callout-info">
+<strong>为什么步幅自动缩小？</strong>
+<p>$f(x)=x^2$ 的导数是 $2x$。梯度下降的更新是 $x_{t+1} = x_t - \eta \cdot 2x_t = (1-2\eta)x_t$。</p>
+<p>当 $\eta=0.3$ 时：$x_{t+1} = (1-0.6)x_t = 0.4x_t$。每一步位置缩为原来的 40%——<strong>呈指数衰减。</strong></p>
+<p>本质原因：$f'(x)=2x$ 在谷底（x=0）为零，越靠近谷底导数越小，更新量自然变小——这是梯度下降「自刹车」的根源。</p>
+</div>
+
+<h2>三、学习率多大算太大？——发散条件</h2>
+<p>不是说「学习率太大了会跨过山谷」——要多<strong>大</strong>才会跨过去？用二次函数来精确算。</p>
+<p>拿 $f(x) = x^2 - 4x + 4$（配成 $(x-2)^2$），谷底在 $x=2$，导数 $f'(x) = 2x - 4$。</p>
+
 <p>梯度下降更新：</p>
 $$x_{t+1} = x_t - \eta \cdot (2x_t - 4) = (1 - 2\eta) x_t + 4\eta$$
-<p>关心的是<strong>离谷底还有多远</strong>：定义误差 $e_t = x_t - 2$（当前离最小值 2 的距离）。</p>
+
+<p>关心的是<strong>离谷底还有多远</strong>——定义误差 $e_t = x_t - 2$：</p>
 $$e_{t+1} = x_{t+1} - 2 = (1-2\eta)x_t + 4\eta - 2 = (1-2\eta)(x_t - 2) = (1-2\eta) \cdot e_t$$
-<p>所以每一步误差乘以 $(1-2\eta)$：</p>
+
+<p>每一步误差乘以 $(1-2\eta)$：</p>
 <ul>
-<li>$|1-2\eta| < 1$ → 误差越来越小 → <strong>收敛</strong>。解出来：$-1 < 1-2\eta < 1$ → $0 < \eta < 1$</li>
+<li>$|1-2\eta| < 1$ → 误差越来越小 → <strong>收敛</strong>。解：$-1 < 1-2\eta < 1$ → $0 < \eta < 1$</li>
 <li>$|1-2\eta| = 1$ → 误差不变 → 来回跳但不缩小（$\eta=1$ 时原地振荡）</li>
 <li>$|1-2\eta| > 1$ → 误差越来越大 → <strong>发散！</strong></li>
 </ul>
-<p><strong>验证：</strong>$\eta = 1.5$，$1-2\eta = 1-3 = -2$，$|{-2}| = 2 > 1$ → 发散。</p>
-<p>$x_0 = 1$，误差 $e_0 = 1-2 = -1$（谷底在右边）。$e_1 = (-2) \times (-1) = 2$，$|e_1| = 2 > |e_0| = 1$。直接验证：$x_1 = 1 - 1.5 \times (-2) = 1 + 3 = 4$，确实从谷底左边直接跳到右边更远的地方——典型的发散。</p>
-<p><strong>一般结论：</strong>对于二次函数 $f(x) = ax^2 + bx + c$（其中 $a>0$，开口朝上），收敛条件是 $0 < \eta < 1/a$。$f''(x) = 2a$ 越大（函数越弯），允许的学习率越小。</p>
-</div>
-<figure><img src="assets/gradient_descent.png" alt="梯度下降"><figcaption>小球从起点沿最陡下坡方向逐步滚到谷底。每一步的坡度越来越缓</figcaption></figure>
+
+<p><strong>验证 $\eta = 1.5$：</strong> $1-2\eta = 1-3 = -2$，$|{-2}| = 2 > 1$ → 发散。从 $x_0 = 1$ 出发：误差 $e_0 = 1-2 = -1$（谷底在右边，人在左边）。$e_1 = (-2) \times (-1) = 2$，$|e_1| = 2 > |e_0| = 1$——越走越远。直接算：$x_1 = 1 - 1.5 \times (-2) = 1 + 3 = 4$，从谷底左边直接跳到右边更远的地方——发散无疑。</p>
+
+<p><strong>一般结论：</strong> 对二次函数 $f(x) = ax^2 + bx + c$（$a>0$），收敛条件是 $0 < \eta < 1/a$。$f''(x) = 2a$ 越大（弯越急），允许的学习率越小。</p>
+
+<h2>四、代码验证——亲眼看到发散</h2>
+<p>把第三节的 $\eta=1.5$ 跑一遍，看发散长什么样：</p>
+
+<pre><code><span class="hl-comment"># 00-12 第二步：学习率太大导致发散——亲自跑一遍</span>
+<span class="hl-comment"># 函数 f(x) = x² - 4x + 4，谷底在 x=2</span>
+<span class="hl-keyword">def</span> <span class="hl-funcdef">f2</span>(x):
+    <span class="hl-string">"""f(x)=x²-4x+4=(x-2)²，谷底 x=2, f(2)=0"""</span>
+    <span class="hl-keyword">return</span> x**<span class="hl-number">2</span> - <span class="hl-number">4</span>*x + <span class="hl-number">4</span>
+
+<span class="hl-keyword">def</span> <span class="hl-funcdef">df2</span>(x):
+    <span class="hl-string">"""f'(x) = 2x - 4"""</span>
+    <span class="hl-keyword">return</span> <span class="hl-number">2</span>*x - <span class="hl-number">4</span>
+
+<span class="hl-comment"># 学习率 η=1.5——超过收敛条件 η<1，应该发散</span>
+<span class="hl-comment"># 从 x=1 出发，离谷底 x=2 差 1 个单位</span>
+x = <span class="hl-number">1.0</span>
+<span class="hl-comment"># 学习率达 1.5——太大，误差会指数爆炸</span>
+eta = <span class="hl-number">1.5</span>
+
+<span class="hl-builtin">print</span>(<span class="hl-string">f"{'步':>3s}  {'x':>10s}  {'|误差|':>10s}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">"-"</span> * <span class="hl-number">28</span>)
+<span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">8</span>):
+    <span class="hl-comment"># 误差 = 当前位置离谷底 (x=2) 的距离的绝对值</span>
+    <span class="hl-comment"># 如果发散，这个值应该越来越大</span>
+    error = <span class="hl-builtin">abs</span>(x - <span class="hl-number">2</span>)
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"{i:3d}  {x:10.4f}  {error:10.4f}"</span>)
+    <span class="hl-comment"># 梯度下降更新——同一条公式，但 η 太大导致误差翻转放大</span>
+    x = x - eta * df2(x)
+
+<span class="hl-comment"># 最后一次更新后的位置——应该比起点离 x=2 更远</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n8步后: x={x:.4f}, |误差|={abs(x-2):.4f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"误差从 1.0 变成了 {abs(x-2):.1f}——越走越远，发散！"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<p>输出中误差从 1.0 开始，每一步翻倍——这就是发散。小球没有被「吸」向谷底，而是被「弹」向远方。</p>
+
+<figure><img src="assets/gradient_descent.png" alt="梯度下降"><figcaption>小球从起点沿最陡下坡方向逐步滚到谷底。每一步的坡度越来越缓——步子也越来越小</figcaption></figure>
+
 <hr>
 <h2>💭 概念题</h2>
 <ol>
-<li>学习率太大的后果：画面上你站在山谷一边，步子太大跨到对面山上去了，再一步又跨回来，来回振荡——永远到不了谷底。试算一下 lr=1.5 在 x=1 处会发生什么。梯度是 $f'(1)=2\times1-4=-2$，更新后 x 变成多少？——考察：梯度下降的发散条件</li>
+<li>学习率太大的后果：画面上你站在山谷一边，步子太大跨到对面山上去了，再一步又跨回来，来回振荡——永远到不了谷底。试算一下 lr=1.5 在 x=1 处（$f(x)=x^2-4x+4$）会发生什么。梯度是 $f'(1)=2\times1-4=-2$，更新后 x 变成多少？——考察：梯度下降的发散条件</li>
+<li>对于 $f(x)=x^2$，用 $\eta=0.3$ 时每步位置缩为原来的 $1-2\eta=0.4$ 倍。如果 $\eta=0.1$，每步位置缩为原来的多少倍？哪个收敛更快？为什么不是 $\eta$ 越大越好？（提示：想想 $\eta=0.9$ 会怎样）——考察：收敛速度与学习率的关系</li>
+<li>梯度下降的「自刹车」——为什么越靠近谷底步子越小？从 $f(x)=x^2$ 的导数 $f'(x)=2x$ 在 $x\to 0$ 时的行为解释。——考察：导数在极值点为零的几何后果</li>
 </ol>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-11/">← 00-09</a><a href="../../">📖 目录</a><a href="../00-13/">00-11 →</a></nav>
-</div></body></html>
+<a href="../00-11/">← 00-11</a><a href="../../">📖 目录</a><a href="../00-13/">00-13 →</a></nav>
+</div>
+<script>
+(function(){
+  document.querySelectorAll('pre code').forEach(function(block){
+    var wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 复制';
+    btn.onclick = function(){
+      var text = block.innerText;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = '✅ 已复制';
+        btn.classList.add('copied');
+        setTimeout(function(){
+          btn.textContent = '📋 复制';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    };
+    block.parentNode.insertBefore(wrapper, block);
+    wrapper.appendChild(btn);
+    wrapper.appendChild(block);
+  });
+})();
+</script>
+
+</body></html>

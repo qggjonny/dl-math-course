@@ -9,7 +9,7 @@
 onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 </head><body>
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-11</span>
-<span><a href="../00-07/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-10/">下一课 →</a></span></nav>
+<span><a href="../00-10/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-12/">下一课 →</a></span></nav>
 <div class="container">
 <h1>00-11 梯度与方向导数</h1>
 <hr>
@@ -55,21 +55,121 @@ $$\nabla f \cdot \mathbf{u} = \|\nabla f\| \cdot \|\mathbf{u}\| \cdot \cos\theta
 </ul>
 <p><strong>推导链完整：</strong>定义 → 拆成偏导数组合 → 推出 $\nabla f \cdot \mathbf{u}$ → 点乘在 $\theta=0°$ 最大 → 所以梯度方向最快。每一步都有出处，没有循环。</p>
 </div>
+
+<h2>二、代码验证——亲手验证梯度确实最快</h2>
+<p>用 $f(x,y) = x^2 + 3xy + y^3$，在点 $(2, 3)$ 处：</p>
+<ul>
+<li>理论上：$\nabla f = [2x+3y,\; 3x+3y^2] = [13,\; 33]$</li>
+<li>梯度方向是单位向量 $\frac{[13, 33]}{\sqrt{13^2+33^2}}$</li>
+<li>走梯度方向时方向导数应最大 = $\|\nabla f\| = \sqrt{13^2+33^2}$</li>
+</ul>
+
+<pre><code><span class="hl-comment"># 00-11 代码验证：方向导数 = ∇f·u，在梯度方向取最大值</span>
+<span class="hl-comment"># 导入numpy——用于向量运算（范数、点乘、单位化）</span>
+<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
+
+<span class="hl-comment"># 定义二元函数 f(x,y)=x²+3xy+y³</span>
+<span class="hl-keyword">def</span> <span class="hl-funcdef">f</span>(x, y):
+    <span class="hl-string">"""f(x,y) = x² + 3xy + y³"""</span>
+    <span class="hl-keyword">return</span> x**<span class="hl-number">2</span> + <span class="hl-number">3</span>*x*y + y**<span class="hl-number">3</span>
+
+<span class="hl-comment"># 梯度函数——返回 [∂f/∂x, ∂f/∂y]（从 00-10 偏导数规则）</span>
+<span class="hl-comment"># ∂f/∂x = 2x + 3y（y当常数），∂f/∂y = 3x + 3y²（x当常数）</span>
+<span class="hl-keyword">def</span> <span class="hl-funcdef">grad_f</span>(x, y):
+    <span class="hl-string">"""返回梯度向量 ∇f = [∂f/∂x, ∂f/∂y]"""</span>
+    <span class="hl-keyword">return</span> np.array([<span class="hl-number">2</span>*x + <span class="hl-number">3</span>*y, <span class="hl-number">3</span>*x + <span class="hl-number">3</span>*y**<span class="hl-number">2</span>])
+
+<span class="hl-comment"># 测试点 (x₀, y₀) = (2, 3)——代入梯度：∂f/∂x=4+9=13, ∂f/∂y=6+27=33</span>
+x0, y0 = <span class="hl-number">2.0</span>, <span class="hl-number">3.0</span>
+<span class="hl-comment"># grad：梯度向量 [13, 33]——指向上升最快的方向</span>
+grad = grad_f(x0, y0)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"梯度 ∇f = [{grad[0]}, {grad[1]}]"</span>)
+
+<span class="hl-comment"># 梯度方向——把梯度向量单位化（方向不变，长度缩到 1）</span>
+<span class="hl-comment"># np.linalg.norm(grad)：梯度的模 = √(13²+33²)</span>
+u_grad = grad / np.linalg.norm(grad)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"梯度方向 u_grad = [{u_grad[0]:.4f}, {u_grad[1]:.4f}]"</span>)
+
+<span class="hl-comment"># 方向导数 = ∇f · u（点乘）</span>
+<span class="hl-comment"># 沿梯度方向：cosθ=1 → D_u f = ‖∇f‖</span>
+D_grad = np.dot(grad, u_grad)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"沿梯度方向的方向导数 = {D_grad:.4f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"梯度模 ‖∇f‖ = {np.linalg.norm(grad):.4f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"两者相等吗？{np.isclose(D_grad, np.linalg.norm(grad))}"</span>)
+
+<span class="hl-comment"># 随机测试 5 个方向——看看哪个方向导数最大</span>
+<span class="hl-comment"># np.random.seed：固定随机种子，每次运行结果一致</span>
+np.random.seed(<span class="hl-number">42</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n{'方向':>12s}  {'D_u f':>10s}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">"-"</span> * <span class="hl-number">24</span>)
+<span class="hl-comment"># 记录最大值，看是否被梯度方向拿下</span>
+max_D = <span class="hl-number">0</span>
+<span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">5</span>):
+    <span class="hl-comment"># 生成随机 2D 向量，然后单位化——得到一个随机方向</span>
+    v = np.random.randn(<span class="hl-number">2</span>)
+    u = v / np.linalg.norm(v)
+    <span class="hl-comment"># 方向导数 = ∇f 在该方向上的投影 = ∇f·u</span>
+    D = np.dot(grad, u)
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"[{u[0]:6.3f},{u[1]:6.3f}]  {D:10.4f}"</span>)
+    <span class="hl-comment"># max()：跟踪最大值——最终应该是梯度方向的值最大</span>
+    max_D = <span class="hl-builtin">max</span>(max_D, <span class="hl-builtin">abs</span>(D))
+
+<span class="hl-builtin">print</span>(<span class="hl-string">f"\n梯度方向的值 = {D_grad:.4f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"5个随机方向的最大值 = {max_D:.4f}"</span>)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"梯度方向 ≥ 所有随机方向？{D_grad >= max_D}"</span>)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<p>输出证实：梯度方向的方向导数等于梯度的模，且大于等于任意随机方向的方向导数——梯度确实是「最陡」的方向。这不是空话，是能在代码里跑通的数学事实。</p>
+
 <div class="callout callout-tip">
-<strong>梯度下降 = 闭着眼睛，每一步都往最陡的下坡方向踩一脚。</strong>
+<strong>梯度下降预览：</strong>
 $$\theta_{t+1} = \theta_t - \eta \cdot \nabla f(\theta_t)$$
 <ul>
 <li>$\theta_t$：你现在站的位置</li>
 <li>$\nabla f(\theta_t)$：这个位置的最陡上坡方向</li>
 <li><strong>负号</strong>：因为我们想<strong>下降</strong>，所以反着走</li>
-<li>$\eta$（学习率）：走多大步。太大→可能跨过山谷冲到对面山上去了；太小→半天走不到底</li>
+<li>$\eta$（学习率）：走多大步</li>
 </ul>
+<p>详细展开见下一课 00-12 梯度下降。</p>
 </div>
+
 <hr>
 <h2>💭 概念题</h2>
 <ol>
-<li>梯度指向上升最快方向。为什么是"最快"？用方向导数 = 梯度与方向向量的点乘来解释。提示：$\cos\theta$ 在 $\theta=0°$（同向）时最大。——考察：方向导数的几何直觉</li>
+<li>梯度指向上升最快方向。为什么是「最快」？用方向导数 = 梯度与方向向量的点乘来解释。提示：$\cos\theta$ 在 $\theta=0°$（同向）时最大。——考察：方向导数的几何直觉</li>
+<li>沿等高线方向走，方向导数是多少？为什么？从 $\nabla f$ 和等高线方向的空间关系来解释。——考察：梯度垂直于等高线的几何含义</li>
+<li>对 $f(x,y) = x^2 + y^2$，在点 (3, 4) 处的梯度是什么？梯度指向什么方向？（提示：画个图——从原点出发的射线）——考察：径向函数的梯度方向</li>
 </ol>
+<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-10/">← 00-08</a><a href="../../">📖 目录</a><a href="../00-12/">00-10 →</a></nav>
-</div></body></html>
+<a href="../00-10/">← 00-10</a><a href="../../">📖 目录</a><a href="../00-12/">00-12 →</a></nav>
+</div>
+<script>
+(function(){
+  document.querySelectorAll('pre code').forEach(function(block){
+    var wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 复制';
+    btn.onclick = function(){
+      var text = block.innerText;
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = '✅ 已复制';
+        btn.classList.add('copied');
+        setTimeout(function(){
+          btn.textContent = '📋 复制';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    };
+    block.parentNode.insertBefore(wrapper, block);
+    wrapper.appendChild(btn);
+    wrapper.appendChild(block);
+  });
+})();
+</script>
+
+</body></html>
