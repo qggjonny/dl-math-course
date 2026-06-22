@@ -35,7 +35,7 @@ $$\boxed{H(P) = -\sum_x P(x) \ln P(x)}$$
 <li>均匀分布 $P=[\frac13, \frac13, \frac13]$：$H = -3 \times \frac13 \ln\frac13 = \ln 3 \approx 1.099$。最大化——你完全不知道会抽到哪个。</li>
 </ul>
 <p>在分类问题里：如果模型的预测分布熵很高（接近均匀）→ 模型很不确定。熵很低（接近 one-hot）→ 模型很自信。</p>
-<pre><code><span class="hl-comment"># 00-20 熵：衡量一个概率分布的不确定性</span>
+<pre><code><span class="hl-comment"># 00-21 熵：衡量一个概率分布的不确定性</span>
 <span class="hl-comment"># 导入numpy，别名np</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 <span class="hl-comment"># probs：概率数组，如 [0.95, 0.03, 0.02]</span>
@@ -73,7 +73,7 @@ $$\boxed{H(P, Q) = -\sum_x P(x) \ln Q(x)}$$
 <p><strong>分类任务里交叉熵为什么当损失函数？</strong> 交叉熵最小 = 模型的预测分布 $Q$ 最接近真实分布 $P$。梯度下降让交叉熵越来越小 → 模型的预测越来越准。</p>
 <pre><code>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-<span class="hl-comment"># 00-20 交叉熵：衡量模型预测与真实标签的差距</span>
+<span class="hl-comment"># 00-21 交叉熵：衡量模型预测与真实标签的差距</span>
 <span class="hl-comment"># p_true=真实分布(one-hot)，q_pred=模型预测</span>
 <span class="hl-keyword">def</span> <span class="hl-func">cross_entropy</span>(p_true, q_pred):
     <span class="hl-string">"""H(P,Q) = -Σ p_i ln(q_i)"""</span>
@@ -139,7 +139,7 @@ $$\boxed{D_{\mathrm{KL}}(P \parallel Q) = \sum_x P(x) \ln\frac{P(x)}{Q(x)}}$$
     <span class="hl-keyword">return</span> -np.<span class="hl-builtin">sum</span>(p_true[mask] * np.log(q_pred[mask]))
 
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-<span class="hl-comment"># 00-20 KL 散度：验证 H(P,Q) = H(P) + D_KL(P||Q)</span>
+<span class="hl-comment"># 00-21 KL 散度：验证 H(P,Q) = H(P) + D_KL(P||Q)</span>
 <span class="hl-comment"># p=真实分布，q=模型预测分布</span>
 <span class="hl-keyword">def</span> <span class="hl-func">kl_divergence</span>(p, q):
     <span class="hl-string">"""D_KL(P||Q) = Σ p_i ln(p_i/q_i)"""</span>

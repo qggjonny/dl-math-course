@@ -52,8 +52,17 @@ $$\Sigma = \begin{bmatrix}
   <li><strong>反对角线</strong> $\rho\sigma_1\sigma_2$：两个维度之间的<strong>协方差</strong>（$\rho$ 是相关系数）</li>
 </ul>
 
-<p>$\rho > 0$ → $x_1$ 大的时候 $x_2$ 也大概率大（<strong>正相关</strong>）→ 椭圆斜着拉长。</p>
-<p>$\rho = 0$ → 两个维度独立 → 椭圆轴和坐标轴对齐。</p>
+<div class="callout callout-info">
+<strong>推导：从一维方差到协方差矩阵</strong><br><br>
+<strong>一维：</strong>方差 $\sigma^2 = \mathbb{E}[(x - \mu)^2] = \frac{1}{N}\sum_{i=1}^{N}(x_i - \mu)^2$。一个数，描述钟形曲线的胖瘦。<br><br>
+<strong>多维：</strong>把「方差」推广为<b>协方差矩阵</b>。核心思路：把一维的 $(x-\mu)^2$ 替换为外积 $(\mathbf{x}-\boldsymbol{\mu})(\mathbf{x}-\boldsymbol{\mu})^T$：<br><br>
+$$\Sigma = \mathbb{E}\left[ (\mathbf{x} - \boldsymbol{\mu})(\mathbf{x} - \boldsymbol{\mu})^T \right] = \frac{1}{N}\sum_{i=1}^N (\mathbf{x}^{(i)} - \boldsymbol{\mu})(\mathbf{x}^{(i)} - \boldsymbol{\mu})^T$$<br>
+展开 $\mathbf{x} = (x_1, x_2)$，$\boldsymbol{\mu} = (\mu_1, \mu_2)$：<br><br>
+$$\Sigma = \mathbb{E}\begin{bmatrix} (x_1-\mu_1)^2 & (x_1-\mu_1)(x_2-\mu_2) \\ (x_2-\mu_2)(x_1-\mu_1) & (x_2-\mu_2)^2 \end{bmatrix} = \begin{bmatrix} \text{Var}(x_1) & \text{Cov}(x_1,x_2) \\ \text{Cov}(x_2,x_1) & \text{Var}(x_2) \end{bmatrix}$$<br>
+• <b>对角线</b>：每个维度自身的方差——和一维的 $\sigma^2$ 一样。<br>
+• <b>非对角线</b>：$\text{Cov}(x_1, x_2) = \mathbb{E}[(x_1-\mu_1)(x_2-\mu_2)] = \rho\sigma_1\sigma_2$——两个维度「一起变化」的程度。<br>
+→ 一维的 $\sigma^2$（一个数）自然推广为 $d$ 维的 $\Sigma$（一个 $d \times d$ 对称正定矩阵）。
+</div>
 
 <h2>三、等高线是椭圆</h2>
 
@@ -62,12 +71,11 @@ $$\Sigma = \begin{bmatrix}
 <p>椭圆的<strong>长轴方向</strong> = $\Sigma$ 的最大特征值对应的特征向量（学过 00-05！）</p>
 <p>椭圆的<strong>轴长比</strong> = $\sqrt{\lambda_1} : \sqrt{\lambda_2}$（特征值的平方根比）</p>
 
-<pre><code><span class="hl-comment"># 00-19 多元高斯 — 不同协方差矩阵产生不同形状的山丘</span>
+<pre><code><span class="hl-comment"># 00-20 多元高斯 — 不同协方差矩阵产生不同形状的山丘</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
 <span class="hl-keyword">def</span> <span class="hl-func">plot_gaussian_contour</span>(mu, Sigma, label):
-<span class="hl-comment">    pass
-    """打印高斯分布的关键信息</span>
+    """打印高斯分布的关键信息
 <span class="hl-comment">    mu: 均值向量 [μ₁, μ₂]</span>
 <span class="hl-comment">    Sigma: 协方差矩阵 2×2</span>
 <span class="hl-comment">    """</span>
@@ -112,8 +120,7 @@ $$D_M(\mathbf{x}) = \sqrt{(\mathbf{x} - \boldsymbol{\mu})^T \Sigma^{-1} (\mathbf
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 <span class="hl-comment"># 马氏距离 vs 欧氏距离</span>
 <span class="hl-keyword">def</span> <span class="hl-func">mahalanobis</span>(x, mu, Sigma):
-<span class="hl-comment">    pass
-    """计算马氏距离</span>
+    """计算马氏距离
 <span class="hl-comment">    x: 待测点 [x₁, x₂]</span>
 <span class="hl-comment">    mu: 均值 [μ₁, μ₂]</span>
 <span class="hl-comment">    Sigma: 协方差矩阵 2×2</span>

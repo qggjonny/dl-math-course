@@ -102,7 +102,7 @@ $$P(a \leq X \leq b) = \int_a^b f(x)\,dx$$
 <h2>六、代码：用黎曼和逼近积分</h2>
 <p>我们用手算 $\int_0^3 x^2\,dx$。解析解：$\frac{x^3}{3}\big|_0^3 = \frac{27}{3} - 0 = 9$。</p>
 <p>下面用黎曼和（矩形法）逼近，看 $n$ 变大时怎么收敛到 9：</p>
-<pre><code><span class="hl-comment"># 00-17 黎曼和：用矩形逼近 ∫₀³ x² dx，解析解 = 9</span>
+<pre><code><span class="hl-comment"># 00-18 黎曼和：用矩形逼近 ∫₀³ x² dx，解析解 = 9</span>
 <span class="hl-comment"># 导入numpy，别名np</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
@@ -144,7 +144,7 @@ riemann_10k = np.sum(f(x_edges[<span class="hl-number">1</span>:])) * ((b-a)/<sp
 <p>注：右端点法对递增函数会<strong>高估</strong>面积（取右边最高点），左端点法会低估。取中点更准。</p>
 <h3>进阶：用梯形法改进</h3>
 <p>矩形法的升级版——每条不用矩形，用<strong>梯形</strong>（上边是斜线，更像原曲线）：</p>
-<pre><code><span class="hl-comment"># 00-17 梯形法：比矩形法收敛更快（二阶）</span>
+<pre><code><span class="hl-comment"># 00-18 梯形法：比矩形法收敛更快（二阶）</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
 <span class="hl-comment"># 同样的 f(x)=x², 区间[0,3]</span>

@@ -49,7 +49,7 @@ $$e \approx 2.718281828\dots$$
 在数学中，$e^x$（通常写成 <code>np.exp(x)</code>）和正态分布、复利计算、种群增长模型等紧密相关。后续课程中你会频繁遇到它——先把基本操作学会。
 </div>
 <h3>用代码看 $e^x$ 的增长</h3>
-<pre><code><span class="hl-comment"># 00-09 第一步：感受指数函数——线性 vs 指数的增长速度对比</span>
+<pre><code><span class="hl-comment"># 00-10 第一步：感受指数函数——线性 vs 指数的增长速度对比</span>
 <span class="hl-comment"># 导入numpy，别名np</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
@@ -104,7 +104,7 @@ $$\boxed{\ln(a^n) = n \cdot \ln a}$$
 </table>
 <p>注意：在数学文献和编程中，$\log$ 经常默认指 $\ln$（自然对数）。numpy 中也是：<code>np.log(x)</code> 就是 $\ln(x)$。这点容易搞混——看到 $\log$ 时先确认底数。</p>
 <h3>用代码验证对数性质</h3>
-<pre><code><span class="hl-comment"># 00-09 第二步：验证对数的两个核心性质</span>
+<pre><code><span class="hl-comment"># 00-10 第二步：验证对数的两个核心性质</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
 <span class="hl-comment"># np.log(x) — 计算 ln(x)，自然对数（以e为底）</span>
@@ -136,7 +136,7 @@ right2 = n * np.log(a)                     <span class="hl-comment"># 3 × ln(4)
 <p>因为是逆运算，指数和对数互相抵消——就像加法和减法、乘法和除法：</p>
 $$\ln(e^x) = x, \qquad e^{\ln x} = x \quad (x > 0)$$
 <p>用代码快速验证：</p>
-<pre><code><span class="hl-comment"># 00-09 第三步：指数和对数互为逆运算——互相抵消</span>
+<pre><code><span class="hl-comment"># 00-10 第三步：指数和对数互为逆运算——互相抵消</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
 x = <span class="hl-number">2.5</span>

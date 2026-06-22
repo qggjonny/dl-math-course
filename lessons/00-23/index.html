@@ -55,7 +55,7 @@ $$L(\theta) = P(\text{数据} \mid \theta) = \binom{10}{7} \theta^7 (1-\theta)^3
 
 $$\theta^7 (1-\theta)^3$$
 
-<pre><code><span class="hl-comment"># 00-18 似然函数 — 抛硬币 10 次 7 正，猜 θ</span>
+<pre><code><span class="hl-comment"># 00-19 似然函数 — 抛硬币 10 次 7 正，猜 θ</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
 <span class="hl-comment"># 100 个候选 θ 值</span>
@@ -127,7 +127,7 @@ $$-\ln L = -\sum_{i=1}^N \big[y_i \ln \hat{p}_i + (1-y_i) \ln(1-\hat{p}_i)\big]$
 
 <p><strong>这就是交叉熵损失！</strong></p>
 
-<pre><code><span class="hl-comment"># 00-18 用 MLE 拟合高斯分布 — 从数据反推均值和方差</span>
+<pre><code><span class="hl-comment"># 00-19 用 MLE 拟合高斯分布 — 从数据反推均值和方差</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
 <span class="hl-comment"># 生成真实分布为 N(5, 2²) 的 1000 个样本</span>
@@ -144,8 +144,7 @@ sigma_hat = np.std(data)                     <span class="hl-comment"># σ̂ = s
 
 <span class="hl-comment"># 验证：算对数似然</span>
 <span class="hl-keyword">def</span> <span class="hl-func">log_likelihood</span>(mu, sigma, data):
-<span class="hl-comment">    pass
-    """高斯分布的对数似然</span>
+    """高斯分布的对数似然
 <span class="hl-comment">    mu: 均值</span>
 <span class="hl-comment">    sigma: 标准差</span>
 <span class="hl-comment">    data: 观测数据</span>

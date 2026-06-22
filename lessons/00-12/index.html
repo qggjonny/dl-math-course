@@ -64,7 +64,7 @@ $$\nabla f \cdot \mathbf{u} = \|\nabla f\| \cdot \|\mathbf{u}\| \cdot \cos\theta
 <li>走梯度方向时方向导数应最大 = $\|\nabla f\| = \sqrt{13^2+33^2}$</li>
 </ul>
 
-<pre><code><span class="hl-comment"># 00-11 代码验证：方向导数 = ∇f·u，在梯度方向取最大值</span>
+<pre><code><span class="hl-comment"># 00-12 代码验证：方向导数 = ∇f·u，在梯度方向取最大值</span>
 <span class="hl-comment"># 导入numpy——用于向量运算（范数、点乘、单位化）</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
@@ -73,7 +73,7 @@ $$\nabla f \cdot \mathbf{u} = \|\nabla f\| \cdot \|\mathbf{u}\| \cdot \cos\theta
     <span class="hl-string">"""f(x,y) = x² + 3xy + y³"""</span>
     <span class="hl-keyword">return</span> x**<span class="hl-number">2</span> + <span class="hl-number">3</span>*x*y + y**<span class="hl-number">3</span>
 
-<span class="hl-comment"># 梯度函数——返回 [∂f/∂x, ∂f/∂y]（从 00-10 偏导数规则）</span>
+<span class="hl-comment"># 梯度函数——返回 [∂f/∂x, ∂f/∂y]（从 00-11 偏导数规则）</span>
 <span class="hl-comment"># ∂f/∂x = 2x + 3y（y当常数），∂f/∂y = 3x + 3y²（x当常数）</span>
 <span class="hl-keyword">def</span> <span class="hl-funcdef">grad_f</span>(x, y):
     <span class="hl-string">"""返回梯度向量 ∇f = [∂f/∂x, ∂f/∂y]"""</span>

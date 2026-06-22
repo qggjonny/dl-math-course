@@ -30,7 +30,7 @@ $$\theta_{t+1} = \theta_t - \eta \cdot \nabla f(\theta_t)$$
 <h2>二、代码演示——亲眼看着小球滚下山</h2>
 <p>拿最简单的二次函数 $f(x) = x^2$ 来跑梯度下降。最小值显然在 $x=0$。我们故意从 $x=3$ 出发，看它能不能滚回去。</p>
 
-<pre><code><span class="hl-comment"># 00-12 第一步：梯度下降——亲眼看着小球从 x=3 滚到 x≈0</span>
+<pre><code><span class="hl-comment"># 00-13 第一步：梯度下降——亲眼看着小球从 x=3 滚到 x≈0</span>
 <span class="hl-comment"># 导入numpy，别名np</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
@@ -103,7 +103,7 @@ $$e_{t+1} = x_{t+1} - 2 = (1-2\eta)x_t + 4\eta - 2 = (1-2\eta)(x_t - 2) = (1-2\e
 <h2>四、代码验证——亲眼看到发散</h2>
 <p>把第三节的 $\eta=1.5$ 跑一遍，看发散长什么样：</p>
 
-<pre><code><span class="hl-comment"># 00-12 第二步：学习率太大导致发散——亲自跑一遍</span>
+<pre><code><span class="hl-comment"># 00-13 第二步：学习率太大导致发散——亲自跑一遍</span>
 <span class="hl-comment"># 函数 f(x) = x² - 4x + 4，谷底在 x=2</span>
 <span class="hl-keyword">def</span> <span class="hl-funcdef">f2</span>(x):
     <span class="hl-string">"""f(x)=x²-4x+4=(x-2)²，谷底 x=2, f(2)=0"""</span>
