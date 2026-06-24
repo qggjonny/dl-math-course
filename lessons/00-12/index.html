@@ -42,6 +42,27 @@ f(x + \epsilon u_x, y + \epsilon u_y) - f(x, y)
 + \underbrace{[f(x, y + \epsilon u_y) - f(x, y)]}_{\text{纯 y-变化量}}
 \end{aligned}
 $$
+
+<p><strong>几何直觉——为什么可以这样拆？</strong></p>
+<p>你现在站在点 $A = (x, y)$，想到达点 $B = (x + \epsilon u_x, y + \epsilon u_y)$。直接走是<strong>斜线</strong>，不好算偏导数。但我们可以绕路——在任何一座山上，不管走直线还是绕弯，只要起点终点一样，<strong>总高度差就一样</strong>。</p>
+<p>绕路方案：$A \to C \to B$——先竖直走到中间站 $C = (x,\; y + \epsilon u_y)$，再水平走到终点 $B$：</p>
+<pre style="font-family:monospace;line-height:1.6;background:none;border:none;padding:0.5em 0;color:inherit;">
+        C ●──────────● B
+          │          ↗
+     εu_y │        ↗  沿 x 方向走 εu_x（用 ∂f/∂x 算）
+          │      ↗
+          ↓    ↗
+          ●──→
+        A(x,y)
+          └─ εu_x ─┘
+</pre>
+<p>因为是纯水平+纯竖直，每一步都<strong>只有一个变量在变</strong>——退化成了 00-11 学过的偏导数：</p>
+<ul>
+<li>$f(B) - f(C)$：$y$ 锁定在 $y+\epsilon u_y$，只有 $x$ 变了 $\epsilon u_x$ → 用 $\partial f/\partial x$ 算</li>
+<li>$f(C) - f(A)$：$x$ 锁定在 $x$，只有 $y$ 变了 $\epsilon u_y$ → 用 $\partial f/\partial y$ 算</li>
+</ul>
+<p>两项加起来就是绕路的总高度差。绕路不改变高度差——所以 $f(B)-f(A)$ 就等于这两项之和。这个「强行塞一个中间站，把斜线拆成两段直线」的技巧，数学里叫<strong>加一项减一项</strong>。</p>
+
 <p>当 $\epsilon \to 0$ 时：</p>
 <ul>
 <li>纯 x-变化量 $\approx \epsilon u_x \cdot \frac{\partial f}{\partial x}$（走了 $\epsilon u_x$ 这么多，乘上 $x$ 方向的坡度）</li>
