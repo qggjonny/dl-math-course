@@ -24,7 +24,15 @@ onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',dis
 <p><strong>第一步：方向导数的定义。</strong></p>
 <p>你站在 $(x, y)$ 点，选一个方向 $\mathbf{u} = (u_x, u_y)$（单位向量，模=1）。往前走 $\epsilon$ 步——也就是 $x$ 变到 $x + \epsilon u_x$，$y$ 变到 $y + \epsilon u_y$。函数值变了多少？</p>
 $$D_{\mathbf{u}} f = \lim_{\epsilon \to 0} \frac{f(x + \epsilon u_x,\; y + \epsilon u_y) - f(x, y)}{\epsilon}$$
-<p>这就是方向导数的<strong>定义</strong>。注意：如果你选的方向是 $(1, 0)$（沿 $x$ 轴走），方向导数就退化成普通偏导数 $\partial f / \partial x$。</p>
+
+<p><strong>符号拆解：</strong>$D_{\mathbf{u}} f$——$D$ 是导数（<strong>D</strong>erivative），下标 $\mathbf{u}$ 是方向向量。跟偏导数对比：</p>
+<ul>
+<li>$\frac{\partial f}{\partial x}$——沿 $x$ 轴走，测 $f$ 的变化率</li>
+<li>$\frac{\partial f}{\partial y}$——沿 $y$ 轴走，测 $f$ 的变化率</li>
+<li>$D_{\mathbf{u}} f$——沿<strong>任意方向</strong> $\mathbf{u}$ 走，测 $f$ 的变化率。偏导数只是 $\mathbf{u}=(1,0)$ 或 $(0,1)$ 时的特例。</li>
+</ul>
+
+<p>这就是方向导数的<strong>定义</strong>。如果你选的方向是 $(1, 0)$（沿 $x$ 轴走），方向导数就退化成普通偏导数 $\partial f / \partial x$。</p>
 <p><strong>第二步：把方向导数拆成偏导数的组合，推出公式。</strong></p>
 <p>关键技巧——把「沿斜线走一步」拆成「先沿 $x$ 走一步，再沿 $y$ 走一步」：</p>
 $$
