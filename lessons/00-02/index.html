@@ -25,14 +25,23 @@ $$\mathbf{a} \cdot \mathbf{b} = a_1b_1 + a_2b_2 + \cdots + a_nb_n = \|\mathbf{a}
 <p><strong>三步推导，只需要余弦定理：</strong></p>
 <p><strong>第 1 步——画出三角形。</strong> 向量 $\mathbf{a}$ 和 $\mathbf{b}$ 的差 $\mathbf{a}-\mathbf{b}$ 构成三角形第三条边。余弦定理告诉我们第三条边的长度平方：</p>
 $$\|\mathbf{a} - \mathbf{b}\|^2 = \|\mathbf{a}\|^2 + \|\mathbf{b}\|^2 - 2\|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$$
-<p><strong>第 2 步——用代数定义展开左边。</strong> 注意：为什么 $\|\mathbf{v}\|^2 = \mathbf{v}\cdot\mathbf{v}$？靠的是<strong>勾股定理</strong>——向量 $\mathbf{v}=(v_1, v_2)$ 是两个直角边，它的长度（斜边）$\|\mathbf{v}\| = \sqrt{v_1^2 + v_2^2}$，所以 $\|\mathbf{v}\|^2 = v_1^2 + v_2^2$。而点乘的代数定义是各分量相乘求和：$\mathbf{v}\cdot\mathbf{v} = v_1\times v_1 + v_2\times v_2 = v_1^2 + v_2^2$。两者相等——勾股定理把几何长度和代数分量串在了一起：</p>
-$$
-\begin{aligned}
+<p><strong>第 2 步——用代数定义展开左边。</strong> 注意：为什么 $\|\mathbf{v}\|^2 = \mathbf{v}\cdot\mathbf{v}$？靠的是<strong>勾股定理</strong>——向量 $\mathbf{v}=(v_1, v_2)$ 是两个直角边，它的长度（斜边）$\|\mathbf{v}\| = \sqrt{v_1^2 + v_2^2}$，所以 $\|\mathbf{v}\|^2 = v_1^2 + v_2^2$。而点乘的代数定义是各分量相乘求和：$\mathbf{v}\cdot\mathbf{v} = v_1\times v_1 + v_2\times v_2 = v_1^2 + v_2^2$。两者相等——勾股定理把几何长度和代数分量串在了一起。</p>
+
+<p>正式展开之前，先确认一件事——<strong>点乘为什么能用分配律和交换律？</strong>回看点乘的代数定义：$\mathbf{a}\cdot\mathbf{b}=a_1b_1+a_2b_2+\cdots$——就是一堆分量乘完再加。实数的乘法有交换律（$a_1b_1 = b_1a_1$），加法也有交换律（$a_1b_1+a_2b_2 = b_2a_2+a_1b_1$），所以 $\mathbf{a}\cdot\mathbf{b} = \mathbf{b}\cdot\mathbf{a}$。实数的乘法对加法有分配律（$a_1(b_1+c_1)=a_1b_1+a_1c_1$），所以 $(\mathbf{a}\pm\mathbf{b})\cdot\mathbf{c} = \mathbf{a}\cdot\mathbf{c} \pm \mathbf{b}\cdot\mathbf{c}$。<strong>点乘的运算律不是新东西——是实数运算律穿了向量外衣。</strong>有了这两条，逐层展开：</p>
+
+$$\begin{aligned}
 \|\mathbf{a} - \mathbf{b}\|^2 &= (\mathbf{a}-\mathbf{b})\cdot(\mathbf{a}-\mathbf{b}) \\
-&= \mathbf{a}\cdot\mathbf{a} + \mathbf{b}\cdot\mathbf{b} - 2(\mathbf{a}\cdot\mathbf{b}) \\
+&= (\mathbf{a}-\mathbf{b})\cdot\mathbf{a} - (\mathbf{a}-\mathbf{b})\cdot\mathbf{b}
+   &&\text{——分配律：先把右边的 }(\mathbf{a}-\mathbf{b})\text{ 拆开，分别点乘} \\
+&= \mathbf{a}\cdot\mathbf{a} - \mathbf{b}\cdot\mathbf{a} - \mathbf{a}\cdot\mathbf{b} + \mathbf{b}\cdot\mathbf{b}
+   &&\text{——分配律再拆左边：}(\mathbf{a}-\mathbf{b})\text{ 拆成 }\mathbf{a}\text{ 和 }-\mathbf{b} \\
+&= \mathbf{a}\cdot\mathbf{a} - \mathbf{a}\cdot\mathbf{b} - \mathbf{a}\cdot\mathbf{b} + \mathbf{b}\cdot\mathbf{b}
+   &&\text{——交换律：}\mathbf{b}\cdot\mathbf{a} = \mathbf{a}\cdot\mathbf{b} \\
+&= \mathbf{a}\cdot\mathbf{a} + \mathbf{b}\cdot\mathbf{b} - 2(\mathbf{a}\cdot\mathbf{b})
+   &&\text{——合并同类项：}-\mathbf{a}\cdot\mathbf{b} - \mathbf{a}\cdot\mathbf{b} = -2(\mathbf{a}\cdot\mathbf{b}) \\
 &= \|\mathbf{a}\|^2 + \|\mathbf{b}\|^2 - 2(\mathbf{a}\cdot\mathbf{b})
-\end{aligned}
-$$
+   &&\text{——}\mathbf{v}\cdot\mathbf{v} = \|\mathbf{v}\|^2\text{（上面刚证）}
+\end{aligned}$$
 <p><strong>第 3 步——对比左右两边。</strong> 第 1 步和第 2 步都等于 $\|\mathbf{a}-\mathbf{b}\|^2$，所以它们相等：</p>
 $$\cancel{\|\mathbf{a}\|^2 + \|\mathbf{b}\|^2} - 2(\mathbf{a}\cdot\mathbf{b}) = \cancel{\|\mathbf{a}\|^2 + \|\mathbf{b}\|^2} - 2\|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$$
 <p>消去相同项：</p>
@@ -96,8 +105,7 @@ $$A\mathbf{x} = \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix}
 <h3>几何含义：矩阵把向量"扭"到新位置</h3>
 <p>$A = \begin{bmatrix}2&1\\0&3\end{bmatrix}$ 把输入 (5,6) 扭到了 (16,18)。整个平面都被这张"操作手册"重新安排了——有些方向被拉伸，有些方向被旋转。</p>
 <p>不同的矩阵做不同的事：</p>
-$$
-\begin{aligned}
+$$\begin{aligned}
 \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}
 &= \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}
 &&\text{——单位矩阵：什么也不做} \\[8pt]
@@ -107,8 +115,7 @@ $$
 \begin{bmatrix} 0 & -1 \\ 1 & 0 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}
 &= \begin{bmatrix} -x_2 \\ x_1 \end{bmatrix}
 &&\text{——旋转矩阵：逆时针转 90°}
-\end{aligned}
-$$
+\end{aligned}$$
 <p>以后学到特征值和特征向量时，会深入讲不同矩阵把平面"怎样扭"——哪里是拉伸方向，哪里是压缩方向。</p>
 <pre><code><span class="hl-comment"># 导入numpy科学计算库，别名np</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
