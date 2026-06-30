@@ -11,31 +11,25 @@
   every node/.style={font=\footnotesize}]
 
   % ---- 坐标定义 ----
-  % v1 = (4,2), v2 = (1,3)
-  % foot = proj_{v1}(v2) = (10/20)·(4,2) = (2,1)
   \coordinate (O)   at (0,0);
   \coordinate (v1)  at (4,2);
   \coordinate (v2)  at (1,3);
   \coordinate (sum) at (5,5);
   \coordinate (foot) at (2,1);
-  % 法向量 n = (c,-a) = (2,-4)，取反向 (−2,4) 朝投影方向
   \coordinate (nvec) at (-2,4);
-  % v2 在法向量上的投影点
-  % proj = ((1,3)·(−2,4))/20 · (−2,4) = (10/20)·(−2,4) = (−1,2)
   \coordinate (proj_n) at (-1,2);
 
-  % ---- v1 所在直线（虚线延展） ----
+  % ---- v1 所在直线 ----
   \draw[dashed, gray!50] (-0.8,-0.4) -- (5.2,2.6);
 
-  % ---- 平行四边形（浅色填充） ----
+  % ---- 平行四边形 ----
   \fill[blue!6]  (O) -- (v1) -- (sum) -- (v2) -- cycle;
   \draw[blue!30, thick] (O) -- (v1) -- (sum) -- (v2) -- cycle;
 
-  % ---- 法向量 n（⊥ 于 v₁ 直线） ----
+  % ---- 法向量 n（标注放端点） ----
   \draw[->, very thick, green!50!black] (O) -- (nvec)
-    node[midway, above left, text=green!50!black]
+    node[above left, text=green!50!black]
       {法向量 $\mathbf{n} = (c,-a)$};
-  % 轻虚线标示 proj_n 在法向量上
   \draw[dotted, green!30] (O) -- (proj_n);
 
   % ---- 向量箭头 ----
@@ -44,25 +38,22 @@
   \draw[->, very thick, orange!80!black] (O) -- (v2)
     node[midway, above, sloped] {$\mathbf{v}_2 = (b,d)$};
 
-  % ---- 高：v2 终点到 v1 直线的垂线段 ----
+  % ---- 高：v2 终点到 v1 直线 ----
   \draw[dashed, red!60!black, very thick] (v2) -- (foot)
-    node[midway, left, text=red!70!black] {高};
+    node[midway, right, text=red!70!black, xshift=3pt] {高};
 
   % ---- 直角标记 ⊓（v1 直线与高的交点） ----
-  % d1∥v1=(0.894,0.447), d2∥高=(−0.447,0.894)
   \draw[red!60!black, thick]
     ($(foot) + (0.313,0.156)$) --
     (foot) --
     ($(foot) + (-0.156,0.313)$);
 
-  % ---- v2 端点到法向量的投影（紫色虚线） ----
-  % 从 v2(1,3) → proj_n(−1,2)，方向 (−2,−1)
+  % ---- v2 端点到法向量的投影 ----
   \draw[dashed, purple!60!black, very thick] (v2) -- (proj_n)
-    node[midway, above right, text=purple!70!black] {$\mathbf{v}_2$的投影};
+    node[midway, left, text=purple!70!black, xshift=-2pt]
+      {$\mathbf{v}_2$的投影};
 
-  % ---- 直角标记 ⊓（法向量上的投影点） ----
-  % 臂1 沿法向量方向 n=(−2,4)/√20≈(−0.447,0.894)→0.35cm=(−0.156,0.313)
-  % 臂2 沿 v2→proj_n 垂线方向 (2,1)/√5≈(0.894,0.447)→0.35cm=(0.313,0.156)
+  % ---- 直角标记 ⊓（投影点） ----
   \draw[purple!60!black, thick]
     ($(proj_n) + (-0.156,0.313)$) --
     (proj_n) --
@@ -70,27 +61,29 @@
 
   % ---- 点标记 ----
   \fill[black]         (O)    circle (2.0pt) node[below left]  {$O$};
-  \fill[red!70!black]  (foot) circle (2.0pt) node[below right, text=red!70!black] {垂足};
-  \fill[green!50!black] (proj_n) circle (2.0pt) node[above left, text=green!50!black] {投影};
+  \fill[red!70!black]  (foot) circle (2.0pt)
+    node[above left, text=red!70!black, xshift=2pt, yshift=2pt] {垂足};
+  \fill[green!50!black] (proj_n) circle (2.0pt)
+    node[left, text=green!50!black, xshift=-1pt] {投影};
   \fill[blue!70!black] (v1)   circle (1.5pt);
   \fill[orange!80!black] (v2) circle (1.5pt);
-  \fill[black]         (sum)  circle (1.5pt) node[above right] {$\mathbf{v}_1\!+\!\mathbf{v}_2$};
+  \fill[black]         (sum)  circle (1.5pt)
+    node[above right] {$\mathbf{v}_1\!+\!\mathbf{v}_2$};
 
   % ---- 底的长度标注 ----
   \draw[<->, gray] ($(O) + (0,-0.7)$) -- ($(v1) + (0,-0.7)$)
     node[midway, below, fill=white, inner sep=1pt]
     {底 = $\|\mathbf{v}_1\| = \sqrt{a^2+c^2}$};
 
-  % ---- 点积 = 投影长 × 向量长 ----
-  % 右下角公式面板
-  \node[draw=green!50!black, fill=white, rounded corners=3pt,
-        inner sep=6pt, anchor=north west,
-        font=\footnotesize\ttfamily]
-    at (2.8, -1.5)
+  % ---- 点积关系公式面板 ----
+  \node[draw=green!50!black, fill=white, rounded corners=4pt,
+        inner sep=7pt, anchor=north west]
+    at (2.5, -1.2)
     {$\begin{aligned}
-      \mathbf{v}_2\!\cdot\!\mathbf{n} &= \text{投影长}\times\|\mathbf{n}\| \\[2pt]
-      (1,3)\!\cdot\!(-2,4) &= \sqrt{5}\times\sqrt{20} = 10 \\[2pt]
-      \Rightarrow\; \text{高} &= \frac{|\mathbf{v}_2\cdot\mathbf{n}|}{\|\mathbf{n}\|}
+      \textbf{点积：}\;
+      \mathbf{v}_2\!\cdot\!\mathbf{n} &= \text{投影长}\times\|\mathbf{n}\| \\[3pt]
+      (1,3)\!\cdot\!(-2,4) &= \sqrt{5}\times\sqrt{20}=10 \\[3pt]
+      \Rightarrow\; \text{高} &= \frac{|\mathbf{v}_2\!\cdot\!\mathbf{n}|}{\|\mathbf{n}\|}
       = \frac{|ad-bc|}{\sqrt{a^2+c^2}}
     \end{aligned}$};
 
