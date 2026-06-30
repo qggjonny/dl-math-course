@@ -32,10 +32,9 @@
   \draw[blue!30, thick] (O) -- (v1) -- (sum) -- (v2) -- cycle;
 
   % ---- 法向量 n（⊥ 于 v₁ 直线） ----
-  % 进入投影标记前先画法向量，避免覆盖
   \draw[->, very thick, green!50!black] (O) -- (nvec)
     node[midway, above left, text=green!50!black]
-      {$\mathbf{n} = (c,-a)$};
+      {法向量 $\mathbf{n} = (c,-a)$};
   % 轻虚线标示 proj_n 在法向量上
   \draw[dotted, green!30] (O) -- (proj_n);
 
@@ -81,6 +80,19 @@
   \draw[<->, gray] ($(O) + (0,-0.7)$) -- ($(v1) + (0,-0.7)$)
     node[midway, below, fill=white, inner sep=1pt]
     {底 = $\|\mathbf{v}_1\| = \sqrt{a^2+c^2}$};
+
+  % ---- 点积 = 投影长 × 向量长 ----
+  % 右下角公式面板
+  \node[draw=green!50!black, fill=white, rounded corners=3pt,
+        inner sep=6pt, anchor=north west,
+        font=\footnotesize\ttfamily]
+    at (2.8, -1.5)
+    {$\begin{aligned}
+      \mathbf{v}_2\!\cdot\!\mathbf{n} &= \text{投影长}\times\|\mathbf{n}\| \\[2pt]
+      (1,3)\!\cdot\!(-2,4) &= \sqrt{5}\times\sqrt{20} = 10 \\[2pt]
+      \Rightarrow\; \text{高} &= \frac{|\mathbf{v}_2\cdot\mathbf{n}|}{\|\mathbf{n}\|}
+      = \frac{|ad-bc|}{\sqrt{a^2+c^2}}
+    \end{aligned}$};
 
 \end{tikzpicture}
 \end{document}

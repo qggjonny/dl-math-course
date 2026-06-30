@@ -66,6 +66,18 @@ $$\mathbf{v}_1 = \begin{bmatrix} a \\ c \end{bmatrix}, \quad
 
 <p>取直线上最简单的点——原点 $O(0, 0)$（因为直线过原点）。从 $O$ 到 $P$ 的向量就是 $\overrightarrow{OP} = (b, d)$。</p>
 
+<p><strong>点积 = 投影长 × 向量长：</strong> 这是内积最核心的几何含义。向量 $\mathbf{u}$ 与 $\mathbf{n}$ 的点积，等于 $\mathbf{u}$ 在 $\mathbf{n}$ 上的<strong>投影长度</strong>乘以 $\mathbf{n}$ 的<strong>自身长度</strong>：</p>
+
+$$\mathbf{u} \cdot \mathbf{n} = (\text{投影长}) \times \|\mathbf{n}\|$$
+
+<p>代具体数字一目了然：$\mathbf{v}_2 = (1,3)$，法向量 $\mathbf{n} = (-2,4)$：</p>
+
+$$\mathbf{v}_2 \cdot \mathbf{n} = 1 \times (-2) + 3 \times 4 = 10$$
+$$\|\mathbf{n}\| = \sqrt{(-2)^2 + 4^2} = \sqrt{20},\quad \text{投影长} = \sqrt{5}$$
+$$\text{验证：} \sqrt{5} \times \sqrt{20} = \sqrt{100} = 10$$
+
+<p>所以<strong>投影长度 = |点积| ÷ 向量长度</strong>——把点积反过来解：</p>
+
 <p>一个向量 $\mathbf{u}$ 在另一个向量 $\mathbf{n}$ 方向上的<strong>投影长度</strong> = $\dfrac{|\mathbf{u} \cdot \mathbf{n}|}{\|\mathbf{n}\|}$（00-02 学过——内积的几何含义）。</p>
 
 <p>代入：</p>
