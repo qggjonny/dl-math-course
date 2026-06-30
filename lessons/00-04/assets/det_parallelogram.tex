@@ -1,0 +1,62 @@
+\documentclass[tikz,border=12pt]{standalone}
+\usepackage{amsmath}
+\usepackage{cancel}
+\usepackage{tikz}
+\usepackage{fontspec}
+\setmainfont{Noto Serif CJK SC}
+\usetikzlibrary{calc}
+
+\begin{document}
+\begin{tikzpicture}[scale=1.2,>=stealth,
+  every node/.style={font=\footnotesize}]
+
+  % ---- 坐标定义 ----
+  % v1 = (4,2), v2 = (1,3)
+  % foot = proj_{v1}(v2) = ((v2·v1)/(v1·v1)) · v1 = (10/20)·(4,2) = (2,1)
+  \coordinate (O)   at (0,0);
+  \coordinate (v1)  at (4,2);
+  \coordinate (v2)  at (1,3);
+  \coordinate (sum) at (5,5);
+  \coordinate (foot) at (2,1);
+
+  % ---- v1 所在直线（虚线延展） ----
+  \draw[dashed, gray!50] (-0.8,-0.4) -- (5.2,2.6);
+
+  % ---- 平行四边形（浅色填充） ----
+  \fill[blue!6]  (O) -- (v1) -- (sum) -- (v2) -- cycle;
+  \draw[blue!30, thick] (O) -- (v1) -- (sum) -- (v2) -- cycle;
+
+  % ---- 向量箭头 ----
+  \draw[->, very thick, blue!70!black] (O) -- (v1)
+    node[midway, below, sloped] {$\mathbf{v}_1 = (a,c)$};
+  \draw[->, very thick, orange!80!black] (O) -- (v2)
+    node[midway, above, sloped] {$\mathbf{v}_2 = (b,d)$};
+
+  % ---- 高：v2 终点到 v1 直线的垂线段 ----
+  % v2=(1,3) → foot=(2,1)
+  \draw[dashed, red!60!black, very thick] (v2) -- (foot)
+    node[midway, left, text=red!70!black] {高};
+
+  % ---- 直角标记 ⊓（严格对齐两条线方向） ----
+  % 线1（v1线）：方向 d1=(4,2)，归一化≈(0.894,0.447)
+  % 线2（高）：方向 d2=(-1,2)，归一化≈(-0.447,0.894)
+  % 沿 d1 走 0.35cm → (0.313, 0.156), 沿 d2 走 0.35cm → (-0.156, 0.313)
+  \draw[red!60!black, thick]
+    ($(foot) + (0.313,0.156)$) --
+    (foot) --
+    ($(foot) + (-0.156,0.313)$);
+
+  % ---- 点标记 ----
+  \fill[black]         (O)    circle (2.0pt) node[below left]  {$O$};
+  \fill[red!70!black]  (foot) circle (2.0pt) node[below right, text=red!70!black] {垂足};
+  \fill[blue!70!black] (v1)   circle (1.5pt);
+  \fill[orange!80!black] (v2) circle (1.5pt);
+  \fill[black]         (sum)  circle (1.5pt) node[above right] {$\mathbf{v}_1\!+\!\mathbf{v}_2$};
+
+  % ---- 底的长度标注 ----
+  \draw[<->, gray] ($(O) + (0,-0.7)$) -- ($(v1) + (0,-0.7)$)
+    node[midway, below, fill=white, inner sep=1pt]
+    {底 = $\|\mathbf{v}_1\| = \sqrt{a^2+c^2}$};
+
+\end{tikzpicture}
+\end{document}
