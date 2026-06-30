@@ -12,12 +12,17 @@
 
   % ---- 坐标定义 ----
   % v1 = (4,2), v2 = (1,3)
-  % foot = proj_{v1}(v2) = ((v2·v1)/(v1·v1)) · v1 = (10/20)·(4,2) = (2,1)
+  % foot = proj_{v1}(v2) = (10/20)·(4,2) = (2,1)
   \coordinate (O)   at (0,0);
   \coordinate (v1)  at (4,2);
   \coordinate (v2)  at (1,3);
   \coordinate (sum) at (5,5);
   \coordinate (foot) at (2,1);
+  % 法向量 n = (c,-a) = (2,-4)，取反向 (−2,4) 朝投影方向
+  \coordinate (nvec) at (-2,4);
+  % v2 在法向量上的投影点
+  % proj = ((1,3)·(−2,4))/20 · (−2,4) = (10/20)·(−2,4) = (−1,2)
+  \coordinate (proj_n) at (-1,2);
 
   % ---- v1 所在直线（虚线延展） ----
   \draw[dashed, gray!50] (-0.8,-0.4) -- (5.2,2.6);
@@ -26,6 +31,14 @@
   \fill[blue!6]  (O) -- (v1) -- (sum) -- (v2) -- cycle;
   \draw[blue!30, thick] (O) -- (v1) -- (sum) -- (v2) -- cycle;
 
+  % ---- 法向量 n（⊥ 于 v₁ 直线） ----
+  % 进入投影标记前先画法向量，避免覆盖
+  \draw[->, very thick, green!50!black] (O) -- (nvec)
+    node[midway, above left, text=green!50!black]
+      {$\mathbf{n} = (c,-a)$};
+  % 轻虚线标示 proj_n 在法向量上
+  \draw[dotted, green!30] (O) -- (proj_n);
+
   % ---- 向量箭头 ----
   \draw[->, very thick, blue!70!black] (O) -- (v1)
     node[midway, below, sloped] {$\mathbf{v}_1 = (a,c)$};
@@ -33,22 +46,33 @@
     node[midway, above, sloped] {$\mathbf{v}_2 = (b,d)$};
 
   % ---- 高：v2 终点到 v1 直线的垂线段 ----
-  % v2=(1,3) → foot=(2,1)
   \draw[dashed, red!60!black, very thick] (v2) -- (foot)
     node[midway, left, text=red!70!black] {高};
 
-  % ---- 直角标记 ⊓（严格对齐两条线方向） ----
-  % 线1（v1线）：方向 d1=(4,2)，归一化≈(0.894,0.447)
-  % 线2（高）：方向 d2=(-1,2)，归一化≈(-0.447,0.894)
-  % 沿 d1 走 0.35cm → (0.313, 0.156), 沿 d2 走 0.35cm → (-0.156, 0.313)
+  % ---- 直角标记 ⊓（v1 直线与高的交点） ----
+  % d1∥v1=(0.894,0.447), d2∥高=(−0.447,0.894)
   \draw[red!60!black, thick]
     ($(foot) + (0.313,0.156)$) --
     (foot) --
     ($(foot) + (-0.156,0.313)$);
 
+  % ---- v2 端点到法向量的投影（紫色虚线） ----
+  % 从 v2(1,3) → proj_n(−1,2)，方向 (−2,−1)
+  \draw[dashed, purple!60!black, very thick] (v2) -- (proj_n)
+    node[midway, above right, text=purple!70!black] {$\mathbf{v}_2$的投影};
+
+  % ---- 直角标记 ⊓（法向量上的投影点） ----
+  % 臂1 沿法向量方向 n=(−2,4)/√20≈(−0.447,0.894)→0.35cm=(−0.156,0.313)
+  % 臂2 沿 v2→proj_n 垂线方向 (2,1)/√5≈(0.894,0.447)→0.35cm=(0.313,0.156)
+  \draw[purple!60!black, thick]
+    ($(proj_n) + (-0.156,0.313)$) --
+    (proj_n) --
+    ($(proj_n) + (0.313,0.156)$);
+
   % ---- 点标记 ----
   \fill[black]         (O)    circle (2.0pt) node[below left]  {$O$};
   \fill[red!70!black]  (foot) circle (2.0pt) node[below right, text=red!70!black] {垂足};
+  \fill[green!50!black] (proj_n) circle (2.0pt) node[above left, text=green!50!black] {投影};
   \fill[blue!70!black] (v1)   circle (1.5pt);
   \fill[orange!80!black] (v2) circle (1.5pt);
   \fill[black]         (sum)  circle (1.5pt) node[above right] {$\mathbf{v}_1\!+\!\mathbf{v}_2$};
