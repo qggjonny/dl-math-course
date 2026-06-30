@@ -34,13 +34,61 @@ $$\mathbf{v}_1 = \begin{bmatrix} a \\ c \end{bmatrix}, \quad
 \mathbf{v}_2 = \begin{bmatrix} b \\ d \end{bmatrix}$$
 <p>矩阵作用在单位正方形上：第一列 $\mathbf{v}_1$ 就是原来 $(1,0)$ 被扭到的新位置，第二列 $\mathbf{v}_2$ 就是原来 $(0,1)$ 被扭到的新位置。所以变换后的平行四边形 <strong>就是 $\mathbf{v}_1$ 和 $\mathbf{v}_2$ 张成的平行四边形</strong>。</p>
 <p>怎么求这个平行四边形的面积？<strong>底 × 高。</strong></p>
-<p><strong>第 1 步——底：</strong> 以 $\mathbf{v}_1$ 为底。$\mathbf{v}_1 = (a, c)$，底长 = $\sqrt{a^2 + c^2}$（勾股定理）。</p>
-<p><strong>第 2 步——高：</strong> $\mathbf{v}_1$ 所在直线过原点，法向量 $(c, -a)$，直线方程 $cx - ay = 0$。$\mathbf{v}_2$ 的终点 $(b, d)$ 到这条直线的距离（点到直线距离公式）：</p>
-$$\text{高} = \frac{|c \cdot b - a \cdot d|}{\sqrt{a^2 + c^2}} = \frac{|ad - bc|}{\sqrt{a^2 + c^2}}$$
-<p>（分子取绝对值因为距离非负，分母 $\sqrt{a^2 + c^2}$ 是法向量的长度。）</p>
-<p><strong>第 3 步——底 × 高：</strong></p>
-$$\text{面积} = \cancel{\sqrt{a^2 + c^2}} \cdot \frac{|ad - bc|}{\cancel{\sqrt{a^2 + c^2}}} = |ad - bc|$$
-<p><strong>两个根号恰好消掉！</strong> $ad-bc$ 自然出现，不是硬凑的公式。</p>
+<p><strong>第 1 步——底：</strong> 以 $\mathbf{v}_1$ 为底。$\mathbf{v}_1 = (a, c)$，底长 = $\sqrt{a^2 + c^2}$（勾股定理，00-01 学过）。</p>
+
+<p><strong>第 2 步——高：</strong> 要算高，就得求 $\mathbf{v}_2$ 的终点 $(b, d)$ 到 $\mathbf{v}_1$ 所在直线的垂直距离。这需要几个小步：</p>
+
+<h4>2.1 方向向量与法向量</h4>
+
+<p>$\mathbf{v}_1 = (a, c)$ 本身就是直线的<strong>方向向量</strong>——它从原点指向 $(a, c)$，沿这个方向延伸就得到整条直线。</p>
+
+<p><strong>法向量</strong>是与方向向量垂直的向量。要找与 $(a, c)$ 垂直的向量，一个非常方便的方法是：<strong>交换坐标，并在其中一个前面加个负号</strong>：</p>
+
+<p>$$\mathbf{n} = (c, -a)$$</p>
+
+<p>验证——点积为 0：$\mathbf{n} \cdot \mathbf{v}_1 = c \cdot a + (-a) \cdot c = ac - ac = 0$。确实垂直。也可以取 $(-c, a)$，效果一样，这里用 $(c, -a)$。</p>
+
+<h4>2.2 从法向量到直线方程</h4>
+
+<p>直线过原点，法向量为 $\mathbf{n} = (c, -a)$。怎么用"法向量"写出直线方程？</p>
+
+<p><strong>关键想法：</strong> 直线上的任意一点 $(x, y)$，从原点指向它的向量 $(x, y)$ 与方向向量 $\mathbf{v}_1 = (a, c)$ 平行。而法向量 $\mathbf{n}$ 与 $\mathbf{v}_1$ 垂直——所以 $(x, y)$ 也与 $\mathbf{n}$ 垂直，即它们的<strong>点积为 0</strong>：</p>
+
+<p>$$(x, y) \cdot (c, -a) = 0 \;\Longrightarrow\; c \cdot x + (-a) \cdot y = 0 \;\Longrightarrow\; cx - ay = 0$$</p>
+
+<p>这就是 $\mathbf{v}_1$ 所在直线的方程。没有常数项——因为直线过原点。</p>
+
+<h4>2.3 点到直线的距离——投影思想</h4>
+
+<p>现在要算点 $P(b, d)$ 到直线 $cx - ay = 0$ 的距离。</p>
+
+<p><strong>几何直觉（投影）：</strong> 点到直线的距离，等于从直线上任意一点到 $P$ 的向量，在<strong>法向量方向上的投影长度</strong>。因为法向量垂直于直线，沿这个方向量的长度就是纯粹"离开直线的垂直距离"。</p>
+
+<p>取直线上最简单的点——原点 $O(0, 0)$（因为直线过原点）。从 $O$ 到 $P$ 的向量就是 $\overrightarrow{OP} = (b, d)$。</p>
+
+<p>一个向量 $\mathbf{u}$ 在另一个向量 $\mathbf{n}$ 方向上的<strong>投影长度</strong> = $\dfrac{|\mathbf{u} \cdot \mathbf{n}|}{\|\mathbf{n}\|}$（00-02 学过——内积的几何含义）。</p>
+
+<p>代入：</p>
+
+<p>$$\begin{aligned}
+\text{距离} &= \frac{|(b, d) \cdot (c, -a)|}{\sqrt{c^2 + (-a)^2}} \\[4pt]
+&= \frac{|b \cdot c + d \cdot (-a)|}{\sqrt{c^2 + a^2}} \\[4pt]
+&= \frac{|cb - ad|}{\sqrt{a^2 + c^2}}
+\end{aligned}$$</p>
+
+<p><strong>分子变形：</strong> $|cb - ad| = |-(ad - bc)| = |ad - bc|$（绝对值内加负号不改变大小）。</p>
+
+<p>所以：</p>
+
+<p>$$\text{高} = \frac{|ad - bc|}{\sqrt{a^2 + c^2}}$$</p>
+
+<p>（分子取绝对值——距离非负。分母 $\sqrt{a^2 + c^2}$ 是法向量的长度，也正好等于底 $\mathbf{v}_1$ 的长度——因为 $\|\mathbf{v}_1\| = \sqrt{a^2 + c^2}$。）</p>
+
+<h4>第 3 步——底 × 高</h4>
+
+<p>$$\text{面积} = \cancel{\sqrt{a^2 + c^2}} \cdot \frac{|ad - bc|}{\cancel{\sqrt{a^2 + c^2}}} = |ad - bc|$$</p>
+
+<p><strong>两个根号恰好消掉！</strong> $ad-bc$ 自然出现，不是硬凑的公式。整个推导只用到了：向量垂直（点积为 0）、点到直线距离的投影公式——都是从 00-01、00-02 就学过的基础知识。</p>
 <figure><img src="assets/det_parallelogram.png" alt="平行四边形面积 = 底×高"><figcaption>$\mathbf{v}_1$ 做底，$\mathbf{v}_2$ 的终点到 $\mathbf{v}_1$ 所在直线的垂直距离为高。底×高 = $|ad-bc|$</figcaption></figure>
 <p><strong>符号的含义：</strong> 去掉绝对值，$ad - bc$ 的正负号表示 $\mathbf{v}_1$ 到 $\mathbf{v}_2$ 的<strong>旋转方向</strong>——逆时针为正（$ad-bc > 0$），顺时针为负（$ad-bc < 0$）。所以行列式是<strong>有向面积</strong>。</p>
 <div class="callout callout-info">
