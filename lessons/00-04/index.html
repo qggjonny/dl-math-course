@@ -189,7 +189,18 @@ $$\begin{aligned}
 
 <p><strong>第 2 步——行交换：把每一项变成 $\mathbf{e}_1$ 的形式</strong></p>
 
-<p>上面三项里，第一项 $\det(\mathbf{e}_1, \mathbf{v}_2, \mathbf{v}_3)$ 最简单——$\mathbf{e}_1 = [1,0,0]^T$ 已经在第一列，沿第一列展开时下面两个 $0$ 杀掉多余 cofactor，直接得：</p>
+<p>上面三项里，第一项 $\det(\mathbf{e}_1, \mathbf{v}_2, \mathbf{v}_3)$ 的几何含义最直接——<strong>用投影理解即可</strong>：</p>
+
+<p>$\mathbf{e}_1 = [1,0,0]^T$ 是 x 轴方向的<strong>单位向量</strong>（长度=1），且 $\mathbf{e}_1$ <strong>严格垂直于 yz 平面</strong>。所以这个平行六面体的体积 = <strong>yz 平面上的投影面积 × 高度 1</strong>：</p>
+
+$$\text{体积} = \text{底面积} \times \text{高} = (\text{投影面积}) \times 1$$
+
+<p>而 $\mathbf{v}_2$ 和 $\mathbf{v}_3$ 在 yz 平面上的投影，就是把它们的<strong>x 分量丢掉</strong>：</p>
+
+$$\mathbf{v}_2 \xrightarrow{\text{yz投影}} \begin{bmatrix} a_{22} \\ a_{32} \end{bmatrix}, \quad
+\mathbf{v}_3 \xrightarrow{\text{yz投影}} \begin{bmatrix} a_{23} \\ a_{33} \end{bmatrix}$$
+
+<p>这两个二维向量张成的平行四边形面积，就是 2×2 行列式（前面 2×2 推导过——底 × 高 = $ad-bc$）：</p>
 
 $$\det(\mathbf{e}_1, \mathbf{v}_2, \mathbf{v}_3) = \begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}$$
 
