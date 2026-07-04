@@ -175,7 +175,32 @@ $$Q^{-1} = \begin{bmatrix} 0.667 & 0.333 \\ 0.333 & -0.333 \end{bmatrix}$$
 
 <p>验证：$QQ^{-1} = \begin{bmatrix}1&0\\0&1\end{bmatrix} = I$ ✓。$Q^{-1}$ 的作用就是<strong>撤销 $Q$ 的变换</strong>——$Q$ 把空间扭过去，$Q^{-1}$ 扭回来。</p>
 
-<p><strong>第四步：用具体向量验证。</strong> $A = Q\Lambda Q^{-1}$ 这个等式说的是：对<strong>任意</strong>向量 $\mathbf{x}$，$A\mathbf{x}$ 和 $Q\Lambda Q^{-1}\mathbf{x}$ 算出来一定一样。$\mathbf{x}$ 只是我们随便挑的一个测试向量——取 $\mathbf{x} = [3,1]$ 来验证。</p>
+<h3>插曲：什么是"基"？</h3>
+
+<p>等一下，马上要讲到「换到特征基」了。但前面还没正式说过什么是<strong>基</strong>。花一分钟把它讲透。</p>
+
+<p><strong>基，就是一组"尺子"。</strong></p>
+
+<p>平时我们说一个点的坐标是 $(3,1)$——这其实是在用 <strong>标准基</strong> 这把尺子来量位置：</p>
+$$\mathbf{x} = 3\begin{bmatrix}1\\0\end{bmatrix} + 1\begin{bmatrix}0\\1\end{bmatrix}$$
+<p>$\begin{bmatrix}1\\0\end{bmatrix}$ 和 $\begin{bmatrix}0\\1\end{bmatrix}$ 就是标准基的两个方向（x 轴和 y 轴），每个方向上的单位长度是 1。</p>
+
+<p><strong>但尺子可以不只有这一把。</strong> 只要有两个不共线的向量 $\mathbf{u}$ 和 $\mathbf{w}$，它们也能张成整个平面——任何一个点都可以用「沿 $\mathbf{u}$ 走几步 + 沿 $\mathbf{w}$ 走几步」来定位：</p>
+$$\mathbf{x} = c_1\mathbf{u} + c_2\mathbf{w}$$
+<p>这时候 $[c_1, c_2]$ 就是这个点在<strong>新基 $\{\mathbf{u}, \mathbf{w}\}$</strong> 下的坐标。</p>
+
+<div class="callout callout-info">
+<strong>同一个点，两套坐标：</strong><br>
+标准基：「沿 x 轴走 3，沿 y 轴走 1」→ 点 $(3,1)$<br>
+特征基 $\{\mathbf{v}_1, \mathbf{v}_2\}$：「沿 $\mathbf{v}_1=[1,1]$ 走 2.33，沿 $\mathbf{v}_2=[1,-2]$ 走 0.67」→ 同一个点 $(3,1)$<br><br>
+两套说法指向同一个位置——就像有人用「经度+纬度」，有人用「离A村多远+离B村多远」。坐标变了，点没变。
+</div>
+
+<p>回头看 $A = Q\Lambda Q^{-1}$ 的三步：<strong>$Q^{-1}$ 就是那个"翻译官"——</strong>把标准基坐标翻译成特征基坐标。一旦翻译到特征基里，$A$ 就变成了对角矩阵 $\Lambda$——每个特征方向独立缩放，互不干扰。</p>
+
+<p>好，基的概念搞懂了。下面用具体向量走一遍三步。</p>
+
+<p><strong>第四步：用具体向量验证。</strong> $A = Q\\Lambda Q^{-1}$ 这个等式说的是：对<strong>任意</strong>向量 $\\mathbf{x}$，$A\\mathbf{x}$ 和 $Q\\Lambda Q^{-1}\\mathbf{x}$ 算出来一定一样。$\\mathbf{x}$ 只是我们随便挑的一个测试向量——取 $\\mathbf{x} = [3,1]$ 来验证。</p>
 
 <p>先硬算 $A\mathbf{x}$：$\begin{bmatrix}4&1\\2&3\end{bmatrix}\begin{bmatrix}3\\1\end{bmatrix} = \begin{bmatrix}13\\9\end{bmatrix}$。</p>
 
@@ -205,10 +230,7 @@ $$Q^{-1}\mathbf{x} = Q^{-1}Q\begin{bmatrix}c_1 \\ c_2\end{bmatrix} = I\begin{bma
 <p>验算：$2.33\begin{bmatrix}1\\1\end{bmatrix} + 0.67\begin{bmatrix}1\\-2\end{bmatrix} = \begin{bmatrix}2.33+0.67\\2.33-1.33\end{bmatrix} = \begin{bmatrix}3\\1\end{bmatrix}$ ✓</p>
 
 <div class="callout callout-info">
-<strong>两套坐标，同一个点：</strong><br>
-标准基：「沿 x 轴走 3，沿 y 轴走 1」→ 点 $(3,1)$<br>
-特征基：「沿 $\mathbf{v}_1$ 走 2.33，沿 $\mathbf{v}_2$ 走 0.67」→ 同一个点<br><br>
-$Q^{-1}$ 做的事就是<strong>把标准基坐标翻译成特征基坐标</strong>。就像同样一个位置，有人用「经度+纬度」说，有人用「离A村多远+离B村多远」说——两个说法指向同一个点，$Q^{-1}$ 就是翻译官。
+<strong>$Q^{-1}$ 的翻译功能如上所述：</strong>标准基数 → 沿特征向量"走几步"的数，就是这个点在特征基里的坐标。验算已验证结果一致。
 </div>
 
 <p><strong>② $\Lambda(Q^{-1}\mathbf{x})$ — 在特征基里缩放。</strong></p>
