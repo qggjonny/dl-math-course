@@ -108,7 +108,16 @@ $$A = \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix} 的列空间：两列都是 \
 
 <p>第五课我们解 $(A-\lambda I)\mathbf{v} = \mathbf{0}$ 来求特征向量。注意这个方程右边是 $\mathbf{0}$（零向量），不是一般的 $\mathbf{b}$。</p>
 
-<p>当 $\mathbf{b} = \mathbf{0}$ 时，方程 $A\mathbf{x} = \mathbf{0}$ 永远有一个「废话解」$\mathbf{x} = \mathbf{0}$。但我们要的是<strong>非零解</strong>——只有在 $\det(A) = 0$ 时才存在。这就是为什么特征方程必须是 $\det(A-\lambda I) = 0$：我们要找那些让矩阵「压扁」的 $\lambda$，压扁之后才有非零的 $\mathbf{v}$ 满足 $(A-\lambda I)\mathbf{v} = \mathbf{0}$。</p>
+<p>当 $\mathbf{b} = \mathbf{0}$ 时，方程 $A\mathbf{x} = \mathbf{0}$ 永远有一个「废话解」$\mathbf{x} = \mathbf{0}$。但我们要的是<strong>非零解</strong>——只有在 $\det(A) = 0$ 时才存在。</p>
+
+<p><strong>⚠️ 注意符号：</strong>上面 $A\mathbf{x}=\mathbf{0}$ 里的 $A$，和 $(A-\lambda I)\mathbf{v}=\mathbf{0}$ 里的 $A$，是<strong>同一个原始矩阵</strong>。区别在于问题：</p>
+
+<ul>
+  <li>$A\mathbf{x}=\mathbf{0}$ 问的是「$A$ 本身是不是压扁了空间？」（看 $\det(A)$ 是否为零）</li>
+  <li>$(A-\lambda I)\mathbf{v}=\mathbf{0}$ 问的是「$\lambda$ 取什么值时，$A-\lambda I$ 会压扁空间？」</li>
+</ul>
+
+<p>这就是为什么特征方程必须是 $\det(A-\lambda I) = 0$：我们把 $\lambda$ 当作未知数，找那些让 $A-\lambda I$ 行列式为零的 $\lambda$。一旦找到这样的 $\lambda$，$A-\lambda I$ 就压扁了空间，对应的「压扁方向」就是特征向量 $\mathbf{v}$。</p>
 
 <pre><code><span class="hl-comment"># 00-06：用 numpy 解线性方程组 A x = b</span>
 <span class="hl-comment"># 导入numpy，别名np</span>
