@@ -341,6 +341,8 @@ Sigma[:<span class="hl-number">2</span>, :<span class="hl-number">2</span>] = np
 
 <p>前面用 numpy 的 <code>linalg.svd</code> 直接算出了奇异值。但奇异值不是凭空来的——它和之前学的特征值有紧密关系。<strong>这不是在重新推导 SVD，而是告诉你：如果你只会算特征值（00-05 学的），也能算出奇异值。</strong></p>
 
+<h3>6.1 算一遍：$\sigma = \sqrt{\lambda}$</h3>
+
 <p>用课文里的 $A = \begin{bmatrix}3&1\\1&3\end{bmatrix}$ 来走一遍。前面 numpy 给出的奇异值是 $\sigma_1=4,\;\sigma_2=2$。</p>
 
 <p><strong>第一步：构造 $A^T A$。</strong></p>
@@ -353,7 +355,9 @@ $$A^T A = \begin{bmatrix}3&1\\1&3\end{bmatrix}\begin{bmatrix}3&1\\1&3\end{bmatri
 
 $$\lambda = \frac{20 \pm \sqrt{400-256}}{2} = \frac{20 \pm 12}{2} \;\Longrightarrow\; \lambda_1 = 16,\; \lambda_2 = 4$$
 
-<p><strong>注意：16 和 4 是 $A^T A$ 的特征值，不是 $A$ 的特征值。</strong> $A$ 的特征值是 2 和 4（00-05 的对称矩阵例子里算过）。</p>
+<div class="callout callout-warning">
+<strong>⚠️ 注意归属：</strong>16 和 4 是<strong> $A^T A$ 的特征值</strong>，不是 $A$ 的特征值（$A$ 的特征值是 2 和 4）。差一个平方，差在「谁的」上面。
+</div>
 
 <p><strong>第三步：开平方得到 $A$ 的奇异值。</strong></p>
 
@@ -365,50 +369,11 @@ $$\boxed{\sigma_i = \sqrt{\lambda_i(A^T A)}}$$
 
 <p><strong>读法：</strong> $\lambda_i(A^T A)$ =「把 $A^T A$ 的特征值从大到小排，取第 $i$ 个」。括号里写的是<strong>哪个矩阵</strong>——$\lambda(A^T A)$ 是 $A^T A$ 的特征值，$\lambda(A)$ 才是 $A$ 的，别搞混。</p>
 
-<div class="callout callout-info">
-<strong>⚠️ 小心归属——谁的奇异值？谁的特征值？</strong><br><br>
-上面算的 16 和 4 是 $A^T A$ 的<strong>特征值</strong>。开平方得到的 4 和 2 是<strong>$A$ 的奇异值</strong>。<br><br>
-那 $A^T A$ 自己的奇异值是多少？$A^T A$ 是<strong>半正定</strong>矩阵——它的特征值永远不会是负数。推导只要两步：<br><br>
-<strong>① 对任意向量 $\mathbf{x}$：</strong><br>
-$\mathbf{x}^T A^T A \mathbf{x} = (A\mathbf{x})^T (A\mathbf{x}) = \|A\mathbf{x}\|^2 \ge 0$<br>
-（拆转置 → 点乘自己 → 长度平方，天然 ≥ 0）<br><br>
-<strong>② 当 $\mathbf{x}$ 取特征向量 $\mathbf{v}$ 时（$A^T A\mathbf{v} = \lambda\mathbf{v}$）：</strong><br>
-$\mathbf{v}^T A^T A \mathbf{v} = \mathbf{v}^T(\lambda\mathbf{v}) = \lambda\|\mathbf{v}\|^2 \ge 0 \;\Longrightarrow\; \lambda \ge 0$<br>
-（特征向量代进去 → $\lambda$ 提出来 → 长度正数 → $\lambda$ 必 ≥ 0）<br><br>
-所以 $A^T A$ 的奇异值 = 特征值 = 16 和 4（半正定不用取绝对值）。<br><br>
-同理，$A A^T$ 的特征值也是 $\sigma_i^2$（非零部分），$A A^T$ 的奇异值也等于它的特征值。<br><br>
-<strong>一句话：$A^T A$ 和 $A A^T$ 的非零特征值相同（都是 $\sigma_i^2$），而 $A$ 的奇异值是 $\sigma_i$。</strong>差一个平方，差在「谁的」上面。
-</div>
+<h3>6.2 为什么刚好是平方？——几何直觉</h3>
 
-<p><strong>为什么刚好是平方关系？</strong></p>
+<p>上面的步骤告诉你「怎么做」，但没说「为什么正好是平方关系」。下面从几何来理解。</p>
 
-<p><strong>先确认一件事：右奇异向量 $\mathbf{v}$ 确实是 $A^T A$ 的特征向量。</strong> 这不是猜的——从 SVD 公式直接推。</p>
-
-<p>SVD 说 $A = U\Sigma V^T$。两边左乘 $A^T$：</p>
-
-$$A^T A = (U\Sigma V^T)^T (U\Sigma V^T)$$
-
-<p>拆转置。00-02 学过：乘积的转置 = 顺序倒过来各自转置。$(XYZ)^T = Z^T Y^T X^T$：</p>
-
-$$(U\Sigma V^T)^T = (V^T)^T \Sigma^T U^T = V\Sigma^T U^T$$
-
-<p>代回去：</p>
-
-$$A^T A = V\Sigma^T U^T U\Sigma V^T$$
-
-<p>$U$ 是正交矩阵，$U^T U = I$（单位矩阵，相当于数字 1，乘谁都等于自己）。消掉：</p>
-
-$$\boxed{A^T A = V(\Sigma^T \Sigma) V^T}$$
-
-<p>这和 00-05 学的特征值分解 $A = Q\Lambda Q^T$ 格式一模一样——<strong>$V$ 就是特征向量矩阵，$\Sigma^T \Sigma$ 对角线上是特征值 $\sigma_1^2, \sigma_2^2, \dots$。</strong></p>
-
-<p>所以 $V$ 的每一列 $\mathbf{v}_i$ 都满足特征向量的定义：</p>
-
-$$A^T A \mathbf{v}_i = \sigma_i^2 \mathbf{v}_i$$
-
-<p><strong>以上是代数路线：</strong>从 SVD 公式出发，纯矩阵乘法，推出 $A^T A = V(\Sigma^T \Sigma)V^T$，所以 $\sigma_i^2$ 写在特征值的位置上。</p>
-
-<p><strong>换个角度——几何路线。</strong> 不依赖 SVD 公式，直接对 $A^T A$ 做特征分解。记 $\lambda$ 是 $A^T A$ 的某个特征值，$\mathbf{v}$ 是对应的特征向量：</p>
+<p>记 $\lambda$ 是 $A^T A$ 的某个特征值，$\mathbf{v}$ 是对应的特征向量：</p>
 
 $$A^T A\mathbf{v} = \lambda\mathbf{v}$$
 
@@ -436,7 +401,7 @@ $$\|\mathbf{w}\|^2 = \mathbf{v}^T A^T A \mathbf{v}$$
 
 <p><strong>不是巧合。</strong> 算向量长度 → 自然带出转置 → 转置一拆 → $A^T$ 和 $A$ 夹在一起。</p>
 
-<p><strong>第 4 步：关键替换。</strong> 前面刚证明了 $A^T A\mathbf{v} = \lambda\mathbf{v}$。把 $A^T A\mathbf{v}$ 这一整坨换成 $\lambda\mathbf{v}$：</p>
+<p><strong>第 4 步：关键替换。</strong> $A^T A\mathbf{v} = \lambda\mathbf{v}$（特征向量的定义），把 $A^T A\mathbf{v}$ 这一整坨换成 $\lambda\mathbf{v}$：</p>
 
 $$\|\mathbf{w}\|^2 = \mathbf{v}^T (\lambda \mathbf{v})$$
 
@@ -463,7 +428,7 @@ $$\sigma = \frac{\|A\mathbf{v}\|}{\|\mathbf{v}\|} = \sqrt{\lambda}$$
 $A\mathbf{v} = \mathbf{w}$（定义 $\mathbf{w}$）<br>
 → $\|\mathbf{w}\|^2 = (A\mathbf{v})^T(A\mathbf{v})$（代入 + 长度定义）<br>
 → $\mathbf{v}^T A^T A \mathbf{v}$（拆转置：$(AB)^T = B^T A^T$，00-02）<br>
-→ $\mathbf{v}^T(\lambda\mathbf{v})$（特征向量替换：$A^T A\mathbf{v} = \lambda\mathbf{v}$，上面刚证）<br>
+→ $\mathbf{v}^T(\lambda\mathbf{v})$（特征向量替换：$A^T A\mathbf{v} = \lambda\mathbf{v}$）<br>
 → $\lambda\|\mathbf{v}\|^2$（$\lambda$ 提到点乘外，线性性质）<br>
 → $\sigma = \sqrt{\lambda}$（认出 $\sigma = \|A\mathbf{v}\|/\|\mathbf{v}\|$，即拉伸倍数 = 奇异值）<br><br>
 每一步只做一件事：展开定义 → 代数变形 → 代入已知 → 提取常数 → 认出结果。没有跳跃。
@@ -511,8 +476,38 @@ _, s, _ = np.linalg.svd(A)
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 
+<h3>6.3 从 SVD 公式验证——代数路线</h3>
+
+<p>上面从几何出发，用「拉长多少倍」的直觉推出了 $\sigma = \sqrt{\lambda}$。现在我们反过来——从 SVD 公式 $A = U\Sigma V^T$ 出发，用纯代数验证 $V$ 的列确实是 $A^T A$ 的特征向量，特征值恰好是 $\sigma_i^2$。两条路殊途同归。</p>
+
+<p>SVD 说 $A = U\Sigma V^T$。两边左乘 $A^T$：</p>
+
+$$A^T A = (U\Sigma V^T)^T (U\Sigma V^T)$$
+
+<p>拆转置。00-02 学过：乘积的转置 = 顺序倒过来各自转置。$(XYZ)^T = Z^T Y^T X^T$：</p>
+
+$$(U\Sigma V^T)^T = (V^T)^T \Sigma^T U^T = V\Sigma^T U^T$$
+
+<p>代回去：</p>
+
+$$A^T A = V\Sigma^T U^T U\Sigma V^T$$
+
+<p>$U$ 是正交矩阵，$U^T U = I$（单位矩阵，相当于数字 1，乘谁都等于自己）。消掉：</p>
+
+$$\boxed{A^T A = V(\Sigma^T \Sigma) V^T}$$
+
+<p>这和 00-05 学的特征值分解 $A = Q\Lambda Q^T$ 格式一模一样——<strong>$V$ 就是特征向量矩阵，$\Sigma^T \Sigma$ 对角线上是特征值 $\sigma_1^2, \sigma_2^2, \dots$。</strong></p>
+
+<p>所以 $V$ 的每一列 $\mathbf{v}_i$ 都满足特征向量的定义：</p>
+
+$$A^T A \mathbf{v}_i = \sigma_i^2 \mathbf{v}_i$$
+
+<p>和 6.2 的几何推导完全吻合——$\lambda_i = \sigma_i^2$。两条路，同一个结果。</p>
+
 <div class="callout callout-info">
-<strong>为什么 $A^T A$ 能用来算奇异值？</strong> 直觉：$A^T A$ 相当于「先用 $A$ 变换，再用 $A^T$ 拉回来」。被拉伸最多的方向（奇异向量）在 $A^T A$ 下也是拉伸最多的方向（特征向量），但拉伸倍数是原来的平方——所以奇异值 = sqrt(特征值)。
+<strong>💡 直觉：为什么 $A^T A$ 能用来算奇异值？</strong><br>
+$A^T A$ 相当于「先用 $A$ 变换，再用 $A^T$ 拉回来」。被拉伸最多的方向在 $A^T A$ 下也是拉伸最多的方向（特征向量），但拉伸倍数变成了原来的平方——所以奇异值 = sqrt(特征值)。<br><br>
+<strong>顺便一提：$A^T A$ 是半正定矩阵</strong>，特征值永远不会是负数（$\mathbf{x}^T A^T A \mathbf{x} = \|A\mathbf{x}\|^2 \ge 0$），所以开平方永远合法。$A A^T$ 同理，非零特征值和 $A^T A$ 完全一样。
 </div>
 
 <h2>七、为什么 $U$ 和 $V$ 是正交的——回到 00-05 的黄金性质</h2>
@@ -533,43 +528,25 @@ $U$（$A A^T$ 的特征向量）→ 列互相垂直 → $U$ 是正交矩阵<br>
 于是椭圆的长轴短轴也互相垂直——这是<strong>验证</strong>，不是<strong>原因</strong>。
 </div>
 
-$$V^T V = I, \qquad U^T U = I$$
+<p>这是 SVD 比普通特征值分解强的地方——<strong>不管 $A$ 长什么样，$U$ 和 $V$ 永远是正交的。</strong>因为正交，$V^{-1} = V^T$，$U^{-1} = U^T$，所以公式里直接写转置。</p>
 
-<p>这是 SVD 比 00-05 普通特征值分解强的地方——<strong>不管 $A$ 长什么样，$U$ 和 $V$ 永远是正交的。</strong></p>
+<h3>7.1 和 00-05 特征值分解的完整对比</h3>
 
-<h3>为什么 SVD 写成 $A = U\Sigma V^T$，右边是 $V^T$ 而不是 $V$？</h3>
-
-<p>SVD 和 00-05 特征值分解结构完全一样——都是「换基 → 缩放 → 换回来」：</p>
+<p>两者的结构完全一样——「换基 → 缩放 → 换回来」。区别只在于：对称矩阵输入输出空间重合（所以 $U=V=Q$），SVD 把它们拆开了。</p>
 
 <table>
-<tr><th></th><th>特征值分解（对称矩阵）</th><th>SVD（任意矩阵）</th></tr>
-<tr><td>公式</td><td>$A = Q\Lambda Q^{-1}$</td><td>$A = U\Sigma V^T$</td></tr>
-<tr><td>第一步（换基）</td><td>$Q^{-1}\mathbf{x}$：换到特征基</td><td>$V^T\mathbf{x}$：转到拉伸方向</td></tr>
-<tr><td>第二步（缩放）</td><td>$\Lambda$：各方向独立缩放</td><td>$\Sigma$：各方向独立拉伸</td></tr>
-<tr><td>第三步（换回）</td><td>$Q$：换回原坐标系</td><td>$U$：转到最终方位</td></tr>
-</table>
-
-<p>$V^T$ 在 SVD 里扮演的就是 $Q^{-1}$ 的角色——<strong>逆矩阵</strong>。但因为 $V$ 是正交矩阵，它的逆恰好等于转置：$V^{-1} = V^T$。</p>
-
-<p><strong>写成 $V^T$ 是一个声明——它在说：「$V$ 是正交的，我不用费劲算逆矩阵，翻一下就行。」</strong></p>
-
-<div class="callout callout-info">
-<strong>🔗 对称矩阵 ⟹ SVD 的精神脉络：</strong><br><br>
-00-05 学的特征值分解 $A = Q\Lambda Q^T$（对称矩阵的最佳情况）是 SVD 的<strong>直系祖先</strong>。任何一个 $A$（哪怕是长方形），只要乘上自己的转置 $A^T A$ 和 $A A^T$，就造出了两个对称矩阵——而对称矩阵的特征向量天生垂直，这就保证了 $U$ 和 $V$ 必然是正交的。<br><br>
-<strong>对比：</strong>
-</div>
-
-<table>
-<tr><th></th><th>对称 $A$ 的特征值分解</th><th>任意 $A$ 的 SVD</th></tr>
-<tr><td>条件</td><td>$A$ 本身对称</td><td>$A$ 可以是任意矩形矩阵</td></tr>
-<tr><td>输入基</td><td>$Q$（$A$ 的特征向量）</td><td>$V$（$A^T A$ 的特征向量）</td></tr>
-<tr><td>输出基</td><td>同一个 $Q$</td><td>$U$（$A A^T$ 的特征向量）</td></tr>
-<tr><td>缩放</td><td>$\Lambda$（特征值）</td><td>$\Sigma$（奇异值 = $\sqrt{\lambda(A^T A)}$）</td></tr>
-<tr><td>正交性来源</td><td>$A$ 对称 → 特征向量垂直</td><td>$A^T A$ 和 $A A^T$ 对称 → 各自特征向量垂直</td></tr>
+<tr><th></th><th>特征值分解（对称 $A$）</th><th>SVD（任意 $A$）</th></tr>
 <tr><td>公式</td><td>$A = Q\Lambda Q^T$</td><td>$A = U\Sigma V^T$</td></tr>
+<tr><td>适用条件</td><td>$A$ 必须是方阵且对称</td><td>$A$ 可以是任意矩形矩阵</td></tr>
+<tr><td>第一步（换基）</td><td>$Q^T\mathbf{x}$：换到特征基</td><td>$V^T\mathbf{x}$：转到拉伸方向</td></tr>
+<tr><td>第二步（缩放）</td><td>$\Lambda$：特征值，各方向独立缩放</td><td>$\Sigma$：奇异值（$=\sqrt{\lambda(A^T A)}$），各方向独立拉伸</td></tr>
+<tr><td>第三步（换回）</td><td>$Q$：换回原坐标系</td><td>$U$：转到最终方位</td></tr>
+<tr><td>正交性来源</td><td>$A$ 对称 → 特征向量垂直</td><td>$A^T A$ 和 $A A^T$ 对称 → 各自特征向量垂直</td></tr>
 </table>
 
-<p>核心逻辑完全一样：<strong>都是「换基 → 缩放 → 换回来」。</strong>对称 $A$ 是输入和输出空间重合的特例（$U=V=Q$），SVD 把它推广到了输入和输出空间不同的情况。</p>
+<p><strong>$V^T$ 在 SVD 里扮演的就是 $Q^T$ 的角色——逆矩阵。</strong>但因为 $V$ 是正交的，$V^{-1} = V^T$，所以直接写转置——「我是正交的，不用费劲算逆。」</p>
+
+<p><strong>精神脉络：</strong>00-05 的特征值分解是 SVD 的<strong>直系祖先</strong>。任何一个 $A$（哪怕是长方形），只要乘上自己的转置 $A^T A$ 和 $A A^T$，就造出了两个对称矩阵——对称矩阵的特征向量天生互相垂直，这就保证了 $U$ 和 $V$ 永远是正交的。对称 $A$ 是输入输出重合的特例，SVD 把它推广到了两者不同的情况。</p>
 
 <h2>💭 概念题</h2>
 
