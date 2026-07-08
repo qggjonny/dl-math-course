@@ -417,7 +417,9 @@ $$\|\mathbf{w}\|^2 = \lambda \|\mathbf{v}\|^2$$
 
 $$\lambda = \frac{\|\mathbf{w}\|^2}{\|\mathbf{v}\|^2} = \left(\frac{\|\mathbf{w}\|}{\|\mathbf{v}\|}\right)^2 = \left(\frac{\|A\mathbf{v}\|}{\|\mathbf{v}\|}\right)^2$$
 
-<p><strong>第 7 步：认出奇异值。</strong> $\dfrac{\|A\mathbf{v}\|}{\|\mathbf{v}\|}$ 就是 $A$ 把 $\mathbf{v}$ 拉长了几倍——课文第二节跑代码时算的「拉伸倍数」就是这个数。这就是<strong>奇异值 $\sigma$</strong>。所以：</p>
+<p><strong>第 7 步：认出奇异值。</strong> $v$ 是 $A^T A$ 的特征向量——而 $A^T A$ 的特征向量<strong>就是 $A$ 的右奇异向量</strong>。这不是巧合：奇异值的定义就是 $\sigma_i = \sqrt{\lambda_i(A^T A)}$，对应的 $v_i$ 正是 $A^T A$ 的特征向量（6.3 节用 SVD 公式验证了这个关系）。</p>
+
+<p>因此，沿 $v$ 方向的拉伸倍数 $\dfrac{\|A\mathbf{v}\|}{\|\mathbf{v}\|}$ <strong>恰好等于该方向对应的奇异值</strong> $\sigma$。所以：</p>
 
 $$\sigma = \frac{\|A\mathbf{v}\|}{\|\mathbf{v}\|} = \sqrt{\lambda}$$
 
@@ -430,7 +432,7 @@ $A\mathbf{v} = \mathbf{w}$（定义 $\mathbf{w}$）<br>
 → $\mathbf{v}^T A^T A \mathbf{v}$（拆转置：$(AB)^T = B^T A^T$，00-02）<br>
 → $\mathbf{v}^T(\lambda\mathbf{v})$（特征向量替换：$A^T A\mathbf{v} = \lambda\mathbf{v}$）<br>
 → $\lambda\|\mathbf{v}\|^2$（$\lambda$ 提到点乘外，线性性质）<br>
-→ $\sigma = \sqrt{\lambda}$（认出 $\sigma = \|A\mathbf{v}\|/\|\mathbf{v}\|$，即拉伸倍数 = 奇异值）<br><br>
+→ $\sigma = \sqrt{\lambda}$（$v$ 是 $A^T A$ 特征向量=右奇异向量，拉伸倍数=奇异值）<br><br>
 每一步只做一件事：展开定义 → 代数变形 → 代入已知 → 提取常数 → 认出结果。没有跳跃。
 </div>
 
