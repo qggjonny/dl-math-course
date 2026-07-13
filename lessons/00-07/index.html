@@ -438,6 +438,21 @@ $A\mathbf{v} = \mathbf{w}$（定义 $\mathbf{w}$）<br>
 每一步只做一件事：展开定义 → 代数变形 → 代入已知 → 提取常数 → 认出结果。没有跳跃。
 </div>
 
+<div class="callout callout-info">
+<strong>🔍 补充观察：$A$ 和 $A^T$ 拉伸同一个倍数</strong><br><br>
+上面证明了 $A$ 把 $v$ 拉长 $\sigma$ 倍。那 $A^T$ 呢？有没有某个方向，$A^T$ 也拉长 $\sigma$ 倍？<br><br>
+有——就是 $w = Av$ 这个方向。验证一下：<br><br>
+<strong>① $w$ 是 $A A^T$ 的特征向量：</strong><br>
+$A A^T w = A (A^T A v) = A (\lambda v) = \lambda (A v) = \lambda w$<br>
+（推导：括号里 $A^T A v = \lambda v$ 是已知 → 提出 $\lambda$ → $Av$ 还原成 $w$）<br><br>
+<strong>② $A^T$ 沿 $w$ 方向拉长多少？</strong><br>
+$A^T w = A^T (A v) = (A^T A) v = \lambda v$<br>
+长度：$\|A^T w\| = \|\lambda v\| = \lambda \|v\| = \sigma^2 \|v\|$<br>
+而 $\|w\| = \|Av\| = \sigma\|v\|$（刚才 7 步推导的结论）<br>
+所以 $\dfrac{\|A^T w\|}{\|w\|} = \dfrac{\sigma^2\|v\|}{\sigma\|v\|} = \sigma$ —— <strong>和 $A$ 拉 $v$ 的倍数一样。</strong><br><br>
+<strong>一句话：</strong> $v$ 被 $A$ 拉长 $\sigma$ 倍变成 $w$，$w$ 被 $A^T$ 拉长 $\sigma$ 倍变回 $\lambda v$（方向同 $v$）。$A$ 和 $A^T$ 共享同一组奇异值——这正好解释了 SVD 里为什么 $U$ 和 $V$ 成对出现：$A v = \sigma u$，$A^T u = \sigma v$。
+</div>
+
 <p>用代码验证：</p>
 
 <pre><code><span class="hl-comment"># 验证：σ = √(A^T A 的特征值) — 奇异值和特征值的关系</span>
