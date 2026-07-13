@@ -197,7 +197,7 @@ $$A = U \Sigma V^T$$
   </tr>
   <tr>
     <td>$V^T$</td>
-    <td>「这两个方向在被拉伸<strong>之前</strong>指向哪里」</td>
+    <td>$V$ 的列是 $A^T A$ 的特征向量——即「在被拉伸<strong>之前</strong>，这两个方向指向哪里」</td>
     <td>长轴在被拉之前是 45°，短轴在被拉之前是 135°</td>
   </tr>
 </table>
@@ -419,7 +419,9 @@ $$\lambda = \frac{\|\mathbf{w}\|^2}{\|\mathbf{v}\|^2} = \left(\frac{\|\mathbf{w}
 
 <p><strong>第 7 步：认出奇异值。</strong> 上面推出了 $\dfrac{\|A\mathbf{v}\|}{\|\mathbf{v}\|} = \sqrt{\lambda}$。而<strong>奇异值的定义</strong>就是 $\sigma_i = \sqrt{\lambda_i(A^T A)}$——$A^T A$ 的每个特征值开平方，对应一个奇异值。这不是推导出来的，是定义。</p>
 
-<p>所以上面 7 步做的事，是把一个代数定义翻译成了几何语言：<strong>「$A$ 沿 $v$ 方向把向量拉长 $\sigma = \sqrt{\lambda}$ 倍」</strong>。特征值 $\lambda$ 是长度<strong>平方</strong>的倍数，奇异值 $\sigma$ 是长度的倍数——差一个平方，仅此而已。</p>
+<p>这里有一个关键对应：<strong>$A^T A$ 的特征向量 $v$，就是 $A$ 的右奇异向量</strong>（SVD 公式 $A=U\Sigma V^T$ 中 $V$ 的列）。6.3 节会从 SVD 公式验证这一点——现在先接受它作为定义。</p>
+
+<p>所以上面 7 步做的事，是把一个代数定义翻译成了几何语言：<strong>「$A$ 沿右奇异向量 $v$ 方向，把向量拉长奇异值 $\sigma = \sqrt{\lambda}$ 倍」</strong>。特征值 $\lambda$ 是长度<strong>平方</strong>的倍数，奇异值 $\sigma$ 是长度的倍数——差一个平方，仅此而已。</p>
 
 $$\sigma = \frac{\|A\mathbf{v}\|}{\|\mathbf{v}\|} = \sqrt{\lambda}$$
 
