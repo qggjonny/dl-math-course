@@ -417,9 +417,9 @@ $$\|\mathbf{w}\|^2 = \lambda \|\mathbf{v}\|^2$$
 
 $$\lambda = \frac{\|\mathbf{w}\|^2}{\|\mathbf{v}\|^2} = \left(\frac{\|\mathbf{w}\|}{\|\mathbf{v}\|}\right)^2 = \left(\frac{\|A\mathbf{v}\|}{\|\mathbf{v}\|}\right)^2$$
 
-<p><strong>第 7 步：认出奇异值。</strong> 上面推出了 $\dfrac{\|A\mathbf{v}\|}{\|\mathbf{v}\|} = \sqrt{\lambda}$。而 6.1 节算过——$A^T A$ 的特征值开平方就是 $A$ 的奇异值：$\sigma = \sqrt{\lambda}$。两边一对接：</p>
+<p><strong>第 7 步：认出奇异值。</strong> 上面推出了 $\dfrac{\|A\mathbf{v}\|}{\|\mathbf{v}\|} = \sqrt{\lambda}$。而<strong>奇异值的定义</strong>就是 $\sigma_i = \sqrt{\lambda_i(A^T A)}$——$A^T A$ 的每个特征值开平方，对应一个奇异值。这不是推导出来的，是定义。</p>
 
-<p><strong>几何意义：</strong> $A^T A$ 的每个特征向量 $v$ 对应一个拉伸方向。沿这个方向，$A$ 把向量拉长 $\sigma$ 倍——而 $\sigma$ 恰好就是 $\sqrt{\lambda}$。这就是为什么奇异值 = sqrt(特征值)：<strong>特征值 $\lambda$ 是长度平方的倍数，奇异值 $\sigma$ 是长度的倍数，差一个平方。</strong></p>
+<p>所以上面 7 步做的事，是把一个代数定义翻译成了几何语言：<strong>「$A$ 沿 $v$ 方向把向量拉长 $\sigma = \sqrt{\lambda}$ 倍」</strong>。特征值 $\lambda$ 是长度<strong>平方</strong>的倍数，奇异值 $\sigma$ 是长度的倍数——差一个平方，仅此而已。</p>
 
 $$\sigma = \frac{\|A\mathbf{v}\|}{\|\mathbf{v}\|} = \sqrt{\lambda}$$
 
@@ -432,7 +432,7 @@ $A\mathbf{v} = \mathbf{w}$（定义 $\mathbf{w}$）<br>
 → $\mathbf{v}^T A^T A \mathbf{v}$（拆转置：$(AB)^T = B^T A^T$，00-02）<br>
 → $\mathbf{v}^T(\lambda\mathbf{v})$（特征向量替换：$A^T A\mathbf{v} = \lambda\mathbf{v}$）<br>
 → $\lambda\|\mathbf{v}\|^2$（$\lambda$ 提到点乘外，线性性质）<br>
-→ $\sigma = \sqrt{\lambda}$（6.1 的 $\sigma=\sqrt{\lambda}$ + 6.2 的 $\|A v\|/\|v\|=\sqrt{\lambda}$ → 拉伸倍数=奇异值）<br><br>
+→ $\sigma = \sqrt{\lambda}$（奇异值的定义 $\sigma_i=\sqrt{\lambda_i(A^T A)}$ + 几何推出拉伸 $=\sqrt{\lambda}$ → 定义与几何吻合）<br><br>
 每一步只做一件事：展开定义 → 代数变形 → 代入已知 → 提取常数 → 认出结果。没有跳跃。
 </div>
 
