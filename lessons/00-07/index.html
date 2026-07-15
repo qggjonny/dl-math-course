@@ -440,8 +440,11 @@ $A\mathbf{v} = \mathbf{w}$（定义 $\mathbf{w}$）<br>
 
 <div class="callout callout-info">
 <strong>🔍 补充观察：$A$ 和 $A^T$ 拉伸同一个倍数</strong><br><br>
-上面证明了 $A$ 把 $v$ 拉长 $\sigma$ 倍。那 $A^T$ 呢？有没有某个方向，$A^T$ 也拉长 $\sigma$ 倍？<br><br>
-有——就是 $w = Av$ 这个方向。验证一下：<br><br>
+<strong>先回顾两个角色：</strong><br>
+• $v$ —— $A^T A$ 的特征向量，也是 $A$ 的右奇异向量（7 步推导全程在用）<br>
+• $w = Av$ —— $v$ 被 $A$ 拉伸后得到的向量，长度是原来的 $\sigma$ 倍<br><br>
+上面 7 步证明了 $A$ 沿 $v$ 方向把向量拉长 $\sigma$ 倍。那 $A^T$ 呢？有没有某个方向，$A^T$ 也拉长 $\sigma$ 倍？<br><br>
+有——就是这个 $w$。验证一下：<br><br>
 <strong>① $w$ 是 $A A^T$ 的特征向量：</strong><br>
 $A A^T w = A (A^T A v) = A (\lambda v) = \lambda (A v) = \lambda w$<br>
 （推导：括号里 $A^T A v = \lambda v$ 是已知 → 提出 $\lambda$ → $Av$ 还原成 $w$）<br><br>
