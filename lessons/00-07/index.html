@@ -529,7 +529,14 @@ $$A^T A \mathbf{v}_i = \sigma_i^2 \mathbf{v}_i$$
 <div class="callout callout-info">
 <strong>💡 直觉：为什么 $A^T A$ 能用来算奇异值？</strong><br>
 $A^T A$ 相当于「先用 $A$ 变换，再用 $A^T$ 拉回来」。被拉伸最多的方向在 $A^T A$ 下也是拉伸最多的方向（特征向量），但拉伸倍数变成了原来的平方——所以奇异值 = sqrt(特征值)。<br><br>
-<strong>顺便一提：$A^T A$ 是半正定矩阵</strong>，特征值永远不会是负数（$\mathbf{x}^T A^T A \mathbf{x} = \|A\mathbf{x}\|^2 \ge 0$），所以开平方永远合法。$A A^T$ 同理，非零特征值和 $A^T A$ 完全一样。
+<strong>顺便一提：$A^T A$ 是半正定矩阵。</strong><br><br>
+<strong>半正定的定义：</strong> 一个对称矩阵 $M$ 如果对<strong>任意</strong>向量 $\mathbf{x}$ 都满足 $\mathbf{x}^T M \mathbf{x} \ge 0$，就称为半正定矩阵。名字很直白——「正定」= 一定是正数，「半正定」= 一定是 ≥ 0（可以等于 0）。<br><br>
+<strong>验证 $A^T A$ 是半正定：</strong><br>
+$\mathbf{x}^T A^T A \mathbf{x} = (\mathbf{x}^T A^T)(A \mathbf{x})$（把 $A^T A$ 拆成两半乘）<br>
+$= (A \mathbf{x})^T (A \mathbf{x})$（用 $(AB)^T = B^T A^T$：令 $B=\mathbf{x}$，则 $\mathbf{x}^T A^T = (A \mathbf{x})^T$）<br>
+$= \|A \mathbf{x}\|^2 \ge 0$（向量点乘自己 = 长度的平方，天然 ≥ 0）<br><br>
+<strong>结论：</strong> 半正定矩阵的特征值一定 ≥ 0，所以 $\sigma = \sqrt{\lambda}$ 永远合法——根号里的 $\lambda$ 不会出现负数。<br><br>
+$A A^T$ 同样可以用 $\mathbf{y}^T A A^T \mathbf{y} = \|A^T \mathbf{y}\|^2 \ge 0$ 验证，也是半正定。它的非零特征值和 $A^T A$ 完全一样。
 </div>
 
 <h2>七、为什么 $U$ 和 $V$ 是正交的——回到 00-05 的黄金性质</h2>
