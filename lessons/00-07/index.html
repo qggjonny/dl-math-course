@@ -453,7 +453,10 @@ $A^T w = A^T (A v) = (A^T A) v = \lambda v$<br>
 长度：$\|A^T w\| = \|\lambda v\| = \lambda \|v\| = \sigma^2 \|v\|$<br>
 而 $\|w\| = \|Av\| = \sigma\|v\|$（刚才 7 步推导的结论）<br>
 所以 $\dfrac{\|A^T w\|}{\|w\|} = \dfrac{\sigma^2\|v\|}{\sigma\|v\|} = \sigma$ —— <strong>和 $A$ 拉 $v$ 的倍数一样。</strong><br><br>
-<strong>一句话：</strong> $v$ 被 $A$ 拉长 $\sigma$ 倍变成 $w$，$w$ 被 $A^T$ 拉长 $\sigma$ 倍变回 $\lambda v$（方向同 $v$）。$A$ 和 $A^T$ 共享同一组奇异值——这正好解释了 SVD 里为什么 $U$ 和 $V$ 成对出现：$A v = \sigma u$，$A^T u = \sigma v$。
+<strong>一句话总结——这恰好是 SVD 里 $U$ 和 $V$ 成对出现的原因：</strong><br><br>
+把 $w$ 写成 $w = \sigma u$，其中 $u$ 是 $w$ 方向上的单位向量（$\|u\| = 1$）。那么：<br>
+$A v = w = \sigma u$，且刚才证明了 $A^T w = \lambda v = \sigma^2 v$，即 $A^T (\sigma u) = \sigma^2 v$ → $A^T u = \sigma v$。<br><br>
+所以 $A$ 和 $A^T$ 是一对镜像：<strong>$A$ 把 $v$ 变成 $\sigma u$，$A^T$ 把 $u$ 变回 $\sigma v$</strong>。这就是 SVD 的精神——$U$（列是 $u$）和 $V$（列是 $v$）共享同一组奇异值，一一配对，谁也离不开谁。
 </div>
 
 <p>用代码验证：</p>
