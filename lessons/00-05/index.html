@@ -64,7 +64,7 @@ $$\lambda = \frac{\text{tr}(A) \pm \sqrt{\text{tr}(A)^2 - 4 \cdot \det(A)}}{2}$$
 <p>代入 $\text{tr}(A) = 7$，$\det(A) = 10$：</p>
 $$\lambda = \frac{7 \pm \sqrt{7^2 - 4 \times 10}}{2} = \frac{7 \pm \sqrt{49 - 40}}{2} = \frac{7 \pm 3}{2}$$
 $$\lambda_1 = \frac{7 + 3}{2} = 5, \quad \lambda_2 = \frac{7 - 3}{2} = 2$$
-<p>对任意 2×2 矩阵，特征值就是两个数：$\frac{\text{tr} \pm \sqrt{\text{tr}^2 - 4\det}}{2}$。判别式 $\text{tr}^2 - 4\det$ 决定：正 → 两个实根，零 → 重根，负 → 复根。</p>
+<p>对任意 2×2 矩阵，特征值就是两个数：$\frac{\text{tr} \pm \sqrt{\text{tr}^2 - 4\det}}{2}$。判别式 $\text{tr}^2 - 4\det$ 决定：正 → 两个实根，零 → 重根，负 → 复根（复数本课程不涉及，先略过）。</p>
 <div class="callout callout-info">
 <strong>🔍 迹的直观比喻：</strong> 迹 = 对角线之和 = <strong>各方向拉伸率之和</strong>。回忆对角矩阵 $\begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}$——x 方向拉长 2 倍，y 方向拉长 3 倍，迹 = 2+3 = 5。而特征值之积 = 行列式（面积放大倍数），特征值之和 = 迹（拉伸率总和）。一个管<strong>乘法</strong>（体积怎么变），一个管<strong>加法</strong>（各方向拉了多少）。
 </div>
@@ -299,7 +299,7 @@ $$A = \begin{bmatrix} a & b \\ b & c \end{bmatrix}, \qquad A^T = \begin{bmatrix}
 
 <p><strong>对称矩阵的黄金性质：</strong> 实对称矩阵的特征向量<strong>天生互相垂直</strong>。以上面 $A=\begin{bmatrix}2&1\\1&2\end{bmatrix}$ 为例：特征值 3 和 1，特征向量 $[1,1]$ 和 $[1,-1]$，点乘 = $1-1=0$，恰好垂直。</p>
 
-<p><strong>为什么专门说「实」对称？</strong> 「实」= 矩阵里所有数都是实数。这个黄金定理<strong>只对实数对称矩阵成立</strong>。如果矩阵含复数（虚数），光满足 $A=A^T$ 不够——特征向量不再保证垂直，得升级成「厄米特矩阵」（$A = \bar{A}^T$，转置后再取共轭）才行。好在深度学习里的矩阵全是实数，所以「对称」默认就是「实对称」，定理直接用。</p>
+<p><strong>为什么专门说「实」对称？</strong> 「实」= 矩阵里所有数都是实数。这个黄金定理<strong>只对实数对称矩阵成立</strong>。如果矩阵含复数（虚数），光满足 $A=A^T$ 不够——特征向量不再保证垂直，得升级成「厄米特矩阵」（$A = \bar{A}^T$，转置后再取共轭）才行。好在实际应用里的矩阵全是实数，所以「对称」默认就是「实对称」，定理直接用。</p>
 
 <h4>两者结合——$A$ 对称 ⟺ $Q$ 正交</h4>
 
@@ -337,7 +337,7 @@ A = np.array([[<span class="hl-number">4</span>, <span class="hl-number">1</span
               [<span class="hl-number">2</span>, <span class="hl-number">3</span>]])
 
 <span class="hl-comment"># np.linalg.eig 返回两个值（元组解包）：</span>
-<span class="hl-comment">#   eigvals → 特征值一维数组（按降序排列）</span>
+<span class="hl-comment">#   eigvals → 特征值一维数组（返回顺序不固定，本例恰好为 [5.,2.]）</span>
 <span class="hl-comment">#   eigvecs → 特征向量矩阵，每列是一个特征向量（按对应列归一化）</span>
 eigvals, eigvecs = np.linalg.eig(A)         <span class="hl-comment"># eigvals=[5., 2.]（浮点数）, eigvecs 2×2矩阵</span>
 <span class="hl-comment"># 输出 [5. 2.] — λ₁=5, λ₂=2</span>

@@ -39,7 +39,7 @@ $$\begin{aligned}
 <p><strong>误差不能直接加起来</strong>——正的负的会抵消。所以把每个误差<strong>平方</strong>再求和：</p>
 $$\text{总误差} = 0^2 + (w-2)^2 + (2w-1)^2$$
 <p>展开：$= w^2 - 4w + 4 + 4w^2 - 4w + 1 = 5w^2 - 8w + 5$</p>
-<p>这是一个开口向上的抛物线。最小值在哪？<strong>求导，令导数为 0：</strong></p>
+<p>这是一个开口向上的抛物线。最小值在哪？<strong>求导，令导数为 0</strong>（求导规则 00-11 才详细讲，这里先用结论）：</p>
 $$\frac{d}{dw}(5w^2 - 8w + 5) = 10w - 8 = 0 \quad\Rightarrow\quad w = 0.8$$
 <p><strong>最佳直线是 $y = 0.8x$。</strong>它不是「正确」的，但它是「最好的」——所有可能直线里误差平方和最小的那一条。</p>
 <p>这就是<strong>最小二乘法</strong>：<strong>「二」是平方，「乘」是误差</strong>。让误差的<strong>平方和</strong>最小。</p>
@@ -65,7 +65,7 @@ $$\begin{aligned}
 &= w^2 A^T A \;-\; 2 w A^T \mathbf{b} \;+\; \mathbf{b}^T \mathbf{b}
 \end{aligned}$$
 
-<p><strong>③ 求导，令其为 0</strong></p>
+<p><strong>③ 求导，令其为 0</strong>（同样先用求导结论，规则见 00-11）</p>
 <p>$A^T A$、$A^T \mathbf{b}$、$\mathbf{b}^T \mathbf{b}$ 都是常数（和 $w$ 无关）。对 $w$ 求导：</p>
 $$\frac{d}{dw}\bigl(w^2 A^T A - 2 w A^T \mathbf{b} + \mathbf{b}^T \mathbf{b}\bigr) = 2 A^T A \, w - 2 A^T \mathbf{b}$$
 <p>令导数为 0：</p>
@@ -154,8 +154,8 @@ $$\mathbf{x} = V\Sigma^+ \mathbf{c} = V\Sigma^+ U^T \mathbf{b} = A^+ \mathbf{b}$
 <h2>💭 概念题</h2>
 <div class="exercise">
 <h3>1. 最小二乘的「二乘」</h3>
-<p>为什么误差要平方再求和，而不是直接把误差的绝对值加起来？（提示：导数能不能算？最小值解能不能写成闭式？）</p>
-<p>——考察：平方误差 vs 绝对误差的可导性差异</p>
+<p>为什么误差要平方再求和，而不是直接把误差的绝对值加起来？（提示：平方和展开后是光滑的二次函数，而绝对值在 0 处有个「拐角」，不好处理）</p>
+<p>——考察：平方误差 vs 绝对误差的「光滑 vs 拐角」差异</p>
 </div>
 <div class="exercise">
 <h3>2. 垂足条件推导</h3>
@@ -168,7 +168,7 @@ $$\mathbf{x} = V\Sigma^+ \mathbf{c} = V\Sigma^+ U^T \mathbf{b} = A^+ \mathbf{b}$
 <p>——考察：$\Sigma$ 的零行 = $A$ 列空间维度的上限</p>
 </div>
 
-<p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
+
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
 <a href="../00-08/">← 00-08</a><a href="../../">📖 目录</a><a href="../00-10/">00-10 →</a></nav>
 </div>

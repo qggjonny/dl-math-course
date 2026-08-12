@@ -46,7 +46,7 @@ $$\mathbf{v}_1 = \begin{bmatrix} a \\ c \end{bmatrix}, \quad
 
 <p>$$\mathbf{n} = (c, -a)$$</p>
 
-<p>验证——点积为 0：$\mathbf{n} \cdot \mathbf{v}_1 = c \cdot a + (-a) \cdot c = ac - ac = 0$。确实垂直。也可以取 $(-c, a)$，效果一样，这里用 $(c, -a)$。</p>
+<p>验证——点积为 0（点积就是 00-02 里的点乘，一回事）：$\mathbf{n} \cdot \mathbf{v}_1 = c \cdot a + (-a) \cdot c = ac - ac = 0$。确实垂直。也可以取 $(-c, a)$，效果一样，这里用 $(c, -a)$。</p>
 
 <h4>2.2 从法向量到直线方程</h4>
 
@@ -70,7 +70,7 @@ $$\mathbf{v}_1 = \begin{bmatrix} a \\ c \end{bmatrix}, \quad
 
 $$\mathbf{u} \cdot \mathbf{n} = (\text{投影长}) \times \|\mathbf{n}\|$$
 
-<p>代具体数字一目了然：$\mathbf{v}_2 = (1,3)$，法向量 $\mathbf{n} = (-2,4)$：</p>
+<p>代具体数字一目了然：取方向向量 $\mathbf{v}_1 = (4,2)$，它的法向量 $\mathbf{n} = (-c, a) = (-2,4)$（就是 2.1 节「交换坐标、一个加负号」里的 $(-c, a)$ 版本）；再取任意向量 $\mathbf{v}_2 = (1,3)$ 来算它往 $\mathbf{n}$ 上的投影：</p>
 
 $$\mathbf{v}_2 \cdot \mathbf{n} = 1 \times (-2) + 3 \times 4 = 10$$
 $$\|\mathbf{n}\| = \sqrt{(-2)^2 + 4^2} = \sqrt{20},\quad \text{投影长} = \sqrt{5}$$
@@ -139,7 +139,7 @@ $$\det(A) = a_{11}\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}
 <td>$-a_{21} \cdot \begin{vmatrix}a_{12}&a_{13}\\a_{32}&a_{33}\end{vmatrix}$</td>
 <td>$\mathbf{v}_1$ 的 y 分量</td>
 <td>$\mathbf{v}_2,\mathbf{v}_3$ 的 xz 子块</td>
-<td>xz 平面的投影面积 × y 方向的高度<br>（前面有个负号——$\mathbf{e}_2$ 跨到第二列需换一次，符号翻转）</td>
+<td>xz 平面的投影面积 × y 方向的高度<br>（前面有个负号——$\mathbf{e}_2$ 跨到第二行需换一次，符号翻转）</td>
 </tr>
 <tr>
 <td>$+a_{31} \cdot \begin{vmatrix}a_{12}&a_{13}\\a_{22}&a_{23}\end{vmatrix}$</td>
@@ -295,7 +295,7 @@ A = np.array([[<span class="hl-number">1</span>, <span class="hl-number">2</span
 <span class="hl-comment"># 手算验证：沿第一行展开 det = a₁₁·M₁₁ - a₁₂·M₁₂ + a₁₃·M₁₃</span>
 <span class="hl-comment"># M₁₁ = 5×9-6×8 = 45-48 = -3  (划掉第0行第0列后的2×2行列式)</span>
 <span class="hl-comment"># M₁₂ = 4×9-6×7 = 36-42 = -6  (划掉第0行第1列后的2×2行列式)</span>
-<span class="hl-comment"># M₁₃ = 4×8-5×7 = 32-35 = -3  (划掉第0行第1列后的2×2行列式)</span>
+<span class="hl-comment"># M₁₃ = 4×8-5×7 = 32-35 = -3  (划掉第0行第2列后的2×2行列式)</span>
 det_manual = 1*(5*9 - 6*8) - 2*(4*9 - 6*7) + 3*(4*8 - 5*7)  <span class="hl-comment"># 手算: 1·(-3) - 2·(-6) + 3·(-3)</span>
 <span class="hl-comment">                                      # = -3 + 12 - 9 = 0</span>
 <span class="hl-comment"># 输出: 手算行列式: 0</span>

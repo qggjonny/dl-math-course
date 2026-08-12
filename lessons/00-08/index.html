@@ -153,7 +153,7 @@ $V$ 的每一列 $\mathbf{v}_i$ 是列向量（右奇异向量）。转置后 $V
 每层中：$\mathbf{u}_i$（列）控制这一层的"列模式"，$\mathbf{v}_i^T$（行）控制"行模式"，外积把两者编织成完整矩阵。
 </div>
 
-<pre><code><span class="hl-comment"># 00-07 第一步：把 SVD 展开，看每一项（每一层）长什么样</span>
+<pre><code><span class="hl-comment"># 00-08 第一步：把 SVD 展开，看每一项（每一层）长什么样</span>
 <span class="hl-comment"># 导入numpy，别名np，提供线性代数运算</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
@@ -204,7 +204,7 @@ reconstructed = s[<span class="hl-number">0</span>]*np.outer(U[:,<span class="hl
 
 <p>$\sigma_1 = 4$，$\sigma_2 = 2$。第一层贡献大，第二层贡献小。如果<strong>只用第一层</strong>（扔掉第二层），结果差多少？</p>
 
-<pre><code><span class="hl-comment"># 00-07 第二步：只用最大的奇异值重建——看看误差多大</span>
+<pre><code><span class="hl-comment"># 00-08 第二步：只用最大的奇异值重建——看看误差多大</span>
 <span class="hl-comment"># 导入numpy，别名np</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
@@ -247,7 +247,7 @@ error = np.linalg.norm(A - A_1, <span class="hl-string">'fro'</span>)
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 
-<p>只用 1 个奇异值（丢掉 2/3 的信息），误差约 54%。但这个思路在<strong>更大的矩阵</strong>上威力巨大。如果一个矩阵有 100 个奇异值、只有前 5 个比较大，丢掉后 95 个可能只损失 1%。</p>
+<p>只用 1 个奇异值（丢掉 1/2 的信息），误差约 44.7%。但这个思路在<strong>更大的矩阵</strong>上威力巨大。如果一个矩阵有 100 个奇异值、只有前 5 个比较大，丢掉后 95 个可能只损失 1%。</p>
 
 <h2>三、更大的例子：5×3 满秩矩阵</h2>
 
@@ -259,7 +259,7 @@ error = np.linalg.norm(A - A_1, <span class="hl-string">'fro'</span>)
 np.random.seed(<span class="hl-number">0</span>)
 
 <span class="hl-comment"># 生成一个 5×3 的随机矩阵——自然满秩（秩=3，三个奇异值都非零）</span>
-<span class="hl-comment"># randn(5,3)：从标准正态分布N(0,1)中抽取 → 5行3列随机矩阵</span>
+<span class="hl-comment"># randn(5,3)：生成5行3列随机矩阵（随机数的分布后面再讲）</span>
 A = np.random.randn(<span class="hl-number">5</span>, <span class="hl-number">3</span>)
 
 <span class="hl-comment"># SVD分解：U(5×5), s(3个奇异值), VT(3×3)</span>
@@ -359,7 +359,7 @@ $$
 
 <p>下面用代码验证上面的推导：</p>
 
-<pre><code><span class="hl-comment"># 00-07 第四步：伪逆 — 手搓 vs 内置 —— 长方矩阵的"逆"</span>
+<pre><code><span class="hl-comment"># 00-08 第四步：伪逆 — 手搓 vs 内置 —— 长方矩阵的"逆"</span>
 <span class="hl-comment"># 导入numpy，别名np</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
@@ -400,13 +400,13 @@ A_plus_manual = VT.T @ sigma_plus @ U.T
 <span class="hl-builtin">print</span>(<span class="hl-string">"\n手搓:\n"</span>, np.round(A_plus_manual, <span class="hl-number">4</span>))
 <span class="hl-builtin">print</span>(<span class="hl-string">f"\n一致？ {np.allclose(A_plus_np, A_plus_manual)}"</span>) <span class="hl-comment"># allclose容忍浮点误差 → True</span>
 
-<span class="hl-comment"># 伪逆有什么用？——解超定方程组 Ax = b（最小二乘解）</span>
+<span class="hl-comment"># 伪逆有什么用？——解超定方程组 Ax = b（让 ‖Ax-b‖ 最小的解）</span>
 <span class="hl-comment"># 目标向量b，形状(3,)——3个方程的目标值</span>
 b = np.array([<span class="hl-number">1</span>, <span class="hl-number">2</span>, <span class="hl-number">3</span>])
-<span class="hl-comment"># x = A⁺b，(2×3)@(3,)→(2,)，最小二乘最优解</span>
+<span class="hl-comment"># x = A⁺b，(2×3)@(3,)→(2,)，让 ‖Ax-b‖ 最小的解</span>
 x = A_plus_np @ b
 <span class="hl-comment"># 这个x让||Ax−b||（误差范数）达到最小</span>
-<span class="hl-comment"># 打印最小二乘解</span>
+<span class="hl-comment"># 打印最优解</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"\n解 Ax ≈ b: x = {np.round(x, 4)}"</span>)
 <span class="hl-comment"># A@x：(3×2)@(2,)→(3,) 验证近似结果</span>
 <span class="hl-builtin">print</span>(<span class="hl-string">f"验证 Ax = {np.round(A @ x, 4)}"</span>)

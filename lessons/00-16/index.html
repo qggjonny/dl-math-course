@@ -1,11 +1,9 @@
-<!DOCTYPE 
-<span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
-html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>00-15 凸性与优化 · 深度学习数学</title>
+  <title>00-16 凸性与优化 · 深度学习数学</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
@@ -14,16 +12,16 @@ html>
 <body>
 
 <nav class="top-nav"><span class="title">🧠 深度学习数学 · 00-16</span>
-<span><a href="../00-15/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-18/">下一课 →</a></span></nav>
+<span><a href="../00-15/">← 上一课</a> &nbsp; <a href="../../">目录</a> &nbsp; <a href="../00-17/">下一课 →</a></span></nav>
 
 <div class="container">
 
-<p style="color:var(--text-light);font-size:0.9em">🌱 阶段 0 · 第 13 课</p>
+<p style="color:var(--text-light);font-size:0.9em">🌱 阶段 0 · 第 16 课</p>
 <h1>00-16 凸性与优化</h1>
 
 <h2>一、梯度下降的"体检报告"</h2>
 
-<p>00-10 学了梯度下降——小球沿坡度往下滚，每一步往梯度反方向走。但有一个问题没回答：</p>
+<p>00-13 学了梯度下降——小球沿坡度往下滚，每一步往梯度反方向走。但有一个问题没回答：</p>
 
 <blockquote>
 <strong>小球最后停在哪里？是全局最低点，还是某个坑里？</strong>
@@ -54,12 +52,11 @@ $$f(tx_1 + (1-t)x_2) \le t f(x_1) + (1-t) f(x_2)$$
   <tr><td>$f(x) = \sin x$</td><td>❌ 非凸</td><td>波浪形，有无穷多个坑</td></tr>
 </table>
 
-<pre><code><span class="hl-comment"># 00-14 凸 vs 非凸 — 用二阶导数判断</span>
+<pre><code><span class="hl-comment"># 00-16 凸 vs 非凸 — 用二阶导数判断</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
 <span class="hl-keyword">def</span> <span class="hl-func">is_convex_1d</span>(f, xs):
-<span class="hl-comment">    pass
-    """对一维函数采样，检查弦在曲线上方（数值验证凸性）</span>
+<span class="hl-comment">    """对一维函数采样，检查弦在曲线上方（数值验证凸性）</span>
 <span class="hl-comment">    f: 待检查的函数</span>
 <span class="hl-comment">    xs: 采样点数组</span>
 <span class="hl-comment">    返回: True 表示在这些采样点上看起来是凸的</span>
@@ -224,7 +221,7 @@ eps = <span class="hl-number">1e-5</span>
 </div>
 
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-15/">← 00-12</a><a href="../../">📖 目录</a><a href="../00-18/">00-14 →</a></nav>
+<a href="../00-15/">← 00-15</a><a href="../../">📖 目录</a><a href="../00-17/">00-17 →</a></nav>
 </div>
 <script>
   document.addEventListener("DOMContentLoaded", function() {

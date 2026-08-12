@@ -74,7 +74,7 @@ P(病 \mid 阳性) &= \frac{P(阳性 \mid 病) \cdot P(病)}{P(阳性 \mid 病) 
 <p><strong>为什么只有 50%？</strong> 因为发病率太低了（1%）。10000 个人里，有 100 个真病人（99 个测出阳性）和 9900 个好人（99 个假阳性）。阳性总共 99+99=198 人，其中只有 99 个真有病——恰好一半。</p>
 <figure><img src="assets/bayes_area.png" alt="贝叶斯体检阳性树状图"><figcaption>10000 人：有病 100 人（99 阳性），没病 9900 人（99 假阳性）。阳性共 198 人，真阳性只有一半。</figcaption></figure>
 <p>假阳性虽然比例低（1%），但<strong>没病的人基数太大</strong>（9900），假阳性的绝对人数（99）和真阳性（99）一样多。这就是<strong>基础率忽略</strong>——直觉只盯住了 99% 的准确率，忘了发病率 1% 这个先验。</p>
-<pre><code><span class="hl-comment"># 00-18 贝叶斯公式：模拟体检阳性问题（发病率1%，检测准确率99%）</span>
+<pre><code><span class="hl-comment"># 00-22 贝叶斯公式：模拟体检阳性问题（发病率1%，检测准确率99%）</span>
 <span class="hl-comment"># 导入numpy，别名np</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 <span class="hl-comment"># 模拟 100000 人的体检数据</span>
@@ -116,7 +116,7 @@ true_positives = (test_positive & has_disease).sum()  <span class="hl-comment">#
 </ol>
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
-<a href="../00-21/">← 00-16</a><a href="../../">📖 目录</a><a href="../00-23/">00-18 →</a></nav>
+<a href="../00-21/">← 00-21</a><a href="../../">📖 目录</a><a href="../00-23/">00-23 →</a></nav>
 </div>
 <script>
 (function(){

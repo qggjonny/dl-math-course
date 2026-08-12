@@ -27,7 +27,7 @@ $$A\mathbf{v} = \lambda \mathbf{v}$$
 
 <p>$A$ 作用在 $\mathbf{v}$ 上，<strong>方向不变，只拉伸 $\lambda$ 倍</strong>。这很直观——但有一个致命限制：<strong>$A$ 必须是方阵</strong>。</p>
 
-<p>现实中大多数矩阵是<strong>长方形的</strong>：1000 个样本 × 50 个特征 → $1000 \times 50$，神经网络权重 $256 \times 784$……这些都不是方阵，没法直接做特征值分解。</p>
+<p>现实中大多数矩阵是<strong>长方形的</strong>：1000 个样本 × 50 个特征 → $1000 \times 50$，某个 $256 \times 784$ 的权重矩阵……这些都不是方阵，没法直接做特征值分解。</p>
 
 <p><strong>SVD（奇异值分解）就是特征值分解的推广——对任意形状的矩阵都有效。</strong></p>
 
@@ -42,7 +42,7 @@ $$A = \begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix}, \quad
 
 <p>取 8 个均匀分布的方向（每 45° 一个），每个方向上取一个<strong>长度为 1 的向量</strong>。用 $A$ 分别去乘它们——看看每个向量被拉伸了多少、转到了哪个方向。</p>
 
-<pre><code><span class="hl-comment"># 00-06 第一步：对8个方向上的单位向量，用A去乘，观察谁被拉得最长</span>
+<pre><code><span class="hl-comment"># 00-07 第一步：对8个方向上的单位向量，用A去乘，观察谁被拉得最长</span>
 <span class="hl-comment"># 导入numpy，别名np</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
@@ -94,7 +94,7 @@ min_idx = np.argmin(stretches)
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 
-<p>跑完你会发现：<strong>45° 方向（向量 [0.707, 0.707]）被拉了 4 倍——是所有方向里拉伸最多的。135° 方向只拉 2 倍——最少。</strong></p>
+<p>跑完你会发现：<strong>45° 方向（向量 [0.707, 0.707]）被拉了 4 倍——是所有方向里拉伸最多的。135° 方向只拉 2 倍——最少（代码里浮点误差可能显示成 315°，是同一个方向的另一端）。</strong></p>
 
 <p>这两个特殊方向，就是 SVD 要抓的东西：</p>
 <ul>
@@ -122,7 +122,7 @@ min_idx = np.argmin(stretches)
 所以「圆变椭圆」=「对大量向量逐个做矩阵乘法，观察结果的形状」。和 $A\mathbf{x}$ 没有本质区别，只是做了很多次。
 </div>
 
-<pre><code><span class="hl-comment"># 00-06 第二步：用100个方向，密集采样，验证输出围成椭圆</span>
+<pre><code><span class="hl-comment"># 00-07 第二步：用100个方向，密集采样，验证输出围成椭圆</span>
 <span class="hl-comment"># 导入numpy</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
@@ -173,7 +173,7 @@ min_idx = np.argmin(distances)
 
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 
-<p>结论：<strong>长轴指向 [2.83, 2.83] 方向，长度 ≈ 4；短轴指向 [-1.41, 1.41] 方向，长度 ≈ 2。</strong></p>
+<p>结论：<strong>长轴指向 [2.83, 2.83] 方向（或相反方向，同一轴的另一端），长度 ≈ 4；短轴指向 [-1.41, 1.41] 方向，长度 ≈ 2。</strong></p>
 
 <p>这两个方向<strong>互相垂直</strong>（点乘 = 2.83×(-1.41) + 2.83×1.41 = 0 ✓），它们是矩阵 $A$ 的<strong>左奇异向量</strong>。</p>
 
@@ -260,7 +260,7 @@ $$\Sigma = \begin{bmatrix} 9.53 & 0 \\ 0 & 0.51 \\ 0 & 0 \end{bmatrix} \quad\lef
 
 <p>用代码验证。numpy 的 <code>linalg.svd</code> 一次返回三个值：<code>U</code>（左奇异向量矩阵）、<code>s</code>（奇异值的一维数组，按从大到小排）、<code>VT</code>（右奇异向量矩阵的转置）。<code>s</code> 里的每个数就是 $\Sigma$ 对角线上的 $\sigma_1,\sigma_2,\dots$。</p>
 
-<pre><code><span class="hl-comment"># 00-06 第三步：用 numpy 的 SVD 函数，把 A 拆成 U Σ V^T 三步</span>
+<pre><code><span class="hl-comment"># 00-07 第三步：用 numpy 的 SVD 函数，把 A 拆成 U Σ V^T 三步</span>
 <span class="hl-comment"># 导入numpy</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
@@ -299,7 +299,7 @@ A_rebuilt = U @ Sigma @ VT
 
 <p>上面的 $A$ 是 $2\times 2$ 方阵。换成 $3\times 2$ 长方形矩阵试试：</p>
 
-<pre><code><span class="hl-comment"># 00-06 第四步：长方形矩阵（非方阵）也能做 SVD</span>
+<pre><code><span class="hl-comment"># 00-07 第四步：长方形矩阵（非方阵）也能做 SVD</span>
 <span class="hl-comment"># 导入numpy</span>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 
