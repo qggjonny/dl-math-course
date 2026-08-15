@@ -73,10 +73,14 @@ $$2 A^T A \, w - 2 A^T \mathbf{b} = 0 \quad\Rightarrow\quad \boxed{A^T A \, w = 
 <p>这个方程叫<strong>法方程（normal equation）</strong>——最小二乘问题的核心。</p>
 
 <p><strong>④ 解出 $w$，认出伪逆</strong></p>
-<p>$A$ 是 $3 \times 1$ 列向量，$A^T A$ 是 $1 \times 1$——一个标量。直接除：</p>
+<p>$A$ 是 $3 \times 1$ 列向量，$A^T A$ 是 $1 \times 1$——一个标量（具体算出来是 5）。所以可以直接除：</p>
 $$w = \frac{A^T \mathbf{b}}{A^T A}$$
-<p>所以：</p>
+<p>现在把 $\mathbf{b}$ 的系数单独拎出来——改写成「系数 × $\mathbf{b}$」的样子：</p>
+$$w = \underbrace{\frac{A^T}{A^T A}}_{\mathbf{b} \text{ 前面的系数}} \cdot \mathbf{b}$$
+<p>这个系数为什么就是伪逆？先回忆伪逆是干嘛的：方阵可逆时，解 $A\mathbf{x} = \mathbf{b}$ 得 $\mathbf{x} = A^{-1}\mathbf{b}$——$A^{-1}$ 就是 $\mathbf{b}$ 前面的系数。超定方程没有精确解，但最小二乘找到了「最好的近似解」$w$，它同样等于「某个矩阵 × $\mathbf{b}$」。这个扮演「逆」角色的矩阵，就叫做<strong>伪逆</strong>，记作 $A^+$。</p>
+<p>所以「认出伪逆」= 把 $w$ 写成「系数 × $\mathbf{b}$」，那个系数就是 $A^+$：</p>
 $$\boxed{A^+ = \frac{A^T}{A^T A}}$$
+<p>再核对维度：$w$ 是 $1\times1$，$\mathbf{b}$ 是 $3\times1$，要让 $A^+ \times \mathbf{b}$ 得到 $1\times1$，$A^+$ 必须是 $1\times3$。而 $\frac{A^T}{A^T A}$ = 行向量 $(1\times3)$ 除以标量 = $1\times3$ ✓，对上了。</p>
 <p><strong>⑤ 一句话总结：</strong>伪逆不是凭空定义的——它就是「让误差平方和最小的那个求解公式」里 $\mathbf{b}$ 前面的系数。</p>
 
 <p>代入数字：$A^T \mathbf{b} = 0 \cdot 0 + 1 \cdot 2 + 2 \cdot 1 = 4$，$A^T A = 0^2+1^2+2^2 = 5$，$w = 4/5 = 0.8$——和求导结果一致 ✓。</p>
