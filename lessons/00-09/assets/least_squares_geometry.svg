@@ -1,101 +1,58 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 440" width="100%" style="max-width:640px">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 470" width="100%" style="max-width:640px">
   <defs>
-    <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#667eea" stop-opacity="0.06"/>
-      <stop offset="100%" stop-color="#667eea" stop-opacity="0.02"/>
-    </linearGradient>
-    <linearGradient id="floorGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.04"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.01"/>
-    </linearGradient>
     <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
       <polygon points="0,0 10,3.5 0,7" fill="#667eea"/>
     </marker>
     <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
       <polygon points="0,0 10,3.5 0,7" fill="#f5576c"/>
     </marker>
+    <marker id="arrowGold" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0,0 10,3.5 0,7" fill="#ffd700"/>
+    </marker>
   </defs>
 
-  <!-- 背景 -->
-  <rect width="640" height="440" fill="#1a1a2e" rx="12"/>
+  <rect width="640" height="470" fill="#1a1a2e" rx="12"/>
 
-  <!-- ====== 3D 空间结构 ====== -->
+  <g stroke="#ffffff" stroke-width="0.3" stroke-dasharray="3,6" opacity="0.14">
+    <line x1="150.0" y1="40.0" x2="150.0" y2="436"/>
+    <line x1="210.0" y1="40.0" x2="210.0" y2="436"/>
+    <line x1="270.0" y1="40.0" x2="270.0" y2="436"/>
+    <line x1="330.0" y1="40.0" x2="330.0" y2="436"/>
+    <line x1="390.0" y1="40.0" x2="390.0" y2="436"/>
+    <line x1="90" y1="268.0" x2="402" y2="268.0"/>
+    <line x1="90" y1="208.0" x2="402" y2="208.0"/>
+    <line x1="90" y1="148.0" x2="402" y2="148.0"/>
+    <line x1="90" y1="87.99999999999999" x2="402" y2="87.99999999999999"/>
+    <line x1="90" y1="388.0" x2="402" y2="388.0"/>
+  </g>
 
-  <!-- 地板：x₁-x₂ 平面（平行四边形） -->
-  <polygon points="150,290 330,290 226,350 46,350" fill="url(#floorGrad)" stroke="#333" stroke-width="0.8"/>
-  <!-- 地板网格线（平行于 x₁ 的虚线） -->
-  <line x1="210" y1="290" x2="106" y2="350" stroke="#ffffff" stroke-width="0.3" stroke-dasharray="3,6" opacity="0.3"/>
-  <line x1="270" y1="290" x2="166" y2="350" stroke="#ffffff" stroke-width="0.3" stroke-dasharray="3,6" opacity="0.3"/>
+  <line x1="82" y1="328.0" x2="410" y2="328.0" stroke="#777" stroke-width="1.2"/>
+  <polygon points="410,328.0 403,324.0 403,332.0" fill="#777"/>
+  <text x="418" y="332.0" fill="#999" font-size="13" font-family="serif" font-style="italic">x₂</text>
 
-  <!-- 侧墙：x₁-x₃ 平面（平行四边形） -->
-  <polygon points="150,290 46,350 46,110 150,50" fill="url(#wallGrad)" stroke="#333" stroke-width="0.8"/>
+  <line x1="90" y1="440" x2="90" y2="34.0" stroke="#777" stroke-width="1.2"/>
+  <polygon points="90,34.0 85,42.0 95,42.0" fill="#777"/>
+  <text x="80" y="30.0" fill="#999" font-size="13" font-family="serif" font-style="italic">x₃</text>
 
-  <!-- 主墙：x₂-x₃ 平面（矩形，正对我们） -->
-  <polygon points="150,290 330,290 330,50 150,50" fill="url(#wallGrad)" stroke="#444" stroke-width="0.8"/>
-  <!-- 主墙网格线 -->
-  <line x1="210" y1="50" x2="210" y2="290" stroke="#667eea" stroke-width="0.3" stroke-dasharray="4,8" opacity="0.2"/>
-  <line x1="270" y1="50" x2="270" y2="290" stroke="#667eea" stroke-width="0.3" stroke-dasharray="4,8" opacity="0.2"/>
-  <line x1="150" y1="230" x2="330" y2="230" stroke="#667eea" stroke-width="0.3" stroke-dasharray="4,8" opacity="0.2"/>
-  <line x1="150" y1="170" x2="330" y2="170" stroke="#667eea" stroke-width="0.3" stroke-dasharray="4,8" opacity="0.2"/>
-  <line x1="150" y1="110" x2="330" y2="110" stroke="#667eea" stroke-width="0.3" stroke-dasharray="4,8" opacity="0.2"/>
+  <line x1="330.0" y1="208.0" x2="126.0" y2="256.0" stroke="#888888" stroke-width="1.2" stroke-dasharray="5,5" opacity="0.45"/>
+  <circle cx="126.0" cy="256.0" r="2.5" fill="#888888" opacity="0.6"/>
+  <text x="198" y="250" fill="#888888" font-size="11" font-family="sans-serif" opacity="0.7">斜边（更长）</text>
 
-  <!-- ====== 坐标轴 ====== -->
+  <line x1="90.0" y1="328.0" x2="228.0" y2="52.0" stroke="#667eea" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+  <text x="236.0" y="56.0" fill="#667eea" font-size="12" font-family="sans-serif" font-weight="bold">列空间 Col(A)</text>
+  <text x="236.0" y="70.0" fill="#667eea" font-size="10" font-family="sans-serif" opacity="0.6">（过原点的直线）</text>
 
-  <!-- x₁ 轴（纵深） -->
-  <line x1="150" y1="290" x2="46" y2="350" stroke="#555" stroke-width="1.5"/>
-  <polygon points="46,350 40,342 48,345" fill="#555"/>
-  <text x="30" y="370" fill="#777" font-size="12" font-family="serif" font-style="italic">x₁</text>
+  <line x1="90.0" y1="328.0" x2="330.0" y2="208.0" stroke="#f5576c" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+  <text x="340.0" y="213.0" fill="#f5576c" font-size="14" font-family="serif" font-weight="bold" font-style="italic">b = (2, 1)</text>
 
-  <!-- x₂ 轴（右） -->
-  <line x1="150" y1="290" x2="340" y2="290" stroke="#666" stroke-width="1.5"/>
-  <polygon points="340,290 332,284 332,296" fill="#666"/>
-  <text x="348" y="295" fill="#888" font-size="12" font-family="serif" font-style="italic">x₂</text>
+  <line x1="186.0" y1="136.0" x2="330.0" y2="208.0" stroke="#ffd700" stroke-width="2.5" stroke-dasharray="8,5" marker-end="url(#arrowGold)"/>
+  <text x="262.0" y="192.0" fill="#ffd700" font-size="13" font-family="serif" font-weight="bold" font-style="italic">r = b − Aŵ</text>
 
-  <!-- x₃ 轴（上） -->
-  <line x1="150" y1="290" x2="150" y2="40" stroke="#666" stroke-width="1.5"/>
-  <polygon points="150,40 144,48 156,48" fill="#666"/>
-  <text x="140" y="32" fill="#888" font-size="12" font-family="serif" font-style="italic">x₃</text>
+  <circle cx="186.0" cy="136.0" r="5" fill="#4facfe" stroke="#fff" stroke-width="1.5"/>
+  <text x="138.0" y="128.0" fill="#4facfe" font-size="14" font-family="serif" font-weight="bold" font-style="italic">Aŵ = (0.8, 1.6)</text>
 
-  <!-- ====== 数据向量（都在 x₂-x₃ 主墙上） ====== -->
+  <polyline points="194.0,119.9 186.0,136.0 202.1,144.0" fill="none" stroke="#ffd700" stroke-width="2"/>
 
-  <!-- 列空间：直线（A=[0,1,2]ᵀ，x₁=0，只在 x₂-x₃ 墙内） -->
-  <!-- 过原点，方向 (1,2)：从 O 到 t=1.8 -->
-  <line x1="150" y1="290" x2="258" y2="74" stroke="#667eea" stroke-width="3" marker-end="url(#arrowBlue)"/>
-  <text x="268" y="68" fill="#667eea" font-size="13" font-family="sans-serif" font-weight="bold">列空间 Col(A)</text>
-  <text x="268" y="84" fill="#667eea" font-size="10" font-family="sans-serif" opacity="0.65">（过原点的直线）</text>
-
-  <!-- Aŵ = [0,0.8,1.6] —— 列空间上的垂足 -->
-  <circle cx="198" cy="194" r="5" fill="#4facfe" stroke="#fff" stroke-width="1.5"/>
-  <text x="208" y="192" fill="#4facfe" font-size="14" font-family="serif" font-weight="bold" font-style="italic">A<b>ŵ</b></text>
-  <!-- 从原点引一条细线到 Aŵ（辅助理解） -->
-  <line x1="150" y1="290" x2="198" y2="194" stroke="#4facfe" stroke-width="0.8" stroke-dasharray="3,5" opacity="0.4"/>
-
-  <!-- b = [0,2,1] —— 目标向量，不在列空间上 -->
-  <line x1="150" y1="290" x2="270" y2="230" stroke="#f5576c" stroke-width="2.5" marker-end="url(#arrowRed)"/>
-  <text x="280" y="228" fill="#f5576c" font-size="14" font-family="serif" font-weight="bold" font-style="italic">b</text>
-
-  <!-- 残差 r = b − Aŵ —— 从垂足连到 b 端点 -->
-  <line x1="198" y1="194" x2="270" y2="230" stroke="#ffd700" stroke-width="2.5" stroke-dasharray="8,5"/>
-  <text x="235" y="206" fill="#ffd700" font-size="12" font-family="serif" font-weight="bold" font-style="italic">r</text>
-
-  <!-- 直角标记：在垂足 Aŵ=(198,194) 处 -->
-  <!-- 列空间方向：从 O(150,290) 沿 (1,2) → 方向 (60,-120) 归一化 → (12,-24) -->
-  <!-- 残差方向：(270-198, 230-194) = (72,36) 归一化 → (16,8) -->
-  <!-- 直角标：沿列空间走 16px → 沿残差走 16px → 4 边形 -->
-  <!-- P=(198,194), Q=(198+12,194-24)=(210,170), R=Q+(16,8)=(226,178), S=P+(16,8)=(214,202) -->
-  <polygon points="198,194 210,170 226,178 214,202" fill="#ffd700" fill-opacity="0.18" stroke="#ffd700" stroke-width="1.5"/>
-
-  <!-- 原点 O -->
-  <circle cx="150" cy="290" r="3.5" fill="#aaa"/>
-  <text x="133" y="306" fill="#aaa" font-size="12" font-family="serif">O</text>
-
-  <!-- ====== 图例 ====== -->
-  <rect x="370" y="290" width="240" height="95" rx="6" fill="#ffffff08" stroke="#333" stroke-width="1"/>
-  <text x="384" y="312" fill="#ccc" font-size="12" font-family="sans-serif" font-weight="bold">最小二乘的几何意义</text>
-  <line x1="380" y1="328" x2="405" y2="328" stroke="#f5576c" stroke-width="2.5"/>
-  <text x="412" y="332" fill="#aaa" font-size="11" font-family="sans-serif">b — 目标向量（在列空间外）</text>
-  <line x1="380" y1="346" x2="405" y2="346" stroke="#4facfe" stroke-width="2.5"/>
-  <text x="412" y="350" fill="#aaa" font-size="11" font-family="sans-serif">Aŵ — 列空间里离 b 最近的点</text>
-  <line x1="380" y1="364" x2="405" y2="364" stroke="#ffd700" stroke-width="2" stroke-dasharray="4,3"/>
-  <text x="412" y="368" fill="#aaa" font-size="11" font-family="sans-serif">r = b−Aŵ — 残差（⟂ 列空间）</text>
+  <circle cx="90.0" cy="328.0" r="3.5" fill="#aaa"/>
+  <text x="70.0" y="346.0" fill="#aaa" font-size="12" font-family="serif">O</text>
 </svg>

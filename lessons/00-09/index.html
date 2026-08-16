@@ -90,14 +90,29 @@ $$\boxed{A^+ = \frac{A^T}{A^T A}}$$
 </div>
 
 <h3>几何画面：投影——为什么 $A\hat{w}$ 是垂足？</h3>
-<p>$A$ 的列空间是过原点、方向为 $\begin{bmatrix}0\\1\\2\end{bmatrix}$ 的一条直线。$\mathbf{b} = \begin{bmatrix}0\\2\\1\end{bmatrix}$ 在这条直线<strong>外面</strong>。要找直线上离 $\mathbf{b}$ 最近的点。</p>
-<p>残差 $\mathbf{r} = \mathbf{b} - A w$ 是连接线。距离最短的条件：<strong>$\mathbf{r}$ 垂直于直线</strong>（直角三角形斜边 > 直角边）。即 $A^T \mathbf{r} = 0$：</p>
-$$A^T(\mathbf{b} - A\hat{w}) = 0 \;\Rightarrow\; A^T A \hat{w} = A^T \mathbf{b} \;\Rightarrow\; \hat{w} = \frac{A^T \mathbf{b}}{A^T A} = 0.8$$
-<p>垂足：$A\hat{w} = 0.8 \cdot [0,1,2]^T = [0, 0.8, 1.6]^T$。残差 $\mathbf{r} = [0, 1.2, -0.6]^T$，验证 $A^T \mathbf{r} = 0$ ✓。</p>
+<p>先看一个巧合：$A = [0,1,2]^T$ 和 $\mathbf{b} = [0,2,1]^T$ 的<strong>第一个分量都是 0</strong>。它们都躺在 $x_1 = 0$ 这个平面里，所以整个问题可以塌缩成一张二维图——横轴 $x_2$，纵轴 $x_3$。</p>
+<p>$A$ 的列空间是过原点、方向为 $(1,2)$ 的一条直线。$\mathbf{b} = (2,1)$ 在这条直线<strong>外面</strong>。要找直线上离 $\mathbf{b}$ 最近的点。</p>
+
+<p><strong>第一步：为什么「最近」一定等于「垂直」？</strong></p>
+<p>在直线上任取一点 $P$，$\mathbf{b}$ 到 $P$ 的距离是 $\|\mathbf{b} - P\|$。现在从 $\mathbf{b}$ 往直线作<strong>垂线</strong>，垂足记作 $F$。看三角形 $\mathbf{b}FP$：$F$ 处是直角（$\mathbf{b}F$ 垂直于直线，而 $FP$ 躺在直线上），所以 $\mathbf{b}P$ 是斜边、$\mathbf{b}F$ 是直角边。勾股定理（00-01）：<strong>斜边永远比直角边长</strong>。$P$ 随便取结论都一样——垂足 $F$ 到 $\mathbf{b}$ 的距离最短。</p>
+
+<p><strong>第二步：把「垂直」翻译成方程。</strong></p>
+<p>直线的方向就是 $A$。「残差 $\mathbf{r} = \mathbf{b} - A\hat{w}$ 垂直于直线」=「$\mathbf{r}$ 与 $A$ 内积为 0」。内积写成矩阵形式（00-05 学过：内积 = 把 $A$ 转置成行向量再乘，$A^T$ 只是语法工具，几何主语是列向量 $A$）：</p>
+$$A^T \mathbf{r} = 0$$
+
+<p><strong>第三步：从垂直条件解出 $\hat{w}$。</strong></p>
+<p>把 $\mathbf{r} = \mathbf{b} - A\hat{w}$ 代进去，逐项拆开：</p>
+$$A^T(\mathbf{b} - A\hat{w}) = 0 \quad\Rightarrow\quad A^T \mathbf{b} - A^T A \hat{w} = 0 \quad\Rightarrow\quad A^T A \hat{w} = A^T \mathbf{b}$$
+<p>（$A^T$ 对减法分配，00-02 矩阵运算。）$A^T A$ 和 $A^T \mathbf{b}$ 都是标量（$A$ 是 $3\times1$ 列向量），可以直接除：</p>
+$$\hat{w} = \frac{A^T \mathbf{b}}{A^T A} = \frac{4}{5} = 0.8$$
+<p>和上面微积分求出的 $0.8$ 一模一样——<strong>求导和投影，两条路殊途同归</strong>。</p>
+
+<p><strong>第四步：代入数字验证。</strong></p>
+<p>垂足 $A\hat{w} = 0.8 \cdot [0,1,2]^T = [0, 0.8, 1.6]^T$。残差 $\mathbf{r} = \mathbf{b} - A\hat{w} = [0,2,1]^T - [0,0.8,1.6]^T = [0, 1.2, -0.6]^T$。验证垂直：$A^T \mathbf{r} = 0\cdot 0 + 1 \cdot 1.2 + 2 \cdot (-0.6) = 1.2 - 1.2 = 0$ ✓。</p>
 
 <figure>
   <img src="assets/least_squares_geometry.svg" alt="最小二乘的几何意义" style="max-width:100%;border-radius:8px">
-  <figcaption>$\mathbf{b}$ 不在 $A$ 的列空间里。最小二乘找的是列空间里离 $\mathbf{b}$ 最近的点 $A\hat{w}$——残差 $\mathbf{r} = \mathbf{b} - A\hat{w}$ 垂直于列空间。</figcaption>
+  <figcaption>横轴 $x_2$、纵轴 $x_3$（$x_1$ 分量恒为 0，问题塌缩成二维）。$\mathbf{b}$ 在列空间（蓝色直线）外。垂足 $A\hat{w}$ 是直线上离 $\mathbf{b}$ 最近的点——残差 $\mathbf{r}$ 垂直于直线（黄色直角标记），而 $\mathbf{b}$ 到直线上其他点的连线（灰色虚线「斜边」）都比 $\mathbf{r}$ 长。</figcaption>
 </figure>
 
 <h3>用 SVD 推导：为什么伪逆是最小二乘解？</h3>
