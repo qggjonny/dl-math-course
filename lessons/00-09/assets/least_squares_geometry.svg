@@ -45,13 +45,13 @@
   <line x1="90.0" y1="328.0" x2="330.0" y2="208.0" stroke="#f5576c" stroke-width="2.5" marker-end="url(#arrowRed)"/>
   <text x="340.0" y="213.0" fill="#f5576c" font-size="14" font-family="serif" font-weight="bold" font-style="italic">b = (2, 1)</text>
 
-  <line x1="186.0" y1="136.0" x2="330.0" y2="208.0" stroke="#ffd700" stroke-width="2.5" stroke-dasharray="8,5" marker-end="url(#arrowGold)"/>
+  <line x1="186.0" y1="136.0" x2="330.0" y2="208.0" stroke="#ffd700" stroke-width="2.5" stroke-dasharray="8,5"/>
   <text x="262.0" y="192.0" fill="#ffd700" font-size="13" font-family="serif" font-weight="bold" font-style="italic">r = b − Aŵ</text>
+
+  <polyline points="194.0,119.9 186.0,136.0 202.1,144.0" fill="none" stroke="#ffd700" stroke-width="2"/>
 
   <circle cx="186.0" cy="136.0" r="5" fill="#4facfe" stroke="#fff" stroke-width="1.5"/>
   <text x="138.0" y="128.0" fill="#4facfe" font-size="14" font-family="serif" font-weight="bold" font-style="italic">Aŵ = (0.8, 1.6)</text>
-
-  <polyline points="194.0,119.9 186.0,136.0 202.1,144.0" fill="none" stroke="#ffd700" stroke-width="2"/>
 
   <circle cx="90.0" cy="328.0" r="3.5" fill="#aaa"/>
   <text x="70.0" y="346.0" fill="#aaa" font-size="12" font-family="serif">O</text>
