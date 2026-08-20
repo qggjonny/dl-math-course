@@ -106,7 +106,14 @@ $$\|\mathbf{b} - wA\|^2 = (0-0)^2 + (2-w)^2 + (1-2w)^2$$
 <p>在直线上任取一点 $P$，$\mathbf{b}$ 到 $P$ 的距离是 $\|\mathbf{b} - P\|$。现在从 $\mathbf{b}$ 往直线作<strong>垂线</strong>，垂足记作 $F$。看三角形 $\mathbf{b}FP$：$F$ 处是直角（$\mathbf{b}F$ 垂直于直线，而 $FP$ 躺在直线上），所以 $\mathbf{b}P$ 是斜边、$\mathbf{b}F$ 是直角边。勾股定理（00-01）：<strong>斜边永远比直角边长</strong>。$P$ 随便取结论都一样——垂足 $F$ 到 $\mathbf{b}$ 的距离最短。</p>
 
 <p><strong>第二步：把「垂直」翻译成方程。</strong></p>
-<p>直线的方向就是 $A$。「残差 $\mathbf{r} = \mathbf{b} - A\hat{w}$ 垂直于直线」=「$\mathbf{r}$ 与 $A$ 内积为 0」。内积写成矩阵形式（00-05 学过：内积 = 把 $A$ 转置成行向量再乘，$A^T$ 只是语法工具，几何主语是列向量 $A$）：</p>
+
+<p><strong>① 先交代残差 $\mathbf{r}$ 是什么。</strong>这里是 $\mathbf{r}$ 第一次登场，先说清它的来历。散点图里每个点的误差是竖直的 $y_i - wx_i$；换到列空间，把三个误差竖着堆成一个向量，就是 $\mathbf{b} - wA$。当 $w$ 取到最优的 $\hat{w}$ 时，这个向量就是<strong>残差</strong>：</p>
+$$\mathbf{r} = \mathbf{b} - A\hat{w}$$
+<p>它是从预测值 $A\hat{w}$（垂足）指向真实值 $\mathbf{b}$ 的那根箭头，长度 $\|\mathbf{r}\|$ 就是我们要缩小的距离。残差 = 预测之后<strong>剩下来、没预测到的</strong>那部分误差，所以叫「残」差。</p>
+
+<p><strong>② 「垂直」怎么翻译成「内积为 0」？</strong>第一步证明了「最近」$\iff$「垂直」。现在要把「垂直」这个几何词变成能算的式子。00-01 学过内积的定义：$\mathbf{a}\cdot\mathbf{b} = \|\mathbf{a}\|\|\mathbf{b}\|\cos\theta$，$\theta$ 是夹角。所以<strong>垂直 $\iff$ 夹角 $90°$ $\iff$ $\cos 90°=0$ $\iff$ 内积为 0</strong>。反过来也对：两个非零向量内积为 0，只能 $\cos\theta=0$，即垂直。「垂直」在代数里的样子就是「内积等于 0」。</p>
+
+<p><strong>③ 直线的方向向量是谁？</strong>这条直线是列空间，由 $wA$ 扫出来——直线上每个点都是 $A$ 的倍数，所以方向就是 $A$ 本身。「$\mathbf{r}$ 垂直于直线」$\iff$「$\mathbf{r}$ 垂直于 $A$」$\iff$「$\mathbf{r}$ 与 $A$ 内积为 0」。内积写成矩阵形式（00-05 学过：内积 = 把 $A$ 转置成行向量再乘，$A^T$ 只是语法工具，几何主语是列向量 $A$）：</p>
 $$A^T \mathbf{r} = 0$$
 
 <p><strong>第三步：从垂直条件解出 $\hat{w}$。</strong></p>
