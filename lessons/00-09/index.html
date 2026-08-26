@@ -50,6 +50,13 @@ $$\underbrace{\begin{bmatrix} 0 \\ 1 \\ 2 \end{bmatrix}}_{A_{3\times 1}}
 \underbrace{\vphantom{\begin{bmatrix}0\\1\\2\end{bmatrix}} w}_{\mathbf{x}_{1\times 1}}
 = \underbrace{\begin{bmatrix} 0 \\ 2 \\ 1 \end{bmatrix}}_{\mathbf{b}_{3\times 1}}$$
 <p>$A$ 是 3×1 列向量，$w$ 是标量。$A w = \mathbf{b}$ 无精确解。最小二乘就是要找 $w$ 让 $\|A w - \mathbf{b}\|^2$ 最小。</p>
+<p>先停一下，把「无解」这三个字看成一张图。</p>
+<p><strong>先把三个方程重复列一遍：</strong></p>
+$$w \cdot 0 = 0, \qquad w \cdot 1 = 2, \qquad w \cdot 2 = 1$$
+<p>合并成矩阵，就是上面的 $A w = \mathbf{b}$。现在看<strong>等号两边各是什么</strong>。</p>
+<p><strong>左边 $Aw$ —— 列空间上的一个点。</strong> $A = [0,1,2]^T$ 是一根固定的箭头（00-06 学过：列空间就是 $A$ 的所有倍数扫出来的直线）。<strong>$w$ 是旋钮，$Aw$ 是滑动的点</strong>——$w$ 一变，$Aw$ 就沿着列空间这条直线来回移动。</p>
+<p><strong>右边 $\mathbf{b}$ —— 列空间外面的一个点。</strong> $\mathbf{b} = [0,2,1]^T$ 不在 $A$ 方向的那条直线上。所以无论 $w$ 怎么拧，$Aw$ 都够不到 $\mathbf{b}$——这就是「$A w = \mathbf{b}$ 无解」的几何真相：<strong>$\mathbf{b}$ 根本不在列空间里。</strong></p>
+<p>于是最小二乘的任务浓缩成一句话：<strong>在列空间这条直线上找一个点 $Aw$，让它离直线外的 $\mathbf{b}$ 最近。</strong>那个最近的点叫垂足，两点间的距离就是残差的长度——后面「几何画面」一节会把这层垂直关系掰开。</p>
 <p>上面用微积分求出来 $w = 0.8$。用伪逆行不行？下面<strong>不靠 SVD</strong>，直接从「最小化误差」这个目标把伪逆公式推出来。</p>
 
 <p><strong>① 目标函数：为什么写 $\|A w - \mathbf{b}\|^2$ 而不是 $\|A w - \mathbf{b}\|$？</strong></p>
