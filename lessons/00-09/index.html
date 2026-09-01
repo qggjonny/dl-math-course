@@ -137,23 +137,53 @@ $$\hat{w} = \frac{A^T \mathbf{b}}{A^T A} = \frac{4}{5} = 0.8$$
 <h3>用 SVD 推导：为什么伪逆是最小二乘解？</h3>
 <p>推广到一般情况：$\underbrace{A}_{m \times n} \mathbf{x} \approx \underbrace{\mathbf{b}}_{m \times 1}$（$m > n$ 超定）。目标 $\min_{\mathbf{x}} \|A\mathbf{x} - \mathbf{b}\|^2$。</p>
 
-<p><strong>第 1 步：代入 SVD。</strong> $A = U\Sigma V^T$：</p>
+<p><strong>第 1 步：代入 SVD。</strong> $A = U\Sigma V^T$，其中 $U$ 是 $m\times m$、$\Sigma$ 是 $m\times n$、$V^T$ 是 $n\times n$（SVD 三件套的维度，00-07 学过）：</p>
 $$\|A\mathbf{x} - \mathbf{b}\|^2 = \|U\Sigma V^T\mathbf{x} - \mathbf{b}\|^2$$
 
-<p><strong>第 2 步：消掉 $U$。</strong> 记 $\mathbf{v} = \Sigma V^T\mathbf{x}$：</p>
-$$\begin{aligned}
-\|U\mathbf{v} - \mathbf{b}\|^2
-&= (U\mathbf{v} - \mathbf{b})^T (U\mathbf{v} - \mathbf{b}) \\
-&= \mathbf{v}^T U^T U \mathbf{v} - 2\mathbf{v}^T U^T \mathbf{b} + \mathbf{b}^T \mathbf{b} \\
-&= \|\mathbf{v} - U^T \mathbf{b}\|^2
-\end{aligned}$$
-<p>（$U^T U = I$，且交叉项是标量 → 转置等于自身 → 两个交叉项相等。）</p>
-<p>口诀：$\|U\mathbf{v} - \mathbf{b}\|^2 = \|\mathbf{v} - U^T\mathbf{b}\|^2$——$U$ 可以「搬」到右边变 $U^T$。</p>
-<p>代回 $\mathbf{v}$：$\boxed{\|U\Sigma V^T\mathbf{x} - \mathbf{b}\|^2 = \|\Sigma V^T\mathbf{x} - U^T\mathbf{b}\|^2}$。</p>
+<p><strong>第 2 步：消掉 $U$。</strong> 把 $\Sigma V^T\mathbf{x}$ 整体记成一个新向量 $\mathbf{v}$：</p>
+$$\mathbf{v} = \Sigma V^T\mathbf{x}$$
+<p>（$\Sigma$ 是 $m\times n$、$V^T\mathbf{x}$ 是 $n\times 1$，乘出来 $\mathbf{v}$ 是 $m\times 1$，和 $\mathbf{b}$ 同维度。）现在要算 $\min \|U\mathbf{v} - \mathbf{b}\|^2$。</p>
 
-<p><strong>第 3 步：换元。</strong> $\mathbf{z} = V^T\mathbf{x}$，$\mathbf{c} = U^T\mathbf{b}$。问题变成 $\min_{\mathbf{z}} \|\Sigma\mathbf{z} - \mathbf{c}\|^2$。</p>
+<p>模平方 = 点乘自己（00-01 勾股定理）：</p>
+$$\|U\mathbf{v} - \mathbf{b}\|^2 = (U\mathbf{v} - \mathbf{b})^T (U\mathbf{v} - \mathbf{b})$$
 
-<p><strong>为什么变简单了？</strong> $\Sigma$ 是对角的——</p>
+<p>像 $(a-b)^2 = a^2 - 2ab + b^2$ 一样展开，但向量乘法要注意顺序、不能随便交换位置：</p>
+$$= (U\mathbf{v})^T (U\mathbf{v}) - (U\mathbf{v})^T \mathbf{b} - \mathbf{b}^T (U\mathbf{v}) + \mathbf{b}^T \mathbf{b}$$
+
+<p>拆转置：$(U\mathbf{v})^T = \mathbf{v}^T U^T$（00-02：乘积转置 = 顺序倒过来、各自转置再乘）：</p>
+$$= \mathbf{v}^T U^T U \mathbf{v} - \mathbf{v}^T U^T \mathbf{b} - \mathbf{b}^T U \mathbf{v} + \mathbf{b}^T \mathbf{b}$$
+
+<p>因为 $U^T U = I$（$U$ 是正交矩阵，00-07），第一项化简：</p>
+$$\mathbf{v}^T U^T U \mathbf{v} = \mathbf{v}^T I \mathbf{v} = \mathbf{v}^T \mathbf{v}$$
+
+<p>现在看两个交叉项 $- \mathbf{v}^T U^T \mathbf{b} - \mathbf{b}^T U \mathbf{v}$。关键观察：$\mathbf{b}^T U \mathbf{v}$ 是一个<strong>标量</strong>——</p>
+$$\underbrace{\mathbf{b}^T}_{1\times m} \cdot \underbrace{U}_{m\times m} \cdot \underbrace{\mathbf{v}}_{m\times 1} = 1\times 1 \;\text{（标量）}$$
+<p>标量的转置等于它自己，所以：</p>
+$$\mathbf{b}^T U \mathbf{v} = \bigl(\mathbf{b}^T U \mathbf{v}\bigr)^T = \mathbf{v}^T U^T \mathbf{b}$$
+<p>两个交叉项其实是同一个数，合并：</p>
+$$- \mathbf{v}^T U^T \mathbf{b} - \mathbf{b}^T U \mathbf{v} = - \mathbf{v}^T U^T \mathbf{b} - \mathbf{v}^T U^T \mathbf{b} = - 2\mathbf{v}^T U^T \mathbf{b}$$
+
+<p>所以：</p>
+$$\|U\mathbf{v} - \mathbf{b}\|^2 = \mathbf{v}^T \mathbf{v} - 2\mathbf{v}^T U^T \mathbf{b} + \mathbf{b}^T \mathbf{b}$$
+
+<p>再看 $\|\mathbf{v} - U^T\mathbf{b}\|^2$，用同样的套路展开：</p>
+$$(\mathbf{v} - U^T\mathbf{b})^T (\mathbf{v} - U^T\mathbf{b}) = \mathbf{v}^T \mathbf{v} - \mathbf{v}^T U^T \mathbf{b} - \mathbf{b}^T U \mathbf{v} + \mathbf{b}^T U U^T \mathbf{b}$$
+<p>两个交叉项照旧合并成 $-2\mathbf{v}^T U^T \mathbf{b}$。最后一项：$U$ 是完整 SVD 里的正交<strong>方阵</strong>，所以不仅 $U^T U = I$，反过来 $U U^T = I$ 也成立，于是 $\mathbf{b}^T U U^T \mathbf{b} = \mathbf{b}^T I \mathbf{b} = \mathbf{b}^T \mathbf{b}$。</p>
+
+<p>两项展开结果完全一样：</p>
+$$\boxed{\|U\mathbf{v} - \mathbf{b}\|^2 = \|\mathbf{v} - U^T\mathbf{b}\|^2}$$
+
+<p>口诀：$U$ 可以「搬」到右边变 $U^T$，模平方不变。代回 $\mathbf{v} = \Sigma V^T\mathbf{x}$：</p>
+$$\boxed{\|U\Sigma V^T\mathbf{x} - \mathbf{b}\|^2 = \|\Sigma V^T\mathbf{x} - U^T\mathbf{b}\|^2}$$
+
+<p><strong>第 3 步：换元。</strong> 把两个长得啰嗦的东西换成短名字：</p>
+$$\mathbf{z} = V^T\mathbf{x}, \qquad \mathbf{c} = U^T\mathbf{b}$$
+<p>维度：$V^T$ 是 $n\times n$、$\mathbf{x}$ 是 $n\times 1$，所以 $\mathbf{z}$ 是 $n\times 1$；$U^T$ 是 $m\times m$、$\mathbf{b}$ 是 $m\times 1$，所以 $\mathbf{c}$ 是 $m\times 1$。问题变成：</p>
+$$\min_{\mathbf{z}} \|\Sigma \mathbf{z} - \mathbf{c}\|^2$$
+
+<p><strong>为什么能随便换元？</strong> $V$ 是正交矩阵（00-07），$V^T$ 也是正交矩阵，所以 $\mathbf{x} \mapsto \mathbf{z} = V^T\mathbf{x}$ 这个变换是<strong>可逆的</strong>（反过来就是 $\mathbf{x} = V\mathbf{z}$）——一个 $\mathbf{x}$ 恰好对应一个 $\mathbf{z}$，不丢信息。既然一一对应，「找让 $\|\Sigma V^T\mathbf{x} - U^T\mathbf{b}\|^2$ 最小的 $\mathbf{x}$」和「找让 $\|\Sigma \mathbf{z} - \mathbf{c}\|^2$ 最小的 $\mathbf{z}$」就是同一件事。找到最优 $\mathbf{z}$ 后，用 $\mathbf{x} = V\mathbf{z}$ 就能还原出 $\mathbf{x}$。</p>
+
+<p><strong>为什么换元后变简单了？</strong> 因为 $\Sigma$ 是<strong>对角</strong>的——</p>
 $$\underbrace{\Sigma}_{m \times n} =
 \begin{bmatrix}
 \sigma_1 & & \\
@@ -170,15 +200,39 @@ $$\underbrace{\Sigma}_{m \times n} =
 &\bigl\} m-n \text{ 行——全是 } 0
 \end{aligned}$$
 
-<p>$\Sigma\mathbf{z}$ 的前 $n$ 个分量是 $\sigma_i z_i$，后 $m-n$ 个分量全是 0。$\mathbf{c}$ 的前 $n$ 个是 $c_1,\dots,c_n$，后 $m-n$ 个是 $c_{n+1},\dots,c_m$。</p>
-<p>减法后前 $n$ 项 $(\sigma_i z_i - c_i)^2$——可优化。后 $m-n$ 项 $(0 - c_j)^2$——<strong>$z$ 根本不出现，无法优化</strong>。这就是残差不可避免的原因：$\mathbf{b}$ 在 $A$ 列空间之外的部分，最小二乘也管不了。</p>
+<p>$\Sigma\mathbf{z}$ 的前 $n$ 个分量是 $\sigma_1 z_1, \dots, \sigma_n z_n$，后 $m-n$ 个分量全是 $0$。$\mathbf{c}$ 的前 $n$ 个是 $c_1,\dots,c_n$，后 $m-n$ 个是 $c_{n+1},\dots,c_m$。</p>
 
-<p><strong>第 4 步：逐项归零。</strong> 前 $n$ 项取 $z_i = c_i/\sigma_i$ 归零。</p>
-<p><strong>第 5 步：矩阵形式。</strong> $\mathbf{z} = \Sigma^+ \mathbf{c}$，其中 $\Sigma^+$ 对角线放 $1/\sigma_i$。</p>
-<p><strong>第 6 步：回到 $\mathbf{x}$。</strong> $\mathbf{z} = V^T\mathbf{x} \Rightarrow \mathbf{x} = V\mathbf{z}$，代入：</p>
-$$\mathbf{x} = V\Sigma^+ \mathbf{c} = V\Sigma^+ U^T \mathbf{b} = A^+ \mathbf{b}$$
+<p><strong>第 4 步：逐项拆开误差平方和。</strong> 模平方 = 每个分量平方再相加，一项一项写出来：</p>
+$$\|\Sigma\mathbf{z} - \mathbf{c}\|^2 = \underbrace{(\sigma_1 z_1 - c_1)^2 + \cdots + (\sigma_n z_n - c_n)^2}_{\text{前 }n\text{ 项}} \;+\; \underbrace{(0 - c_{n+1})^2 + \cdots + (0 - c_m)^2}_{\text{后 }m-n\text{ 项}}$$
 
-<p><strong>完整链条：</strong>换元 → 对角化 → 各管各优化 → 解得 $\mathbf{z} = \Sigma^+ \mathbf{c}$ → 沿原路走回 → $\mathbf{x} = A^+ \mathbf{b}$。SVD 的威力：把 $m$ 维纠缠问题崩解成 $n$ 个独立单变量平方项。</p>
+<p>前面 $n$ 项里都有 $z_i$——可以调 $z_i$ 去改变它们。后面 $m-n$ 项里<strong>根本没有 $z$</strong>：$\Sigma$ 的这些行全是 0，所以 $\Sigma\mathbf{z}$ 的对应分量恒为 0，只剩下 $-c_j$ 的平方，是固定的常数，$z$ 怎么变都动不了。</p>
+
+<p>这就是对角化的威力：原来 $\|A\mathbf{x}-\mathbf{b}\|^2$ 是 $m$ 维纠缠的（每个分量都牵扯到 $\mathbf{x}$ 的所有分量），现在拆成了 $n$ 个<strong>互不干扰</strong>的平方项——每个 $z_i$ 只出现在自己那一项 $(\sigma_i z_i - c_i)^2$ 里。于是可以「各管各」地优化。</p>
+
+<p>后面 $m-n$ 项 $(0-c_j)^2$ 动不了，就是残差的最小值——$\mathbf{b}$ 在 $A$ 列空间<strong>之外</strong>的那部分（$m-n$ 维），最小二乘也管不了。</p>
+
+<p><strong>第 5 步：逐项归零。</strong> 前 $n$ 项每一项 $(\sigma_i z_i - c_i)^2 \ge 0$，最小值是 0。要取到 0，令 $\sigma_i z_i - c_i = 0$，即：</p>
+$$z_i = \frac{c_i}{\sigma_i} \qquad (i = 1, \dots, n)$$
+<p>（这里默认所有 $\sigma_i > 0$，也就是 $A$ 列满秩、rank $= n$——00-08 学过：非零奇异值的个数 = 秩。列满秩时 $n$ 个奇异值全为正，除法才安全。）</p>
+
+<p>写成矩阵形式：$\mathbf{z} = \Sigma^+ \mathbf{c}$，其中 $\Sigma^+$ 是把 $\Sigma$ 转置后、对角元素取倒数得到的 $n\times m$ 矩阵：</p>
+$$\underbrace{\Sigma^+}_{n\times m} =
+\begin{bmatrix}
+1/\sigma_1 & & & 0 & \cdots & 0 \\
+& \ddots & & \vdots & & \vdots \\
+& & 1/\sigma_n & 0 & \cdots & 0
+\end{bmatrix}$$
+<p>左边 $n\times n$ 对角是 $1/\sigma_i$，右边 $n\times(m-n)$ 全是 0。验证维度：$\Sigma^+$ 是 $n\times m$、$\mathbf{c}$ 是 $m\times 1$，乘出来 $\Sigma^+\mathbf{c}$ 是 $n\times 1$，正好等于 $\mathbf{z}$（$n\times 1$）✓。</p>
+
+<p><strong>第 6 步：回到 $\mathbf{x}$。</strong> $\mathbf{z} = V^T\mathbf{x}$，两边同时左乘 $V$：</p>
+$$V\mathbf{z} = V V^T \mathbf{x} = I \mathbf{x} = \mathbf{x}$$
+<p>（$V$ 是正交方阵，$V V^T = I$，00-07 学过。）所以 $\mathbf{x} = V\mathbf{z} = V\Sigma^+ \mathbf{c} = V\Sigma^+ U^T \mathbf{b}$。把 $\mathbf{b}$ 前面的系数拎出来（回忆前面「认出伪逆」的做法：$w = A^+\mathbf{b}$，$A^+$ 就是 $\mathbf{b}$ 前面的那个系数）：</p>
+$$\boxed{A^+ = V\Sigma^+ U^T}$$
+<p>于是最小二乘解就是：</p>
+$$\boxed{\mathbf{x} = A^+ \mathbf{b}}$$
+<p>维度核对：$V$ 是 $n\times n$、$\Sigma^+$ 是 $n\times m$、$U^T$ 是 $m\times m$，乘起来 $A^+$ 是 $n\times m$——正好是 $A$（$m\times n$）的转置形状 ✓。</p>
+
+<p><strong>完整链条：</strong>代入 SVD → 消 $U$（正交搬移）→ 换元（对角化）→ 各管各优化 → 解得 $\mathbf{z} = \Sigma^+ \mathbf{c}$ → 沿原路走回 → $\mathbf{x} = A^+ \mathbf{b}$。SVD 的威力：把 $m$ 维纠缠问题崩解成 $n$ 个独立单变量平方项。</p>
 
 <div class="callout callout-info">
 <strong>🎯 最小二乘小结：</strong><br>
