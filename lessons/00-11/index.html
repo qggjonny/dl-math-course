@@ -109,11 +109,50 @@ $(x+\epsilon)$ &nbsp; $(x+\epsilon)$ &nbsp; $(x+\epsilon)$ &nbsp; $\cdots$ &nbsp
 
 <p>我们<strong>不需要知道挑 2 个、3 个……的系数具体是多少</strong>——只需知道它们都带着 $\epsilon^2$ 或更高次方。这在下一步导数计算中会自动消掉。</p>
 
-<h3>补充：排列组合与杨辉三角</h3>
-<p>从 $n$ 个盒子里挑 $k$ 个选 $\epsilon$（其余选 $x$），有几种挑法？这个数记作 $C(n,k)$——读作「n 选 k」。也叫<strong>组合数</strong>。</p>
+<h3>补充：组合数——从 n 个里挑 k 个</h3>
+<p>前面说「不需要知道挑 2 个、3 个的系数具体是多少」——那是针对<strong>导数推导</strong>而言（反正都带 $\epsilon^2$ 会被消掉）。但「从 $n$ 个里挑 $k$ 个」这个数本身太常用了，值得单独讲清楚。</p>
+<p>先补一句前面没点破的话：<strong>每个盒子里只有两件东西——$x$ 和 $\epsilon$</strong>。展开 $(x+\epsilon)^n$ 时，每个盒子必须拿一件。所以「挑 $k$ 个盒子选 $\epsilon$」=「从 $n$ 个盒子这个整体里，选出 $k$ 个」，剩下 $n-k$ 个自动选 $x$。</p>
 
-<p><strong>杨辉三角</strong>就是把所有 $C(n,k)$ 排成三角形——第 $n$ 行第 $k$ 个数就是 $C(n,k)$（行和列都从 0 开始数）：</p>
+<div class="callout callout-info">
+<strong>组合数的定义：</strong>从 $n$ 个<strong>互不相同</strong>的东西里，选出 $k$ 个（<strong>不计顺序</strong>），选法总数记作 $\binom{n}{k}$，读作「n 选 k」或「n 取 k」，也写作 $C(n,k)$。
+$$\binom{n}{k} = \frac{n!}{k!\,(n-k)!}$$
+其中 $n!$ 是阶乘（00-02 提过：$n! = n\times(n-1)\times\cdots\times1$，比如 $4!=24$）。
+</div>
 
+<p>定义里两个关键词一个都不能漏：<strong>互不相同</strong>（盒子 1、盒子 2……是不同的盒子，不能混淆）和<strong>不计顺序</strong>（只问「选了哪几个」，不问「先选谁后选谁」）。第二个词是组合数最容易乱的根源，下面专门拆开讲。</p>
+
+<h4>先搞清楚：顺序到底重不重要？</h4>
+<p>看一个具体例子——<strong>3 个同学 A、B、C，选 2 个人</strong>。</p>
+<p><strong>情形一（顺序重要）：选一个正班长 + 一个副班长。</strong>先选正班长（A、B、C 三选一，3 种），再选副班长（剩下 2 人里选，2 种），共 $3\times2 = 6$ 种：</p>
+<p style="text-align:center;font-family:monospace">(A,B)&nbsp;&nbsp;(A,C)&nbsp;&nbsp;(B,A)&nbsp;&nbsp;(B,C)&nbsp;&nbsp;(C,A)&nbsp;&nbsp;(C,B)</p>
+<p>注意 (A,B) 和 (B,A) 是<strong>两种不同结果</strong>——A 当正班长、B 当副班长，跟反过来，班子不一样。</p>
+<p><strong>情形二（顺序不重要）：选两个「代表」，不分正副。</strong>这时 (A,B) 和 (B,A) 是<strong>同一种结果</strong>（都是 A、B 两个人）。6 种里每两个人被重复算了 2 遍，真正不同的选法只剩：</p>
+<p style="text-align:center;font-family:monospace">{A,B}&nbsp;&nbsp;{A,C}&nbsp;&nbsp;{B,C}</p>
+<p>共 3 种。从 6 变 3，就是<strong>除以 2</strong>——因为选出来的 2 个人内部有 $2! = 2$ 种排队顺序（AB 和 BA），排列把它们当成 2 种，组合只看成 1 种。</p>
+<p>这两个概念都有名字：<strong>顺序重要叫「排列」</strong>（$3\times2=6$ 种），<strong>顺序不重要叫「组合」</strong>（$6\div2=3$ 种）。组合数 = 排列数 ÷ 内部顺序数。我们的盒子问题是组合——下面会确认。</p>
+
+<h4>公式怎么来的</h4>
+<p>把上面的例子推广到一般情况：从 $n$ 个里选 $k$ 个。</p>
+<p><strong>第一步，先算排列（顺序重要）：</strong>第 1 个位置 $n$ 种选法，第 2 个位置 $n-1$ 种……一直选到第 $k$ 个位置 $n-k+1$ 种。连乘：</p>
+$$\underbrace{n \times (n-1) \times \cdots \times (n-k+1)}_{k\ \text{个因子}}$$
+<p><strong>第二步，除以内部顺序数：</strong>选出来的 $k$ 个东西，它们之间有 $k! = k\times(k-1)\times\cdots\times1$ 种排队顺序，而组合不区分这些顺序——所以每种组合被排列重复算了 $k!$ 遍，除回去：</p>
+$$\binom{n}{k} = \frac{\overbrace{n\times(n-1)\times\cdots\times(n-k+1)}^{k\ \text{个因子}}}{k!}$$
+<p>这个式子就是 $\dfrac{n!}{k!(n-k)!}$（分子分母同乘 $(n-k)!$ 就补齐成 $n!$）。<strong>手算口诀：$n$ 往下连乘 $k$ 个，再除以 $k!$。</strong>比如 $\binom{5}{2} = \dfrac{5\times4}{2\times1} = 10$。</p>
+
+<h4>回到盒子：为什么是「组合」不是「排列」</h4>
+<p>因为展开时我们<strong>只关心「哪几个盒子贡献了 $\epsilon$」，不关心选的先后顺序</strong>。盒子 1、2 选 $\epsilon$ 和盒子 2、1 选 $\epsilon$，乘出来的都是 $x^{n-2}\epsilon^2$——同一个结果，只该算一次。所以系数 = 组合数 $\binom{n}{k}$。</p>
+<p>拿 $n=3$ 跟前面手算的 8 种选法对一遍：</p>
+<table>
+<tr><th>$k$（几个 $\epsilon$）</th><th>含义</th><th>组合数</th><th>值</th></tr>
+<tr><td>0</td><td>三个盒子都不选 $\epsilon$（全选 $x$）</td><td>$\binom{3}{0}$</td><td>1</td></tr>
+<tr><td>1</td><td>三个里挑 1 个选 $\epsilon$</td><td>$\binom{3}{1}=\frac{3}{1!}$</td><td>3</td></tr>
+<tr><td>2</td><td>三个里挑 2 个选 $\epsilon$</td><td>$\binom{3}{2}=\frac{3\times2}{2!}$</td><td>3</td></tr>
+<tr><td>3</td><td>三个盒子都选 $\epsilon$</td><td>$\binom{3}{3}$</td><td>1</td></tr>
+</table>
+<p>得到 1, 3, 3, 1——正是前面 8 种选法合并同类项后的系数，也是杨辉三角第 3 行。</p>
+
+<h4>杨辉三角 = 所有组合数排成的三角形</h4>
+<p>把 $\binom{n}{k}$ 按 $n$（行）、$k$（列）排起来，行和列都从 0 数起：</p>
 <div style="text-align:center;margin:1.2em 0;font-family:monospace;line-height:1.6">
 n=0:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1<br>
 n=1:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;1<br>
@@ -122,31 +161,52 @@ n=3:&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;3&nbsp;&nbsp;3&nbsp;&nbsp;1<br>
 n=4:&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;4&nbsp;&nbsp;6&nbsp;&nbsp;4&nbsp;&nbsp;1<br>
 n=5:&nbsp;&nbsp;1&nbsp;&nbsp;5&nbsp;10&nbsp;10&nbsp;&nbsp;5&nbsp;&nbsp;1
 </div>
+<p>第 $n$ 行从左到右就是 $\binom{n}{0}, \binom{n}{1}, \dots, \binom{n}{n}$。每一行相邻两数相加得到下一行的数（比如第 3 行的 $1+3=4$ 就是第 4 行的 $\binom{4}{1}$）——这是组合数的一条恒等式 $\binom{n}{k}+\binom{n}{k+1}=\binom{n+1}{k+1}$，先记住「加出来的」这个画面，证明留到需要时再展开。</p>
 
-<p>每行的数 = 上一行相邻两数之和（$1+2=3$，$3+3=6$……）。第 3 行的 1, 3, 3, 1 正好和 $(x+\epsilon)^3$ 展开的系数一致——不是巧合。杨辉三角就是二项式系数的几何版。</p>
+<h4>二项式定理——把结论写成一条公式</h4>
+<p>有了组合数，二项式展开就能写成紧凑的一条：</p>
+$$(a+b)^n = \binom{n}{0}a^n + \binom{n}{1}a^{n-1}b + \binom{n}{2}a^{n-2}b^2 + \cdots + \binom{n}{n}b^n = \sum_{k=0}^{n}\binom{n}{k}\,a^{n-k}b^k$$
+<p>代入 $a=x$、$b=\epsilon$，就是 $(x+\epsilon)^n = \sum_{k=0}^{n}\binom{n}{k}x^{n-k}\epsilon^k$。系数 $\binom{n}{k}$ 的含义一句话说清：<strong>展开时，选 $k$ 个因子贡献 $\epsilon$（其余贡献 $x$）的选法数</strong>。</p>
 
-<p><strong>二项式定理</strong>用组合数写出来就是：</p>
-$$(a+b)^n = C(n,0)a^n + C(n,1)a^{n-1}b + C(n,2)a^{n-2}b^2 + \cdots + C(n,n)b^n = \sum_{k=0}^n C(n,k)\\, a^{n-k} b^k$$
+<h4>一个自然的疑问：盒子要是装了三件东西怎么办？</h4>
+<p>好问题。如果每个盒子里有 3 件东西（比如展开 $(x+y+z)^n$），就要分两步选：先选哪些盒子贡献 $x$（$\binom{n}{a}$ 种），再在剩下的盒子里选哪些贡献 $y$（$\binom{n-a}{b}$ 种），剩下自动是 $z$。于是 $x^a y^b z^c$（$a+b+c=n$）的系数是：</p>
+$$\binom{n}{a}\binom{n-a}{b} = \frac{n!}{a!\,b!\,c!}$$
+<p>这叫<strong>多重组合数</strong>。二项式是它「只有 2 组」的特例（$b=n-a$，退化成 $\frac{n!}{a!(n-a)!}=\binom{n}{a}$）。</p>
+<p><strong>但现在不用管它。</strong>推导导数只需要二项式——每个盒子 2 件东西，$\binom{n}{k}$ 足够。先把「两件东西 + 组合数」这个最常用的情形吃透，多项的情形是它的自然延伸，用到时（概率里的多项分布）再展开不迟。</p>
 
-<p>把 $a=x$，$b=\epsilon$ 代入，就是 $(x+\epsilon)^n = \sum_{k=0}^n C(n,k)\\, x^{n-k} \\epsilon^k$。所以：$C(n,0)=1$（一个 $\epsilon$ 都不选），$C(n,1)=n$（选 1 个 $\epsilon$），$C(n,2)=\frac{n(n-1)}{2}$（选 2 个 $\epsilon$），以此类推。</p>
-
-<p>一行代码验证杨辉三角前三行的系数和上面手算的结果一致：</p>
+<h4>代码验证</h4>
 <pre><code><span class="hl-comment"># 用 Python 的 math.comb 算组合数，验证杨辉三角</span>
-<span class="hl-comment"># 导入 math 模块——comb(n,k) 就是 C(n,k) = n选k</span>
+<span class="hl-comment"># 导入 math 模块——comb(n,k) 就是组合数 C(n,k)</span>
 <span class="hl-keyword">import</span> math
 
 <span class="hl-comment"># n=3 的展开系数：C(3,0), C(3,1), C(3,2), C(3,3)</span>
-<span class="hl-comment"># 应该等于 [1, 3, 3, 1]——和前面手算的结果一致</span>
+<span class="hl-comment"># 应该等于 [1, 3, 3, 1]——和前面手算的 8 种选法一致</span>
 coeffs = [math.comb(<span class="hl-number">3</span>, k) <span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">4</span>)]
-<span class="hl-builtin">print</span>(<span class="hl-string">f"n=3 的系数: {coeffs}"</span>)           <span class="hl-comment"># → [1, 3, 3, 1]</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"n=3 的系数: {coeffs}"</span>)
 
-<span class="hl-comment"># n=4 的展开系数——杨辉三角第 4 行</span>
+<span class="hl-comment"># n=4 的展开系数——杨辉三角第 4 行，应等于 [1, 4, 6, 4, 1]</span>
 coeffs4 = [math.comb(<span class="hl-number">4</span>, k) <span class="hl-keyword">for</span> k <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">5</span>)]
-<span class="hl-builtin">print</span>(<span class="hl-string">f"n=4 的系数: {coeffs4}"</span>)           <span class="hl-comment"># → [1, 4, 6, 4, 1]</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"n=4 的系数: {coeffs4}"</span>)
 </code></pre>
 <p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
 
-<p>组合数后面会在概率课（二项分布、$C(n,k)p^k(1-p)^{n-k}$）里反复用到——这里的「选盒子」直觉到时候直接复用。</p>
+<p>上面「三件东西」的多重组合数也能验证——$(x+y+z)^3$ 里 $x\,y\,z$ 的系数应该是 $\frac{3!}{1!\,1!\,1!}=6$：</p>
+<pre><code><span class="hl-comment"># 验证多重组合数：展开 (x+y+z)^3，x·y·z 这一项的系数</span>
+<span class="hl-comment"># 公式：n!/(a!b!c!) = 3!/(1!1!1!) = 6</span>
+<span class="hl-keyword">import</span> math
+
+<span class="hl-comment"># n=3 次幂，a=b=c=1（对应 x^1 · y^1 · z^1）</span>
+n, a, b, c = <span class="hl-number">3</span>, <span class="hl-number">1</span>, <span class="hl-number">1</span>, <span class="hl-number">1</span>
+
+<span class="hl-comment"># math.factorial(3)=6，除以 a!b!c! = 1×1×1</span>
+coef = math.factorial(n) / (math.factorial(a) * math.factorial(b) * math.factorial(c))
+
+<span class="hl-comment"># 应该输出 6.0——xyz 三个字母有 6 种排列顺序</span>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"(x+y+z)^3 里 x·y·z 的系数 = {coef:.0f}"</span>)
+</code></pre>
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<p>组合数后面会在概率课（二项分布 $\binom{n}{k}p^k(1-p)^{n-k}$）里反复用到——这里的「选盒子」直觉到时候直接复用。</p>
 
 <h3>回到导数——走三步</h3>
 <p><strong>① 展开：</strong> $(x+\epsilon)^n = x^n + n x^{n-1}\epsilon + (\text{带 }\epsilon^2\text{ 及更高次的项})$</p>
@@ -265,7 +325,7 @@ py_num = partial_y(g, x0, y0)             <span class="hl-comment"># 数值计�
 $$\nabla f = \begin{bmatrix} \frac{\partial f}{\partial x} \\[4pt] \frac{\partial f}{\partial y} \end{bmatrix}$$
 <p>对 $f(x,y) = x^2 + 3xy + y^3$，梯度 = $\begin{bmatrix} 2x+3y \\ 3x+3y^2 \end{bmatrix}$。</p>
 <p>在点 $(2,3)$ 处，梯度 = $\begin{bmatrix} 13 \\ 33 \end{bmatrix}$。</p>
-<p>梯度的几何含义是下一课（00-11）的主题——这里先知道它就是把所有偏导打包成一个向量。</p>
+<p>梯度的几何含义是下一课（00-12）的主题——这里先知道它就是把所有偏导打包成一个向量。</p>
 <hr>
 <h2>💭 概念题</h2>
 <ol>
