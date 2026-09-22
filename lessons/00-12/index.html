@@ -19,6 +19,27 @@ onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',dis
 <p><strong>核心直觉：梯度向量指向函数值上升<em>最快</em>的方向。</strong></p>
 <p><strong>画面：</strong> 你站在山谷里，四周都是坡。你原地转一圈，总有一个方向是<strong>最陡的上坡</strong>——那就是梯度指的方向。梯度的大小 = 那个方向的坡度有多陡。梯度的反方向 = 最陡的下坡路。</p>
 <figure><img src="assets/gradient_contour.png" alt="梯度方向垂直于等高线"><figcaption>等高线越密坡越陡。梯度方向（红色箭头）始终<strong>垂直于等高线</strong>——这就是最陡上坡方向。沿等高线走（蓝色箭头）高度不变。</figcaption></figure>
+<h3>方向导数是在哪个坐标系里量的？</h3>
+<p>你站在一片山坡上，脚下这一点的位置是 $(x, y)$——这是<strong>地面上的位置</strong>。$xy$ 平面是<strong>地面</strong>；山坡不是它，山坡是立在地面上方的曲面，只有它的投影落在这个平面上。</p>
+<p>从脚下朝一个方向，在地面上画一支箭头 $\mathbf{u}$——<strong>箭头躺在地面里</strong>。再从这支箭头往上竖起一堵墙，这堵墙<strong>垂直于 $xy$ 平面</strong>。墙上贴两支轴：</p>
+<ul>
+<li><strong>横轴</strong>：沿 $\mathbf{u}$ 走过的路程 $s$——躺在地面里</li>
+<li><strong>纵轴</strong>：函数值 $f$——<strong>垂直于 $xy$ 平面</strong>，往上</li>
+</ul>
+<p>墙从山坡上切过去，切出一条曲线。方向导数就是这条曲线在 $s = 0$ 处的斜率。</p>
+<p><strong>这条曲线的方程：</strong></p>
+<p>$$g(s) = f(x_0 + s\mathbf{u})$$</p>
+<ul>
+<li>$s$——沿 $\mathbf{u}$ 走了多远，$s = 0$ 就是你脚下这一点</li>
+<li>$x_0 + s\mathbf{u}$——走 $s$ 步之后到达的地面位置</li>
+<li>$g(s)$——那个位置的高度</li>
+</ul>
+<p>$g$ 只有一个输入 $s$——<strong>这是一条一元函数的曲线</strong>。方向导数 $D_{\mathbf{u}}f$ 就是它的斜率，<strong>一个数</strong>。</p>
+<p><strong>为什么一定是数，不是向量？</strong>墙上只有 $s$ 和 $f$ 两支轴，量出来只能是斜率。「方向」已经被焊进横轴的刻度里——横轴走 1 格，就是地面朝 $\mathbf{u}$ 走 1 步，<strong>没有多余的维度去装第二个分量</strong>。</p>
+<p><strong>对比偏导数：</strong>选 $\mathbf{u} = (1, 0)$，$g(s) = f(x_0 + s,\; y_0)$——正是 00-11 的 $\partial f/\partial x$。偏导数是「拿坐标轴当路」，方向导数是「随便选一条路」。</p>
+<div class="callout callout-warn">
+<p>⚠️ 「竖直」在本课有两处用法，别混：绕路图里的「竖直走」是<strong>地面内</strong>沿 $y$ 轴走；这里的「垂直于 $xy$ 平面」是从<strong>地面往上</strong>。</p>
+</div>
 <div class="callout callout-info">
 <h3>为什么梯度方向最快？——方向导数完整推导</h3>
 <p><strong>第一步：方向导数的定义。</strong></p>
