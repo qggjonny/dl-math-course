@@ -98,9 +98,74 @@ $$e_{t+1} = x_{t+1} - 2 = (1-2\eta)x_t + 4\eta - 2 = (1-2\eta)(x_t - 2) = (1-2\e
 
 <p><strong>验证 $\eta = 1.5$：</strong> $1-2\eta = 1-3 = -2$，$|{-2}| = 2 > 1$ → 发散。从 $x_0 = 1$ 出发：误差 $e_0 = 1-2 = -1$（谷底在右边，人在左边）。$e_1 = (-2) \times (-1) = 2$，$|e_1| = 2 > |e_0| = 1$——越走越远。直接算：$x_1 = 1 - 1.5 \times (-2) = 1 + 3 = 4$，从谷底左边直接跳到右边更远的地方——发散无疑。</p>
 
-<p><strong>一般结论：</strong> 对二次函数 $f(x) = ax^2 + bx + c$（$a>0$），收敛条件是 $0 < \eta < 1/a$。$f''(x) = 2a$ 越大（弯越急），允许的学习率越小。</p>
+<h2>四、从特例到一般——$f(x) = ax^2 + bx + c$ 的收敛条件</h2>
+<p>特例里 $f = (x-2)^2$，谷底落在 2——好算是因为系数干净。一般二次函数只多两件事：常数项 $c$ 不影响导数（它把整条曲线上下平移，谷底位置不动），$b$ 会把谷底从原点挪走。<strong>所以麻烦全在 $b$ 上。</strong></p>
 
-<h2>四、代码验证——亲眼看到发散</h2>
+<p><strong>第一步——先找谷底。</strong>谷底是斜率为零的地方，解 $f'(x) = 2ax + b = 0$：</p>
+$$x^* = -\frac{b}{2a}$$
+<p>拿第三节的特例核对：$f = x^2 - 4x + 4$ 里 $a=1$、$b=-4$，代入得 $x^* = 4/2 = 2$——正是第三节那个谷底。</p>
+
+<p><strong>第二步——写出更新式。</strong>把 $f'(x) = 2ax + b$ 代入 $x_{t+1} = x_t - \eta f'(x_t)$：</p>
+$$x_{t+1} = x_t - \eta(2ax_t + b) = (1-2a\eta)x_t - \eta b$$
+<p>特例里没有最后那一项 $-\eta b$——这就是一般情况多出来的东西。</p>
+
+<p><strong>第三步——定义误差。</strong>和特例一样，关心离谷底多远：$e_t = x_t - x^*$。</p>
+
+<p><strong>第四步——把更新式改写成误差的式子。</strong></p>
+$$e_{t+1} = x_{t+1} - x^* = (1-2a\eta)x_t - \eta b + \frac{b}{2a}$$
+<p>后两项都是 $b$ 的倍数，先合并起来：</p>
+$$-\eta b + \frac{b}{2a} = b\left(\frac{1}{2a} - \eta\right) = b \cdot \frac{1-2a\eta}{2a}$$
+<p><strong>这一步是整条证明的关键</strong>：把 $b$ 的项也凑出公因子 $(1-2a\eta)$。特例里 $b$ 的项压根不存在，所以特例不需要这一步。代回去就闭合了：</p>
+$$e_{t+1} = (1-2a\eta)x_t + (1-2a\eta)\frac{b}{2a} = (1-2a\eta)\left(x_t + \frac{b}{2a}\right) = (1-2a\eta)\,e_t$$
+
+<p><strong>第五步——解收敛条件。</strong>误差每一步乘的是同一个数 $r = 1-2a\eta$，所以 $e_t = r^t e_0$；$|r| < 1$ 时 $r^t \to 0$，误差归零：</p>
+$$|1-2a\eta| < 1 \iff -1 < 1-2a\eta < 1 \iff 0 < \eta < \frac{1}{a}$$
+<p><strong>回看特例：</strong>$f = x^2 - 4x + 4$ 里 $a = 1$，$1/a = 1$——第三节算出的 $0 < \eta < 1$ 正是这条公式在 $a=1$ 时的样子。一般结论不是新东西，是特例的推广。</p>
+
+<p><strong>第六步——为什么「弯得越急，允许的学习率越小」。</strong>$2a$ 是斜率 $2ax + b$ 的变化速度，也就是曲线弯的急缓——它就是把导数再求一次导，记作<strong>二阶导数</strong> $f''(x) = 2a$。于是上界可以写成更干净的形式：</p>
+$$\eta_{\max} = \frac{1}{a} = \frac{2}{f''}$$
+<p>误差乘子是 $1 - \eta f''$：$f''$ 越大，同样的 $\eta$ 就把乘子推得越接近 $-1$——一步跨过谷底后误差不但没收住，反而翻转放大。一旦 $\eta f'' \ge 2$，乘子的绝对值 $\ge 1$，收敛彻底失败。这就是「弯得急的谷，只能用更小的步子」的来历。</p>
+
+<p>拿 $a=2$、$b=-3$、$c=7$ 跑一遍（谷底 $x^* = 0.75$，上界 $\eta < 0.5$），边界看得见：</p>
+
+<pre><code><span class="hl-comment"># 00-13 第三步：一般二次函数 f(x)=ax²+bx+c——用代码看 η&lt;1/a 这条边界</span>
+<span class="hl-comment"># 取 a=2, b=-3, c=7——谷底在 x*=-b/(2a)=0.75，收敛上界 1/a=0.5</span>
+a = <span class="hl-number">2.0</span>
+b = <span class="hl-number">-3.0</span>
+c = <span class="hl-number">7.0</span>
+
+<span class="hl-comment"># 谷底位置：解 f'(x)=2ax+b=0，得 x*=-b/(2a)</span>
+x_star = -b / (<span class="hl-number">2</span> * a)
+<span class="hl-comment"># 收敛上界：η 必须小于 1/a</span>
+eta_max = <span class="hl-number">1</span> / a
+<span class="hl-builtin">print</span>(<span class="hl-string">f"谷底 x*={x_star}, 收敛要求 η&lt;{eta_max}"</span>)
+
+<span class="hl-comment"># 导数 f'(x)=2ax+b——这里用 a、b 算，不再写死数字</span>
+<span class="hl-keyword">def</span> <span class="hl-funcdef">grad</span>(x):
+    <span class="hl-string">"""f'(x)=2ax+b，指向上升最快的方向"""</span>
+    <span class="hl-keyword">return</span> <span class="hl-number">2</span> * a * x + b
+
+<span class="hl-comment"># 试 3 个学习率：0.45 收敛、0.50 卡在边界、0.51 越界</span>
+<span class="hl-keyword">for</span> eta <span class="hl-keyword">in</span> [<span class="hl-number">0.45</span>, <span class="hl-number">0.50</span>, <span class="hl-number">0.51</span>]:
+    <span class="hl-comment"># 每个学习率都从同一点出发：x=1.0</span>
+    x = <span class="hl-number">1.0</span>
+    <span class="hl-comment"># 误差乘子：每步误差都乘以它，|r|&lt;1 才收敛</span>
+    r = <span class="hl-number">1</span> - <span class="hl-number">2</span> * a * eta
+    <span class="hl-comment"># 打印这个小节的开头：η 和误差乘子的绝对值</span>
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"\nη={eta:.2f}  |1-2aη|={abs(r):.2f}"</span>)
+    <span class="hl-comment"># 走 6 步，每步打印：第几步、当前位置、误差（离谷底的距离）</span>
+    <span class="hl-keyword">for</span> step <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(<span class="hl-number">6</span>):
+        <span class="hl-builtin">print</span>(<span class="hl-string">f"  第{step}步  x={x:8.4f}  e={x - x_star:8.4f}"</span>)
+        <span class="hl-comment"># 梯度下降更新：x ← x - η·f'(x)</span>
+        x = x - eta * grad(x)
+</code></pre>
+
+<p><a href="https://www.online-python.com" target="_blank">🔗 在线运行</a></p>
+
+<p>看这 3 段输出：$\eta = 0.45$ 在区间内，误差 0.2500 → −0.2000 → 0.1600 → …，<strong>符号左右横跳但绝对值每步缩为 80%</strong>（乘子 $|1-2a\eta| = 0.80$），最终归零；$\eta = 0.50$ 正好卡在 $\eta = 1/a$ 上，乘子的绝对值等于 1，误差 0.2500 → −0.2500 → 0.2500 → …，大小一点不变，人在谷底两边<strong>永远来回跳</strong>；$\eta = 0.51$ 越过上界，乘子绝对值等于 1.04，0.2500 → −0.2600 → 0.2704 → …，一步比一步大——<strong>发散</strong>。</p>
+<p>注意 $\eta = 0.45$ 那一段也出现过符号横跳（跨过谷底冲到另一侧），它照样收敛——<strong>判断收敛看的是误差的绝对值，不是符号</strong>。</p>
+
+<h2>五、代码验证——亲眼看到发散</h2>
 <p>把第三节的 $\eta=1.5$ 跑一遍，看发散长什么样：</p>
 
 <pre><code><span class="hl-comment"># 00-13 第二步：学习率太大导致发散——亲自跑一遍</span>
@@ -146,6 +211,7 @@ eta = <span class="hl-number">1.5</span>
 <li>学习率太大的后果：画面上你站在山谷一边，步子太大跨到对面山上去了，再一步又跨回来，来回振荡——永远到不了谷底。试算一下 lr=1.5 在 x=1 处（$f(x)=x^2-4x+4$）会发生什么。梯度是 $f'(1)=2\times1-4=-2$，更新后 x 变成多少？——考察：梯度下降的发散条件</li>
 <li>对于 $f(x)=x^2$，用 $\eta=0.3$ 时每步位置缩为原来的 $1-2\eta=0.4$ 倍。如果 $\eta=0.1$，每步位置缩为原来的多少倍？哪个收敛更快？为什么不是 $\eta$ 越大越好？（提示：想想 $\eta=0.9$ 会怎样）——考察：收敛速度与学习率的关系</li>
 <li>梯度下降的「自刹车」——为什么越靠近谷底步子越小？从 $f(x)=x^2$ 的导数 $f'(x)=2x$ 在 $x\to 0$ 时的行为解释。——考察：导数在极值点为零的几何后果</li>
+<li>为什么 $f(x) = ax^2$ 里 $a$ 越大，能用的学习率上界 $1/a$ 越小？从误差乘子 $1-2a\eta$ 出发解释，并说明 $\eta = 1/a$ 时误差会怎样变化。——考察：曲率（二阶导数）对收敛条件的影响</li>
 </ol>
 <p style="text-align:right"><a href="https://www.online-python.com" target="_blank">→ online-python.com 运行全部代码</a></p>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
