@@ -141,6 +141,12 @@ $$H_{ij} = \frac{\partial^2 f}{\partial x_i \partial x_j}$$
 
 <p>回到 00-05 特征值的直觉：半正定 = 所有特征值 ≥ 0。等价于沿任何方向 $\mathbf{v}$，都有 $\mathbf{v}^T H \mathbf{v} \ge 0$（二阶方向导数非负）。</p>
 
+<div class="callout callout-info">
+<strong>接上 00-13：特征值不只判凸，还定步长上限。</strong>
+<p>00-13 推出的收敛条件是 $\eta < \frac{2}{f''}$——一维时由曲率决定步子能迈多大。多元时同一个条件写成 $\eta < \frac{2}{\lambda_{\max}(H)}$：<strong>Hessian 最大特征值对应的那个方向决定步长上限</strong>，别的方向再平缓也救不了。</p>
+<p>几何画面：碗壁有陡有缓，$\lambda_{\max}$ 是最陡那个方向的弯曲程度。步长按最陡的方向来定——稍微大一点，小球就会在那个方向上被弹出去。</p>
+</div>
+
 <pre><code>
 <span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 <span class="hl-comment"># 多元凸函数：f(x,y) = x² + y²（抛物面）</span>
