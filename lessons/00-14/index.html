@@ -27,19 +27,51 @@ $$f(x) \approx f(a) + f'(a)(x-a)$$
 <p><strong>第 2 级——二次近似：加上弯曲。</strong> 再加一个"弯曲修正项"，让近似曲线在 $x=a$ 处的<strong>二阶导数（弯曲程度）也和原曲线一样</strong>：</p>
 $$f(x) \approx f(a) + f'(a)(x-a) + \frac{f''(a)}{2}(x-a)^2$$
 <p>二次项 $(x-a)^2$ 是一条抛物线——它天然有弯曲。现在两条线在 $x=a$ 处：经过同一点 ✓、坡度相同 ✓、弯曲程度相同 ✓。附近的一小段几乎完全重合。</p>
-<p><strong>第 n 级——无限逼近。</strong> 继续加三阶、四阶……每一项让更高阶的导数也匹配：</p>
-$$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \frac{f'''(a)}{3!}(x-a)^3 + \cdots$$
-<p>$n!$ 出现在分母是因为每次求导会带下来一个因子（$(x-a)^n$ 的 $n$ 阶导数是 $n!$），系数里除以 $n!$ 正好消掉。</p>
+<p><strong>规律看出来了：</strong>每加一级，就多匹配一阶导数——第 2 级已经把"弯曲"也对齐了。那"一般第 $n$ 级"长什么样？先别急着要公式，拿一个真函数算一遍，公式自己会冒出来。</p>
 </div>
-<p><strong>泰勒展开的威力：</strong> 如果 $f$ 无限可导，这个无穷级数<strong>精确等于</strong>原函数（在收敛半径内）。实践中，我们通常只取前几项就够用了——比如中央差分只用到二阶展开，已经足够让 $\epsilon^2$ 项抵消。</p>
-<figure><img src="assets/taylor_approx.png" alt="泰勒展开逐阶逼近"><figcaption>$\sin x$ 在 $x=0$ 处的泰勒展开。1 阶（红线）只是切线；3 阶（绿线）已经能追上一段曲线；5 阶（橙线）几乎重合。阶数越高，在展开点附近越精确。</figcaption></figure>
+<h2>二、先算一个具体例子：$n!$ 是怎么冒出来的</h2>
+<p>拿一个你能手算的函数走一遍：$f(x) = 2x^3 - 5x^2 + 7x + 1$，在 $a = 0$ 处展开。它只用得到 00-11 的幂函数求导规则（$x^n \to n x^{n-1}$），不需要任何新东西。</p>
+<p><strong>第一步——把各阶导数在 $a=0$ 处的值算出来。</strong>求一次导就降一阶，常数项直接归零：</p>
+$$f'(x) = 6x^2 - 10x + 7,\qquad f''(x) = 12x - 10,\qquad f'''(x) = 12$$
+<p>代入 $x = 0$：$f(0) = 1$，$f'(0) = 7$，$f''(0) = -10$，$f'''(0) = 12$。</p>
+<p><strong>第二步——按「第 $n$ 级的系数 = 该阶导数值 ÷ $n!$」把每一项算出来。</strong>这条规则为什么长这样，下一步再解释，先照做：</p>
+<table>
+  <tr><th>$n$</th><th>$f^{(n)}(0)$</th><th>$n!$</th><th>系数</th><th>这一项</th></tr>
+  <tr><td>0</td><td>1</td><td>$1!=1$</td><td>1</td><td>$1$</td></tr>
+  <tr><td>1</td><td>7</td><td>$1!=1$</td><td>7</td><td>$7x$</td></tr>
+  <tr><td>2</td><td>$-10$</td><td>$2!=2$</td><td>$-5$</td><td>$-5x^2$</td></tr>
+  <tr><td>3</td><td>12</td><td>$3!=6$</td><td>2</td><td>$2x^3$</td></tr>
+</table>
+<p>四项加起来：$1 + 7x - 5x^2 + 2x^3$——<strong>正好还原原来的函数</strong>。这不是巧合：$-10 \div 2 = -5$，$12 \div 6 = 2$，原函数的系数本来就只有这几个数。<strong>除以 $n!$ 就是把求导时被放大出去的倍数除回来。</strong></p>
+<p><strong>第三步——$n!$ 的来历：幂函数求导会一路「掉因子」。</strong>看 $x^3$ 被求三阶导的全过程，每次求导都把"当前的次数"掉下来乘到前面去：</p>
+$$x^3 \xrightarrow{\ d/dx\ } 3x^2 \xrightarrow{\ d/dx\ } 3\cdot 2\,x \xrightarrow{\ d/dx\ } 3\cdot 2\cdot 1 = 6 = 3!$$
+<p>所以 $x^n$ 求 $n$ 次导，前面挂着的就是 $n\cdot(n-1)\cdots 1 = n!$。换句话说：<strong>项 $c_n(x-a)^n$ 的 $n$ 阶导数是 $c_n\cdot n!$</strong>。</p>
+<p>而"逐级匹配"要求这一项的 $n$ 阶导数在 $x=a$ 处恰好等于 $f^{(n)}(a)$——两件事一对上：</p>
+$$c_n\cdot n! = f^{(n)}(a)\quad\Longrightarrow\quad c_n = \frac{f^{(n)}(a)}{n!}$$
+<p>分母上的 $n!$ 不是凭空规定出来的，它是<strong>求导时掉下来的那堆因子的总和</strong>：1 阶掉 1 个（$1!=1$，所以一次项看不见分母），2 阶掉 2 个（$2!=2$，就是二次项那个 2），3 阶掉 3 个（$3!=6$）。</p>
+<p><strong>把它写回「逐级逼近」，就是通用公式：</strong></p>
+$$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots + \frac{f^{(n)}(a)}{n!}(x-a)^n + \cdots$$
+<p><strong>再看一个非多项式的例子：$\sin x$。</strong>$\sin$ 的求导是四次一循环——$\sin \to \cos \to -\sin \to -\cos \to \sin$（这条课里还没讲过，此处不证；但用 00-11 的数值微分，取很小的间距用差商去近似，算出来的就是 $\cos$，你可以自己试）。于是</p>
+$$f(0)=0,\quad f'(0)=1,\quad f''(0)=0,\quad f'''(0)=-1,\quad f^{(4)}(0)=0,\quad f^{(5)}(0)=1,\ \cdots$$
+<p>偶数阶全是 0（$\sin$ 是奇函数），所以展开式里只剩奇次项，系数照样按 $1/n!$ 算：</p>
+$$\sin x = x - \frac{x^3}{3!} + \frac{x^5}{5!} - \frac{x^7}{7!} + \cdots = x - \frac{x^3}{6} + \frac{x^5}{120} - \frac{x^7}{5040} + \cdots$$
+<p>取 $x = 1$ 看它准不准（真值 $\sin 1 = 0.841471$）：</p>
+<table>
+  <tr><th>加到哪一项</th><th>算出来的值</th><th>误差</th></tr>
+  <tr><td>$x$</td><td>1.000000</td><td>$1.6\times 10^{-1}$</td></tr>
+  <tr><td>再减 $x^3/6$</td><td>0.833333</td><td>$8.1\times 10^{-3}$</td></tr>
+  <tr><td>再加 $x^5/120$</td><td>0.841667</td><td>$2.0\times 10^{-4}$</td></tr>
+  <tr><td>再减 $x^7/5040$</td><td>0.841468</td><td>$2.7\times 10^{-6}$</td></tr>
+</table>
+<p>每多加一项，误差掉大约两个数量级——这就是"阶数越高、在展开点附近越贴合"的实际含义。</p>
+<figure><img src="assets/taylor_approx.png" alt="泰勒展开逐阶逼近"><figcaption>$\sin x$ 在 $x=0$ 处的泰勒展开。1 阶（红线）只是切线；3 阶（绿线）已经能追上一段曲线；5 阶（橙线）几乎重合——和上面那张表的四行数字是同一件事。</figcaption></figure>
+<p><strong>泰勒展开的威力：</strong> 如果 $f$ 无限可导，这个无穷级数<strong>精确等于</strong>原函数（在收敛半径内）。实践中，我们通常只取前几项就够用了——比如后面要讲的中央差分只用到二阶展开，已经足够让 $\epsilon^2$ 项抵消。</p>
 <hr>
 <h2>🖥️ 代码</h2>
 <pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 <span class="hl-comment"># ===== 数值微分：用代码算坡度 =====</span>
 <span class="hl-keyword">def</span> <span class="hl-func">num_grad</span>(f, x, eps=<span class="hl-number">1e-5</span>):
-<span class="hl-string">    pass
-    """中央差分：往前走一丁点，往后退一丁点，算平均坡度
+<span class="hl-string">    """中央差分：往前走一丁点，往后退一丁点，算平均坡度
 (f(x+eps)-f(x-eps)) / (2*eps) 
 精度比单边高：单边只看"往前"，中央看了"前后"然后取平均，误差抵消了一部分
 """</span>
@@ -53,11 +85,6 @@ $$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \frac{f'''(a)}{3!}(x-a)^
     <span class="hl-comment"># 理论：f'(x)=2x</span>
     t = <span class="hl-number">2</span> * x
     <span class="hl-builtin">print</span>(<span class="hl-string">f"数值={n:.6f} 理论={t:.0f}"</span>)
-<span class="hl-comment"># 数值近似</span>
-n = num_grad(sq, x)
-<span class="hl-comment"># 理论：f'(x)=2x</span>
-t = <span class="hl-number">2</span> * x
-<span class="hl-builtin">print</span>(<span class="hl-string">f"f'({x}) 数值={n:.6f}  理论={t}"</span>)
 <span class="hl-comment"># ===== 梯度下降：从山顶走到山谷 =====</span>
 <span class="hl-comment"># f(x)=x²-4x+4 的最小值在 x=2（f'(x)=2x-4=0 → x=2）</span>
 <span class="hl-comment"># 站在 x=0 的位置</span>
@@ -103,6 +130,7 @@ $$\frac{f(x+\epsilon)-f(x-\epsilon)}{2\epsilon} = f'(x) + \underbrace{\frac{\eps
 <hr>
 <h2>💭 概念题</h2>
 <ol>
+<li>展开式里为什么每一项都要除以 $n!$？拿 $f(x)=2x^3-5x^2+7x+1$ 过一遍：$f''(0)/2! = -10/2 = -5$、$f'''(0)/3! = 12/6 = 2$——这两个数分别是原式里哪一项的系数？——考察：$n!$ 是求导时掉下来的因子，除以它才能把系数还原</li>
 <li>中央差分为什么比单边差分更精确？中央用 $(x+\epsilon)$ 和 $(x-\epsilon)$ 两边的信息取平均，单边只用一边。在你心里过一遍：x² 的中央差分计算结果比单边差分更接近 2x 吗？——考察：对称差分抵消误差</li>
 </ol>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
