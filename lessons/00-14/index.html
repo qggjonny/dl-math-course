@@ -13,69 +13,73 @@ onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',dis
 <div class="container">
 <h1>00-14 泰勒展开与数值微分</h1>
 <hr>
-<h2>一、泰勒展开：用多项式"克隆"一条曲线</h2>
-<p><strong>画面：</strong> 你有一条弯弯曲曲的曲线 $f(x)$，太复杂了不好算。你想找一条<strong>简单的多项式</strong>来代替它——至少在某个点 $x=a$ 附近，让它和原曲线"长得很像"。</p>
-<p>怎么做到？一层一层地逼近：</p>
-<div class="callout callout-info">
-<h3>逐级逼近：从"经过同一点"到"弯曲程度都一样"</h3>
-<p><strong>第 0 级——常数近似：经过同一点。</strong> 最简单的近似就是一条水平线，让它和原曲线在 $x=a$ 处相交：</p>
-$$f(x) \approx f(a)$$
-<p>这就保证了两条线<strong>经过同一点</strong>。但在那点附近，水平线很快就偏离了原曲线——因为原曲线有坡度，水平线没有。</p>
-<p><strong>第 1 级——线性近似：切线。</strong> 加上坡度修正：让近似曲线不仅经过同一点，而且在 $x=a$ 处的<strong>斜率也一样</strong>：</p>
-$$f(x) \approx f(a) + f'(a)(x-a)$$
-<p>这就是切线方程。两条线现在<strong>相切</strong>——既经过同一点，又有同样的坡度。在 $x=a$ 极近处，切线已经非常接近原曲线了。但稍微走远一点，切线是直的，原曲线却是弯的——两者还是会分开。</p>
-<p><strong>为什么右边这个式子就是切线？</strong>关键只有一句话：<strong>$f(a)$ 和 $f'(a)$ 都是数</strong>（常数），式子里唯一会变的是 $x$。看清这两块各自是什么：</p>
-$$L(x) = \underbrace{f(a)}_{\text{常数}} \;+\; \underbrace{f'(a)\,(x-a)}_{\text{固定倍数 } f'(a) \text{ 乘 } (x-a)}$$
-<p>常数 $f(a)$ 求导得 $0$（水平线没有坡度）；$(x-a)$ 求导得 $1$，而 $f'(a)$ 只是个固定的放大倍数——固定倍数不参与求导，只把结果放大同样的倍数。于是整条线（叫它 $L$）的斜率处处是 $f'(a)$，<strong>不管 $x$ 取哪都一样</strong>：</p>
-$$L'(x) = 0 + f'(a)\cdot 1 = f'(a)$$
-<p>而原曲线 $f$ 在 $x = a$ 处的斜率正好也是 $f'(a)$（这就是 00-11 里导数的定义）。<strong>两边斜率一致，再加上 $L(a) = f(a) + f'(a)\cdot 0 = f(a)$（经过同一点），两条线在 $x = a$ 处就相切了</strong>——"相切"的定义就是这两条：经过同一点 ✓、斜率相同 ✓。所以它不是"长得像"切线，它<strong>就是</strong>切线。</p>
-<p><strong>那括号里为什么要减 $a$？</strong>因为"斜率对"只是条件的一半，另一半是这条线必须<strong>经过 $f$ 上那个点</strong>。$(x-a)$ 就是"从 $a$ 出发量出来的水平距离"：$x = a$ 时它正好等于 $0$，于是 $f'(a)(x-a)$ 这一项消失，只剩 $f(a)$：</p>
-$$L(a) = f(a) + f'(a)\cdot 0 = f(a)$$
-<p>两条线在 $a$ 处高度相同——这就是"经过同一点"。<strong>如果把 $a$ 省掉、写成 $f(a) + f'(a)x$，求导结果一模一样、斜率照样是 $f'(a)$</strong>，但它经过的点变了：代 $f = x^2$、$a = 2$（$f(2) = 4$、$f'(2) = 4$）得到 $4 + 4x$，在 $x = 2$ 处高度是 $12$，比曲线上的 $4$ 高出 $8 = f'(a)\cdot a$。<strong>斜率相同、位置错开——那是一条平行线，不是切线。</strong>两个条件缺一不可：<strong>斜率靠 $f'(a)$，经过哪个点靠 $(x-a)$。</strong></p>
-<p>但右边是直线、左边是曲线，除了 $x = a$ 那一点外并不相等，所以只能写 $\approx$——差的那部分恰好是 $(x-a)^2$（$f = x^2$、$a = 2$ 时可以精确算：$x = 2.1$ 差 $0.01$、$x = 3$ 差 $1$、$x = 4$ 差 $4$，全都等于 $(x-a)^2$）。这正是第 2 级要补上的那一项。</p>
-<p><strong>第 2 级——二次近似：加上弯曲。</strong> 再加一个"弯曲修正项"，让近似曲线在 $x=a$ 处的<strong>二阶导数（弯曲程度）也和原曲线一样</strong>：</p>
-$$f(x) \approx f(a) + f'(a)(x-a) + \frac{f''(a)}{2}(x-a)^2$$
-<p>二次项 $(x-a)^2$ 是一条抛物线——它天然有弯曲。现在两条线在 $x=a$ 处：经过同一点 ✓、坡度相同 ✓、弯曲程度相同 ✓。附近的一小段几乎完全重合。</p>
-<p><strong>规律看出来了：</strong>每加一级，就多匹配一阶导数——第 2 级已经把"弯曲"也对齐了。那"一般第 $n$ 级"长什么样？先别急着要公式，拿一个真函数算一遍，公式自己会冒出来。</p>
-</div>
-<h2>二、先算一个具体例子：$n!$ 是怎么冒出来的</h2>
-<p>拿一个你能手算的函数走一遍：$f(x) = 2x^3 - 5x^2 + 7x + 1$，在 $a = 0$ 处展开。它只用得到 00-11 的幂函数求导规则（$x^n \to n x^{n-1}$），不需要任何新东西。</p>
-<p><strong>第一步——把各阶导数在 $a=0$ 处的值算出来。</strong>求一次导就降一阶，常数项直接归零：</p>
-$$f'(x) = 6x^2 - 10x + 7,\qquad f''(x) = 12x - 10,\qquad f'''(x) = 12$$
-<p>代入 $x = 0$：$f(0) = 1$，$f'(0) = 7$，$f''(0) = -10$，$f'''(0) = 12$。</p>
-<p><strong>第二步——按「第 $n$ 级的系数 = 该阶导数值 ÷ $n!$」把每一项算出来。</strong>这条规则为什么长这样，下一步再解释，先照做：</p>
+<h2>一、先看公式：用多项式"克隆"一条曲线</h2>
+<p><strong>目标：</strong>一条复杂的曲线 $f(x)$ 不好算，我们想找一条<strong>简单的多项式</strong>来代替它——至少在某个点 $x=a$ 附近，和它长得一模一样。</p>
+<p>这个多项式长什么样，公式直接给出来了。$f$ 在 $x=a$ 处的<strong>泰勒展开</strong>是：</p>
+$$f(x) = f(a) + f'(a)\,\frac{(x-a)}{1!} + f''(a)\,\frac{(x-a)^2}{2!}$$
+$$+ f'''(a)\,\frac{(x-a)^3}{3!} + \cdots$$
+$$+ f^{(n)}(a)\,\frac{(x-a)^n}{n!} + \cdots$$
+<p><strong>记号约定：</strong>$f^{(n)}(a)$ 表示"$f$ 求 $n$ 次导之后代入 $a$"（$f^{(0)}(a) = f(a)$、$f^{(1)}(a) = f'(a)$、$f^{(2)}(a) = f''(a)$）；$n!$ 是阶乘，$1! = 1$、$2! = 2$、$3! = 6$、$4! = 24$、$5! = 120$，规则是 $n! = n\cdot(n-1)\cdots 1$。</p>
+<p>公式很长，但结构极简单：<strong>右边每一项，只负责"对上" $f$ 的一阶导数</strong>——第 1 项对上函数值，第 2 项对上斜率（切线），第 3 项对上二阶导数……把每一阶都对上，两条曲线在 $a$ 点附近就重合了。下面逐项拆开看。</p>
+<p>（如果 $f$ 无限可导，这个无穷级数在收敛半径内<strong>精确等于</strong> $f(x)$；实际使用时通常只取前几项。）</p>
+<h2>二、逐项拆解：每一项只负责一阶导数</h2>
+<p>把右边第 $n$ 项单独拎出来，记作 $T_n$：</p>
+$$T_n = f^{(n)}(a)\cdot\frac{(x-a)^n}{n!}$$
+<p>它的本事在"求 $n$ 次导"这一步上。先看 $(x-a)^n$ 被求 $n$ 次导会发生什么——每求一次导，就把当前的次数掉下来乘到前面：</p>
+$$(x-a)^n \xrightarrow{\ n\text{ 次导数}\ } n\cdot(n-1)\cdots 2\cdot 1 = n!$$
+<p>再除以下面那个 $n!$：$\frac{n!}{n!} = 1$。所以分母的 $n!$ 正好把掉下来的因子消干净：</p>
+$$\frac{(x-a)^n}{n!} \xrightarrow{\ n\text{ 次导数}\ } 1$$
+$$\Longrightarrow\qquad T_n \xrightarrow{\ n\text{ 次导数}\ } f^{(n)}(a)$$
+<p><strong>一句话：第 $n$ 项求 $n$ 次导，得到的正好是 $f^{(n)}(a)$。这就是它存在的唯一理由。</strong></p>
+<p>其他项会不会来捣乱？不会。次数<strong>低于</strong> $n$ 的项（比如 $f(a)$、$f'(a)(x-a)$）求 $n$ 次导后全是 $0$；次数<strong>高于</strong> $n$ 的项求 $n$ 次导后仍然带着 $(x-a)$，代入 $x = a$ 还是 $0$。所以在 $x=a$ 处，第 $n$ 阶导数只由 $T_n$ 一个项贡献——<strong>各管一阶，互不干扰</strong>。</p>
+<p>把 $n = 0, 1, 2$ 各看一遍，这个"对号入座"就清楚了。</p>
+<h3>第 0 项：对上"函数值"</h3>
+$$T_0 = f(a)$$
+<p>它是常数，管的是高度：$x = a$ 时所有 $n \ge 1$ 的项都带着 $(x-a)$、全部归零，只剩 $f(a)$，所以两边在 $a$ 处高度相同 ✓</p>
+<h3>第 1 项：对上"斜率"——这就是切线</h3>
+$$T_1 = f'(a)\cdot(x-a)$$
+<p>注意 $f(a)$ 和 $f'(a)$ 都是<strong>数（常数）</strong>，式子里只有 $x$ 在变。求导：常数 $f(a)$ 得 $0$；$(x-a)$ 得 $1$；$f'(a)$ 是固定的倍数，不参与求导。所以前两项加起来</p>
+$$L(x) = f(a) + f'(a)(x-a)$$
+$$\Longrightarrow\qquad L'(x) = f'(a)$$
+<p>斜率处处是 $f'(a)$，而原曲线在 $x=a$ 处的斜率也正是 $f'(a)$（00-11 里导数的定义）；再加上 $L(a) = f(a)$（经过同一点）。"相切"的定义就是这两条——经过同一点 ✓、斜率相同 ✓，所以 <strong>$L$ 就是 $f$ 在 $a$ 处的切线</strong>。</p>
+<p><strong>为什么括号里要减 $a$？</strong>为了让这一项<strong>在 $x=a$ 处自动消失</strong>：$x = a$ 时 $(x-a) = 0$，它归零，只剩 $f(a)$，高度才对得上。若写成 $f(a) + f'(a)x$，斜率照样是 $f'(a)$，但在 $x=a$ 处高度变成 $f(a) + f'(a)a$——整条线平移了，成了平行线（$f = x^2$、$a = 2$ 时高出 $8 = f'(a)\cdot a$），那就不是切线。</p>
+<h3>第 2 项：对上"二阶导数"</h3>
+$$T_2 = f''(a)\cdot\frac{(x-a)^2}{2!}$$
+<p>照它自己的规矩：求两次导。$(x-a)^2$ 第一次得 $2(x-a)$，第二次得 $2$；再除以 $2! = 2$，结果是 $1$。所以 $T_2$ 求两次导贡献 $f''(a)$。而 $T_0$（常数）、$T_1$（一次项）求两次导都是 $0$；$T_3$ 及更高项求两次导还带着 $(x-a)$，在 $x=a$ 处为 $0$。于是<strong>在 $a$ 处二阶导数只由 $T_2$ 贡献</strong> ✓——这一项就是用来把"弯曲"对上的。</p>
+<h3>第 $n$ 项：一般情形</h3>
+<p>把上面的规律一般化：<strong>$T_n$ 在 $x=a$ 处只贡献第 $n$ 阶导数，数值恰好是 $f^{(n)}(a)$；其余各阶都由零贡献。</strong>于是"$f$ 的第 $n$ 阶导数在 $a$ 处等于 $f^{(n)}(a)$"这件事对每个 $n$ 都成立——这正是右边那些项拼起来就能替代 $f$ 的原因。取的项越多，对上的阶数越高，在 $a$ 点附近贴得越紧。</p>
+<h2>三、$n!$ 为什么写在 $(x-a)^n$ 下面</h2>
+<p>看 $(x-a)^3$ 被求三阶导的全过程——每次求导都把当前的次数掉下来乘到前面：</p>
+$$\begin{aligned} (x-a)^3 &\xrightarrow{\ \text{1 次}\ } 3(x-a)^2 \\[4pt] &\xrightarrow{\ \text{2 次}\ } 3\cdot 2\,(x-a) \\[4pt] &\xrightarrow{\ \text{3 次}\ } 3\cdot 2\cdot 1 = 6 = 3! \end{aligned}$$
+<p>掉下来的因子是 $n\cdot(n-1)\cdots 1 = n!$。也就是说，<strong>$(x-a)^n$ 求 $n$ 次导，前面会多出 $n!$ 倍</strong>。而我们要求这一项"不多不少，正好贡献 $f^{(n)}(a)$"——所以把 $n!$ 写在 $(x-a)^n$ 下面除一下，正好抵消：</p>
+$$\frac{(x-a)^n}{n!} \xrightarrow{\ n\text{ 次导数}\ } \frac{n!}{n!} = 1$$
+<p><strong>分母的 $n!$ 不是凭空规定，它是"求导时掉下来的那堆因子的总和"，摆在这里正好消掉。</strong>看具体数：$1! = 1$（一次项看不出分母）、$2! = 2$（二次项那个 2 就是这么来的）、$3! = 6$、$5! = 120$。</p>
+<h2>四、拿真函数验一遍</h2>
+<p>公式和 $n!$ 都拆完了，用一个能手算的函数把"每一项各管一阶导数"验一遍：$f(x) = 2x^3 - 5x^2 + 7x + 1$，在 $a = 0$ 处展开。它只用得到 00-11 的幂函数求导规则（$x^n \to n x^{n-1}$）。</p>
+<p><strong>第一步——各阶导数在 $0$ 处的值。</strong>求一次导就降一阶，常数项直接归零：</p>
+$$\begin{aligned} f'(x) &= 6x^2 - 10x + 7 \\[4pt] f''(x) &= 12x - 10, \qquad f'''(x) = 12 \end{aligned}$$
+<p>代入 $x = 0$：$f(0) = 1$、$f'(0) = 7$、$f''(0) = -10$、$f'''(0) = 12$。</p>
+<p><strong>第二步——按公式摆出每一项。</strong>（$a = 0$ 时 $(x-a)^n$ 就是 $x^n$。）</p>
 <table>
-  <tr><th>$n$</th><th>$f^{(n)}(0)$</th><th>$n!$</th><th>系数</th><th>这一项</th></tr>
-  <tr><td>0</td><td>1</td><td>$1!=1$</td><td>1</td><td>$1$</td></tr>
-  <tr><td>1</td><td>7</td><td>$1!=1$</td><td>7</td><td>$7x$</td></tr>
-  <tr><td>2</td><td>$-10$</td><td>$2!=2$</td><td>$-5$</td><td>$-5x^2$</td></tr>
-  <tr><td>3</td><td>12</td><td>$3!=6$</td><td>2</td><td>$2x^3$</td></tr>
+  <tr><th>$n$</th><th>$f^{(n)}(0)$</th><th>$n!$</th><th>这一项</th><th>它负责对上</th></tr>
+  <tr><td>0</td><td>1</td><td>$1!=1$</td><td>$1$</td><td>函数值 $f(0) = 1$</td></tr>
+  <tr><td>1</td><td>7</td><td>$1!=1$</td><td>$7x$</td><td>斜率 $f'(0) = 7$</td></tr>
+  <tr><td>2</td><td>$-10$</td><td>$2!=2$</td><td>$-5x^2$</td><td>二阶导 $f''(0) = -10$</td></tr>
+  <tr><td>3</td><td>12</td><td>$3!=6$</td><td>$2x^3$</td><td>三阶导 $f'''(0) = 12$</td></tr>
 </table>
-<p>四项加起来：$1 + 7x - 5x^2 + 2x^3$——<strong>正好还原原来的函数</strong>。这不是巧合：$-10 \div 2 = -5$，$12 \div 6 = 2$，原函数的系数本来就只有这几个数。<strong>除以 $n!$ 就是把求导时被放大出去的倍数除回来。</strong></p>
-<p><strong>第三步——$n!$ 的来历：幂函数求导会一路「掉因子」。</strong>看 $x^3$ 被求三阶导的全过程，每次求导都把"当前的次数"掉下来乘到前面去：</p>
-$$x^3 \xrightarrow{\ d/dx\ } 3x^2 \xrightarrow{\ d/dx\ } 3\cdot 2\,x \xrightarrow{\ d/dx\ } 3\cdot 2\cdot 1 = 6 = 3!$$
-<p>所以 $x^n$ 求 $n$ 次导，前面挂着的就是 $n\cdot(n-1)\cdots 1 = n!$。换句话说：<strong>项 $c_n(x-a)^n$ 的 $n$ 阶导数是 $c_n\cdot n!$</strong>。</p>
-<p>而"逐级匹配"要求这一项的 $n$ 阶导数在 $x=a$ 处恰好等于 $f^{(n)}(a)$——两件事一对上：</p>
-$$c_n\cdot n! = f^{(n)}(a)\quad\Longrightarrow\quad c_n = \frac{f^{(n)}(a)}{n!}$$
-<p>分母上的 $n!$ 不是凭空规定出来的，它是<strong>求导时掉下来的那堆因子的总和</strong>：1 阶掉 1 个（$1!=1$，所以一次项看不见分母），2 阶掉 2 个（$2!=2$，就是二次项那个 2），3 阶掉 3 个（$3!=6$）。</p>
-<p><strong>把它写回「逐级逼近」，就是通用公式：</strong></p>
-$$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots + \frac{f^{(n)}(a)}{n!}(x-a)^n + \cdots$$
-<p><strong>再看一个非多项式的例子：$\sin x$。</strong>$\sin$ 的求导是四次一循环——$\sin \to \cos \to -\sin \to -\cos \to \sin$（这条课里还没讲过，此处不证；但用 00-11 的数值微分，取很小的间距用差商去近似，算出来的就是 $\cos$，你可以自己试）。于是</p>
-$$f(0)=0,\quad f'(0)=1,\quad f''(0)=0,\quad f'''(0)=-1,\quad f^{(4)}(0)=0,\quad f^{(5)}(0)=1,\ \cdots$$
-<p>偶数阶全是 0（$\sin$ 是奇函数），所以展开式里只剩奇次项，系数照样按 $1/n!$ 算：</p>
-$$\sin x = x - \frac{x^3}{3!} + \frac{x^5}{5!} - \frac{x^7}{7!} + \cdots = x - \frac{x^3}{6} + \frac{x^5}{120} - \frac{x^7}{5040} + \cdots$$
+<p>四项加起来：$1 + 7x - 5x^2 + 2x^3$——<strong>正好还原原来的函数</strong>。这不是巧合：$-10 \div 2 = -5$、$12 \div 6 = 2$，原函数的系数本来就只有这几个数。<strong>除以 $n!$ 就是把求导时被放大出去的倍数除回来。</strong></p>
+<p><strong>再看一个非多项式的例子——$\sin x$，看"对上更多阶导数"的威力。</strong>$\sin$ 的求导是四次一循环（$\sin \to \cos \to -\sin \to -\cos \to \sin$——课里还没讲过，此处不证；用 00-11 的数值微分取很小的间距近似，算出来就是 $\cos$）。于是 $f^{(n)}(0)$ 依次是 $0, 1, 0, -1, 0, 1, \cdots$，偶数阶全为 0（奇函数），展开式里只剩奇次项：</p>
+$$\begin{aligned} \sin x &= x - \frac{x^3}{3!} + \frac{x^5}{5!} - \frac{x^7}{7!} + \cdots \\[4pt] &= x - \frac{x^3}{6} + \frac{x^5}{120} - \frac{x^7}{5040} + \cdots \end{aligned}$$
 <p>取 $x = 1$ 看它准不准（真值 $\sin 1 = 0.841471$）：</p>
 <table>
-  <tr><th>加到哪一项</th><th>算出来的值</th><th>误差</th></tr>
-  <tr><td>$x$</td><td>1.000000</td><td>$1.6\times 10^{-1}$</td></tr>
-  <tr><td>再减 $x^3/6$</td><td>0.833333</td><td>$8.1\times 10^{-3}$</td></tr>
-  <tr><td>再加 $x^5/120$</td><td>0.841667</td><td>$2.0\times 10^{-4}$</td></tr>
-  <tr><td>再减 $x^7/5040$</td><td>0.841468</td><td>$2.7\times 10^{-6}$</td></tr>
+  <tr><th>多留一项</th><th>算出来的值</th><th>误差</th></tr>
+  <tr><td>只留 $x$</td><td>1.000000</td><td>$1.6\times 10^{-1}$</td></tr>
+  <tr><td>再留 $x^3/6$</td><td>0.833333</td><td>$8.1\times 10^{-3}$</td></tr>
+  <tr><td>再留 $x^5/120$</td><td>0.841667</td><td>$2.0\times 10^{-4}$</td></tr>
+  <tr><td>再留 $x^7/5040$</td><td>0.841468</td><td>$2.7\times 10^{-6}$</td></tr>
 </table>
-<p>每多加一项，误差掉大约两个数量级——这就是"阶数越高、在展开点附近越贴合"的实际含义。</p>
+<p>每多留一项，误差掉大约两个数量级——这就是"对上的阶数越高、在 $a$ 点附近贴得越紧"的实际含义。</p>
 <figure><img src="assets/taylor_approx.png" alt="泰勒展开逐阶逼近"><figcaption>$\sin x$ 在 $x=0$ 处的泰勒展开。1 阶（红线）只是切线；3 阶（绿线）已经能追上一段曲线；5 阶（橙线）几乎重合——和上面那张表的四行数字是同一件事。</figcaption></figure>
-<p><strong>泰勒展开的威力：</strong> 如果 $f$ 无限可导，这个无穷级数<strong>精确等于</strong>原函数（在收敛半径内）。实践中，我们通常只取前几项就够用了——比如后面要讲的中央差分只用到二阶展开，已经足够让 $\epsilon^2$ 项抵消。</p>
-<hr>
 <h2>🖥️ 代码</h2>
 <pre><code><span class="hl-keyword">import</span> numpy <span class="hl-keyword">as</span> np
 <span class="hl-comment"># ===== 数值微分：用代码算坡度 =====</span>
@@ -114,32 +118,36 @@ lr = <span class="hl-number">0.1</span>
 <h3>为什么中央差分比单边更精确？——泰勒展开揭密</h3>
 <p>代码注释说「误差抵消了一部分」——到底怎么抵消的？用泰勒展开来算。</p>
 <p><strong>单边差分（只看往前）：</strong></p>
-$$f(x+\epsilon) = f(x) + \epsilon f'(x) + \frac{\epsilon^2}{2} f''(x) + \frac{\epsilon^3}{6} f'''(x) + O(\epsilon^4)$$
+$$f(x+\epsilon) = f(x) + \epsilon f'(x) + f''(x)\frac{\epsilon^2}{2!}$$
+$$+ f'''(x)\frac{\epsilon^3}{3!} + O(\epsilon^4)$$
 <p>移项：</p>
-$$\frac{f(x+\epsilon)-f(x)}{\epsilon} = f'(x) + \underbrace{\frac{\epsilon}{2}f''(x) + O(\epsilon^2)}_{\text{误差项：首项是 } O(\epsilon)}$$
-<p>误差的主导项是 $\frac{\epsilon}{2}f''(x)$——和 $\epsilon$ 成正比。$\epsilon$ 缩小 10 倍，误差大约缩小 10 倍。</p>
+$$\frac{f(x+\epsilon)-f(x)}{\epsilon} = f'(x) + \underbrace{f''(x)\frac{\epsilon}{2!} + O(\epsilon^2)}_{\text{误差项：首项是 } O(\epsilon)}$$
+<p>误差的主导项是 $f''(x)\frac{\epsilon}{2!}$——和 $\epsilon$ 成正比。$\epsilon$ 缩小 10 倍，误差大约缩小 10 倍。</p>
 <p><strong>中央差分（看前后）：</strong>写出 $f(x+\epsilon)$ 和 $f(x-\epsilon)$ 两个泰勒展开：</p>
 $$
 \begin{aligned}
-f(x+\epsilon) &= f(x) + \epsilon f'(x) + \frac{\epsilon^2}{2} f''(x) + \frac{\epsilon^3}{6} f'''(x) + \frac{\epsilon^4}{24} f''''(x) + \cdots \\[4pt]
-f(x-\epsilon) &= f(x) - \epsilon f'(x) + \frac{\epsilon^2}{2} f''(x) - \frac{\epsilon^3}{6} f'''(x) + \frac{\epsilon^4}{24} f''''(x) - \cdots
+f(x+\epsilon) &= f(x) + \epsilon f'(x) + f''(x)\frac{\epsilon^2}{2!} \\[4pt]
+&\quad + f'''(x)\frac{\epsilon^3}{3!} + f''''(x)\frac{\epsilon^4}{4!} + \cdots \\[4pt]
+f(x-\epsilon) &= f(x) - \epsilon f'(x) + f''(x)\frac{\epsilon^2}{2!} \\[4pt]
+&\quad - f'''(x)\frac{\epsilon^3}{3!} + f''''(x)\frac{\epsilon^4}{4!} - \cdots
 \end{aligned}
 $$
 <p><strong>相减：</strong>$f(x+\epsilon) - f(x-\epsilon)$：</p>
 <ul>
 <li>$f(x)$ 消掉（都有，相减得 0）</li>
 <li>$\epsilon f'(x) - (-\epsilon f'(x)) = 2\epsilon f'(x)$ ← 保留</li>
-<li>$\frac{\epsilon^2}{2}f''(x) - \frac{\epsilon^2}{2}f''(x) = 0$ ← <strong>抵！消！了！</strong></li>
-<li>$\frac{\epsilon^3}{6}f'''(x) - (-\frac{\epsilon^3}{6}f'''(x)) = \frac{\epsilon^3}{3}f'''(x)$</li>
+<li>$f''(x)\frac{\epsilon^2}{2!} - f''(x)\frac{\epsilon^2}{2!} = 0$ ← <strong>抵！消！了！</strong></li>
+<li>$f'''(x)\frac{\epsilon^3}{3!} - (-f'''(x)\frac{\epsilon^3}{3!}) = f'''(x)\cdot\frac{2\epsilon^3}{3!}$</li>
 </ul>
-$$\frac{f(x+\epsilon)-f(x-\epsilon)}{2\epsilon} = f'(x) + \underbrace{\frac{\epsilon^2}{6}f'''(x) + O(\epsilon^4)}_{\text{误差项：首项是 } O(\epsilon^2)}$$
-<p><strong>关键：</strong>相减时 $\epsilon^2$ 项<strong>同号抵消</strong>了！剩余误差主导项是 $\frac{\epsilon^2}{6}f'''(x)$——和 $\epsilon^2$ 成正比。$\epsilon$ 缩小 10 倍，误差缩小 100 倍。这就是为什么中央差分比单边差分高一个精度量级。</p>
+$$\frac{f(x+\epsilon)-f(x-\epsilon)}{2\epsilon} = f'(x)$$
+$$+ \underbrace{f'''(x)\frac{\epsilon^2}{3!} + O(\epsilon^4)}_{\text{误差项：首项是 } O(\epsilon^2)}$$
+<p><strong>关键：</strong>相减时 $\epsilon^2$ 项<strong>同号抵消</strong>了！剩余误差主导项是 $f'''(x)\frac{\epsilon^2}{3!}$——和 $\epsilon^2$ 成正比。$\epsilon$ 缩小 10 倍，误差缩小 100 倍。这就是为什么中央差分比单边差分高一个精度量级。</p>
 <p><strong>直观理解：</strong>单边差分就像只看了看你前方一毫米的地形，就猜整条路的坡度——局部信息有限。中央差分同时看了前方和后方，左右信息对称，把「地形弯曲」带来的偏差对消掉了。</p>
 </div>
 <hr>
 <h2>💭 概念题</h2>
 <ol>
-<li>展开式里为什么每一项都要除以 $n!$？拿 $f(x)=2x^3-5x^2+7x+1$ 过一遍：$f''(0)/2! = -10/2 = -5$、$f'''(0)/3! = 12/6 = 2$——这两个数分别是原式里哪一项的系数？——考察：$n!$ 是求导时掉下来的因子，除以它才能把系数还原</li>
+<li>公式里为什么把 $n!$ 写在 $(x-a)^n$ 的下面？把 $(x-a)^3$ 求三次导走一遍，看掉下来的因子是多少；再说清"除了这个 $n!$ 之后，这一项对三阶导数的贡献是几"。——考察：$n!$ 是求导掉下来的因子，除在幂下面正好抵消，使每一项恰好对上自己那一阶导数</li>
 <li>中央差分为什么比单边差分更精确？中央用 $(x+\epsilon)$ 和 $(x-\epsilon)$ 两边的信息取平均，单边只用一边。在你心里过一遍：x² 的中央差分计算结果比单边差分更接近 2x 吗？——考察：对称差分抵消误差</li>
 </ol>
 <nav class="top-nav" style="padding:0;margin-top:2rem;justify-content:space-between">
