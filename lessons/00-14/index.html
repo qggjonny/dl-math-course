@@ -155,21 +155,27 @@ lr = <span class="hl-number">0.1</span>
 <div class="callout callout-info">
 <h3>为什么中央差分比单边更精确？——泰勒展开揭密</h3>
 <p>数值微分是近似，那就要问：<strong>它有多准？</strong>——这个问题只有泰勒展开能回答：把 $f$ 在 $x$ 处展开，误差是从哪一项漏出来的、随 $\epsilon$ 怎么变，看得一清二楚。</p>
-<p><strong>单边差分（只看往前）：</strong></p>
-$$f(x+\epsilon) = f(x) + \epsilon f'(x) + f''(x)\frac{\epsilon^2}{2!}$$
-$$+ f'''(x)\frac{\epsilon^3}{3!} + O(\epsilon^4)$$
-<p>移项：</p>
+<p><strong>先看单边差分（只看往前）。</strong>它用的展开式不是新东西——就是「一、先看公式」里的通用公式，把字母换掉而已。通用公式（在 $a$ 处展开）：</p>
+$$f(u) = f(a) + f'(a)(u-a) + f''(a)\frac{(u-a)^2}{2!}$$
+$$+ f'''(a)\frac{(u-a)^3}{3!} + \cdots$$
+<p>（第一项分母是 $1! = 1$，所以直接写成 $f'(a)(u-a)$。）</p>
+<p>要算 $f(x+\epsilon)$，就把字母换成这一次的：</p>
+<ul>
+<li>展开点取 $a = x$ → 所有导数都在 $x$ 处取值：$f(x)$、$f'(x)$、$f''(x)$……</li>
+<li>要算的点取 $u = x + \epsilon$ → 位移是 $u - a = (x+\epsilon) - x = \epsilon$</li>
+</ul>
+<p>代进去（$(u-a)$ 全部换成 $\epsilon$）：</p>
+$$f(x+\epsilon) = f(x) + f'(x)\epsilon + f''(x)\frac{\epsilon^2}{2!}$$
+$$+ f'''(x)\frac{\epsilon^3}{3!} + \cdots$$
+<p>末尾的 $O(\epsilon^4)$ 是"打包"记号——把 $\epsilon^4$ 及更高次的项全部装进去，$\epsilon$ 很小时它们可以忽略。</p>
+<p><strong>移项</strong>（两边减 $f(x)$、再除以 $\epsilon$），就得到单边差分：</p>
 $$\frac{f(x+\epsilon)-f(x)}{\epsilon} = f'(x) + \underbrace{f''(x)\frac{\epsilon}{2!} + O(\epsilon^2)}_{\text{误差项：首项是 } O(\epsilon)}$$
 <p>误差的主导项是 $f''(x)\frac{\epsilon}{2!}$——和 $\epsilon$ 成正比。$\epsilon$ 缩小 10 倍，误差大约缩小 10 倍。</p>
-<p><strong>中央差分（看前后）：</strong>写出 $f(x+\epsilon)$ 和 $f(x-\epsilon)$ 两个泰勒展开：</p>
-$$
-\begin{aligned}
-f(x+\epsilon) &= f(x) + \epsilon f'(x) + f''(x)\frac{\epsilon^2}{2!} \\[4pt]
-&\quad + f'''(x)\frac{\epsilon^3}{3!} + f''''(x)\frac{\epsilon^4}{4!} + \cdots \\[4pt]
-f(x-\epsilon) &= f(x) - \epsilon f'(x) + f''(x)\frac{\epsilon^2}{2!} \\[4pt]
-&\quad - f'''(x)\frac{\epsilon^3}{3!} + f''''(x)\frac{\epsilon^4}{4!} - \cdots
-\end{aligned}
-$$
+<p>往后退一步也一样，代入 $u = x - \epsilon$，位移变成 $u - a = -\epsilon$：</p>
+$$f(x-\epsilon) = f(x) - f'(x)\epsilon + f''(x)\frac{\epsilon^2}{2!}$$
+$$- f'''(x)\frac{\epsilon^3}{3!} + \cdots$$
+<p>符号一正一负地交替，是因为 $(-\epsilon)^n = (-1)^n\epsilon^n$——<strong>奇次幂带负号、偶次幂不变</strong>。这个差别，正是下一步「相减」能把偶数阶项消掉的根源。</p>
+<p><strong>现在看中央差分（前后各看一点）。</strong>把上面两式相减：</p>
 <p><strong>相减：</strong>$f(x+\epsilon) - f(x-\epsilon)$：</p>
 <ul>
 <li>$f(x)$ 消掉（都有，相减得 0）</li>
